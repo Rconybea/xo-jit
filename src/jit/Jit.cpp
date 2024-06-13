@@ -7,6 +7,8 @@ namespace xo {
     using xo::ast::Expression;
     using xo::ast::ConstantInterface;
     using xo::ast::PrimitiveInterface;
+    using xo::ast::Lambda;
+    using xo::ast::Variable;
     using xo::ast::Apply;
     using xo::reflect::TypeDescr;
     using std::cerr;
@@ -133,6 +135,88 @@ namespace xo {
             }
         } /*codegen_apply*/
 
+        llvm::Function *
+        Jit::codegen_lambda(ref::brw<Lambda> lambda)
+        {
+            /* reminder! this is the *expression*, not the *closure* */
+
+            global_env_[lambda->name()] = lambda.get();
+
+            /* do we already know a function with this name? */
+            auto * fn = llvm_module_->getFunction(lambda->name());
+
+            if (fn) {
+                /** function with this name already defined?? **/
+                return nullptr;
+            }
+
+            /* establish prototype for this function */
+
+            // PLACEHOLDER
+            // just make prototype for function :: double -> double
+
+            std::vector<llvm::Type *> double_v(1, llvm::Type::getDoubleTy(*llvm_cx_));
+
+            auto * llvm_fn_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(*llvm_cx_),
+                                                          double_v,
+                                                          false /*!varargs*/);
+
+            /* create (initially empty) function */
+            fn = llvm::Function::Create(llvm_fn_type,
+                                        llvm::Function::ExternalLinkage,
+                                        lambda->name(),
+                                        llvm_module_.get());
+            /* also capture argument names */
+            int i = 0;
+            for (auto & arg : fn->args())
+                arg.setName(lambda->argv().at(i));
+
+            /* generate function body */
+
+            auto block = llvm::BasicBlock::Create(*llvm_cx_, "entry", fn);
+
+            llvm_ir_builder_->SetInsertPoint(block);
+
+            /* formal parameters need to appear in named_value_map_ */
+            nested_env_.clear();
+            for (auto & arg : fn->args())
+                nested_env_[std::string(arg.getName())] = &arg;
+
+            llvm::Value * retval = this->codegen(lambda->body());
+
+            if (retval) {
+                /* completes the function.. */
+                llvm_ir_builder_->CreateRet(retval);
+
+                /* validate!  always validate! */
+                llvm::verifyFunction(*fn);
+
+                /* optimize! */
+                // thefpm->run(*fn, *thefam);
+
+                return fn;
+            }
+
+            /* oops,  something went wrong */
+            fn->eraseFromParent();
+
+            return nullptr;
+        } /*codegen_lambda*/
+
+        llvm::Value *
+        Jit::codegen_variable(ref::brw<Variable> var)
+        {
+            auto ix = nested_env_.find(var->name());
+
+            if (ix == nested_env_.end()) {
+                cerr << "Jit::codegen_variable: no binding for variable x"
+                     << xtag("x", var->name())
+                     << endl;
+            }
+
+            return ix->second;
+        } /*codegen_variable*/
+
         llvm::Value *
         Jit::codegen(ref::brw<Expression> expr)
         {
@@ -143,7 +227,10 @@ namespace xo {
                 return this->codegen_primitive(PrimitiveInterface::from(expr));
             case exprtype::apply:
                 return this->codegen_apply(Apply::from(expr));
-                break;
+            case exprtype::lambda:
+                return this->codegen_lambda(Lambda::from(expr));
+            case exprtype::variable:
+                return this->codegen_variable(Variable::from(expr));
             case exprtype::invalid:
             case exprtype::n_expr:
                 return nullptr;

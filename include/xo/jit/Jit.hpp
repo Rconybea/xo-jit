@@ -12,6 +12,8 @@
 #include "xo/expression/ConstantInterface.hpp"
 #include "xo/expression/PrimitiveInterface.hpp"
 #include "xo/expression/Apply.hpp"
+#include "xo/expression/Lambda.hpp"
+#include "xo/expression/Variable.hpp"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/BasicBlock.h"
@@ -52,6 +54,8 @@ namespace xo {
             llvm::Value * codegen_constant(ref::brw<xo::ast::ConstantInterface> expr);
             llvm::Function * codegen_primitive(ref::brw<xo::ast::PrimitiveInterface> expr);
             llvm::Value * codegen_apply(ref::brw<xo::ast::Apply> expr);
+            llvm::Function * codegen_lambda(ref::brw<xo::ast::Lambda> expr);
+            llvm::Value * codegen_variable(ref::brw<xo::ast::Variable> var);
 
             llvm::Value * codegen(ref::brw<Expression> expr);
 
@@ -72,6 +76,13 @@ namespace xo {
              *  - function names are unique within a module.
              **/
             std::unique_ptr<llvm::Module> llvm_module_;
+
+            /** map global names to functions/variables **/
+            std::map<std::string, xo::ref::rp<Expression>> global_env_;
+            /** map variable names (formal parameters) to
+             *  corresponding llvm interactor
+             **/
+            std::map<std::string, llvm::Value*> nested_env_;
         };
     } /*namespace jit*/
 } /*namespace xo*/
