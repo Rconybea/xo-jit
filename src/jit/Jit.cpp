@@ -61,10 +61,46 @@ namespace xo {
             // PLACEHOLDER
             // just make prototype for function :: double -> double
 
-            std::vector<llvm::Type *> double_v(1, llvm::Type::getDoubleTy(*llvm_cx_));
+            TypeDescr fn_td = expr->value_td();
+            int n_fn_arg = fn_td->n_fn_arg();
 
-            auto * llvm_fn_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(*llvm_cx_),
-                                                          double_v,
+            std::vector<llvm::Type *> llvm_argtype_v(n_fn_arg);
+
+            /** check function args are all doubles **/
+            for (int i = 0; i < n_fn_arg; ++i) {
+                TypeDescr arg_td = fn_td->fn_arg(i);
+
+                if (arg_td->is_native<double>()) {
+                    llvm_argtype_v.push_back(llvm::Type::getDoubleTy(*llvm_cx_));
+
+                    // TODO: extend with other native types here...
+                } else {
+                    cerr << "Jit::codegen_primitive: error: primitive f with arg i of type T where double expected"
+                         << xtag("f", expr->name())
+                         << xtag("i", i)
+                         << xtag("T", arg_td->short_name())
+                         << endl;
+                    return nullptr;
+                }
+            }
+
+            //std::vector<llvm::Type *> double_v(n_fn_arg, llvm::Type::getDoubleTy(*llvm_cx_));
+
+            TypeDescr retval_td = fn_td->fn_retval();
+            llvm::Type * llvm_retval = nullptr;
+
+            if (retval_td->is_native<double>()) {
+                llvm_retval = llvm::Type::getDoubleTy(*llvm_cx_);
+            } else {
+                cerr << "Jit::codegen_primitive: error: primitive f returning T where double expected"
+                     << xtag("f", expr->name())
+                     << xtag("T", retval_td->short_name())
+                     << endl;
+                return nullptr;
+            }
+
+            auto * llvm_fn_type = llvm::FunctionType::get(llvm_retval,
+                                                          llvm_argtype_v,
                                                           false /*!varargs*/);
 
             fn = llvm::Function::Create(llvm_fn_type,
