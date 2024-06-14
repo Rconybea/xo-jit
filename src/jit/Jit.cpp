@@ -244,6 +244,15 @@ namespace xo {
             return nullptr;
         } /*codegen*/
 
+        void
+        Jit::display(std::ostream & os) const {
+            os << "<Jit>";
+        }
+
+        std::string
+        Jit::display_string() const {
+            return tostr(*this);
+        }
     } /*namespace jit*/
 } /*namespace xo*/
 

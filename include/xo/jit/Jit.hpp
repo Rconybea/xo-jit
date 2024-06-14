@@ -59,6 +59,9 @@ namespace xo {
 
             llvm::Value * codegen(ref::brw<Expression> expr);
 
+            virtual void display(std::ostream & os) const;
+            virtual std::string display_string() const;
+
         private:
             Jit();
 
@@ -83,7 +86,13 @@ namespace xo {
              *  corresponding llvm interactor
              **/
             std::map<std::string, llvm::Value*> nested_env_;
-        };
+        }; /*Jit*/
+
+        inline std::ostream &
+        operator<<(std::ostream & os, const Jit & x) {
+            x.display(os);
+            return os;
+        }
     } /*namespace jit*/
 } /*namespace xo*/
 
