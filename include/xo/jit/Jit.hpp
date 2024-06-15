@@ -98,6 +98,13 @@ namespace xo {
 
             llvm::Value * codegen(ref::brw<Expression> expr);
 
+            // ----- jit online execution -----
+
+            /** add IR code in current module to JIT,
+             *  so that its available for execution
+             **/
+            void machgen_current_module();
+
             llvm::orc::ExecutorAddr lookup_symbol(const std::string & x);
 
             virtual void display(std::ostream & os) const;
@@ -116,6 +123,9 @@ namespace xo {
             /* iniitialize native builder (i.e. for platform we're running on) */
             static void init_once();
 
+            /** (re)create pipeline to turn expressions into llvm IR code **/
+            void recreate_llvm_ir_pipeline();
+
         private:
             // ----- this part adapted from LLVM 19.0 KaleidoscopeJIT.hpp [wip] -----
 
@@ -133,6 +143,14 @@ namespace xo {
 
             // ----- this part adapted from kaleidoscope.cpp -----
 
+            /** everything bleow represents a pipeline
+             *  that takes expressions, and turns them into llvm IR.
+             *
+             *  llvm IR can be added to running JIT by calling
+             *    kal_jit_.addModule()
+             *  Note that this makes the module itself unavailable to us
+             **/
+
             /** owns + manages core "global" llvm data,
              *  including type- and constant- unique-ing tables.
              *
@@ -142,7 +160,9 @@ namespace xo {
             std::unique_ptr<llvm::LLVMContext> llvm_cx_;
             /** builder for intermediate-representation objects **/
             std::unique_ptr<llvm::IRBuilder<>> llvm_ir_builder_;
-            /** a module (aka library) being prepared by llvm.
+            /** a module (1:1 with library) being prepared by llvm.
+             *  IR-level -- does not contain machine code
+             *
              *  - function names are unique within a module.
              **/
             std::unique_ptr<llvm::Module> llvm_module_;

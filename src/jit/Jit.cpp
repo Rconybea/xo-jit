@@ -98,7 +98,7 @@ namespace xo {
                  llvm::DataLayout dl
 #endif
             )
-            : kal_jit_{std::move(kal_jit)},
+            : kal_jit_{std::move(kal_jit)}
 #ifdef NOT_USING
             jit_es_(std::move(jit_es)),
               jit_data_layout_(std::move(dl)),
@@ -114,9 +114,6 @@ namespace xo {
               jit_our_dynamic_lib_(this->jit_es_->createBareJITDylib("<xojitlib>")), /*was MainJD*/
 #endif
 
-              llvm_cx_{std::make_unique<llvm::LLVMContext>()},
-              llvm_ir_builder_{std::make_unique<llvm::IRBuilder<>>(*llvm_cx_)},
-              llvm_module_{std::make_unique<llvm::Module>("xojit", *llvm_cx_)}
         {
 #ifdef NOT_USING
             jit_our_dynamic_lib_.addGenerator
@@ -128,6 +125,16 @@ namespace xo {
                 jit_object_layer_.setAutoClaimResponsibilityForObjectSymbols(true);
             }
 #endif
+
+            this->recreate_llvm_ir_pipeline();
+        }
+
+        void
+        Jit::recreate_llvm_ir_pipeline()
+        {
+            llvm_cx_ = std::make_unique<llvm::LLVMContext>();
+            llvm_ir_builder_ = std::make_unique<llvm::IRBuilder<>>(*llvm_cx_);
+            llvm_module_ = std::make_unique<llvm::Module>("xojit", *llvm_cx_);
 
             llvm_module_->setDataLayout(kal_jit_->getDataLayout());
 
@@ -162,7 +169,7 @@ namespace xo {
             llvm_pass_builder.registerModuleAnalyses(*llvm_mamgr_);
             llvm_pass_builder.registerFunctionAnalyses(*llvm_famgr_);
             llvm_pass_builder.crossRegisterProxies(*llvm_lamgr_, *llvm_famgr_, *llvm_cgamgr_, *llvm_mamgr_);
-        }
+        } /*recreate_llvm_ir_pipeline*/
 
         const std::string &
         Jit::target_triple() const {
@@ -464,6 +471,21 @@ namespace xo {
 
             return nullptr;
         } /*codegen*/
+
+        void
+        Jit::machgen_current_module()
+        {
+            static llvm::ExitOnError llvm_exit_on_err;
+
+            auto tracker = kal_jit_->getMainJITDylib().createResourceTracker();
+
+            auto ts_module = llvm::orc::ThreadSafeModule(std::move(llvm_module_),
+                                                         std::move(llvm_cx_));
+
+            llvm_exit_on_err(kal_jit_->addModule(std::move(ts_module), tracker));
+
+            this->recreate_llvm_ir_pipeline();
+        }
 
         llvm::orc::ExecutorAddr
         Jit::lookup_symbol(const std::string & sym)
