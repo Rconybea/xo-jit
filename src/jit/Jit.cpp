@@ -130,6 +130,15 @@ namespace xo {
 
             llvm_module_->setDataLayout(kal_jit_->getDataLayout());
 
+            if (!llvm_cx_.get()) {
+                throw std::runtime_error("Jit::ctor: expected non-empty llvm context");
+            }
+            if (!llvm_ir_builder_.get()) {
+                throw std::runtime_error("Jit::ctor: expected non-empty llvm IR builder");
+            }
+            if (!llvm_module_.get()) {
+                throw std::runtime_error("Jit::ctor: expected non-empty llvm module");
+            }
         }
 
         const std::string &
