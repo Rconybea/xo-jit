@@ -73,6 +73,8 @@ namespace xo {
         public:
             /* tracking KaleidoscopeJIT::Create() here.. */
             static llvm::Expected<std::unique_ptr<Jit>> make_aux();
+            static xo::ref::rp<Jit> make();
+
 
             llvm::Value * codegen_constant(ref::brw<xo::ast::ConstantInterface> expr);
             llvm::Function * codegen_primitive(ref::brw<xo::ast::PrimitiveInterface> expr);

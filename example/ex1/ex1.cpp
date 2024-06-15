@@ -53,7 +53,8 @@ main() {
     llvm::InitializeNativeTargetAsmPrinter();
     llvm::InitializeNativeTargetAsmParser();
 
-    auto jit = llvm_exit_on_err(Jit::make_aux());
+    //auto jit = llvm_exit_on_err(Jit::make_aux());
+    auto jit = Jit::make();
 
     //static_assert(std::is_function_v<decltype(&foo)>);
 

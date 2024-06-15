@@ -66,6 +66,15 @@ namespace xo {
                                             ));
         } /*make*/
 
+        xo::ref::rp<Jit>
+        Jit::make() {
+            static llvm::ExitOnError llvm_exit_on_err;
+
+            std::unique_ptr<Jit> jit = llvm_exit_on_err(make_aux());
+
+            return jit.release();
+        } /*make*/
+
         Jit::Jit(
             std::unique_ptr<KaleidoscopeJIT> kal_jit
 #ifdef NOT_USING
