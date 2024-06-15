@@ -127,6 +127,9 @@ namespace xo {
                 jit_object_layer_.setAutoClaimResponsibilityForObjectSymbols(true);
             }
 #endif
+
+            llvm_module_->setDataLayout(kal_jit_->getDataLayout());
+
         }
 
         const std::string &
