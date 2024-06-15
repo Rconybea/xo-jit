@@ -50,6 +50,7 @@ namespace xo {
             using SelfExecutorProcessControl = llvm::orc::SelfExecutorProcessControl;
 
         private:
+            /* execution session - represents a currenlty-running jit program */
             std::unique_ptr<ExecutionSession> ES;
 
             DataLayout DL;
@@ -117,6 +118,11 @@ namespace xo {
 
             llvm::Expected<ExecutorSymbolDef> lookup(StringRef Name) {
                 return ES->lookup({&MainJD}, Mangle(Name.str()));
+            }
+
+            /* dump */
+            void dump_execution_session() {
+                ES->dump(llvm::errs());
             }
         };
 

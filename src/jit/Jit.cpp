@@ -127,6 +127,23 @@ namespace xo {
                 jit_object_layer_.setAutoClaimResponsibilityForObjectSymbols(true);
             }
 #endif
+        const std::string &
+        Jit::target_triple() const {
+            return llvm_module_->getTargetTriple();
+        }
+
+        std::vector<std::string>
+        Jit::get_function_name_v() {
+            std::vector<std::string> retval;
+            for (const auto & fn_name : *llvm_module_)
+                retval.push_back(fn_name.getName().str());
+
+            return retval;
+        } /*get_function_names*/
+
+        void
+        Jit::dump_execution_session() {
+            kal_jit_->dump_execution_session();
         }
 
         llvm::Value *

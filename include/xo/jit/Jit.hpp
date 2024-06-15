@@ -75,6 +75,17 @@ namespace xo {
             static llvm::Expected<std::unique_ptr<Jit>> make_aux();
             static xo::ref::rp<Jit> make();
 
+            // ----- module access -----
+
+            /** target triple = string describing target host for codegen **/
+            const std::string & target_triple() const;
+            /** append function names defined in attached module to *p_v **/
+            std::vector<std::string> get_function_name_v();
+
+            /** write state of execution session (all the associated dynamic libraries) **/
+            void dump_execution_session();
+
+            // ----- jit code generation -----
 
             llvm::Value * codegen_constant(ref::brw<xo::ast::ConstantInterface> expr);
             llvm::Function * codegen_primitive(ref::brw<xo::ast::PrimitiveInterface> expr);
