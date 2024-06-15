@@ -14,6 +14,27 @@
 #include "xo/expression/Apply.hpp"
 #include "xo/expression/Lambda.hpp"
 #include "xo/expression/Variable.hpp"
+
+#include "KaleidoscopeJit.hpp"
+#ifdef NOT_USING
+/* stuff from KaleidoscopeJIT.hpp */
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ExecutionEngine/JITSymbol.h"
+#include "llvm/ExecutionEngine/Orc/CompileUtils.h"
+#include "llvm/ExecutionEngine/Orc/Core.h"
+#include "llvm/ExecutionEngine/Orc/ExecutionUtils.h"
+#include "llvm/ExecutionEngine/Orc/ExecutorProcessControl.h"
+#include "llvm/ExecutionEngine/Orc/IRCompileLayer.h"
+#include "llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h"
+#include "llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h"
+#include "llvm/ExecutionEngine/Orc/Shared/ExecutorSymbolDef.h"
+#include "llvm/ExecutionEngine/SectionMemoryManager.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/LLVMContext.h"
+#include <memory>
+#endif
+
+/* stuff from kaleidoscope.cpp */
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/BasicBlock.h"
@@ -36,6 +57,7 @@
 #include "llvm/Transforms/Scalar/Reassociate.h"
 #include "llvm/Transforms/Scalar/SimplifyCFG.h"
 
+
 namespace xo {
     namespace jit {
         /** @class Jit
@@ -49,7 +71,8 @@ namespace xo {
             //using ConstantInterface = xo::ast::ConstantInterface;
 
         public:
-            static ref::rp<Jit> make() { return new Jit(); }
+            /* tracking KaleidoscopeJIT::Create() here.. */
+            static llvm::Expected<std::unique_ptr<Jit>> make_aux();
 
             llvm::Value * codegen_constant(ref::brw<xo::ast::ConstantInterface> expr);
             llvm::Function * codegen_primitive(ref::brw<xo::ast::PrimitiveInterface> expr);
@@ -63,9 +86,32 @@ namespace xo {
             virtual std::string display_string() const;
 
         private:
-            Jit();
+            Jit(
+                std::unique_ptr<KaleidoscopeJIT> kal_jit
+#ifdef NOT_USING
+                std::unique_ptr<llvm::orc::ExecutionSession> es,
+                llvm::orc::JITTargetMachineBuilder jtmb,
+                llvm::DataLayout dl
+#endif
+                );
 
         private:
+            // ----- this part adapted from LLVM 19.0 KaleidoscopeJIT.hpp [wip] -----
+
+            std::unique_ptr<KaleidoscopeJIT> kal_jit_;
+
+#ifdef NOT_USING
+            std::unique_ptr<llvm::orc::ExecutionSession> jit_es_;
+            llvm::DataLayout jit_data_layout_;
+            llvm::orc::MangleAndInterner jit_mangle_;
+            llvm::orc::RTDyldObjectLinkingLayer jit_object_layer_;
+            llvm::orc::IRCompileLayer jit_compile_layer_;
+            /** reference here.  looks like storage owned by .jit_es **/
+            llvm::orc::JITDylib & jit_our_dynamic_lib_;
+#endif
+
+            // ----- this part adapted from kaleidoscope.cpp -----
+
             /** owns + manages core "global" llvm data,
              *  including type- and constant- unique-ing tables.
              *

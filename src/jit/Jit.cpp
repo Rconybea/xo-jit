@@ -15,11 +15,96 @@ namespace xo {
     using std::endl;
 
     namespace jit {
-        Jit::Jit()
-            : llvm_cx_{std::make_unique<llvm::LLVMContext>()},
+
+        /* tracking KaleidoscopeJIT::Create() here..
+         *
+         * Verified:
+         * + 'execution session' as per Kaleidoscope JIT,
+         *   can instantiate from python
+         * + 'jit object layer'
+         *   (realtime dynamic library object linking layer)
+         * + 'jit_copmile_layer'
+         * + 'jit_our_dynamic_lib'
+         */
+        llvm::Expected<std::unique_ptr<Jit>>
+        Jit::make_aux()
+        {
+#ifdef NOT_USING
+            /* 'executor process control' */
+            auto epc = llvm::orc::SelfExecutorProcessControl::Create();
+            if (!epc) {
+                return epc.takeError();
+                //throw std::runtime_error("Jit::make: failed to establish executor process control");
+            }
+
+            /* 'execution session' */
+            auto es = std::make_unique<llvm::orc::ExecutionSession>(std::move(*epc));
+
+            /* 'jit target machine builder' */
+            llvm::orc::JITTargetMachineBuilder jtmb(es
+                                                    ->getExecutorProcessControl()
+                                                    .getTargetTriple());
+
+            auto dl = jtmb.getDefaultDataLayoutForTarget();
+            if (!dl) {
+                return dl.takeError();
+                //throw std::runtime_error("Jit::make: failed to establish data layout object"
+                //                         " for target machine");
+            }
+#endif
+
+            static llvm::ExitOnError llvm_exit_on_err;
+
+            std::unique_ptr<KaleidoscopeJIT> kal_jit = llvm_exit_on_err(KaleidoscopeJIT::Create());
+
+            return std::unique_ptr<Jit>(new Jit(std::move(kal_jit)
+#ifdef NOT_USING
+                                            std::move(es),
+                                                std::move(jtmb),
+                                                std::move(*dl)
+#endif
+                                            ));
+        } /*make*/
+
+        Jit::Jit(
+            std::unique_ptr<KaleidoscopeJIT> kal_jit
+#ifdef NOT_USING
+            std::unique_ptr<llvm::orc::ExecutionSession> jit_es,
+                 llvm::orc::JITTargetMachineBuilder jtmb,
+                 llvm::DataLayout dl
+#endif
+            )
+            : kal_jit_{std::move(kal_jit)},
+#ifdef NOT_USING
+            jit_es_(std::move(jit_es)),
+              jit_data_layout_(std::move(dl)),
+              jit_mangle_(*this->jit_es_, this->jit_data_layout_),
+              jit_object_layer_(*this->jit_es_,
+                                []() { return std::make_unique<llvm::SectionMemoryManager>(); }),
+              jit_compile_layer_(*this->jit_es_,
+                                 jit_object_layer_,
+                                 std::make_unique<llvm::orc::ConcurrentIRCompiler>(std::move(jtmb))),
+              /* note: string passed to createBareJITDyLib must be unique
+               * (within running process address space?)
+               */
+              jit_our_dynamic_lib_(this->jit_es_->createBareJITDylib("<xojitlib>")), /*was MainJD*/
+#endif
+
+              llvm_cx_{std::make_unique<llvm::LLVMContext>()},
               llvm_ir_builder_{std::make_unique<llvm::IRBuilder<>>(*llvm_cx_)},
               llvm_module_{std::make_unique<llvm::Module>("xojit", *llvm_cx_)}
-        {}
+        {
+#ifdef NOT_USING
+            jit_our_dynamic_lib_.addGenerator
+                (cantFail(llvm::orc::DynamicLibrarySearchGenerator::GetForCurrentProcess
+                          (jit_data_layout_.getGlobalPrefix())));
+
+            if(jtmb.getTargetTriple().isOSBinFormatCOFF()) {
+                jit_object_layer_.setOverrideObjectFlagsWithResponsibilityFlags(true);
+                jit_object_layer_.setAutoClaimResponsibilityForObjectSymbols(true);
+            }
+#endif
+        }
 
         llvm::Value *
         Jit::codegen_constant(ref::brw<ConstantInterface> expr)
@@ -40,9 +125,12 @@ namespace xo {
         llvm::Function *
         Jit::codegen_primitive(ref::brw<PrimitiveInterface> expr)
         {
+            constexpr bool c_debug_flag = true;
+            using xo::scope;
+
             /** note: documentation (such as it is) for llvm::Function here:
              *
-             *  https://llvm.org/doxygen/classllvm_1_1Function.html
+             *  https://llvm.org/doxygenL/classllvm_1_1Function.html
              **/
 
             auto * fn = llvm_module_->getFunction(expr->name());
@@ -64,11 +152,18 @@ namespace xo {
             TypeDescr fn_td = expr->value_td();
             int n_fn_arg = fn_td->n_fn_arg();
 
-            std::vector<llvm::Type *> llvm_argtype_v(n_fn_arg);
+            scope log(XO_DEBUG(c_debug_flag),
+                      xtag("fn_td", fn_td->short_name()),
+                      xtag("n_fn_arg", n_fn_arg));
+
+            std::vector<llvm::Type *> llvm_argtype_v;
+            llvm_argtype_v.reserve(n_fn_arg);
 
             /** check function args are all doubles **/
             for (int i = 0; i < n_fn_arg; ++i) {
                 TypeDescr arg_td = fn_td->fn_arg(i);
+
+                log && log(xtag("i_arg", i), xtag("arg_td", arg_td->short_name()));
 
                 if (arg_td->is_native<double>()) {
                     llvm_argtype_v.push_back(llvm::Type::getDoubleTy(*llvm_cx_));
@@ -87,6 +182,9 @@ namespace xo {
             //std::vector<llvm::Type *> double_v(n_fn_arg, llvm::Type::getDoubleTy(*llvm_cx_));
 
             TypeDescr retval_td = fn_td->fn_retval();
+
+            log && log(xtag("retval_td", retval_td->short_name()));
+
             llvm::Type * llvm_retval = nullptr;
 
             if (retval_td->is_native<double>()) {
@@ -108,11 +206,21 @@ namespace xo {
                                         expr->name(),
                                         llvm_module_.get());
 
-            // set names for arguments (for diagonostics?).  Money-see-kaleidoscope-monkey-do here
 #ifdef NOT_USING
-            for (auto & arg : fn->args())
-                arg.setName(formalnameofthisarg);
+            // set names for arguments (for diagnostics?).  Monkey-see-kaleidoscope-monkey-do here
+            {
+                int i_arg = 0;
+                for (auto & arg : fn->args()) {
+                    std::stringstream ss;
+                    ss << "x_" << i_arg;
+
+                    arg.setName(ss.str());
+                    ++i_arg;
+                }
+            }
 #endif
+
+            log && log("returning llvm function");
 
             return fn;
         } /*codegen_primitive*/
@@ -189,7 +297,7 @@ namespace xo {
             /* establish prototype for this function */
 
             // PLACEHOLDER
-            // just make prototype for function :: double -> double
+            // just handle double arguments + return type for now
 
             std::vector<llvm::Type *> double_v(1, llvm::Type::getDoubleTy(*llvm_cx_));
 
