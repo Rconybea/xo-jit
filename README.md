@@ -2,6 +2,11 @@
 
 A library for representing abstract syntax trees for EGAD (a small jit-based language).
 
+## Links
+
+- [new pass manager (26mar2021)](https://blog.llvm.org/posts/2021-03-26-the-new-pass-manager)
+- [life of an llvm instruction (24nov2012)](https://eli.thegreenplace.net/2012/11/24/life-of-an-instruction-in-llvm)
+
 ## Getting Started
 
 ### build + install `xo-cmake` dependency
