@@ -67,6 +67,7 @@ namespace xo {
             }
 #endif
 
+
             static llvm::ExitOnError llvm_exit_on_err;
 
             std::unique_ptr<KaleidoscopeJIT> kal_jit = llvm_exit_on_err(KaleidoscopeJIT::Create());
@@ -139,6 +140,28 @@ namespace xo {
             if (!llvm_module_.get()) {
                 throw std::runtime_error("Jit::ctor: expected non-empty llvm module");
             }
+
+            this->llvm_fpmgr_ = std::make_unique<llvm::FunctionPassManager>();
+            this->llvm_lamgr_ = std::make_unique<llvm::LoopAnalysisManager>();
+            this->llvm_famgr_ = std::make_unique<llvm::FunctionAnalysisManager>();
+            this->llvm_cgamgr_ = std::make_unique<llvm::CGSCCAnalysisManager>();
+            this->llvm_mamgr_ = std::make_unique<llvm::ModuleAnalysisManager>();
+            this->llvm_pic_ = std::make_unique<llvm::PassInstrumentationCallbacks>();
+            this->llvm_si_ = std::make_unique<llvm::StandardInstrumentations>(*llvm_cx_,
+                                                                              /*DebugLogging*/ true);
+
+            this->llvm_si_->registerCallbacks(*llvm_pic_, llvm_mamgr_.get());
+
+            // TODO: llvm_fpmgr_->addPass(InstCombinePass()) etc.
+            // TODO: llvm_fpmgr_->addPass(ReassociatePass()) etc.
+            // TODO: llvm_fpmgr_->addPass(GVNPasss()) etc.
+            // TODO: llvm_fpmgr_->addPass(SimplifyCFGPass()) etc.
+
+            /** tracking for analysis passes that share info? **/
+            llvm::PassBuilder llvm_pass_builder;
+            llvm_pass_builder.registerModuleAnalyses(*llvm_mamgr_);
+            llvm_pass_builder.registerFunctionAnalyses(*llvm_famgr_);
+            llvm_pass_builder.crossRegisterProxies(*llvm_lamgr_, *llvm_famgr_, *llvm_cgamgr_, *llvm_mamgr_);
         }
 
         const std::string &
@@ -389,8 +412,8 @@ namespace xo {
                 /* validate!  always validate! */
                 llvm::verifyFunction(*fn);
 
-                /* optimize! */
-                // thefpm->run(*fn, *thefam);
+                /* optimize!  does this generate code? */
+                llvm_fpmgr_->run(*fn, *llvm_famgr_);
 
                 return fn;
             }

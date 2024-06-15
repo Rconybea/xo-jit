@@ -79,7 +79,10 @@ namespace xo {
 
             /** target triple = string describing target host for codegen **/
             const std::string & target_triple() const;
-            /** append function names defined in attached module to *p_v **/
+            /** append function names defined in attached module to *p_v
+             *
+             *  (RC 15jun2024 - this part is working)
+             **/
             std::vector<std::string> get_function_name_v();
 
             /** write state of execution session (all the associated dynamic libraries) **/
@@ -148,8 +151,27 @@ namespace xo {
             std::map<std::string, xo::ref::rp<Expression>> global_env_;
             /** map variable names (formal parameters) to
              *  corresponding llvm interactor
+             *
+             *  only supports one level atm (i.e. only top-level functions)
              **/
             std::map<std::string, llvm::Value*> nested_env_;
+
+            // ----- transforms (also adapted from kaleidescope.cpp) ------
+
+            /** manages all the passes+analaysis (?) **/
+            std::unique_ptr<llvm::FunctionPassManager> llvm_fpmgr_;
+            /** loop analysis (?) **/
+            std::unique_ptr<llvm::LoopAnalysisManager> llvm_lamgr_;
+            /** function-level analysis (?) **/
+            std::unique_ptr<llvm::FunctionAnalysisManager> llvm_famgr_;
+            /** cgscc (?) analysis **/
+            std::unique_ptr<llvm::CGSCCAnalysisManager> llvm_cgamgr_;
+            /** module analsyis (?) **/
+            std::unique_ptr<llvm::ModuleAnalysisManager> llvm_mamgr_;
+            /** pass instrumentation **/
+            std::unique_ptr<llvm::PassInstrumentationCallbacks> llvm_pic_;
+            /** standard instrumentation **/
+            std::unique_ptr<llvm::StandardInstrumentations> llvm_si_;
         }; /*Jit*/
 
         inline std::ostream &
