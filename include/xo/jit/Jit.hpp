@@ -95,6 +95,8 @@ namespace xo {
 
             llvm::Value * codegen(ref::brw<Expression> expr);
 
+            llvm::orc::ExecutorAddr lookup_symbol(const std::string & x);
+
             virtual void display(std::ostream & os) const;
             virtual std::string display_string() const;
 

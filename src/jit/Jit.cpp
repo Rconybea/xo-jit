@@ -442,6 +442,20 @@ namespace xo {
             return nullptr;
         } /*codegen*/
 
+        llvm::orc::ExecutorAddr
+        Jit::lookup_symbol(const std::string & sym)
+        {
+            static llvm::ExitOnError llvm_exit_on_err;
+
+            /* llvm_sym: ExecutorSymbolDef */
+            auto llvm_sym = llvm_exit_on_err(kal_jit_->lookup(sym));
+
+            /* llvm_addr: ExecutorAddr */
+            auto llvm_addr = llvm_sym.getAddress();
+
+            return llvm_addr;
+        } /*lookup_symbol*/
+
         void
         Jit::display(std::ostream & os) const {
             os << "<Jit>";
