@@ -151,6 +151,10 @@ main() {
                  << xtag("expr", lambda)
                  << endl;
         }
+
+        /* is this in module? */
+        cerr << "ex1: jit execution session" << endl;
+        jit->dump_execution_session();
     }
 }
 
