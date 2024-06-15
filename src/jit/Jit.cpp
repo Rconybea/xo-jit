@@ -127,6 +127,8 @@ namespace xo {
                 jit_object_layer_.setAutoClaimResponsibilityForObjectSymbols(true);
             }
 #endif
+        }
+
         const std::string &
         Jit::target_triple() const {
             return llvm_module_->getTargetTriple();
