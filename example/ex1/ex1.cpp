@@ -8,8 +8,33 @@
 #include "xo/expression/Variable.hpp"
 #include <iostream>
 
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/PassManager.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Verifier.h"
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/StandardInstrumentations.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Transforms/InstCombine/InstCombine.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/Scalar/GVN.h"
+#include "llvm/Transforms/Scalar/Reassociate.h"
+#include "llvm/Transforms/Scalar/SimplifyCFG.h"
+
+//double foo(double x) { return x; }
+
 int
 main() {
+    using xo::scope;
     using xo::jit::Jit;
     using xo::ast::make_constant;
     using xo::ast::make_primitive;
@@ -22,10 +47,22 @@ main() {
 
     //using xo::ast::make_constant;
 
-    auto jit = Jit::make();
+    static llvm::ExitOnError llvm_exit_on_err;
+
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+    llvm::InitializeNativeTargetAsmParser();
+
+    auto jit = llvm_exit_on_err(Jit::make_aux());
+
+    //static_assert(std::is_function_v<decltype(&foo)>);
+
+    scope log(XO_DEBUG(true));
 
     {
         auto expr = make_constant(7.0);
+
+        log && log(xtag("expr", expr));
 
         auto llvm_ircode = jit->codegen(expr);
 
@@ -42,7 +79,9 @@ main() {
     }
 
     {
-        auto expr = make_primitive("sqrt", ::sqrt);
+        auto expr = make_primitive("sqrt", &sqrt);
+
+        log && log(xtag("expr", expr));
 
         auto llvm_ircode = jit->codegen(expr);
 
@@ -61,10 +100,12 @@ main() {
     {
         /* (sqrt 2) */
 
-        auto fn = make_primitive("sqrt", ::sqrt);
+        auto fn = make_primitive("sqrt", &sqrt);
         auto arg = make_constant(2.0);
 
         auto call = make_apply(fn, arg);
+
+        log && log(xtag("expr", call));
 
         auto llvm_ircode = jit->codegen(call);
 
@@ -94,6 +135,8 @@ main() {
         auto lambda = make_lambda("lm_1",
                                   {"x"},
                                   call2);
+
+        log && log(xtag("expr", lambda));
 
         auto llvm_ircode = jit->codegen(lambda);
 
