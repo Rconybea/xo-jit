@@ -97,6 +97,9 @@ namespace xo {
 #endif
                 );
 
+            /* iniitialize native builder (i.e. for platform we're running on) */
+            static void init_once();
+
         private:
             // ----- this part adapted from LLVM 19.0 KaleidoscopeJIT.hpp [wip] -----
 

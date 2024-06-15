@@ -15,6 +15,18 @@ namespace xo {
     using std::endl;
 
     namespace jit {
+        void
+        Jit::init_once() {
+            static bool s_init_once = false;
+
+            if (!s_init_once) {
+                s_init_once = true;
+
+                llvm::InitializeNativeTarget();
+                llvm::InitializeNativeTargetAsmPrinter();
+                llvm::InitializeNativeTargetAsmParser();
+            }
+        } /*init_once*/
 
         /* tracking KaleidoscopeJIT::Create() here..
          *
@@ -29,6 +41,8 @@ namespace xo {
         llvm::Expected<std::unique_ptr<Jit>>
         Jit::make_aux()
         {
+            Jit::init_once();
+
 #ifdef NOT_USING
             /* 'executor process control' */
             auto epc = llvm::orc::SelfExecutorProcessControl::Create();
