@@ -159,10 +159,11 @@ namespace xo {
 
             this->llvm_si_->registerCallbacks(*llvm_pic_, llvm_mamgr_.get());
 
-            // TODO: llvm_fpmgr_->addPass(InstCombinePass()) etc.
-            // TODO: llvm_fpmgr_->addPass(ReassociatePass()) etc.
-            // TODO: llvm_fpmgr_->addPass(GVNPasss()) etc.
-            // TODO: llvm_fpmgr_->addPass(SimplifyCFGPass()) etc.
+            /** transform passes **/
+            this->llvm_fpmgr_->addPass(llvm::InstCombinePass());
+            this->llvm_fpmgr_->addPass(llvm::ReassociatePass());
+            this->llvm_fpmgr_->addPass(llvm::GVNPass());
+            this->llvm_fpmgr_->addPass(llvm::SimplifyCFGPass());
 
             /** tracking for analysis passes that share info? **/
             llvm::PassBuilder llvm_pass_builder;
