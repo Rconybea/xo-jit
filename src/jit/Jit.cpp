@@ -73,11 +73,6 @@ namespace xo {
             std::unique_ptr<KaleidoscopeJIT> kal_jit = llvm_exit_on_err(KaleidoscopeJIT::Create());
 
             return std::unique_ptr<Jit>(new Jit(std::move(kal_jit)
-#ifdef NOT_USING
-                                            std::move(es),
-                                                std::move(jtmb),
-                                                std::move(*dl)
-#endif
                                             ));
         } /*make*/
 
@@ -93,18 +88,12 @@ namespace xo {
         Jit::Jit(
             std::unique_ptr<KaleidoscopeJIT> kal_jit
 #ifdef NOT_USING
-            std::unique_ptr<llvm::orc::ExecutionSession> jit_es,
                  llvm::orc::JITTargetMachineBuilder jtmb,
                  llvm::DataLayout dl
 #endif
             )
             : kal_jit_{std::move(kal_jit)}
 #ifdef NOT_USING
-            jit_es_(std::move(jit_es)),
-              jit_data_layout_(std::move(dl)),
-              jit_mangle_(*this->jit_es_, this->jit_data_layout_),
-              jit_object_layer_(*this->jit_es_,
-                                []() { return std::make_unique<llvm::SectionMemoryManager>(); }),
               jit_compile_layer_(*this->jit_es_,
                                  jit_object_layer_,
                                  std::make_unique<llvm::orc::ConcurrentIRCompiler>(std::move(jtmb))),
@@ -119,10 +108,6 @@ namespace xo {
             jit_our_dynamic_lib_.addGenerator
                 (cantFail(llvm::orc::DynamicLibrarySearchGenerator::GetForCurrentProcess
                           (jit_data_layout_.getGlobalPrefix())));
-
-            if(jtmb.getTargetTriple().isOSBinFormatCOFF()) {
-                jit_object_layer_.setOverrideObjectFlagsWithResponsibilityFlags(true);
-                jit_object_layer_.setAutoClaimResponsibilityForObjectSymbols(true);
             }
 #endif
 

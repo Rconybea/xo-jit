@@ -115,7 +115,6 @@ namespace xo {
             Jit(
                 std::unique_ptr<KaleidoscopeJIT> kal_jit
 #ifdef NOT_USING
-                std::unique_ptr<llvm::orc::ExecutionSession> es,
                 llvm::orc::JITTargetMachineBuilder jtmb,
                 llvm::DataLayout dl
 #endif
@@ -133,10 +132,6 @@ namespace xo {
             std::unique_ptr<KaleidoscopeJIT> kal_jit_;
 
 #ifdef NOT_USING
-            std::unique_ptr<llvm::orc::ExecutionSession> jit_es_;
-            llvm::DataLayout jit_data_layout_;
-            llvm::orc::MangleAndInterner jit_mangle_;
-            llvm::orc::RTDyldObjectLinkingLayer jit_object_layer_;
             llvm::orc::IRCompileLayer jit_compile_layer_;
             /** reference here.  looks like storage owned by .jit_es **/
             llvm::orc::JITDylib & jit_our_dynamic_lib_;

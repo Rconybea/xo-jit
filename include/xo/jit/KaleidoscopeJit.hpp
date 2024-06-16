@@ -10,8 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_EXECUTIONENGINE_ORC_KALEIDOSCOPEJIT_H
-#define LLVM_EXECUTIONENGINE_ORC_KALEIDOSCOPEJIT_H
+#pragma once
 
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ExecutionEngine/JITSymbol.h"
@@ -50,42 +49,47 @@ namespace xo {
             using SelfExecutorProcessControl = llvm::orc::SelfExecutorProcessControl;
 
         private:
-            /* execution session - represents a currenlty-running jit program */
-            std::unique_ptr<ExecutionSession> ES;
+            /** execution session - represents a currently-running jit program **/
+            std::unique_ptr<ExecutionSession> xsession_;
 
-            DataLayout DL;
-            MangleAndInterner Mangle;
+            /** (?) needed for name mangling (?) **/
+            DataLayout data_layout_;
+            /** symbol mangling and unique-ifying */
+            MangleAndInterner mangler_;
 
-            RTDyldObjectLinkingLayer ObjectLayer;
-            IRCompileLayer CompileLayer;
+            /** in-process linking layer
+             *  (? specialized for jit in running process ?)
+             **/
+            RTDyldObjectLinkingLayer object_layer_;
+            IRCompileLayer compile_layer_;
 
             JITDylib &MainJD;
 
         public:
-            KaleidoscopeJIT(std::unique_ptr<ExecutionSession> ES,
-                            JITTargetMachineBuilder JTMB,
-                            DataLayout DL)
-                : ES(std::move(ES)),
-                  DL(std::move(DL)),
-                  Mangle(*this->ES, this->DL),
-                  ObjectLayer(*this->ES,
-                              []() { return std::make_unique<SectionMemoryManager>(); }),
-                  CompileLayer(*this->ES, ObjectLayer,
-                               std::make_unique<ConcurrentIRCompiler>(std::move(JTMB))),
-                  MainJD(this->ES->createBareJITDylib("<main>"))
+            KaleidoscopeJIT(std::unique_ptr<ExecutionSession> xsession,
+                            JITTargetMachineBuilder jtmb,
+                            DataLayout data_layout_)
+                : xsession_{std::move(xsession)},
+                  data_layout_(std::move(data_layout_)),
+                  mangler_(*this->xsession_, this->data_layout_),
+                  object_layer_(*this->xsession_,
+                                []() { return std::make_unique<SectionMemoryManager>(); }),
+                  compile_layer_(*this->xsession_, object_layer_,
+                                 std::make_unique<ConcurrentIRCompiler>(std::move(jtmb))),
+                  MainJD(this->xsession_->createBareJITDylib("<main>"))
                 {
                     MainJD.addGenerator(
                         cantFail(DynamicLibrarySearchGenerator::GetForCurrentProcess(
-                                     DL.getGlobalPrefix())));
-                    if (JTMB.getTargetTriple().isOSBinFormatCOFF()) {
-                        ObjectLayer.setOverrideObjectFlagsWithResponsibilityFlags(true);
-                        ObjectLayer.setAutoClaimResponsibilityForObjectSymbols(true);
+                                     data_layout_.getGlobalPrefix())));
+                    if (jtmb.getTargetTriple().isOSBinFormatCOFF()) {
+                        object_layer_.setOverrideObjectFlagsWithResponsibilityFlags(true);
+                        object_layer_.setAutoClaimResponsibilityForObjectSymbols(true);
                     }
                 }
 
             ~KaleidoscopeJIT() {
-                if (auto Err = ES->endSession())
-                    ES->reportError(std::move(Err));
+                if (auto Err = this->xsession_->endSession())
+                    this->xsession_->reportError(std::move(Err));
             }
 
             static llvm::Expected<std::unique_ptr<KaleidoscopeJIT>> Create() {
@@ -93,40 +97,43 @@ namespace xo {
                 if (!EPC)
                     return EPC.takeError();
 
-                auto ES = std::make_unique<ExecutionSession>(std::move(*EPC));
+                auto xsession = std::make_unique<ExecutionSession>(std::move(*EPC));
 
-                JITTargetMachineBuilder JTMB(
-                    ES->getExecutorProcessControl().getTargetTriple());
+                JITTargetMachineBuilder jtmb
+                    (xsession->getExecutorProcessControl().getTargetTriple());
 
-                auto DL = JTMB.getDefaultDataLayoutForTarget();
-                if (!DL)
-                    return DL.takeError();
+                auto data_layout = jtmb.getDefaultDataLayoutForTarget();
+                if (!data_layout)
+                    return data_layout.takeError();
 
-                return std::make_unique<KaleidoscopeJIT>(std::move(ES), std::move(JTMB),
-                                                         std::move(*DL));
+                return std::make_unique<KaleidoscopeJIT>(std::move(xsession),
+                                                         std::move(jtmb),
+                                                         std::move(*data_layout));
             }
 
-            const DataLayout &getDataLayout() const { return DL; }
+            const DataLayout & getDataLayout() const { return data_layout_; }
 
             JITDylib &getMainJITDylib() { return MainJD; }
 
-            llvm::Error addModule(ThreadSafeModule TSM, ResourceTrackerSP RT = nullptr) {
+            llvm::Error
+            addModule(ThreadSafeModule ts_module,
+                      ResourceTrackerSP RT = nullptr) {
                 if (!RT)
                     RT = MainJD.getDefaultResourceTracker();
-                return CompileLayer.add(RT, std::move(TSM));
+
+                return compile_layer_.add(RT, std::move(ts_module));
             }
 
-            llvm::Expected<ExecutorSymbolDef> lookup(StringRef Name) {
-                return ES->lookup({&MainJD}, Mangle(Name.str()));
+            llvm::Expected<ExecutorSymbolDef> lookup(StringRef name) {
+                return this->xsession_->lookup({&MainJD},
+                                               this->mangler_(name.str()));
             }
 
             /* dump */
             void dump_execution_session() {
-                ES->dump(llvm::errs());
+                this->xsession_->dump(llvm::errs());
             }
         };
 
     } // end namespace jit
 } // end namespace xo
-
-#endif // LLVM_EXECUTIONENGINE_ORC_KALEIDOSCOPEJIT_H
