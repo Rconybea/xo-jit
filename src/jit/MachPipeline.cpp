@@ -413,7 +413,7 @@ namespace xo {
             /* note does not discard llvm_cx_->llvm_cx(),  it's already been moved */
             this->llvm_cx_ = nullptr;
 
-            llvm_exit_on_err(this->jit_->addModule(std::move(ts_module), tracker));
+            llvm_exit_on_err(this->jit_->add_llvm_module(std::move(ts_module), tracker));
 
             this->recreate_llvm_ir_pipeline();
         }

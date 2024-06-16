@@ -113,13 +113,17 @@ namespace xo {
 
             JITDylib & dest_dynamic_lib_ref() { return dest_dynamic_lib_; }
 
+            /** compile module to machine code that's runnable from this process;
+             *  incorporate into @ref dest_dynamic_lib_
+             **/
             llvm::Error
-            addModule(ThreadSafeModule ts_module,
-                      ResourceTrackerSP RT = nullptr) {
-                if (!RT)
-                    RT = dest_dynamic_lib_.getDefaultResourceTracker();
+            add_llvm_module(ThreadSafeModule ts_module,
+                            ResourceTrackerSP rtracker = nullptr) {
+                if (!rtracker)
+                    rtracker = dest_dynamic_lib_.getDefaultResourceTracker();
 
-                return compile_layer_.add(RT, std::move(ts_module));
+                return compile_layer_.add(rtracker,
+                                          std::move(ts_module));
             }
 
             llvm::Expected<ExecutorSymbolDef> lookup(StringRef name) {
