@@ -4,9 +4,11 @@
 
 namespace xo {
     namespace jit {
-        IrPipeline::IrPipeline(llvm::LLVMContext & llvm_cx)
+        IrPipeline::IrPipeline(ref::rp<LlvmContext> llvm_cx)
         {
             using std::make_unique;
+
+            this->llvm_cx_ = std::move(llvm_cx);
 
             this->llvm_fpmgr_ = make_unique<llvm::FunctionPassManager>();
             this->llvm_lamgr_ = std::make_unique<llvm::LoopAnalysisManager>();
@@ -14,7 +16,8 @@ namespace xo {
             this->llvm_cgamgr_ = std::make_unique<llvm::CGSCCAnalysisManager>();
             this->llvm_mamgr_ = std::make_unique<llvm::ModuleAnalysisManager>();
             this->llvm_pic_ = std::make_unique<llvm::PassInstrumentationCallbacks>();
-            this->llvm_si_ = std::make_unique<llvm::StandardInstrumentations>(llvm_cx,
+            /* reference kept alive by @ref llvm_cx_ */
+            this->llvm_si_ = std::make_unique<llvm::StandardInstrumentations>(llvm_cx_->llvm_cx_ref(),
                                                                               /*DebugLogging*/ true);
 
             this->llvm_si_->registerCallbacks(*llvm_pic_, llvm_mamgr_.get());

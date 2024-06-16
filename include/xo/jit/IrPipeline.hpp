@@ -6,6 +6,7 @@
 #pragma once
 
 #include "xo/refcnt/Refcounted.hpp"
+#include "LlvmContext.hpp"
 
 /* stuff from kaleidoscope.cpp */
 #include "llvm/ADT/APFloat.h"
@@ -46,12 +47,15 @@ namespace xo {
          **/
         class IrPipeline : public ref::Refcount {
         public:
-            explicit IrPipeline(llvm::LLVMContext & llvm_cx);
+            explicit IrPipeline(ref::rp<LlvmContext> llvm_cx);
 
             void run_pipeline(llvm::Function & fn);
 
         private:
             // ----- transforms (also adapted from kaleidescope.cpp) ------
+
+            /** keepalive for contained llvm::LLVMContext **/
+            ref::rp<LlvmContext> llvm_cx_;
 
             /** manages all the passes+analaysis (?) **/
             std::unique_ptr<llvm::FunctionPassManager> llvm_fpmgr_;

@@ -2,6 +2,7 @@
 
 set(SELF_LIB xo_jit)
 set(SELF_SRCS
+    LlvmContext.cpp
     IrPipeline.cpp
     Jit.cpp
 )

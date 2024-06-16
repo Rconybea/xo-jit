@@ -9,6 +9,7 @@
 
 #include "xo/refcnt/Refcounted.hpp"
 #include "IrPipeline.hpp"
+#include "LlvmContext.hpp"
 #include "xo/expression/Expression.hpp"
 #include "xo/expression/ConstantInterface.hpp"
 #include "xo/expression/PrimitiveInterface.hpp"
@@ -31,7 +32,6 @@
 #include "llvm/ExecutionEngine/Orc/Shared/ExecutorSymbolDef.h"
 #include "llvm/ExecutionEngine/SectionMemoryManager.h"
 #include "llvm/IR/DataLayout.h"
-#include "llvm/IR/LLVMContext.h"
 #include <memory>
 #endif
 
@@ -159,7 +159,8 @@ namespace xo {
              *  Not threadsafe,  but ok to have multiple threads,
              *  each with its own LLVMContext
              **/
-            std::unique_ptr<llvm::LLVMContext> llvm_cx_;
+            ref::rp<LlvmContext> llvm_cx_;
+            //std::unique_ptr<llvm::LLVMContext> llvm_cx_;
             /** builder for intermediate-representation objects **/
             std::unique_ptr<llvm::IRBuilder<>> llvm_ir_builder_;
             /** a module (1:1 with library) being prepared by llvm.

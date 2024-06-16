@@ -132,9 +132,10 @@ namespace xo {
         void
         Jit::recreate_llvm_ir_pipeline()
         {
-            llvm_cx_ = std::make_unique<llvm::LLVMContext>();
-            llvm_ir_builder_ = std::make_unique<llvm::IRBuilder<>>(*llvm_cx_);
-            llvm_module_ = std::make_unique<llvm::Module>("xojit", *llvm_cx_);
+            //llvm_cx_ = std::make_unique<llvm::LLVMContext>();
+            llvm_cx_ = LlvmContext::make();
+            llvm_ir_builder_ = std::make_unique<llvm::IRBuilder<>>(llvm_cx_->llvm_cx_ref());
+            llvm_module_ = std::make_unique<llvm::Module>("xojit", llvm_cx_->llvm_cx_ref());
 
             llvm_module_->setDataLayout(kal_jit_->getDataLayout());
 
@@ -148,7 +149,7 @@ namespace xo {
                 throw std::runtime_error("Jit::ctor: expected non-empty llvm module");
             }
 
-            ir_pipeline_ = new IrPipeline(*llvm_cx_);
+            ir_pipeline_ = new IrPipeline(llvm_cx_);
         } /*recreate_llvm_ir_pipeline*/
 
         const std::string &
@@ -176,10 +177,10 @@ namespace xo {
             TypeDescr td = expr->value_td();
 
             if (td->is_native<double>()) {
-                return llvm::ConstantFP::get(*llvm_cx_,
+                return llvm::ConstantFP::get(llvm_cx_->llvm_cx_ref(),
                                              llvm::APFloat(*(expr->value_tp().recover_native<double>())));
             } else if (td->is_native<float>()) {
-                return llvm::ConstantFP::get(*llvm_cx_,
+                return llvm::ConstantFP::get(llvm_cx_->llvm_cx_ref(),
                                              llvm::APFloat(*(expr->value_tp().recover_native<float>())));
             }
 
@@ -230,7 +231,7 @@ namespace xo {
                 log && log(xtag("i_arg", i), xtag("arg_td", arg_td->short_name()));
 
                 if (arg_td->is_native<double>()) {
-                    llvm_argtype_v.push_back(llvm::Type::getDoubleTy(*llvm_cx_));
+                    llvm_argtype_v.push_back(llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref()));
 
                     // TODO: extend with other native types here...
                 } else {
@@ -252,7 +253,7 @@ namespace xo {
             llvm::Type * llvm_retval = nullptr;
 
             if (retval_td->is_native<double>()) {
-                llvm_retval = llvm::Type::getDoubleTy(*llvm_cx_);
+                llvm_retval = llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref());
             } else {
                 cerr << "Jit::codegen_primitive: error: primitive f returning T where double expected"
                      << xtag("f", expr->name())
@@ -363,9 +364,9 @@ namespace xo {
             // PLACEHOLDER
             // just handle double arguments + return type for now
 
-            std::vector<llvm::Type *> double_v(1, llvm::Type::getDoubleTy(*llvm_cx_));
+            std::vector<llvm::Type *> double_v(1, llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref()));
 
-            auto * llvm_fn_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(*llvm_cx_),
+            auto * llvm_fn_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref()),
                                                           double_v,
                                                           false /*!varargs*/);
 
@@ -381,7 +382,7 @@ namespace xo {
 
             /* generate function body */
 
-            auto block = llvm::BasicBlock::Create(*llvm_cx_, "entry", fn);
+            auto block = llvm::BasicBlock::Create(llvm_cx_->llvm_cx_ref(), "entry", fn);
 
             llvm_ir_builder_->SetInsertPoint(block);
 
@@ -459,8 +460,15 @@ namespace xo {
 
             auto tracker = kal_jit_->getMainJITDylib().createResourceTracker();
 
+            /* invalidates llvm_cx_->llvm_cx_ref();  will discard and re-create
+             *
+             * Note that @ref ir_pipeline_ holds reference,  which is invalidated here
+             */
             auto ts_module = llvm::orc::ThreadSafeModule(std::move(llvm_module_),
-                                                         std::move(llvm_cx_));
+                                                         std::move(llvm_cx_->llvm_cx()));
+
+            /* note does not discard llvm_cx_->llvm_cx(),  it's already been moved */
+            this->llvm_cx_ = nullptr;
 
             llvm_exit_on_err(kal_jit_->addModule(std::move(ts_module), tracker));
 
