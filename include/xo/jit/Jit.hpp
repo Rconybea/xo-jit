@@ -1,14 +1,6 @@
-//===- KaleidoscopeJIT.h - A simple JIT for Kaleidoscope --------*- C++ -*-===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
-//===----------------------------------------------------------------------===//
-//
-// Contains a simple JIT definition for use in the kaleidoscope tutorials.
-//
-//===----------------------------------------------------------------------===//
+/** @file Jit.hpp **/
+
+/** Adapted from LLVM KaleidoscopeJIT.h **/
 
 #pragma once
 
@@ -30,7 +22,7 @@
 namespace xo {
     namespace jit {
 
-        class KaleidoscopeJIT {
+        class Jit {
         private:
             using StringRef = llvm::StringRef;
             using SectionMemoryManager = llvm::SectionMemoryManager;
@@ -61,14 +53,16 @@ namespace xo {
              *  (? specialized for jit in running process ?)
              **/
             RTDyldObjectLinkingLayer object_layer_;
+            /** compilation layer (sits above linking layer) **/
             IRCompileLayer compile_layer_;
 
-            JITDylib &MainJD;
+            /** destination library **/
+            JITDylib & dest_dynamic_lib_; //MainJD;
 
         public:
-            KaleidoscopeJIT(std::unique_ptr<ExecutionSession> xsession,
-                            JITTargetMachineBuilder jtmb,
-                            DataLayout data_layout_)
+            Jit(std::unique_ptr<ExecutionSession> xsession,
+                JITTargetMachineBuilder jtmb,
+                DataLayout data_layout_)
                 : xsession_{std::move(xsession)},
                   data_layout_(std::move(data_layout_)),
                   mangler_(*this->xsession_, this->data_layout_),
@@ -76,9 +70,9 @@ namespace xo {
                                 []() { return std::make_unique<SectionMemoryManager>(); }),
                   compile_layer_(*this->xsession_, object_layer_,
                                  std::make_unique<ConcurrentIRCompiler>(std::move(jtmb))),
-                  MainJD(this->xsession_->createBareJITDylib("<main>"))
+                  dest_dynamic_lib_(this->xsession_->createBareJITDylib("<main>"))
                 {
-                    MainJD.addGenerator(
+                    dest_dynamic_lib_.addGenerator(
                         cantFail(DynamicLibrarySearchGenerator::GetForCurrentProcess(
                                      data_layout_.getGlobalPrefix())));
                     if (jtmb.getTargetTriple().isOSBinFormatCOFF()) {
@@ -87,12 +81,12 @@ namespace xo {
                     }
                 }
 
-            ~KaleidoscopeJIT() {
+            ~Jit() {
                 if (auto Err = this->xsession_->endSession())
                     this->xsession_->reportError(std::move(Err));
             }
 
-            static llvm::Expected<std::unique_ptr<KaleidoscopeJIT>> Create() {
+            static llvm::Expected<std::unique_ptr<Jit>> Create() {
                 auto EPC = SelfExecutorProcessControl::Create();
                 if (!EPC)
                     return EPC.takeError();
@@ -106,9 +100,9 @@ namespace xo {
                 if (!data_layout)
                     return data_layout.takeError();
 
-                return std::make_unique<KaleidoscopeJIT>(std::move(xsession),
-                                                         std::move(jtmb),
-                                                         std::move(*data_layout));
+                return std::make_unique<Jit>(std::move(xsession),
+                                             std::move(jtmb),
+                                             std::move(*data_layout));
             }
 
             const std::string & target_triple() const {
@@ -117,19 +111,19 @@ namespace xo {
 
             const DataLayout & data_layout() const { return data_layout_; }
 
-            JITDylib &getMainJITDylib() { return MainJD; }
+            JITDylib &getMainJITDylib() { return dest_dynamic_lib_; }
 
             llvm::Error
             addModule(ThreadSafeModule ts_module,
                       ResourceTrackerSP RT = nullptr) {
                 if (!RT)
-                    RT = MainJD.getDefaultResourceTracker();
+                    RT = dest_dynamic_lib_.getDefaultResourceTracker();
 
                 return compile_layer_.add(RT, std::move(ts_module));
             }
 
             llvm::Expected<ExecutorSymbolDef> lookup(StringRef name) {
-                return this->xsession_->lookup({&MainJD},
+                return this->xsession_->lookup({&dest_dynamic_lib_},
                                                this->mangler_(name.str()));
             }
 
@@ -137,7 +131,9 @@ namespace xo {
             void dump_execution_session() {
                 this->xsession_->dump(llvm::errs());
             }
-        };
+        }; /*Jit*/
 
-    } // end namespace jit
-} // end namespace xo
+    } /*namespace jit&*/
+} /*namespace xo*/
+
+/** end Jit.hpp **/

@@ -10,6 +10,8 @@
 #include "xo/refcnt/Refcounted.hpp"
 #include "IrPipeline.hpp"
 #include "LlvmContext.hpp"
+#include "Jit.hpp"
+
 #include "xo/expression/Expression.hpp"
 #include "xo/expression/ConstantInterface.hpp"
 #include "xo/expression/PrimitiveInterface.hpp"
@@ -17,7 +19,6 @@
 #include "xo/expression/Lambda.hpp"
 #include "xo/expression/Variable.hpp"
 
-#include "KaleidoscopeJit.hpp"
 
 /* stuff from kaleidoscope.cpp */
 #include "llvm/ADT/APFloat.h"
@@ -96,7 +97,7 @@ namespace xo {
             virtual std::string display_string() const;
 
         private:
-            MachPipeline(std::unique_ptr<KaleidoscopeJIT> kal_jit);
+            MachPipeline(std::unique_ptr<Jit> jit);
 
             /* iniitialize native builder (i.e. for platform we're running on) */
             static void init_once();
@@ -107,7 +108,7 @@ namespace xo {
         private:
             // ----- this part adapted from LLVM 19.0 KaleidoscopeJIT.hpp [wip] -----
 
-            std::unique_ptr<KaleidoscopeJIT> kal_jit_;
+            std::unique_ptr<Jit> kal_jit_;
 
             // ----- this part adapted from kaleidoscope.cpp -----
 

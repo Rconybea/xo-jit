@@ -45,7 +45,7 @@ namespace xo {
 
             static llvm::ExitOnError llvm_exit_on_err;
 
-            std::unique_ptr<KaleidoscopeJIT> kal_jit = llvm_exit_on_err(KaleidoscopeJIT::Create());
+            std::unique_ptr<Jit> kal_jit = llvm_exit_on_err(Jit::Create());
 
             return std::unique_ptr<MachPipeline>(new MachPipeline(std::move(kal_jit)
                                             ));
@@ -60,7 +60,7 @@ namespace xo {
             return jit.release();
         } /*make*/
 
-        MachPipeline::MachPipeline(std::unique_ptr<KaleidoscopeJIT> kal_jit)
+        MachPipeline::MachPipeline(std::unique_ptr<Jit> kal_jit)
             : kal_jit_{std::move(kal_jit)}
         {
             this->recreate_llvm_ir_pipeline();
