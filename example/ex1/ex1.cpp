@@ -1,6 +1,6 @@
 /** @file ex1.cpp **/
 
-#include "xo/jit/Jit.hpp"
+#include "xo/jit/MachPipeline.hpp"
 #include "xo/expression/Constant.hpp"
 #include "xo/expression/Primitive.hpp"
 #include "xo/expression/Apply.hpp"
@@ -35,7 +35,7 @@
 int
 main() {
     using xo::scope;
-    using xo::jit::Jit;
+    using xo::jit::MachPipeline;
     using xo::ast::make_constant;
     using xo::ast::make_primitive;
     using xo::ast::make_apply;
@@ -54,7 +54,7 @@ main() {
     llvm::InitializeNativeTargetAsmParser();
 
     //auto jit = llvm_exit_on_err(Jit::make_aux());
-    auto jit = Jit::make();
+    auto jit = MachPipeline::make();
 
     //static_assert(std::is_function_v<decltype(&foo)>);
 

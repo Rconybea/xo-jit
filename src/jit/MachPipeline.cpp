@@ -1,6 +1,6 @@
-/* @file Jit.cpp */
+/* @file MachPipeline.cpp */
 
-#include "Jit.hpp"
+#include "MachPipeline.hpp"
 
 namespace xo {
     using xo::ast::exprtype;
@@ -16,7 +16,7 @@ namespace xo {
 
     namespace jit {
         void
-        Jit::init_once() {
+        MachPipeline::init_once() {
             static bool s_init_once = false;
 
             if (!s_init_once) {
@@ -38,36 +38,36 @@ namespace xo {
          * + 'jit_copmile_layer'
          * + 'jit_our_dynamic_lib'
          */
-        llvm::Expected<std::unique_ptr<Jit>>
-        Jit::make_aux()
+        llvm::Expected<std::unique_ptr<MachPipeline>>
+        MachPipeline::make_aux()
         {
-            Jit::init_once();
+            MachPipeline::init_once();
 
             static llvm::ExitOnError llvm_exit_on_err;
 
             std::unique_ptr<KaleidoscopeJIT> kal_jit = llvm_exit_on_err(KaleidoscopeJIT::Create());
 
-            return std::unique_ptr<Jit>(new Jit(std::move(kal_jit)
+            return std::unique_ptr<MachPipeline>(new MachPipeline(std::move(kal_jit)
                                             ));
         } /*make*/
 
-        xo::ref::rp<Jit>
-        Jit::make() {
+        xo::ref::rp<MachPipeline>
+        MachPipeline::make() {
             static llvm::ExitOnError llvm_exit_on_err;
 
-            std::unique_ptr<Jit> jit = llvm_exit_on_err(make_aux());
+            std::unique_ptr<MachPipeline> jit = llvm_exit_on_err(make_aux());
 
             return jit.release();
         } /*make*/
 
-        Jit::Jit(std::unique_ptr<KaleidoscopeJIT> kal_jit)
+        MachPipeline::MachPipeline(std::unique_ptr<KaleidoscopeJIT> kal_jit)
             : kal_jit_{std::move(kal_jit)}
         {
             this->recreate_llvm_ir_pipeline();
         }
 
         void
-        Jit::recreate_llvm_ir_pipeline()
+        MachPipeline::recreate_llvm_ir_pipeline()
         {
             //llvm_cx_ = std::make_unique<llvm::LLVMContext>();
             llvm_cx_ = LlvmContext::make();
@@ -77,13 +77,13 @@ namespace xo {
             llvm_module_->setDataLayout(kal_jit_->data_layout());
 
             if (!llvm_cx_.get()) {
-                throw std::runtime_error("Jit::ctor: expected non-empty llvm context");
+                throw std::runtime_error("MachPipeline::ctor: expected non-empty llvm context");
             }
             if (!llvm_ir_builder_.get()) {
-                throw std::runtime_error("Jit::ctor: expected non-empty llvm IR builder");
+                throw std::runtime_error("MachPipeline::ctor: expected non-empty llvm IR builder");
             }
             if (!llvm_module_.get()) {
-                throw std::runtime_error("Jit::ctor: expected non-empty llvm module");
+                throw std::runtime_error("MachPipeline::ctor: expected non-empty llvm module");
             }
 
             ir_pipeline_ = new IrPipeline(llvm_cx_);
@@ -93,7 +93,7 @@ namespace xo {
          *  e.g. "x86_64-unknown-linux-gnu"
          **/
         const std::string &
-        Jit::target_triple() const {
+        MachPipeline::target_triple() const {
             // although this getter is defined,  seems to be empty in practice
             //return llvm_module_->getTargetTriple();
 
@@ -101,7 +101,7 @@ namespace xo {
         }
 
         std::vector<std::string>
-        Jit::get_function_name_v() {
+        MachPipeline::get_function_name_v() {
             std::vector<std::string> retval;
             for (const auto & fn_name : *llvm_module_)
                 retval.push_back(fn_name.getName().str());
@@ -110,12 +110,12 @@ namespace xo {
         } /*get_function_names*/
 
         void
-        Jit::dump_execution_session() {
+        MachPipeline::dump_execution_session() {
             kal_jit_->dump_execution_session();
         }
 
         llvm::Value *
-        Jit::codegen_constant(ref::brw<ConstantInterface> expr)
+        MachPipeline::codegen_constant(ref::brw<ConstantInterface> expr)
         {
             TypeDescr td = expr->value_td();
 
@@ -131,7 +131,7 @@ namespace xo {
         }
 
         llvm::Function *
-        Jit::codegen_primitive(ref::brw<PrimitiveInterface> expr)
+        MachPipeline::codegen_primitive(ref::brw<PrimitiveInterface> expr)
         {
             constexpr bool c_debug_flag = true;
             using xo::scope;
@@ -178,7 +178,7 @@ namespace xo {
 
                     // TODO: extend with other native types here...
                 } else {
-                    cerr << "Jit::codegen_primitive: error: primitive f with arg i of type T where double expected"
+                    cerr << "MachPipeline::codegen_primitive: error: primitive f with arg i of type T where double expected"
                          << xtag("f", expr->name())
                          << xtag("i", i)
                          << xtag("T", arg_td->short_name())
@@ -198,7 +198,7 @@ namespace xo {
             if (retval_td->is_native<double>()) {
                 llvm_retval = llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref());
             } else {
-                cerr << "Jit::codegen_primitive: error: primitive f returning T where double expected"
+                cerr << "MachPipeline::codegen_primitive: error: primitive f returning T where double expected"
                      << xtag("f", expr->name())
                      << xtag("T", retval_td->short_name())
                      << endl;
@@ -234,7 +234,7 @@ namespace xo {
         } /*codegen_primitive*/
 
         llvm::Value *
-        Jit::codegen_apply(ref::brw<Apply> apply)
+        MachPipeline::codegen_apply(ref::brw<Apply> apply)
         {
             using std::cerr;
             using std::endl;
@@ -251,13 +251,13 @@ namespace xo {
                 auto * fn = this->codegen_primitive(pm);
 
 #ifdef NOT_USING_DEBUG
-                cerr << "Jit::codegen_apply: fn:" << endl;
+                cerr << "MachPipeline::codegen_apply: fn:" << endl;
                 fn->print(llvm::errs());
                 cerr << endl;
 #endif
 
                 if (fn->arg_size() != apply->argv().size()) {
-                    cerr << "Jit::codegen_apply: error: callee f expecting n1 args where n2 supplied"
+                    cerr << "MachPipeline::codegen_apply: error: callee f expecting n1 args where n2 supplied"
                               << xtag("f", pm->name())
                               << xtag("n1", pm->n_arg())
                               << xtag("n2", apply->argv().size())
@@ -272,7 +272,7 @@ namespace xo {
                     auto * arg = this->codegen(arg_expr);
 
 #ifdef NOT_USING_DEBUG
-                    cerr << "Jit::codegen_apply: arg:" << endl;
+                    cerr << "MachPipeline::codegen_apply: arg:" << endl;
                     arg->print(llvm::errs());
                     cerr << endl;
 #endif
@@ -282,13 +282,13 @@ namespace xo {
 
                 return llvm_ir_builder_->CreateCall(fn, args, "calltmp");
             } else {
-                cerr << "Jit::codegen_apply: error: only allowing call to known primitives at present" << endl;
+                cerr << "MachPipeline::codegen_apply: error: only allowing call to known primitives at present" << endl;
                 return nullptr;
             }
         } /*codegen_apply*/
 
         llvm::Function *
-        Jit::codegen_lambda(ref::brw<Lambda> lambda)
+        MachPipeline::codegen_lambda(ref::brw<Lambda> lambda)
         {
             /* reminder! this is the *expression*, not the *closure* */
 
@@ -356,12 +356,12 @@ namespace xo {
         } /*codegen_lambda*/
 
         llvm::Value *
-        Jit::codegen_variable(ref::brw<Variable> var)
+        MachPipeline::codegen_variable(ref::brw<Variable> var)
         {
             auto ix = nested_env_.find(var->name());
 
             if (ix == nested_env_.end()) {
-                cerr << "Jit::codegen_variable: no binding for variable x"
+                cerr << "MachPipeline::codegen_variable: no binding for variable x"
                      << xtag("x", var->name())
                      << endl;
             }
@@ -370,7 +370,7 @@ namespace xo {
         } /*codegen_variable*/
 
         llvm::Value *
-        Jit::codegen(ref::brw<Expression> expr)
+        MachPipeline::codegen(ref::brw<Expression> expr)
         {
             switch(expr->extype()) {
             case exprtype::constant:
@@ -389,7 +389,7 @@ namespace xo {
                 break;
             }
 
-            cerr << "Jit::codegen: error: no handler for expression of type T"
+            cerr << "MachPipeline::codegen: error: no handler for expression of type T"
                  << xtag("T", expr->extype())
                  << endl;
 
@@ -397,7 +397,7 @@ namespace xo {
         } /*codegen*/
 
         void
-        Jit::machgen_current_module()
+        MachPipeline::machgen_current_module()
         {
             static llvm::ExitOnError llvm_exit_on_err;
 
@@ -419,7 +419,7 @@ namespace xo {
         }
 
         llvm::orc::ExecutorAddr
-        Jit::lookup_symbol(const std::string & sym)
+        MachPipeline::lookup_symbol(const std::string & sym)
         {
             static llvm::ExitOnError llvm_exit_on_err;
 
@@ -433,15 +433,15 @@ namespace xo {
         } /*lookup_symbol*/
 
         void
-        Jit::display(std::ostream & os) const {
-            os << "<Jit>";
+        MachPipeline::display(std::ostream & os) const {
+            os << "<MachPipeline>";
         }
 
         std::string
-        Jit::display_string() const {
+        MachPipeline::display_string() const {
             return tostr(*this);
         }
     } /*namespace jit*/
 } /*namespace xo*/
 
-/* end Jit.cpp */
+/* end MachPipeline.cpp */

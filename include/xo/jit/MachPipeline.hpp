@@ -1,4 +1,4 @@
-/** @file Jit.hpp
+/** @file MachPipeline.hpp
  *
  *  Author: Roland Conybeare
  **/
@@ -45,20 +45,20 @@
 
 namespace xo {
     namespace jit {
-        /** @class Jit
+        /** @class MachPipeline
          *  @brief just-in-time compiler for EGAD
          *
          *  TODO: make module name a parameter?
         **/
-        class Jit : public ref::Refcount {
+        class MachPipeline : public ref::Refcount {
         public:
             using Expression = xo::ast::Expression;
             //using ConstantInterface = xo::ast::ConstantInterface;
 
         public:
             /* tracking KaleidoscopeJIT::Create() here.. */
-            static llvm::Expected<std::unique_ptr<Jit>> make_aux();
-            static xo::ref::rp<Jit> make();
+            static llvm::Expected<std::unique_ptr<MachPipeline>> make_aux();
+            static xo::ref::rp<MachPipeline> make();
 
             // ----- module access -----
 
@@ -96,7 +96,7 @@ namespace xo {
             virtual std::string display_string() const;
 
         private:
-            Jit(std::unique_ptr<KaleidoscopeJIT> kal_jit);
+            MachPipeline(std::unique_ptr<KaleidoscopeJIT> kal_jit);
 
             /* iniitialize native builder (i.e. for platform we're running on) */
             static void init_once();
@@ -146,10 +146,10 @@ namespace xo {
              **/
             std::map<std::string, llvm::Value*> nested_env_;
 
-        }; /*Jit*/
+        }; /*MachPipeline*/
 
         inline std::ostream &
-        operator<<(std::ostream & os, const Jit & x) {
+        operator<<(std::ostream & os, const MachPipeline & x) {
             x.display(os);
             return os;
         }
@@ -157,4 +157,4 @@ namespace xo {
 } /*namespace xo*/
 
 
-/** end Jit.hpp **/
+/** end MachPipeline.hpp **/
