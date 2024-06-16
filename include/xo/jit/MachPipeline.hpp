@@ -91,15 +91,17 @@ namespace xo {
              **/
             void machgen_current_module();
 
+            /** lookup symbol in jit-associated output library **/
             llvm::orc::ExecutorAddr lookup_symbol(const std::string & x);
 
             virtual void display(std::ostream & os) const;
             virtual std::string display_string() const;
 
         private:
-            MachPipeline(std::unique_ptr<Jit> jit);
+            /** construct instance, adopting jit for compilation+execution **/
+            explicit MachPipeline(std::unique_ptr<Jit> jit);
 
-            /* iniitialize native builder (i.e. for platform we're running on) */
+            /** iniitialize native builder (i.e. for platform we're running on) **/
             static void init_once();
 
             /** (re)create pipeline to turn expressions into llvm IR code **/

@@ -35,7 +35,7 @@ namespace xo {
          *   can instantiate from python
          * + 'jit object layer'
          *   (realtime dynamic library object linking layer)
-         * + 'jit_copmile_layer'
+         * + 'jit_compile_layer'
          * + 'jit_our_dynamic_lib'
          */
         llvm::Expected<std::unique_ptr<MachPipeline>>
