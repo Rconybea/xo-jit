@@ -401,7 +401,7 @@ namespace xo {
         {
             static llvm::ExitOnError llvm_exit_on_err;
 
-            auto tracker = kal_jit_->getMainJITDylib().createResourceTracker();
+            auto tracker = kal_jit_->dest_dynamic_lib_ref().createResourceTracker();
 
             /* invalidates llvm_cx_->llvm_cx_ref();  will discard and re-create
              *

@@ -111,7 +111,7 @@ namespace xo {
 
             const DataLayout & data_layout() const { return data_layout_; }
 
-            JITDylib &getMainJITDylib() { return dest_dynamic_lib_; }
+            JITDylib & dest_dynamic_lib_ref() { return dest_dynamic_lib_; }
 
             llvm::Error
             addModule(ThreadSafeModule ts_module,
