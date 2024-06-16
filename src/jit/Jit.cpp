@@ -89,10 +89,15 @@ namespace xo {
             ir_pipeline_ = new IrPipeline(llvm_cx_);
         } /*recreate_llvm_ir_pipeline*/
 
+        /** identifies target host/architecture for machine code.
+         *  e.g. "x86_64-unknown-linux-gnu"
+         **/
         const std::string &
         Jit::target_triple() const {
             // although this getter is defined,  seems to be empty in practice
-            return llvm_module_->getTargetTriple();
+            //return llvm_module_->getTargetTriple();
+
+            return kal_jit_->target_triple();
         }
 
         std::vector<std::string>

@@ -111,6 +111,10 @@ namespace xo {
                                                          std::move(*data_layout));
             }
 
+            const std::string & target_triple() const {
+                return xsession_->getTargetTriple().getTriple();
+            }
+
             const DataLayout & data_layout() const { return data_layout_; }
 
             JITDylib &getMainJITDylib() { return MainJD; }
