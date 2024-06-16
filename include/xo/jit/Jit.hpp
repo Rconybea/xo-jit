@@ -18,22 +18,6 @@
 #include "xo/expression/Variable.hpp"
 
 #include "KaleidoscopeJit.hpp"
-#ifdef NOT_USING
-/* stuff from KaleidoscopeJIT.hpp */
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ExecutionEngine/JITSymbol.h"
-#include "llvm/ExecutionEngine/Orc/CompileUtils.h"
-#include "llvm/ExecutionEngine/Orc/Core.h"
-#include "llvm/ExecutionEngine/Orc/ExecutionUtils.h"
-#include "llvm/ExecutionEngine/Orc/ExecutorProcessControl.h"
-#include "llvm/ExecutionEngine/Orc/IRCompileLayer.h"
-#include "llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h"
-#include "llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h"
-#include "llvm/ExecutionEngine/Orc/Shared/ExecutorSymbolDef.h"
-#include "llvm/ExecutionEngine/SectionMemoryManager.h"
-#include "llvm/IR/DataLayout.h"
-#include <memory>
-#endif
 
 /* stuff from kaleidoscope.cpp */
 #include "llvm/ADT/APFloat.h"
@@ -112,13 +96,7 @@ namespace xo {
             virtual std::string display_string() const;
 
         private:
-            Jit(
-                std::unique_ptr<KaleidoscopeJIT> kal_jit
-#ifdef NOT_USING
-                llvm::orc::JITTargetMachineBuilder jtmb,
-                llvm::DataLayout dl
-#endif
-                );
+            Jit(std::unique_ptr<KaleidoscopeJIT> kal_jit);
 
             /* iniitialize native builder (i.e. for platform we're running on) */
             static void init_once();
@@ -130,12 +108,6 @@ namespace xo {
             // ----- this part adapted from LLVM 19.0 KaleidoscopeJIT.hpp [wip] -----
 
             std::unique_ptr<KaleidoscopeJIT> kal_jit_;
-
-#ifdef NOT_USING
-            llvm::orc::IRCompileLayer jit_compile_layer_;
-            /** reference here.  looks like storage owned by .jit_es **/
-            llvm::orc::JITDylib & jit_our_dynamic_lib_;
-#endif
 
             // ----- this part adapted from kaleidoscope.cpp -----
 

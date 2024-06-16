@@ -111,7 +111,7 @@ namespace xo {
                                                          std::move(*data_layout));
             }
 
-            const DataLayout & getDataLayout() const { return data_layout_; }
+            const DataLayout & data_layout() const { return data_layout_; }
 
             JITDylib &getMainJITDylib() { return MainJD; }
 

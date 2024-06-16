@@ -43,31 +43,6 @@ namespace xo {
         {
             Jit::init_once();
 
-#ifdef NOT_USING
-            /* 'executor process control' */
-            auto epc = llvm::orc::SelfExecutorProcessControl::Create();
-            if (!epc) {
-                return epc.takeError();
-                //throw std::runtime_error("Jit::make: failed to establish executor process control");
-            }
-
-            /* 'execution session' */
-            auto es = std::make_unique<llvm::orc::ExecutionSession>(std::move(*epc));
-
-            /* 'jit target machine builder' */
-            llvm::orc::JITTargetMachineBuilder jtmb(es
-                                                    ->getExecutorProcessControl()
-                                                    .getTargetTriple());
-
-            auto dl = jtmb.getDefaultDataLayoutForTarget();
-            if (!dl) {
-                return dl.takeError();
-                //throw std::runtime_error("Jit::make: failed to establish data layout object"
-                //                         " for target machine");
-            }
-#endif
-
-
             static llvm::ExitOnError llvm_exit_on_err;
 
             std::unique_ptr<KaleidoscopeJIT> kal_jit = llvm_exit_on_err(KaleidoscopeJIT::Create());
@@ -85,32 +60,9 @@ namespace xo {
             return jit.release();
         } /*make*/
 
-        Jit::Jit(
-            std::unique_ptr<KaleidoscopeJIT> kal_jit
-#ifdef NOT_USING
-                 llvm::orc::JITTargetMachineBuilder jtmb,
-                 llvm::DataLayout dl
-#endif
-            )
+        Jit::Jit(std::unique_ptr<KaleidoscopeJIT> kal_jit)
             : kal_jit_{std::move(kal_jit)}
-#ifdef NOT_USING
-              jit_compile_layer_(*this->jit_es_,
-                                 jit_object_layer_,
-                                 std::make_unique<llvm::orc::ConcurrentIRCompiler>(std::move(jtmb))),
-              /* note: string passed to createBareJITDyLib must be unique
-               * (within running process address space?)
-               */
-              jit_our_dynamic_lib_(this->jit_es_->createBareJITDylib("<xojitlib>")), /*was MainJD*/
-#endif
-
         {
-#ifdef NOT_USING
-            jit_our_dynamic_lib_.addGenerator
-                (cantFail(llvm::orc::DynamicLibrarySearchGenerator::GetForCurrentProcess
-                          (jit_data_layout_.getGlobalPrefix())));
-            }
-#endif
-
             this->recreate_llvm_ir_pipeline();
         }
 
@@ -120,9 +72,9 @@ namespace xo {
             //llvm_cx_ = std::make_unique<llvm::LLVMContext>();
             llvm_cx_ = LlvmContext::make();
             llvm_ir_builder_ = std::make_unique<llvm::IRBuilder<>>(llvm_cx_->llvm_cx_ref());
-            llvm_module_ = std::make_unique<llvm::Module>("xojit", llvm_cx_->llvm_cx_ref());
 
-            llvm_module_->setDataLayout(kal_jit_->getDataLayout());
+            llvm_module_ = std::make_unique<llvm::Module>("xojit", llvm_cx_->llvm_cx_ref());
+            llvm_module_->setDataLayout(kal_jit_->data_layout());
 
             if (!llvm_cx_.get()) {
                 throw std::runtime_error("Jit::ctor: expected non-empty llvm context");
@@ -139,6 +91,7 @@ namespace xo {
 
         const std::string &
         Jit::target_triple() const {
+            // although this getter is defined,  seems to be empty in practice
             return llvm_module_->getTargetTriple();
         }
 
