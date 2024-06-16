@@ -148,28 +148,7 @@ namespace xo {
                 throw std::runtime_error("Jit::ctor: expected non-empty llvm module");
             }
 
-            this->llvm_fpmgr_ = std::make_unique<llvm::FunctionPassManager>();
-            this->llvm_lamgr_ = std::make_unique<llvm::LoopAnalysisManager>();
-            this->llvm_famgr_ = std::make_unique<llvm::FunctionAnalysisManager>();
-            this->llvm_cgamgr_ = std::make_unique<llvm::CGSCCAnalysisManager>();
-            this->llvm_mamgr_ = std::make_unique<llvm::ModuleAnalysisManager>();
-            this->llvm_pic_ = std::make_unique<llvm::PassInstrumentationCallbacks>();
-            this->llvm_si_ = std::make_unique<llvm::StandardInstrumentations>(*llvm_cx_,
-                                                                              /*DebugLogging*/ true);
-
-            this->llvm_si_->registerCallbacks(*llvm_pic_, llvm_mamgr_.get());
-
-            /** transform passes **/
-            this->llvm_fpmgr_->addPass(llvm::InstCombinePass());
-            this->llvm_fpmgr_->addPass(llvm::ReassociatePass());
-            this->llvm_fpmgr_->addPass(llvm::GVNPass());
-            this->llvm_fpmgr_->addPass(llvm::SimplifyCFGPass());
-
-            /** tracking for analysis passes that share info? **/
-            llvm::PassBuilder llvm_pass_builder;
-            llvm_pass_builder.registerModuleAnalyses(*llvm_mamgr_);
-            llvm_pass_builder.registerFunctionAnalyses(*llvm_famgr_);
-            llvm_pass_builder.crossRegisterProxies(*llvm_lamgr_, *llvm_famgr_, *llvm_cgamgr_, *llvm_mamgr_);
+            ir_pipeline_ = new IrPipeline(*llvm_cx_);
         } /*recreate_llvm_ir_pipeline*/
 
         const std::string &
@@ -420,8 +399,8 @@ namespace xo {
                 /* validate!  always validate! */
                 llvm::verifyFunction(*fn);
 
-                /* optimize!  does this generate code? */
-                llvm_fpmgr_->run(*fn, *llvm_famgr_);
+                /* optimize!  improves IR */
+                ir_pipeline_->run_pipeline(*fn); // llvm_fpmgr_->run(*fn, *llvm_famgr_);
 
                 return fn;
             }

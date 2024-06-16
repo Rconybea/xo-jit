@@ -8,6 +8,7 @@
 //#include <cstdint>
 
 #include "xo/refcnt/Refcounted.hpp"
+#include "IrPipeline.hpp"
 #include "xo/expression/Expression.hpp"
 #include "xo/expression/ConstantInterface.hpp"
 #include "xo/expression/PrimitiveInterface.hpp"
@@ -150,6 +151,7 @@ namespace xo {
              *    kal_jit_.addModule()
              *  Note that this makes the module itself unavailable to us
              **/
+            xo::ref::rp<IrPipeline> ir_pipeline_;
 
             /** owns + manages core "global" llvm data,
              *  including type- and constant- unique-ing tables.
@@ -176,22 +178,6 @@ namespace xo {
              **/
             std::map<std::string, llvm::Value*> nested_env_;
 
-            // ----- transforms (also adapted from kaleidescope.cpp) ------
-
-            /** manages all the passes+analaysis (?) **/
-            std::unique_ptr<llvm::FunctionPassManager> llvm_fpmgr_;
-            /** loop analysis (?) **/
-            std::unique_ptr<llvm::LoopAnalysisManager> llvm_lamgr_;
-            /** function-level analysis (?) **/
-            std::unique_ptr<llvm::FunctionAnalysisManager> llvm_famgr_;
-            /** cgscc (?) analysis **/
-            std::unique_ptr<llvm::CGSCCAnalysisManager> llvm_cgamgr_;
-            /** module analsyis (?) **/
-            std::unique_ptr<llvm::ModuleAnalysisManager> llvm_mamgr_;
-            /** pass instrumentation **/
-            std::unique_ptr<llvm::PassInstrumentationCallbacks> llvm_pic_;
-            /** standard instrumentation **/
-            std::unique_ptr<llvm::StandardInstrumentations> llvm_si_;
         }; /*Jit*/
 
         inline std::ostream &
