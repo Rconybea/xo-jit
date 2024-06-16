@@ -131,10 +131,9 @@ namespace xo {
              *  each with its own LLVMContext
              **/
             ref::rp<LlvmContext> llvm_cx_;
-            //std::unique_ptr<llvm::LLVMContext> llvm_cx_;
             /** builder for intermediate-representation objects **/
             std::unique_ptr<llvm::IRBuilder<>> llvm_ir_builder_;
-            /** a module (1:1 with library) being prepared by llvm.
+            /** a module (1:1 with library ?) being prepared by llvm.
              *  IR-level -- does not contain machine code
              *
              *  - function names are unique within a module.
@@ -144,7 +143,7 @@ namespace xo {
             /** map global names to functions/variables **/
             std::map<std::string, xo::ref::rp<Expression>> global_env_;
             /** map variable names (formal parameters) to
-             *  corresponding llvm interactor
+             *  corresponding llvm IR.
              *
              *  only supports one level atm (i.e. only top-level functions)
              **/

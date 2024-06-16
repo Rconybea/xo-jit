@@ -45,9 +45,9 @@ namespace xo {
 
             static llvm::ExitOnError llvm_exit_on_err;
 
-            std::unique_ptr<Jit> kal_jit = llvm_exit_on_err(Jit::Create());
+            std::unique_ptr<Jit> jit = llvm_exit_on_err(Jit::Create());
 
-            return std::unique_ptr<MachPipeline>(new MachPipeline(std::move(kal_jit)
+            return std::unique_ptr<MachPipeline>(new MachPipeline(std::move(jit)
                                             ));
         } /*make*/
 
