@@ -108,7 +108,10 @@ namespace xo {
         private:
             // ----- this part adapted from LLVM 19.0 KaleidoscopeJIT.hpp [wip] -----
 
-            std::unique_ptr<Jit> kal_jit_;
+            /** just-in-time compiler -- construct machine code that can
+             *  be invoked from this running process
+             **/
+            std::unique_ptr<Jit> jit_;
 
             // ----- this part adapted from kaleidoscope.cpp -----
 
@@ -116,7 +119,7 @@ namespace xo {
              *  that takes expressions, and turns them into llvm IR.
              *
              *  llvm IR can be added to running JIT by calling
-             *    kal_jit_.addModule()
+             *    jit_->addModule()
              *  Note that this makes the module itself unavailable to us
              **/
             xo::ref::rp<IrPipeline> ir_pipeline_;

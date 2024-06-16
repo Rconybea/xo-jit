@@ -60,8 +60,8 @@ namespace xo {
             return jit.release();
         } /*make*/
 
-        MachPipeline::MachPipeline(std::unique_ptr<Jit> kal_jit)
-            : kal_jit_{std::move(kal_jit)}
+        MachPipeline::MachPipeline(std::unique_ptr<Jit> jit)
+            : jit_{std::move(jit)}
         {
             this->recreate_llvm_ir_pipeline();
         }
@@ -74,7 +74,7 @@ namespace xo {
             llvm_ir_builder_ = std::make_unique<llvm::IRBuilder<>>(llvm_cx_->llvm_cx_ref());
 
             llvm_module_ = std::make_unique<llvm::Module>("xojit", llvm_cx_->llvm_cx_ref());
-            llvm_module_->setDataLayout(kal_jit_->data_layout());
+            llvm_module_->setDataLayout(this->jit_->data_layout());
 
             if (!llvm_cx_.get()) {
                 throw std::runtime_error("MachPipeline::ctor: expected non-empty llvm context");
@@ -97,7 +97,7 @@ namespace xo {
             // although this getter is defined,  seems to be empty in practice
             //return llvm_module_->getTargetTriple();
 
-            return kal_jit_->target_triple();
+            return this->jit_->target_triple();
         }
 
         std::vector<std::string>
@@ -111,7 +111,7 @@ namespace xo {
 
         void
         MachPipeline::dump_execution_session() {
-            kal_jit_->dump_execution_session();
+            this->jit_->dump_execution_session();
         }
 
         llvm::Value *
@@ -401,7 +401,7 @@ namespace xo {
         {
             static llvm::ExitOnError llvm_exit_on_err;
 
-            auto tracker = kal_jit_->dest_dynamic_lib_ref().createResourceTracker();
+            auto tracker = this->jit_->dest_dynamic_lib_ref().createResourceTracker();
 
             /* invalidates llvm_cx_->llvm_cx_ref();  will discard and re-create
              *
@@ -413,7 +413,7 @@ namespace xo {
             /* note does not discard llvm_cx_->llvm_cx(),  it's already been moved */
             this->llvm_cx_ = nullptr;
 
-            llvm_exit_on_err(kal_jit_->addModule(std::move(ts_module), tracker));
+            llvm_exit_on_err(this->jit_->addModule(std::move(ts_module), tracker));
 
             this->recreate_llvm_ir_pipeline();
         }
@@ -424,7 +424,7 @@ namespace xo {
             static llvm::ExitOnError llvm_exit_on_err;
 
             /* llvm_sym: ExecutorSymbolDef */
-            auto llvm_sym = llvm_exit_on_err(kal_jit_->lookup(sym));
+            auto llvm_sym = llvm_exit_on_err(this->jit_->lookup(sym));
 
             /* llvm_addr: ExecutorAddr */
             auto llvm_addr = llvm_sym.getAddress();
