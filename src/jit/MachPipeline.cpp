@@ -366,6 +366,7 @@ namespace xo {
                 cerr << "MachPipeline::codegen_variable: no binding for variable x"
                      << xtag("x", var->name())
                      << endl;
+                return nullptr;
             }
 
             return ix->second;
