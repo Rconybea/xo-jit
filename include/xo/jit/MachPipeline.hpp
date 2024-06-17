@@ -18,7 +18,7 @@
 #include "xo/expression/Apply.hpp"
 #include "xo/expression/Lambda.hpp"
 #include "xo/expression/Variable.hpp"
-
+#include "xo/expression/IfExpr.hpp"
 
 /* stuff from kaleidoscope.cpp */
 #include "llvm/ADT/APFloat.h"
@@ -81,6 +81,7 @@ namespace xo {
             llvm::Value * codegen_apply(ref::brw<xo::ast::Apply> expr);
             llvm::Function * codegen_lambda(ref::brw<xo::ast::Lambda> expr);
             llvm::Value * codegen_variable(ref::brw<xo::ast::Variable> var);
+            llvm::Value * codegen_ifexpr(ref::brw<xo::ast::IfExpr> ifexpr);
 
             llvm::Value * codegen(ref::brw<Expression> expr);
 
@@ -117,7 +118,7 @@ namespace xo {
 
             // ----- this part adapted from kaleidoscope.cpp -----
 
-            /** everything bleow represents a pipeline
+            /** everything below represents a pipeline
              *  that takes expressions, and turns them into llvm IR.
              *
              *  llvm IR can be added to running JIT by calling

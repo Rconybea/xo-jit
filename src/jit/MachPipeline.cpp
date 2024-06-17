@@ -10,6 +10,7 @@ namespace xo {
     using xo::ast::Lambda;
     using xo::ast::Variable;
     using xo::ast::Apply;
+    using xo::ast::IfExpr;
     using xo::reflect::TypeDescr;
     using std::cerr;
     using std::endl;
@@ -371,6 +372,85 @@ namespace xo {
         } /*codegen_variable*/
 
         llvm::Value *
+        MachPipeline::codegen_ifexpr(ref::brw<IfExpr> expr)
+        {
+            llvm::Value * test_ir = this->codegen(expr->test());
+
+            /** need test result in a variable
+             **/
+            llvm::Value * test_with_cmp_ir
+                = llvm_ir_builder_->CreateFCmpONE(test_ir,
+                                                  llvm::ConstantFP::get(llvm_cx_->llvm_cx_ref(),
+                                                                        llvm::APFloat(0.0)),
+                                                  "iftest");
+
+            llvm::Function * parent_fn = llvm_ir_builder_->GetInsertBlock()->getParent();
+
+            /* when_true_bb, when_false_bb, merge_bb:
+             * initially-empty basic-blocks for {when_true, when_false, merged} codegen
+             */
+
+            /* when_true branch inserted at (current) end of function */
+            llvm::BasicBlock * when_true_bb
+                = llvm::BasicBlock::Create(llvm_cx_->llvm_cx_ref(),
+                                           "when_true",
+                                           parent_fn);
+            llvm::BasicBlock * when_false_bb
+                = llvm::BasicBlock::Create(llvm_cx_->llvm_cx_ref(),
+                                           "when_false");
+
+            llvm::BasicBlock * merge_bb
+                = llvm::BasicBlock::Create(llvm_cx_->llvm_cx_ref(),
+                                           "merge");
+
+            /* IR to direct control flow to one of {when_true_bb, when_false_bb},
+             * depending on result of test_with_cmp_ir
+             */
+            llvm_ir_builder_->CreateCondBr(test_with_cmp_ir,
+                                           when_true_bb,
+                                           when_false_bb);
+
+            /* populate when_true_bb */
+            llvm_ir_builder_->SetInsertPoint(when_true_bb);
+
+            llvm::Value * when_true_ir = this->codegen(expr->when_true());
+
+            if (!when_true_ir)
+                return nullptr;
+
+            /* at end of when-true sequence, jump to merge suffix */
+            llvm_ir_builder_->CreateBr(merge_bb);
+            /* note: codegen for expr->when_true() may have altered builder's "current block" */
+            when_true_bb = llvm_ir_builder_->GetInsertBlock();
+
+            /* populate when_false_bb */
+            parent_fn->insert(parent_fn->end(), when_false_bb);
+            llvm_ir_builder_->SetInsertPoint(when_false_bb);
+
+            llvm::Value * when_false_ir = this->codegen(expr->when_false());
+            if (!when_false_ir)
+                return nullptr;
+
+            /* at end of when-false sequence, jump to merge suffix */
+            llvm_ir_builder_->CreateBr(merge_bb);
+            /* note: codegen for expr->when_false() may have altered builder's "current block" */
+            when_false_bb = llvm_ir_builder_->GetInsertBlock();
+
+            /* merged suffix sequence */
+            parent_fn->insert(parent_fn->end(), merge_bb);
+            llvm_ir_builder_->SetInsertPoint(merge_bb);
+
+            llvm::PHINode * phi_node
+                = llvm_ir_builder_->CreatePHI(llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref()),
+                                              2 /*#of branches being merged (?)*/,
+                                              "iftmp");
+            phi_node->addIncoming(when_true_ir, when_true_bb);
+            phi_node->addIncoming(when_false_ir, when_false_bb);
+
+            return phi_node;
+        }
+
+        llvm::Value *
         MachPipeline::codegen(ref::brw<Expression> expr)
         {
             switch(expr->extype()) {
@@ -384,6 +464,8 @@ namespace xo {
                 return this->codegen_lambda(Lambda::from(expr));
             case exprtype::variable:
                 return this->codegen_variable(Variable::from(expr));
+            case exprtype::if_expr:
+                return this->codegen_ifexpr(IfExpr::from(expr));
             case exprtype::invalid:
             case exprtype::n_expr:
                 return nullptr;
