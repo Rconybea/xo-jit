@@ -104,7 +104,7 @@ main() {
         auto fn = make_primitive("sqrt", &sqrt);
         auto arg = make_constant(2.0);
 
-        auto call = make_apply(fn, arg);
+        auto call = make_apply(fn, {arg});
 
         log && log(xtag("expr", call));
 
@@ -129,8 +129,8 @@ main() {
         auto cos = make_primitive("cos", ::cos);
 
         auto x_var = make_var("x");
-        auto call1 = make_apply(cos, x_var); /* (cos x) */
-        auto call2 = make_apply(sin, call1); /* (sin (cos x)) */
+        auto call1 = make_apply(cos, {x_var}); /* (cos x) */
+        auto call2 = make_apply(sin, {call1}); /* (sin (cos x)) */
 
         /* (define (lm_1 x) (sin (cos x))) */
         auto lambda = make_lambda("lm_1",

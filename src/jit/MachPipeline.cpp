@@ -464,7 +464,7 @@ namespace xo {
                 return this->codegen_lambda(Lambda::from(expr));
             case exprtype::variable:
                 return this->codegen_variable(Variable::from(expr));
-            case exprtype::if_expr:
+            case exprtype::ifexpr:
                 return this->codegen_ifexpr(IfExpr::from(expr));
             case exprtype::invalid:
             case exprtype::n_expr:
