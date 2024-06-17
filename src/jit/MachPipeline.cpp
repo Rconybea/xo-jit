@@ -155,7 +155,7 @@ namespace xo {
             /** establish prototype for this function **/
 
             // PLACEHOLDER
-            // just make prototype for function :: double -> double
+            // just make prototype for function :: double^n -> double
 
             TypeDescr fn_td = expr->value_td();
             int n_fn_arg = fn_td->n_fn_arg();
@@ -307,7 +307,8 @@ namespace xo {
             // PLACEHOLDER
             // just handle double arguments + return type for now
 
-            std::vector<llvm::Type *> double_v(1, llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref()));
+            std::vector<llvm::Type *> double_v(lambda->n_arg(),
+                                               llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref()));
 
             auto * llvm_fn_type = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref()),
                                                           double_v,
