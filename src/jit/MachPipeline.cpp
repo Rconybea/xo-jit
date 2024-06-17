@@ -291,6 +291,12 @@ namespace xo {
         llvm::Function *
         MachPipeline::codegen_lambda(ref::brw<Lambda> lambda)
         {
+            constexpr bool c_debug_flag = true;
+            using xo::scope;
+
+            scope log(XO_DEBUG(c_debug_flag),
+                      xtag("lambda-name", lambda->name()));
+
             /* reminder! this is the *expression*, not the *closure* */
 
             global_env_[lambda->name()] = lambda.get();
@@ -300,6 +306,10 @@ namespace xo {
 
             if (fn) {
                 /** function with this name already defined?? **/
+                cerr << "MachPipeline::codegen_lambda: function f already defined"
+                     << xtag("f", lambda->name())
+                     << endl;
+
                 return nullptr;
             }
 
@@ -321,9 +331,15 @@ namespace xo {
                                         lambda->name(),
                                         llvm_module_.get());
             /* also capture argument names */
-            int i = 0;
-            for (auto & arg : fn->args())
-                arg.setName(lambda->argv().at(i));
+            {
+                int i = 0;
+                for (auto & arg : fn->args()) {
+                    log && log("llvm format param names", xtag("i", i), xtag("param", lambda->argv().at(i)));
+
+                    arg.setName(lambda->argv().at(i));
+                    ++i;
+                }
+            }
 
             /* generate function body */
 
@@ -333,8 +349,15 @@ namespace xo {
 
             /* formal parameters need to appear in named_value_map_ */
             nested_env_.clear();
-            for (auto & arg : fn->args())
-                nested_env_[std::string(arg.getName())] = &arg;
+            {
+                int i = 0;
+                for (auto & arg : fn->args()) {
+                    log && log("nested environment", xtag("i", i), xtag("param", std::string(arg.getName())));
+
+                    nested_env_[std::string(arg.getName())] = &arg;
+                    ++i;
+                }
+            }
 
             llvm::Value * retval = this->codegen(lambda->body());
 
