@@ -504,6 +504,14 @@ namespace xo {
         } /*codegen*/
 
         void
+        MachPipeline::dump_current_module()
+        {
+            /* dump module contents to console */
+
+            llvm_module_->dump();
+        }
+
+        void
         MachPipeline::machgen_current_module()
         {
             static llvm::ExitOnError llvm_exit_on_err;

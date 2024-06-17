@@ -92,6 +92,9 @@ namespace xo {
              **/
             void machgen_current_module();
 
+            /** dump text description of module contents to console **/
+            void dump_current_module();
+
             /** lookup symbol in jit-associated output library **/
             llvm::orc::ExecutorAddr lookup_symbol(const std::string & x);
 
