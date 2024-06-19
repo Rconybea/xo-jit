@@ -614,8 +614,6 @@ namespace xo {
         llvm::Expected<llvm::orc::ExecutorAddr>
         MachPipeline::lookup_symbol(const std::string & sym)
         {
-            static llvm::ExitOnError llvm_exit_on_err;
-
             /* llvm_sym: ExecutorSymbolDef */
             auto llvm_sym_expected = this->jit_->lookup(sym);
 
