@@ -95,6 +95,9 @@ namespace xo {
             /** dump text description of module contents to console **/
             void dump_current_module();
 
+            /** report mangle symbol **/
+            std::string mangle(const std::string & x) const;
+
             /** lookup symbol in jit-associated output library **/
             llvm::Expected<llvm::orc::ExecutorAddr> lookup_symbol(const std::string & x);
 

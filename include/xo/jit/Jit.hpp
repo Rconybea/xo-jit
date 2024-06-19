@@ -126,9 +126,14 @@ namespace xo {
                                           std::move(ts_module));
             }
 
+            /** report mangled symbol name **/
+            auto mangle(StringRef name) {
+                return this->mangler_(name.str());
+            }
+
             llvm::Expected<ExecutorSymbolDef> lookup(StringRef name) {
                 return this->xsession_->lookup({&dest_dynamic_lib_},
-                                               this->mangler_(name.str()));
+                                               this->mangle(name));
             }
 
             /* dump */
