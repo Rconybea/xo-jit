@@ -81,7 +81,8 @@ main() {
     }
 
     {
-        auto expr = make_primitive("sqrt", &sqrt);
+        auto expr = make_primitive("sqrt", &sqrt,
+                                   false /*!explicit_symbol_def*/);
 
         log && log(xtag("expr", expr));
 
@@ -102,7 +103,8 @@ main() {
     {
         /* (sqrt 2) */
 
-        auto fn = make_primitive("sqrt", &sqrt);
+        auto fn = make_primitive("sqrt", &sqrt,
+                                 false /*!explicit_symbol_def*/);
         auto arg = make_constant(2.0);
 
         auto call = make_apply(fn, {arg});
@@ -126,8 +128,10 @@ main() {
     {
         /* (lambda (x) (sin (cos x))) */
 
-        auto sin = make_primitive("sin", ::sin);
-        auto cos = make_primitive("cos", ::cos);
+        auto sin = make_primitive("sin", ::sin,
+                                  false /*!explicit_symbol_def*/);
+        auto cos = make_primitive("cos", ::cos,
+                                  false /*!explicit_symbol_def*/);
 
         auto x_var = make_var("x", Reflect::require<double>());
         auto call1 = make_apply(cos, {x_var}); /* (cos x) */
