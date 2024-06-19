@@ -598,6 +598,18 @@ namespace xo {
 
             this->recreate_llvm_ir_pipeline();
         }
+        std::string
+        MachPipeline::mangle(const std::string & sym) const
+        {
+            auto p = this->jit_->mangle(sym);
+
+            if (p)
+                return (*p).str();
+
+            throw std::runtime_error(tostr("MachPipeline::mangle"
+                                           ": mangle(sym) returned empty pointer",
+                                           xtag("sym", sym)));
+        } /*mangle*/
 
         llvm::Expected<llvm::orc::ExecutorAddr>
         MachPipeline::lookup_symbol(const std::string & sym)
