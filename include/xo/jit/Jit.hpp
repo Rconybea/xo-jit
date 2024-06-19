@@ -72,9 +72,10 @@ namespace xo {
                                  std::make_unique<ConcurrentIRCompiler>(std::move(jtmb))),
                   dest_dynamic_lib_(this->xsession_->createBareJITDylib("<main>"))
                 {
-                    dest_dynamic_lib_.addGenerator(
-                        cantFail(DynamicLibrarySearchGenerator::GetForCurrentProcess(
-                                     data_layout_.getGlobalPrefix())));
+                    dest_dynamic_lib_.addGenerator
+                        (cantFail(DynamicLibrarySearchGenerator::GetForCurrentProcess
+                                  (data_layout_.getGlobalPrefix())));
+
                     if (jtmb.getTargetTriple().isOSBinFormatCOFF()) {
                         object_layer_.setOverrideObjectFlagsWithResponsibilityFlags(true);
                         object_layer_.setAutoClaimResponsibilityForObjectSymbols(true);
