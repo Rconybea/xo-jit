@@ -5,6 +5,7 @@ set(SELF_SRCS
     LlvmContext.cpp
     IrPipeline.cpp
     MachPipeline.cpp
+    intrinsics.cpp
 )
 
 xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 ${SELF_SRCS})
