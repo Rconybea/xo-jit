@@ -41,6 +41,7 @@ main() {
     using xo::ast::make_apply;
     using xo::ast::make_var;
     using xo::ast::make_lambda;
+    using xo::reflect::Reflect;
     using xo::xtag;
     using std::cerr;
     using std::endl;
@@ -128,13 +129,13 @@ main() {
         auto sin = make_primitive("sin", ::sin);
         auto cos = make_primitive("cos", ::cos);
 
-        auto x_var = make_var("x");
+        auto x_var = make_var("x", Reflect::require<double>());
         auto call1 = make_apply(cos, {x_var}); /* (cos x) */
         auto call2 = make_apply(sin, {call1}); /* (sin (cos x)) */
 
         /* (define (lm_1 x) (sin (cos x))) */
         auto lambda = make_lambda("lm_1",
-                                  {"x"},
+                                  {x_var},
                                   call2);
 
         log && log(xtag("expr", lambda));
