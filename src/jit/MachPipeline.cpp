@@ -137,7 +137,7 @@ namespace xo {
             }
 
             return nullptr;
-        }
+        } /*codegen_constant*/
 
         namespace {
             llvm::Type *
@@ -204,11 +204,12 @@ namespace xo {
             std::vector<llvm::Type *> llvm_argtype_v;
             llvm_argtype_v.reserve(n_fn_arg);
 
-            /** check function args are all doubles **/
+            /** check function args are all known **/
             for (int i = 0; i < n_fn_arg; ++i) {
                 TypeDescr arg_td = fn_td->fn_arg(i);
 
-                log && log(xtag("i_arg", i), xtag("arg_td", arg_td->short_name()));
+                log && log(xtag("i_arg", i),
+                           xtag("arg_td", arg_td->short_name()));
 
                 llvm::Type * llvm_argtype = td_to_llvm_type(llvm_cx_.borrow(), arg_td);
 
