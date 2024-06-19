@@ -62,9 +62,9 @@ namespace xo {
         public:
             Jit(std::unique_ptr<ExecutionSession> xsession,
                 JITTargetMachineBuilder jtmb,
-                DataLayout data_layout_)
+                DataLayout data_layout)
                 : xsession_{std::move(xsession)},
-                  data_layout_(std::move(data_layout_)),
+                  data_layout_(std::move(data_layout)),
                   mangler_(*this->xsession_, this->data_layout_),
                   object_layer_(*this->xsession_,
                                 []() { return std::make_unique<SectionMemoryManager>(); }),
