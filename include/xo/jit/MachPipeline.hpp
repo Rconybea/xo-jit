@@ -96,7 +96,7 @@ namespace xo {
             void dump_current_module();
 
             /** lookup symbol in jit-associated output library **/
-            llvm::orc::ExecutorAddr lookup_symbol(const std::string & x);
+            llvm::Expected<llvm::orc::ExecutorAddr> lookup_symbol(const std::string & x);
 
             virtual void display(std::ostream & os) const;
             virtual std::string display_string() const;
