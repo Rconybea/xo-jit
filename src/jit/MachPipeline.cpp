@@ -1,6 +1,7 @@
 /* @file MachPipeline.cpp */
 
 #include "MachPipeline.hpp"
+#include <string>
 
 namespace xo {
     using xo::ast::exprtype;

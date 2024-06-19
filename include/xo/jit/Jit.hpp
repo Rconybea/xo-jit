@@ -126,6 +126,19 @@ namespace xo {
                                           std::move(ts_module));
             }
 
+            /** intern @p symbol, binding it to address @p dest **/
+            template <typename T>
+            llvm::Error intern_symbol(const std::string & symbol, T * dest) {
+                llvm::orc::SymbolMap symbol_map;
+                symbol_map[mangler_(symbol)]
+                    = llvm::orc::ExecutorSymbolDef(llvm::orc::ExecutorAddr::fromPtr(dest),
+                                                   llvm::JITSymbolFlags());
+
+                auto materializer = llvm::orc::absoluteSymbols(symbol_map);
+
+                return dest_dynamic_lib_.define(materializer);
+            } /*intern_symbol*/
+
             /** report mangled symbol name **/
             auto mangle(StringRef name) {
                 return this->mangler_(name.str());
