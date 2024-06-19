@@ -254,6 +254,25 @@ namespace xo {
             }
 #endif
 
+            if (expr->explicit_symbol_def()) {
+                static llvm::ExitOnError llvm_exit_on_err;
+
+                llvm_exit_on_err(this->jit_->intern_symbol(expr->name(),
+                                                           expr->function_address()));
+
+#ifdef NOT_USING
+                if (!llvm_result) {
+                    cerr << "MachPipeline::codegen_primitive"
+                         << ": intern_symbol failed"
+                         << xtag("name", expr->name())
+                         << xtag("addr", expr->function_address())
+                         << endl;
+
+                    return nullptr;
+                }
+#endif
+            }
+
             log && log("returning llvm function");
 
             return fn;
