@@ -465,8 +465,7 @@ namespace xo {
         {
             llvm::Value * test_ir = this->codegen(expr->test());
 
-            /** need test result in a variable
-             **/
+            /** need test result in a variable **/
             llvm::Value * test_with_cmp_ir
                 = llvm_ir_builder_->CreateFCmpONE(test_ir,
                                                   llvm::ConstantFP::get(llvm_cx_->llvm_cx_ref(),
@@ -538,7 +537,7 @@ namespace xo {
             phi_node->addIncoming(when_false_ir, when_false_bb);
 
             return phi_node;
-        }
+        } /*codegen_ifexpr*/
 
         llvm::Value *
         MachPipeline::codegen(ref::brw<Expression> expr)
@@ -597,7 +596,8 @@ namespace xo {
             llvm_exit_on_err(this->jit_->add_llvm_module(std::move(ts_module), tracker));
 
             this->recreate_llvm_ir_pipeline();
-        }
+        } /*machgen_current_module*/
+
         std::string
         MachPipeline::mangle(const std::string & sym) const
         {

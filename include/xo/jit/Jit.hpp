@@ -142,7 +142,7 @@ namespace xo {
             }
         }; /*Jit*/
 
-    } /*namespace jit&*/
+    } /*namespace jit*/
 } /*namespace xo*/
 
 /** end Jit.hpp **/
