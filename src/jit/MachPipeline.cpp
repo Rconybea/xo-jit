@@ -440,12 +440,14 @@ namespace xo {
             // PLACEHOLDER
             // just handle double arguments + return type for now
 
-            llvm::Type * llvm_retval = td_to_llvm_type(llvm_cx_.borrow(), lambda->fn_retval());
+            llvm::Type * llvm_retval = td_to_llvm_type(llvm_cx_.borrow(),
+                                                       lambda->fn_retval());
 
             std::vector<llvm::Type *> arg_type_v(lambda->n_arg());
 
             for (size_t i = 0, n = lambda->n_arg(); i < n; ++i) {
-                arg_type_v[i] = td_to_llvm_type(llvm_cx_.borrow(), lambda->fn_arg(i));
+                arg_type_v[i] = td_to_llvm_type(llvm_cx_.borrow(),
+                                                lambda->fn_arg(i));
             }
 
             auto * llvm_fn_type = llvm::FunctionType::get(llvm_retval,
@@ -461,7 +463,9 @@ namespace xo {
             {
                 int i = 0;
                 for (auto & arg : fn->args()) {
-                    log && log("llvm format param names", xtag("i", i), xtag("param", lambda->argv().at(i)));
+                    log && log("llvm format param names",
+                               xtag("i", i),
+                               xtag("param", lambda->argv().at(i)));
 
                     arg.setName(lambda->argv().at(i)->name());
                     ++i;
@@ -479,7 +483,9 @@ namespace xo {
             {
                 int i = 0;
                 for (auto & arg : fn->args()) {
-                    log && log("nested environment", xtag("i", i), xtag("param", std::string(arg.getName())));
+                    log && log("nested environment",
+                               xtag("i", i),
+                               xtag("param", std::string(arg.getName())));
 
                     /* stack location for arg[i] */
                     llvm::AllocaInst * alloca
