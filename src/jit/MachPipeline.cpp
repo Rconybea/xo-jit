@@ -13,6 +13,7 @@ namespace xo {
     using xo::ast::Variable;
     using xo::ast::Apply;
     using xo::ast::IfExpr;
+    using xo::ast::llvmintrinsic;
     using xo::reflect::Reflect;
     using xo::reflect::TypeDescr;
     using std::cerr;
@@ -295,6 +296,7 @@ namespace xo {
                 || apply->fn()->extype() == exprtype::lambda)
             {
                 llvm::Function * llvm_fn = nullptr;
+                llvmintrinsic intrinsic = llvmintrinsic::invalid;
                 FunctionInterface * fn = nullptr;
                 {
                     // TODO: codgen_function()
@@ -303,6 +305,8 @@ namespace xo {
                     if (pm) {
                         fn = pm.get();
                         llvm_fn = this->codegen_primitive(pm);
+                        /* hint, when available. use faster alternative to IRBuilder::CreateCall below */
+                        intrinsic = pm->intrinsic();
                     }
 
                     auto lm = Lambda::from(apply->fn());
@@ -359,6 +363,25 @@ namespace xo {
 #endif
 
                     args.push_back(arg);
+                }
+
+                switch(intrinsic) {
+                case llvmintrinsic::i_add:
+                    return llvm_ir_builder_->CreateAdd(args[0], args[1]);
+                case llvmintrinsic::i_mul:
+                    return llvm_ir_builder_->CreateMul(args[0], args[1]);
+                case llvmintrinsic::fp_add:
+                    return llvm_ir_builder_->CreateFAdd(args[0], args[1]);
+                case llvmintrinsic::fp_mul:
+                    return llvm_ir_builder_->CreateFMul(args[0], args[1]);
+                case llvmintrinsic::invalid:
+                case llvmintrinsic::fp_sqrt:
+                case llvmintrinsic::fp_pow:
+                case llvmintrinsic::fp_sin:
+                case llvmintrinsic::fp_cos:
+                case llvmintrinsic::fp_tan:
+                case llvmintrinsic::n_intrinsic: /* n_intrinsic: not reachable */
+                    break;
                 }
 
                 return llvm_ir_builder_->CreateCall(llvm_fn, args, "calltmp");
