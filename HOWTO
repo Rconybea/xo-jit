@@ -1,0 +1,45 @@
+* How to add an llvm intrinsic
+
+  - add enum value llvmintrinsic::foo to llvmintrinsic in xo-expression
+  - also add foo to llvmintrinsic2str in xo-expression llvmintrinsic.hpp
+  - if we have a built-in Primitive for the same functionality,
+    want Primitive::intrinsic_ = llvmintrinsic::foo
+  - in MachPipeline::codegen_apply(), look for switch(intrinsic),
+    add case llvmintrinsic::foo
+  - substitute codegen for the intrinsic
+    in place of the catch-all IRBuilder::CreateCall
+
+** To test from python:
+
+   1. install xo-pyjit and deps somewhere (~/local2 in this example)
+
+   2. PYTHONPATH=~/local2:$PYTHONPATH python
+
+   3. python:
+
+      from xo_pyreflect import *
+      from xo_pyexpression import *
+      from xo_pyjit import *
+      i32_t=TypeDescr.lookup_by_name('double')
+      x=make_var('x',i32_t)
+      f=make_mul_i32_pm()
+      c=make_apply(f,[x,x])
+      lm=make_lambda('sq',[x],c)
+
+      mp=MachPipeline.make()
+      code=mp.codegen(lm)
+      print(code.print())
+
+   4. in our example,  get output like:
+
+      define i32 @sq(i32 %x) {
+      entry:
+        %0 = mul i32 %x, %x
+        ret i32 %0
+      }
+
+   5. to compile+run via JIT:
+
+      mp.machgen_current_module()
+      fn=mp.lookup_fn('int (*)(int)', 'sq')
+      fn(16) # -> 256
