@@ -519,8 +519,24 @@ namespace xo {
                 /* validate!  always validate! */
                 llvm::verifyFunction(*fn);
 
+                if (log) {
+                    std::string buf;
+                    llvm::raw_string_ostream ss(buf);
+                    fn->print(ss);
+
+                    log(xtag("IR-before-opt", buf));
+                }
+
                 /* optimize!  improves IR */
                 ir_pipeline_->run_pipeline(*fn); // llvm_fpmgr_->run(*fn, *llvm_famgr_);
+
+                if (log) {
+                    std::string buf;
+                    llvm::raw_string_ostream ss(buf);
+                    fn->print(ss);
+
+                    log(xtag("IR-after-opt", buf));
+                }
 
                 return fn;
             }
