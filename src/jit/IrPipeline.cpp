@@ -24,6 +24,13 @@ namespace xo {
 
             /** transform passes **/
             this->llvm_fpmgr_->addPass(llvm::InstCombinePass());
+
+            /* NOTE: llvm 19 adds mem2reg transform here.
+             *       speculating that PromotePass() does same/goodenough thing in llvm 18.
+             *       This pays off,  works first try!
+             */
+            this->llvm_fpmgr_->addPass(llvm::PromotePass());
+
             this->llvm_fpmgr_->addPass(llvm::ReassociatePass());
             this->llvm_fpmgr_->addPass(llvm::GVNPass());
             this->llvm_fpmgr_->addPass(llvm::SimplifyCFGPass());
