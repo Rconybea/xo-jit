@@ -54,6 +54,7 @@ namespace xo {
         class MachPipeline : public ref::Refcount {
         public:
             using Expression = xo::ast::Expression;
+            using TypeDescr = xo::reflect::TypeDescr;
             //using ConstantInterface = xo::ast::ConstantInterface;
 
         public:
@@ -111,6 +112,16 @@ namespace xo {
             /** iniitialize native builder (i.e. for platform we're running on) **/
             static void init_once();
 
+            /** codegen helper for a user-defined function (codegen_lambda()):
+             *  create stack slot on behalf of some formal parameter to a function,
+             *  so we can avoid SSA restriction on function body
+             *
+             *  @p var_type.  variable type
+             **/
+            llvm::AllocaInst * create_entry_block_alloca(llvm::Function * llvm_fn,
+                                                         const std::string & var_name,
+                                                         TypeDescr var_type);
+
             /** (re)create pipeline to turn expressions into llvm IR code **/
             void recreate_llvm_ir_pipeline();
 
@@ -155,8 +166,13 @@ namespace xo {
              *  corresponding llvm IR.
              *
              *  only supports one level atm (i.e. only top-level functions)
+             *
+             *  All values  live on the stack, so that we can evade single-assignment
+             *  restrictions.
+             *
+             *  rhs identifies logical stack location of a variable
              **/
-            std::map<std::string, llvm::Value*> nested_env_;
+            std::map<std::string, llvm::AllocaInst*> nested_env_; /* <-> kaleidoscope NamedValues */
 
         }; /*MachPipeline*/
 

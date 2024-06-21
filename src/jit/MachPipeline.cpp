@@ -391,6 +391,25 @@ namespace xo {
             }
         } /*codegen_apply*/
 
+        /* in kaleidoscope7.cpp: CreateEntryBlockAlloca */
+        llvm::AllocaInst *
+        MachPipeline::create_entry_block_alloca(llvm::Function * llvm_fn,
+                                                const std::string & var_name,
+                                                TypeDescr var_type)
+        {
+            llvm::IRBuilder<> tmp_ir_builder(&llvm_fn->getEntryBlock(),
+                                             llvm_fn->getEntryBlock().begin());
+
+            llvm::Type * llvm_var_type = td_to_llvm_type(llvm_cx_.borrow(),
+                                                         var_type);
+            if (!llvm_var_type)
+                return nullptr;
+
+            return tmp_ir_builder.CreateAlloca(llvm_var_type,
+                                               nullptr,
+                                               var_name);
+        } /*create_entry_block_alloca*/
+
         llvm::Function *
         MachPipeline::codegen_lambda(ref::brw<Lambda> lambda)
         {
@@ -462,7 +481,25 @@ namespace xo {
                 for (auto & arg : fn->args()) {
                     log && log("nested environment", xtag("i", i), xtag("param", std::string(arg.getName())));
 
-                    nested_env_[std::string(arg.getName())] = &arg;
+                    /* stack location for arg[i] */
+                    llvm::AllocaInst * alloca
+                        = create_entry_block_alloca(fn,
+                                                    std::string(arg.getName()),
+                                                    lambda->fn_arg(i));
+
+                    if (!alloca)
+                        return nullptr;
+
+                    /* store on function entry
+                     *   see codegen_variable() for corresponding load
+                     */
+                    this->llvm_ir_builder_->CreateStore(&arg, alloca);
+
+                    /* remember stack location for reference + assignment
+                     * in lambda body.
+                     *
+                     */
+                    nested_env_[std::string(arg.getName())] = alloca;
                     ++i;
                 }
             }
@@ -500,7 +537,12 @@ namespace xo {
                 return nullptr;
             }
 
-            return ix->second;
+            llvm::AllocaInst * alloca = ix->second;
+
+            /* code to load value from stack */
+            return this->llvm_ir_builder_->CreateLoad(alloca->getAllocatedType(),
+                                                      alloca,
+                                                      var->name().c_str());
         } /*codegen_variable*/
 
         llvm::Value *
