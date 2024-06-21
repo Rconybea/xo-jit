@@ -38,6 +38,7 @@ main() {
     using xo::jit::MachPipeline;
     using xo::ast::make_constant;
     using xo::ast::make_primitive;
+    using xo::ast::llvmintrinsic;
     using xo::ast::make_apply;
     using xo::ast::make_var;
     using xo::ast::make_lambda;
@@ -82,7 +83,8 @@ main() {
 
     {
         auto expr = make_primitive("sqrt", &sqrt,
-                                   false /*!explicit_symbol_def*/);
+                                   false /*!explicit_symbol_def*/,
+                                   llvmintrinsic::fp_sqrt);
 
         log && log(xtag("expr", expr));
 
@@ -104,7 +106,8 @@ main() {
         /* (sqrt 2) */
 
         auto fn = make_primitive("sqrt", &sqrt,
-                                 false /*!explicit_symbol_def*/);
+                                 false /*!explicit_symbol_def*/,
+                                 llvmintrinsic::fp_sqrt);
         auto arg = make_constant(2.0);
 
         auto call = make_apply(fn, {arg});
@@ -128,10 +131,14 @@ main() {
     {
         /* (lambda (x) (sin (cos x))) */
 
-        auto sin = make_primitive("sin", ::sin,
-                                  false /*!explicit_symbol_def*/);
-        auto cos = make_primitive("cos", ::cos,
-                                  false /*!explicit_symbol_def*/);
+        auto sin = make_primitive("sin",
+                                  ::sin,
+                                  false /*!explicit_symbol_def*/,
+                                  llvmintrinsic::fp_sin);
+        auto cos = make_primitive("cos",
+                                  ::cos,
+                                  false /*!explicit_symbol_def*/,
+                                  llvmintrinsic::fp_cos);
 
         auto x_var = make_var("x", Reflect::require<double>());
         auto call1 = make_apply(cos, {x_var}); /* (cos x) */
