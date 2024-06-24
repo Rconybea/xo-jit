@@ -419,15 +419,29 @@ namespace xo {
                 ++i;
             }
 
+            /* if we have an intrinsic hint,
+             * then instead of invoking a function,
+             * we use some native machine instruction instead.
+             */
             switch(intrinsic) {
+            case llvmintrinsic::i_neg:
+                return ir_builder.CreateNeg(args[0]);
             case llvmintrinsic::i_add:
                 return ir_builder.CreateAdd(args[0], args[1]);
+            case llvmintrinsic::i_sub:
+                return ir_builder.CreateSub(args[0], args[1]);
             case llvmintrinsic::i_mul:
                 return ir_builder.CreateMul(args[0], args[1]);
+            case llvmintrinsic::i_sdiv:
+                return ir_builder.CreateSDiv(args[0], args[1]);
+            case llvmintrinsic::i_udiv:
+                return ir_builder.CreateUDiv(args[0], args[1]);
             case llvmintrinsic::fp_add:
                 return ir_builder.CreateFAdd(args[0], args[1]);
             case llvmintrinsic::fp_mul:
                 return ir_builder.CreateFMul(args[0], args[1]);
+            case llvmintrinsic::fp_div:
+                return ir_builder.CreateFDiv(args[0], args[1]);
             case llvmintrinsic::invalid:
             case llvmintrinsic::fp_sqrt:
             case llvmintrinsic::fp_pow:
