@@ -67,7 +67,7 @@ main() {
 
         log && log(xtag("expr", expr));
 
-        auto llvm_ircode = jit->codegen(expr);
+        auto llvm_ircode = jit->codegen_toplevel(expr);
 
         if (llvm_ircode) {
             /* note: llvm:errs() is 'raw stderr stream' */
@@ -88,7 +88,7 @@ main() {
 
         log && log(xtag("expr", expr));
 
-        auto llvm_ircode = jit->codegen(expr);
+        auto llvm_ircode = jit->codegen_toplevel(expr);
 
         if (llvm_ircode) {
             /* note: llvm:errs() is 'raw stderr stream' */
@@ -114,7 +114,7 @@ main() {
 
         log && log(xtag("expr", call));
 
-        auto llvm_ircode = jit->codegen(call);
+        auto llvm_ircode = jit->codegen_toplevel(call);
 
         if (llvm_ircode) {
             /* note: llvm:errs() is 'raw stderr stream' */
@@ -151,7 +151,7 @@ main() {
 
         log && log(xtag("expr", lambda));
 
-        auto llvm_ircode = jit->codegen(lambda);
+        auto llvm_ircode = jit->codegen_toplevel(lambda);
 
         if (llvm_ircode) {
             /* note: llvm:errs() is 'raw stderr stream' */

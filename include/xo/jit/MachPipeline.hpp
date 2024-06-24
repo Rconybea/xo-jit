@@ -11,6 +11,7 @@
 #include "IrPipeline.hpp"
 #include "LlvmContext.hpp"
 #include "Jit.hpp"
+#include "activation_record.hpp"
 
 #include "xo/expression/Expression.hpp"
 #include "xo/expression/ConstantInterface.hpp"
@@ -54,6 +55,7 @@ namespace xo {
         class MachPipeline : public ref::Refcount {
         public:
             using Expression = xo::ast::Expression;
+            using Lambda = xo::ast::Lambda;
             using TypeDescr = xo::reflect::TypeDescr;
             //using ConstantInterface = xo::ast::ConstantInterface;
 
@@ -63,6 +65,10 @@ namespace xo {
             static xo::ref::rp<MachPipeline> make();
 
             // ----- module access -----
+
+            llvm::Module * current_module() { return llvm_module_.get(); }
+            ref::brw<LlvmContext> llvm_cx() { return llvm_cx_; }
+            llvm::IRBuilder<> * llvm_current_ir_builder() { return llvm_toplevel_ir_builder_.get(); }
 
             /** target triple = string describing target host for codegen **/
             const std::string & target_triple() const;
@@ -75,16 +81,22 @@ namespace xo {
             /** write state of execution session (all the associated dynamic libraries) **/
             void dump_execution_session();
 
-            // ----- jit code generation -----
+            // ----- code generation -----
 
             llvm::Value * codegen_constant(ref::brw<xo::ast::ConstantInterface> expr);
             llvm::Function * codegen_primitive(ref::brw<xo::ast::PrimitiveInterface> expr);
-            llvm::Value * codegen_apply(ref::brw<xo::ast::Apply> expr);
-            llvm::Function * codegen_lambda(ref::brw<xo::ast::Lambda> expr);
-            llvm::Value * codegen_variable(ref::brw<xo::ast::Variable> var);
-            llvm::Value * codegen_ifexpr(ref::brw<xo::ast::IfExpr> ifexpr);
+            llvm::Value * codegen_apply(ref::brw<xo::ast::Apply> expr, llvm::IRBuilder<> & ir_builder);
+            /* NOTE: codegen_lambda() needs to be reentrant too.
+             *       for example can have a lambda in apply position.
+             */
+            llvm::Function * codegen_lambda_decl(ref::brw<xo::ast::Lambda> expr);
+            llvm::Function * codegen_lambda_defn(ref::brw<xo::ast::Lambda> expr, llvm::IRBuilder<> & ir_builder);
+            llvm::Value * codegen_variable(ref::brw<xo::ast::Variable> var, llvm::IRBuilder<> & ir_builder);
+            llvm::Value * codegen_ifexpr(ref::brw<xo::ast::IfExpr> ifexpr, llvm::IRBuilder<> & ir_builder);
 
-            llvm::Value * codegen(ref::brw<Expression> expr);
+            llvm::Value * codegen(ref::brw<Expression> expr, llvm::IRBuilder<> & ir_builder);
+
+            llvm::Value * codegen_toplevel(ref::brw<Expression> expr);
 
             // ----- jit online execution -----
 
@@ -112,6 +124,10 @@ namespace xo {
             /** iniitialize native builder (i.e. for platform we're running on) **/
             static void init_once();
 
+            /** helper function.  find all lambda expressions in AST @p expr **/
+            std::vector<ref::brw<Lambda>> find_lambdas(ref::brw<Expression> expr) const;
+
+        public:
             /** codegen helper for a user-defined function (codegen_lambda()):
              *  create stack slot on behalf of some formal parameter to a function,
              *  so we can avoid SSA restriction on function body
@@ -122,6 +138,7 @@ namespace xo {
                                                          const std::string & var_name,
                                                          TypeDescr var_type);
 
+        private:
             /** (re)create pipeline to turn expressions into llvm IR code **/
             void recreate_llvm_ir_pipeline();
 
@@ -135,6 +152,7 @@ namespace xo {
 
             // ----- this part adapted from kaleidoscope.cpp -----
 
+        public:
             /** everything below represents a pipeline
              *  that takes expressions, and turns them into llvm IR.
              *
@@ -144,6 +162,7 @@ namespace xo {
              **/
             xo::ref::rp<IrPipeline> ir_pipeline_;
 
+        private:
             /** owns + manages core "global" llvm data,
              *  including type- and constant- unique-ing tables.
              *
@@ -151,8 +170,10 @@ namespace xo {
              *  each with its own LLVMContext
              **/
             ref::rp<LlvmContext> llvm_cx_;
+
             /** builder for intermediate-representation objects **/
-            std::unique_ptr<llvm::IRBuilder<>> llvm_ir_builder_;
+            std::unique_ptr<llvm::IRBuilder<>> llvm_toplevel_ir_builder_;
+
             /** a module (1:1 with library ?) being prepared by llvm.
              *  IR-level -- does not contain machine code
              *
@@ -162,6 +183,8 @@ namespace xo {
 
             /** map global names to functions/variables **/
             std::map<std::string, xo::ref::rp<Expression>> global_env_;
+
+        public:
             /** map variable names (formal parameters) to
              *  corresponding llvm IR.
              *
@@ -172,8 +195,7 @@ namespace xo {
              *
              *  rhs identifies logical stack location of a variable
              **/
-            std::map<std::string, llvm::AllocaInst*> nested_env_; /* <-> kaleidoscope NamedValues */
-
+            std::stack<activation_record> env_stack_;  /* <-> kaleidoscope NamedValues */
         }; /*MachPipeline*/
 
         inline std::ostream &

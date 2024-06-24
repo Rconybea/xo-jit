@@ -6,6 +6,7 @@ set(SELF_SRCS
     IrPipeline.cpp
     MachPipeline.cpp
     intrinsics.cpp
+    activation_record.cpp
 )
 
 xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 ${SELF_SRCS})
