@@ -3,6 +3,7 @@
 #include "xo/jit/MachPipeline.hpp"
 #include "xo/expression/Primitive.hpp"
 #include "xo/ratio/ratio.hpp"
+#include "xo/ratio/ratio_reflect.hpp"
 #include "xo/reflect/reflect_struct.hpp"
 #include "xo/indentlog/scope.hpp"
 #include <catch2/catch.hpp>
@@ -184,8 +185,32 @@ namespace xo {
             }
         } /*TEST_CASE(machpipeline)*/
 
+        rp<Lambda>
+        make_ratio() {
+            auto make_ratio_impl = make_primitive("make_ratio_impl",
+                                                  xo::ratio::make_ratio<int, int>,
+                                                  true /*explicit_symbol_def*/,
+                                                  llvmintrinsic::invalid);
+            REQUIRE(make_ratio_impl.get());
+            REQUIRE(make_ratio_impl->explicit_symbol_def());
+
+            /* jit-prepared library:
+             * 1. *uses* make_ratio_impl
+             * 2. *provides* make_ratio  (can do jit->lookup_symbol("make_ratio"))
+             */
+            auto n_var = make_var("n", Reflect::require<int>());
+            auto d_var = make_var("d", Reflect::require<int>());
+            auto call1 = make_apply(make_ratio_impl, {n_var, d_var}); /*make_ratio(n,d)*/
+
+            auto make_ratio = make_lambda("make_ratio",
+                                          {n_var, d_var},
+                                          call1);
+
+            return make_ratio;
+        }
+
         TEST_CASE("machpipeline.struct", "[llvm][llvm_struct]") {
-            constexpr bool c_debug_flag = false;
+            constexpr bool c_debug_flag = true;
 
             // can get bits from /dev/random by uncommenting the 2nd line below
             //uint64_t seed = xxx;
@@ -200,9 +225,61 @@ namespace xo {
 
             /* let's reflect xo::ratio::ratio<int> */
 
-            auto struct_td = reflect_struct<xo::ratio::ratio<int>>();
+            using ratio_type = xo::ratio::ratio<int>;
+
+            auto struct_td = reflect_struct<ratio_type>();
 
             REQUIRE(struct_td);
+
+            auto fn_ast = make_ratio();
+
+            llvm::Value * llvm_ircode = jit->codegen_toplevel(fn_ast);
+
+            /* TODO: printer for llvm::Value* */
+            if (llvm_ircode) {
+                /* note: llvm:errs() is 'raw stderr stream' */
+                cerr << "llvm_ircode:" << endl;
+                llvm_ircode->print(llvm::errs());
+                cerr << endl;
+            } else {
+                cerr << "code generation failed"
+                     << xtag("fn_ast", fn_ast)
+                     << endl;
+            }
+
+            REQUIRE(llvm_ircode);
+
+            jit->machgen_current_module();
+
+            cerr << "execution session after codegen:" << endl;
+            jit->dump_execution_session();
+
+            /** lookup compiled function pointer in jit **/
+            auto llvm_addr = jit->lookup_symbol(fn_ast->name());
+
+            cerr << "execution session after lookup attempt:" << endl;
+            jit->dump_execution_session();
+
+            if (!llvm_addr) {
+                cerr << "ex2: lookup: symbol not found"
+                     << xtag("symbol", fn_ast->name())
+                     << endl;
+            } else {
+                cerr << "ex2: lookup: symbol found"
+                     << xtag("llvm_addr", llvm_addr.get().getValue())
+                     << xtag("symbol", fn_ast->name())
+                     << endl;
+            }
+
+            auto fn_ptr = llvm_addr.get().toPtr<ratio_type(*)(int,int)>();
+
+            REQUIRE(fn_ptr);
+
+            auto value = (*fn_ptr)(2, 3);
+
+            log && log(xtag("value.num", value.num()),
+                       xtag("value.den", value.den()));
+
         } /*TEST_CASE(machpipeline.struct)*/
     } /*namespace ut*/
 } /*namespace xo*/
