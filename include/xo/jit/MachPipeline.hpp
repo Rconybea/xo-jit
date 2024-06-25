@@ -43,6 +43,7 @@
 #include "llvm/Transforms/Scalar/GVN.h"
 #include "llvm/Transforms/Scalar/Reassociate.h"
 #include "llvm/Transforms/Scalar/SimplifyCFG.h"
+#include <llvm/ExecutionEngine/Orc/Core.h>
 
 
 namespace xo {
@@ -57,6 +58,7 @@ namespace xo {
             using Expression = xo::ast::Expression;
             using Lambda = xo::ast::Lambda;
             using TypeDescr = xo::reflect::TypeDescr;
+            using ExecutionSession = llvm::orc::ExecutionSession;
             using DataLayout = llvm::DataLayout;
             //using ConstantInterface = xo::ast::ConstantInterface;
 
@@ -73,6 +75,8 @@ namespace xo {
 
             /** target triple = string describing target host for codegen **/
             const std::string & target_triple() const;
+            /** execution session (run jit-generated machine code in this process) **/
+            const ExecutionSession * xsession() const;
             /** data layout = rules for alignment/padding; specific to target host **/
             const DataLayout & data_layout() const;
             /** append function names defined in attached module to *p_v

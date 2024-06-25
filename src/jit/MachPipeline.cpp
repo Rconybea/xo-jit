@@ -17,6 +17,7 @@ namespace xo {
     using xo::reflect::Reflect;
     using xo::reflect::StructMember;
     using xo::reflect::TypeDescr;
+    using llvm::orc::ExecutionSession;
     using llvm::DataLayout;
     using std::cerr;
     using std::endl;
@@ -95,6 +96,11 @@ namespace xo {
 
             ir_pipeline_ = new IrPipeline(llvm_cx_);
         } /*recreate_llvm_ir_pipeline*/
+
+        const ExecutionSession *
+        MachPipeline::xsession() const {
+            return this->jit_->xsession();
+        }
 
         /** identifies target host/architecture for machine code.
          *  e.g. "x86_64-unknown-linux-gnu"
