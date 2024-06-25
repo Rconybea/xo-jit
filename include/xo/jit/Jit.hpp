@@ -109,13 +109,15 @@ namespace xo {
                                              std::move(*data_layout));
             }
 
+            /* exposing this for printing */
+            const ExecutionSession * xsession() const { return xsession_.get(); }
+            const DataLayout & data_layout() const { return data_layout_; }
+
+            JITDylib & dest_dynamic_lib_ref() { return dest_dynamic_lib_; }
             const std::string & target_triple() const {
                 return xsession_->getTargetTriple().getTriple();
             }
 
-            const DataLayout & data_layout() const { return data_layout_; }
-
-            JITDylib & dest_dynamic_lib_ref() { return dest_dynamic_lib_; }
 
             /** compile module to machine code that's runnable from this process;
              *  incorporate into @ref dest_dynamic_lib_
