@@ -57,6 +57,7 @@ namespace xo {
             using Expression = xo::ast::Expression;
             using Lambda = xo::ast::Lambda;
             using TypeDescr = xo::reflect::TypeDescr;
+            using DataLayout = llvm::DataLayout;
             //using ConstantInterface = xo::ast::ConstantInterface;
 
         public:
@@ -64,7 +65,7 @@ namespace xo {
             static llvm::Expected<std::unique_ptr<MachPipeline>> make_aux();
             static xo::ref::rp<MachPipeline> make();
 
-            // ----- module access -----
+            // ----- access -----
 
             llvm::Module * current_module() { return llvm_module_.get(); }
             ref::brw<LlvmContext> llvm_cx() { return llvm_cx_; }
@@ -72,6 +73,8 @@ namespace xo {
 
             /** target triple = string describing target host for codegen **/
             const std::string & target_triple() const;
+            /** data layout = rules for alignment/padding; specific to target host **/
+            const DataLayout & data_layout() const;
             /** append function names defined in attached module to *p_v
              *
              *  (RC 15jun2024 - this part is working)
@@ -173,7 +176,7 @@ namespace xo {
             std::unique_ptr<llvm::IRBuilder<>> llvm_toplevel_ir_builder_;
 
             /** a module (1:1 with library ?) being prepared by llvm.
-             *  IR-level -- does not contain machine code
+             *  IR-level -- does not contain machine coode
              *
              *  - function names are unique within a module.
              **/

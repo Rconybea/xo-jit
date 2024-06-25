@@ -17,6 +17,7 @@ namespace xo {
     using xo::reflect::Reflect;
     using xo::reflect::StructMember;
     using xo::reflect::TypeDescr;
+    using llvm::DataLayout;
     using std::cerr;
     using std::endl;
 
@@ -104,6 +105,11 @@ namespace xo {
             //return llvm_module_->getTargetTriple();
 
             return this->jit_->target_triple();
+        }
+
+        const DataLayout &
+        MachPipeline::data_layout() const {
+            return this->jit_->data_layout();
         }
 
         std::vector<std::string>
