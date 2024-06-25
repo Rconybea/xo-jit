@@ -6,7 +6,12 @@
 #pragma once
 
 #include "xo/refcnt/Refcounted.hpp"
-#include "llvm/IR/LLVMContext.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+# include "llvm/IR/LLVMContext.h"
+#pragma GCC diagnostic pop
+
 //#include <cstdint>
 
 namespace xo {
