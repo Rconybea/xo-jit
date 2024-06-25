@@ -86,6 +86,23 @@ namespace xo {
 
             // ----- code generation -----
 
+            /** establish llvm IR corresponding to a c++ type.
+             *  Handles
+             *  T := bool|char|short|int|long|float|double
+             *        | T1(*)(T2..Tn)
+             *        | struct{T1,..,Tn}
+             *
+             *  Not supported yet:
+             *  - vector<T>
+             *  - string
+             *  - map<T1,T2>
+             *  - unions
+             *  - pointers (except function pointers)
+             *
+             *  Idempotent: multiple calls with the same @p td produce the same @c llvm::Type pointer.
+             *  @c llvm::Type instances are *immortal* (llvm interns them into opaque global lookup tables)
+             **/
+            llvm::Type * codegen_type(TypeDescr td);
             llvm::Value * codegen_constant(ref::brw<xo::ast::ConstantInterface> expr);
             llvm::Function * codegen_primitive(ref::brw<xo::ast::PrimitiveInterface> expr);
             llvm::Value * codegen_apply(ref::brw<xo::ast::Apply> expr, llvm::IRBuilder<> & ir_builder);

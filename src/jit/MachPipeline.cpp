@@ -311,6 +311,11 @@ namespace xo {
             }
         }
 
+        llvm::Type *
+        MachPipeline::codegen_type(TypeDescr td) {
+            return td_to_llvm_type(llvm_cx_.borrow(), td);
+        }
+
         llvm::Function *
         MachPipeline::codegen_primitive(ref::brw<PrimitiveInterface> expr)
         {
