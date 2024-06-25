@@ -28,6 +28,9 @@ xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets
 add_subdirectory(example)
 add_subdirectory(utest)
 
+# reminder: must come last: docs targets depend on all the other library/utest targets
+add_subdirectory(docs)
+
 # ----------------------------------------------------------------
 # docs targets depend on all the other library/utest targets
 #

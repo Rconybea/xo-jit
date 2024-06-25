@@ -1,0 +1,70 @@
+build
+
+        +-----------------------------------------------+
+        | cmake                                         |
+        |   CMakeLists.txt                              |
+        |   $PREFIX/share/cmake/xo_macros/xo_cxx.cmake  |
+        +-----------------------------------------------+
+           |
+           |                                                  +----------------------+
+           +------------------------------------------------->| .build/docs/Doxyfile |
+           |                                                  +----------------------+
+           |                                                     |
+           |                                        /------------/
+           |                                        |
+           |                                        v
+           |     +---------------------------------------+    +-----------------+
+           +---->| doxygen                               |--->| .build/docs/dox |
+           |     |   $PREFIX/share/xo-macros/Doxyfile.in |    |   +- html/      |
+           |     +---------------------------------------+    |   +- xml/       |
+           |                                                  +-----------------+
+           |                                                     |
+           |                                        /------------/
+           |                                        |
+           |                                        v
+           |     +---------------------------------------+    +--------------------+
+           \---->| sphinx                                |--->| .build/docs/sphinx |
+                 |   +- conf.py                          |    |   +- html/         |
+                 |   +- _static/                         |    +--------------------+
+                 |   +- *.rst                            |
+                 +---------------------------------------+
+
+files
+
+   README            this file
+   CMakeLists.txt    build entry point
+   conf.py           sphinx config
+   _static           static files for sphinx
+
+map
+
+   index.rst
+   +- install.rst
+   +- examples.rst
+   +- unit-quantities.rst
+   +- classes.rst
+   +- glossary.rst
+   ...
+
+examples
+
+.. doxygenclass:: ${c++ class name}
+   :project:
+   :path:
+   :members:
+   :protected-members:
+   :private-members:
+   :undoc-members:
+   :member-groups:
+   :members-only:
+   :outline:
+   :no-link:
+   :allow-dot-graphs:
+
+.. doxygendefine:: ${c preprocessor define}
+
+.. doxygenconcept:: ${c++ concept definition}
+
+.. doxygenenum:: ${c++ enum definition}
+
+.. doxygenfunction:: ${c++ function name}
