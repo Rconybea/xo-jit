@@ -251,13 +251,14 @@ namespace xo {
 
             jit->machgen_current_module();
 
-            cerr << "execution session after codegen:" << endl;
+            log && log("execution session after codegen:");
+            //log && log(jit->xsession());  // segfaults
             jit->dump_execution_session();
 
             /** lookup compiled function pointer in jit **/
             auto llvm_addr = jit->lookup_symbol(fn_ast->name());
 
-            cerr << "execution session after lookup attempt:" << endl;
+            log && log("execution session after lookup attempt:");
             jit->dump_execution_session();
 
             if (!llvm_addr) {
