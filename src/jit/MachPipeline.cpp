@@ -308,8 +308,10 @@ namespace xo {
         llvm::Function *
         MachPipeline::codegen_primitive(ref::brw<PrimitiveInterface> expr)
         {
-            //constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = true;
             using xo::scope;
+
+            scope log(XO_DEBUG(c_debug_flag));
 
             /** note: documentation (such as it is) for llvm::Function here:
              *
@@ -359,8 +361,13 @@ namespace xo {
             if (expr->explicit_symbol_def()) {
                 static llvm::ExitOnError llvm_exit_on_err;
 
-                llvm_exit_on_err(this->jit_->intern_symbol(expr->name(),
-                                                           expr->function_address()));
+                auto name = expr->name();
+                auto fn_addr = expr->function_address();
+
+                log && log(xtag("sym", name),
+                           xtag("mangled_sym", this->jit_->mangle(name)));
+
+                llvm_exit_on_err(this->jit_->intern_symbol(name, fn_addr));
 
 #ifdef NOT_USING
                 if (!llvm_result) {
@@ -373,6 +380,8 @@ namespace xo {
                     return nullptr;
                 }
 #endif
+            } else {
+                log && log("not requiring absolute address", xtag("sym", expr->name()));
             }
 
 #ifdef OBSOLETE
@@ -987,17 +996,10 @@ namespace xo {
             this->recreate_llvm_ir_pipeline();
         } /*machgen_current_module*/
 
-        std::string
+        std::string_view
         MachPipeline::mangle(const std::string & sym) const
         {
-            auto p = this->jit_->mangle(sym);
-
-            if (p)
-                return (*p).str();
-
-            throw std::runtime_error(tostr("MachPipeline::mangle"
-                                           ": mangle(sym) returned empty pointer",
-                                           xtag("sym", sym)));
+            return this->jit_->mangle(sym);
         } /*mangle*/
 
         llvm::Expected<llvm::orc::ExecutorAddr>

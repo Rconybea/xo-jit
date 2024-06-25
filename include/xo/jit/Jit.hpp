@@ -133,8 +133,10 @@ namespace xo {
             /** intern @p symbol, binding it to address @p dest **/
             template <typename T>
             llvm::Error intern_symbol(const std::string & symbol, T * dest) {
+                auto mangled_sym = mangler_(symbol);
+
                 llvm::orc::SymbolMap symbol_map;
-                symbol_map[mangler_(symbol)]
+                symbol_map[mangled_sym]
                     = llvm::orc::ExecutorSymbolDef(llvm::orc::ExecutorAddr::fromPtr(dest),
                                                    llvm::JITSymbolFlags());
 
@@ -144,8 +146,10 @@ namespace xo {
             } /*intern_symbol*/
 
             /** report mangled symbol name **/
-            auto mangle(StringRef name) {
-                return this->mangler_(name.str());
+            std::string_view mangle(StringRef name) {
+                auto tmp = *(this->mangler_(name.str()));
+
+                return std::string_view(tmp.data(), tmp.size());
             }
 
             llvm::Expected<ExecutorSymbolDef> lookup(StringRef name) {
