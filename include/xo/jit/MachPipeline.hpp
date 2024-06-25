@@ -152,7 +152,6 @@ namespace xo {
 
             // ----- this part adapted from kaleidoscope.cpp -----
 
-        public:
             /** everything below represents a pipeline
              *  that takes expressions, and turns them into llvm IR.
              *
@@ -162,7 +161,6 @@ namespace xo {
              **/
             xo::ref::rp<IrPipeline> ir_pipeline_;
 
-        private:
             /** owns + manages core "global" llvm data,
              *  including type- and constant- unique-ing tables.
              *
@@ -184,7 +182,6 @@ namespace xo {
             /** map global names to functions/variables **/
             std::map<std::string, xo::ref::rp<Expression>> global_env_;
 
-        public:
             /** map variable names (formal parameters) to
              *  corresponding llvm IR.
              *

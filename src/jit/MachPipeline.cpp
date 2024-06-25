@@ -15,6 +15,7 @@ namespace xo {
     using xo::ast::IfExpr;
     using xo::ast::llvmintrinsic;
     using xo::reflect::Reflect;
+    using xo::reflect::StructMember;
     using xo::reflect::TypeDescr;
     using std::cerr;
     using std::endl;
@@ -142,6 +143,12 @@ namespace xo {
         } /*codegen_constant*/
 
         namespace {
+            /** REMINDER:
+             *  1. creation of llvm types is idempotent
+             *     (duplicate calls will receive the same llvm::Type* pointer)
+             *  2. llvm::Types are never deleted.
+             **/
+
             llvm::Type *
             td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx, TypeDescr td);
 
@@ -197,6 +204,73 @@ namespace xo {
                 return llvm_ptr_type;
             }
 
+            /**
+             *  Generate llvm::Type correspoinding to a TypeDescr for a struct.
+             **/
+            llvm::StructType *
+            struct_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
+                                   TypeDescr struct_td)
+            {
+                // see
+                //   [[https://stackoverflow.com/questions/32299166/accessing-struct-members-and-arrays-of-structs-from-llvm-ir]]
+
+                auto & llvm_cx_ref = llvm_cx->llvm_cx_ref();
+
+                /* note: object pointer ignored for struct types,
+                 *       since number of members is known at compile time
+                 */
+                int n_member = struct_td->n_child(nullptr /*&object*/);
+
+                /* one type for each struct member */
+                std::vector<llvm::Type *> llvm_membertype_v;
+                llvm_membertype_v.reserve(n_member);
+
+                for (int i = 0; i < n_member; ++i) {
+                    StructMember const & sm = struct_td->struct_member(i);
+
+                    llvm_membertype_v.push_back(td_to_llvm_type(llvm_cx,
+                                                                sm.get_member_td()));
+                }
+
+                std::string struct_name = std::string(struct_td->short_name());
+
+                /* structs with names:  within an llvmcontext, must be unique
+                 *
+                 * If we don't set isPacked,  then padding will be chosen based on DataLayout,
+                 * which might C++ compiler's padding,  but no guarantees.
+                 *
+                 * We can however compare the offsets recorded in xo::reflect with
+                 * offsets chosen by llvm, *once we've created the llvm type*
+                 *
+                 * Also,  we can't guarantee that a c++ type was completely reflected --
+                 * it's possible one or more members were omitted, in which case
+                 * it's unlikely at best that llvm chooses the same layout.
+                 *
+                 * Instead: tell llvm to make packed struct,
+                 *          and introduce dummy members for padding.
+                 *
+                 * A consequence is we have to maintain mapping between llvm's
+                 * member numbering and xo::reflect's
+                 */
+                llvm::StructType * llvm_struct_type
+                    = llvm::StructType::create(llvm_cx_ref,
+                                               llvm_membertype_v,
+                                               llvm::StringRef(struct_name),
+                                               true /*isPacked*/);
+
+                /* TODO: inspect (how) offsets that llvm is using
+                 * we need them to match what C++ chose
+                 *
+                 * (because we want jitted llvm code to interoperate with
+                 *  C++ library code that has structs)
+                 */
+
+                // GetElementPtrInst is interesting,
+                // but I think that's for generating code
+
+                return llvm_struct_type;
+            } /*struct_td_to_llvm_type*/
+
             llvm::Type *
             td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx, TypeDescr td) {
                 auto & llvm_cx_ref = llvm_cx->llvm_cx_ref();
@@ -206,6 +280,8 @@ namespace xo {
                      * i.e. something that can be stored in a variable
                      */
                     return function_td_to_llvm_fnptr_type(llvm_cx, td);
+                } else if (td->is_struct()) {
+                    return struct_td_to_llvm_type(llvm_cx, td);
                 } else if (Reflect::is_native<bool>(td)) {
                     return llvm::Type::getInt1Ty(llvm_cx_ref);
                 } else if (Reflect::is_native<char>(td)) {

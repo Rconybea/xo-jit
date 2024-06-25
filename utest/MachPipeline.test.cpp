@@ -2,6 +2,8 @@
 
 #include "xo/jit/MachPipeline.hpp"
 #include "xo/expression/Primitive.hpp"
+#include "xo/ratio/ratio.hpp"
+#include "xo/reflect/reflect_struct.hpp"
 #include "xo/indentlog/scope.hpp"
 #include <catch2/catch.hpp>
 
@@ -15,6 +17,7 @@ namespace xo {
     using xo::ast::Lambda;
     using xo::ast::exprtype;
     using xo::reflect::Reflect;
+    using xo::reflect::reflect_struct;
     using xo::ref::rp;
     using xo::ref::brw;
     using std::cerr;
@@ -179,8 +182,28 @@ namespace xo {
                     REQUIRE(actual == expected);
                 }
             }
-
         } /*TEST_CASE(machpipeline)*/
+
+        TEST_CASE("machpipeline.struct", "[llvm][llvm_struct]") {
+            constexpr bool c_debug_flag = false;
+
+            // can get bits from /dev/random by uncommenting the 2nd line below
+            //uint64_t seed = xxx;
+            //rng::Seed<xoshio256ss> seed;
+
+            //auto rng = xo::rng::xoshiro256ss(seed);
+
+            scope log(XO_DEBUG2(c_debug_flag, "TEST_CASE.machpipeline.struct"));
+            //log && log("(A)", xtag("foo", foo));
+
+            auto jit = MachPipeline::make();
+
+            /* let's reflect xo::ratio::ratio<int> */
+
+            auto struct_td = reflect_struct<xo::ratio::ratio<int>>();
+
+            REQUIRE(struct_td);
+        } /*TEST_CASE(machpipeline.struct)*/
     } /*namespace ut*/
 } /*namespace xo*/
 
