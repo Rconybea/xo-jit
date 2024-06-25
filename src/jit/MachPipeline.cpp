@@ -97,6 +97,11 @@ namespace xo {
             ir_pipeline_ = new IrPipeline(llvm_cx_);
         } /*recreate_llvm_ir_pipeline*/
 
+        const DataLayout &
+        MachPipeline::data_layout() const {
+            return this->jit_->data_layout();
+        }
+
         const ExecutionSession *
         MachPipeline::xsession() const {
             return this->jit_->xsession();
@@ -111,11 +116,6 @@ namespace xo {
             //return llvm_module_->getTargetTriple();
 
             return this->jit_->target_triple();
-        }
-
-        const DataLayout &
-        MachPipeline::data_layout() const {
-            return this->jit_->data_layout();
         }
 
         std::vector<std::string>
@@ -242,7 +242,7 @@ namespace xo {
 
                     llvm_membertype_v.push_back(td_to_llvm_type(llvm_cx,
                                                                 sm.get_member_td()));
-                }
+               }
 
                 std::string struct_name = std::string(struct_td->short_name());
 
