@@ -7,7 +7,7 @@ namespace xo {
     using xo::ast::exprtype;
     using xo::ast::Expression;
     using xo::ast::ConstantInterface;
-    using xo::ast::FunctionInterface;
+    //using xo::ast::FunctionInterface;
     using xo::ast::PrimitiveInterface;
     using xo::ast::Lambda;
     using xo::ast::Variable;
