@@ -627,6 +627,42 @@ namespace xo {
         } /*create_entry_block_alloca*/
 
 
+        /* in kaleidoscope7.cpp: CreateEntryBlockAlloca */
+        llvm::AllocaInst *
+        MachPipeline::create_entry_frame_alloca(llvm::Function * llvm_fn,
+                                                llvm::StructType * frame_llvm_type)
+        {
+            constexpr bool c_debug_flag = true;
+            using xo::scope;
+
+            scope log(XO_DEBUG(c_debug_flag),
+                      xtag("llvm_fn", (void*)llvm_fn));
+
+            llvm::IRBuilder<> tmp_ir_builder(&llvm_fn->getEntryBlock(),
+                                             llvm_fn->getEntryBlock().begin());
+
+            if (!frame_llvm_type)
+                return nullptr;
+
+            if (log) {
+                std::string llvm_frame_type_str;
+                llvm::raw_string_ostream ss(llvm_frame_type_str);
+                frame_llvm_type->print(ss);
+
+                log(xtag("frame_llvm_type", llvm_frame_type_str));
+            }
+
+            llvm::AllocaInst * retval = tmp_ir_builder.CreateAlloca(frame_llvm_type,
+                                                                    nullptr,
+                                                                    llvm_fn->getName());
+
+            log && log(xtag("alloca", (void*)retval),
+                       xtag("align", retval->getAlign().value()),
+                       xtag("size", retval->getAllocationSize(jit_->data_layout()).value()));
+
+            return retval;
+        } /*create_entry_frame_alloca*/
+
         std::vector<ref::brw<Lambda>>
         MachPipeline::find_lambdas(ref::brw<Expression> expr) const
         {
@@ -869,7 +905,6 @@ namespace xo {
             } /*frame_to_llvm_type*/
         } /*namespace*/
 
-
         llvm::Function *
         MachPipeline::codegen_lambda_defn(ref::brw<Lambda> lambda,
                                           llvm::IRBuilder<> & ir_builder)
@@ -900,12 +935,24 @@ namespace xo {
 
             ir_builder.SetInsertPoint(block);
 
+            /* create stack frame */
+            llvm::StructType * frame_llvm_type
+                = frame_to_llvm_type(llvm_cx_,
+                                     lambda,
+                                     llvm_fn);
+
+            llvm::AllocaInst * frame_alloca = create_entry_frame_alloca(llvm_fn,
+                                                                        frame_llvm_type);
+
+            if (!frame_alloca)
+                return nullptr;
+
             /** Actual parameters will need their own activation record.
              *  Track its shape here.
              *
              *  Local variables will be formal parameters to a nested lambda;
              **/
-            this->env_stack_.push(activation_record());
+            this->env_stack_.push(activation_record(llvm_fn, frame_alloca));
 
             {
                 log && log("lambda: stack size Z", xtag("Z", env_stack_.size()));
@@ -918,6 +965,7 @@ namespace xo {
 
                     std::string arg_name = std::string(arg.getName());
 
+#ifdef OBSOLETE
                     /* stack location for arg[i] */
                     llvm::AllocaInst * alloca
                         = create_entry_block_alloca(llvm_fn,
@@ -928,17 +976,45 @@ namespace xo {
                         this->env_stack_.pop();
                         return nullptr;
                     }
+#endif
+
+                    /* need to store args to stack frame */
+
+                    std::int32_t i_slot = env_stack_.top().lookup_var(arg_name);
+
+                    if (i_slot == -1) {
+                        /* variable not found! */
+                        return nullptr;
+                    }
+
+                    llvm::Value * i32_zero = llvm::ConstantInt::get(llvm_cx_->llvm_cx_ref(),
+                                                                    llvm::APInt(32, 0));
+                    llvm::Value * i32_slot = llvm::ConstantInt::get(llvm_cx_->llvm_cx_ref(),
+                                                                    llvm::APInt(32, i_slot));
+
+                    std::array<llvm::Value*,2> index_v = {
+                        {i32_zero /*deref frame pointer*/,
+                         i32_slot /*field# relative to frame pointer*/}};
+
+                    /* location in stack frame of arg #i */
+                    auto arg_ptr
+                        = ir_builder.CreateInBoundsGEP(frame_llvm_type,
+                                                       frame_alloca,
+                                                       index_v);
 
                     /* store on function entry
                      *   see codegen_variable() for corresponding load
                      */
-                    ir_builder.CreateStore(&arg, alloca);
+                    ir_builder.CreateStore(&arg,
+                                           alloca /*destination*/);
 
+#ifdef OBSOLETE
                     /* remember stack location for reference + assignment
                      * in lambda body.
                      *
                      */
                     env_stack_.top().alloc_var(arg_name, alloca);
+#endif
                     ++i;
                 }
             }

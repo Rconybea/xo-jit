@@ -152,6 +152,13 @@ namespace xo {
             std::vector<ref::brw<Lambda>> find_lambdas(ref::brw<Expression> expr) const;
 
         public:
+            /** codegen helper for a user-defined function.
+             *  create stack slot on behalf of formal parameters.
+             *  linked to (dynamic) callers for stack unwinding
+             **/
+            llvm::AllocaInst * create_entry_frame_alloca(llvm::Function * llvm_fn,
+                                                         llvm::StructType * frame_llvm_type);
+
             /** codegen helper for a user-defined function (codegen_lambda()):
              *  create stack slot on behalf of some formal parameter to a function,
              *  so we can avoid SSA restriction on function body
