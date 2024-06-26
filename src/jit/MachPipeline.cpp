@@ -700,6 +700,176 @@ namespace xo {
             return fn;
         } /*codegen_lambda_decl*/
 
+        namespace {
+            /** A function type:
+             *
+             *    _baseframe* (*) (_baseframe*
+             **/
+            llvm::FunctionType *
+            require_baseframe_unwind_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
+                                               llvm::PointerType * frameptr_llvm_type)
+            {
+                std::vector<llvm::Type *> llvm_argtype_v;
+                llvm_argtype_v.reserve(2);
+
+                /* 1st arg is frame pointer */
+                llvm_argtype_v.push_back(frameptr_llvm_type);
+
+                /* 2nd arg is an i32.
+                 *   0 -> unwind.
+                 *   1 -> lift to heap (someday)
+                 */
+                llvm_argtype_v.push_back
+                    (llvm::Type::getInt32Ty(llvm_cx->llvm_cx_ref()));
+
+                /* return value is frame pointer */
+                llvm::Type * retval_llvm_type = frameptr_llvm_type;
+
+                auto * unwind_llvm_type = llvm::FunctionType::get(retval_llvm_type,
+                                                                  llvm_argtype_v,
+                                                                  false /*!varargs*/);
+
+                return unwind_llvm_type;
+            } /*require_baseframe_unwind_llvm_type*/
+
+            /** Each lambda gets its own stack frame definition.
+             *  However all the various frame representations share the same 'baseframe'
+             *  prefix.
+             *
+             *  _baseframe:
+             *                                ^
+             *                                |
+             *                    +-------+   |
+             *    next_frame  [0] |   o-------/
+             *                    +-------|
+             *    unwind_fn   [1] |   o-------> frame* (*)(frame*, ctl)
+             *                    +-------+
+             *
+             *  This helper function generates an llvm::Type* for a baseframe.
+             *  It only needs to be invoked once (per LlvmContext, I guess ..)
+             **/
+            llvm::StructType *
+            require_baseframe_llvm_type(xo::ref::brw<LlvmContext> llvm_cx)
+            {
+                /* _baseframe: base type for a stack frame */
+                llvm::StructType * frame_llvm_type
+                    = llvm::StructType::get(llvm_cx->llvm_cx_ref(),
+                                            "_baseframe");
+
+                /* _baseframe*: pointer to a stack frame */
+                llvm::PointerType * frameptr_llvm_type
+                    = llvm::PointerType::getUnqual(frame_llvm_type);
+
+                /* unwind function = frame[1] */
+                llvm::FunctionType * unwind_llvm_type
+                    = require_baseframe_unwind_llvm_type(llvm_cx,
+                                                         frameptr_llvm_type);
+
+                /* _baseframe members */
+                std::vector<llvm::Type *> llvm_membertype_v;
+                {
+                    llvm_membertype_v.reserve(2);
+
+                    /* frame[0] = pointer to next frame */
+                    llvm_membertype_v.push_back(frameptr_llvm_type);
+                    /* frame[1] = unwind function */
+                    llvm_membertype_v.push_back(unwind_llvm_type);
+                }
+
+                frame_llvm_type->setBody(frameptr_llvm_type /*frame[0]*/,
+                                         unwind_llvm_type /*frame[1]*/);
+
+                return frame_llvm_type;
+            } /*require_baseframe_llvm_type*/
+
+            /** need a supporting type for stack frame
+             * - so we can handle variables with non-trivial dtors
+             *   (e.g. smart pointers)
+             * - so we can implement nested lexical scoping
+             * - so we can walk stack for exception handling
+             * - eventually: so we can eventually implement trampoline
+             *
+             * frame representation:
+             *
+             *                                ^
+             *                                |
+             *                    +-------+   |
+             *    next_frame  [0] |   o-------/
+             *                    +-------|
+             *    unwind_fn   [1] |   o-------> baseframe* (*)(baseframe*, ctl)
+             *                    +-------|
+             *    arg[i]    [2+i] |  ...  |
+             *                    +-------+
+             *
+             *  invoke frame.unwind_fn to dispose of a frame
+             *  - ctl=0  dtor.  deal with smart pointers etc.
+             *  - ctl=1  copy.  lift frame into heap for lambda capture
+             *
+             * every frame is a subtype of _baseframe (ofc llvm doesn't know this).
+             * See baseframe_llvm_type(), baseframe_unwind_llvm_type() above
+             *
+             * editor bait: activation_record_to_llvm_type
+             **/
+            llvm::StructType *
+            frame_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
+                               ref::brw<Lambda> lambda,
+                               llvm::Function * lambda_llvm_fn)
+            {
+                constexpr bool c_debug_flag = true;
+                using xo::scope;
+
+                scope log(XO_DEBUG(c_debug_flag));
+
+                /* frame type doesn't need a name */
+                llvm::StructType * frame_llvm_type
+                    = llvm::StructType::get(llvm_cx->llvm_cx_ref());
+
+                /* _baseframe */
+                llvm::StructType * baseframe_llvm_type
+                    = require_baseframe_llvm_type(llvm_cx);
+
+                /* _baseframe*: pointer to a generic stack frame */
+                llvm::PointerType * baseframeptr_llvm_type
+                    = llvm::PointerType::getUnqual(baseframe_llvm_type);
+
+                /* _baseframe* (*)(_baseframe*, i32) */
+                llvm::FunctionType * unwind_llvm_type
+                    = require_baseframe_unwind_llvm_type(llvm_cx,
+                                                         baseframeptr_llvm_type);
+
+                /* llvm_argtype_v:
+                 * - llvm_argtype_v[0]   = llvm::Type* for pointer to next_frame
+                 * - llvm_argtype_v[1]   = llvm::Type* for unwind_fn
+                 * - llvm_argtype_v[2+i] = llvm::Type* for lambda->fn_arg(i)
+                 */
+                std::vector<llvm::Type *> llvm_argtype_v;
+                {
+                    llvm_argtype_v.reserve(2 + lambda_llvm_fn->arg_size());
+
+                    /* frame pointer */
+                    llvm_argtype_v.push_back(baseframeptr_llvm_type);
+                    /* unwind function */
+                    llvm_argtype_v.push_back(unwind_llvm_type);
+
+                    int i_arg = 0;
+                    for (auto & arg : lambda_llvm_fn->args()) {
+                        log && log(xtag("i_arg", i_arg),
+                                   xtag("param", std::string(arg.getName())));
+
+                        llvm_argtype_v.push_back(td_to_llvm_type(llvm_cx,
+                                                                 lambda->fn_arg(i_arg)));
+
+                        ++i_arg;
+                    }
+                }
+
+                frame_llvm_type->setBody(llvm_argtype_v);
+
+                return frame_llvm_type;
+            } /*frame_to_llvm_type*/
+        } /*namespace*/
+
+
         llvm::Function *
         MachPipeline::codegen_lambda_defn(ref::brw<Lambda> lambda,
                                           llvm::IRBuilder<> & ir_builder)
@@ -724,7 +894,6 @@ namespace xo {
                 return nullptr;
             }
 
-
             /* generate function body */
 
             auto block = llvm::BasicBlock::Create(llvm_cx_->llvm_cx_ref(), "entry", llvm_fn);
@@ -733,6 +902,8 @@ namespace xo {
 
             /** Actual parameters will need their own activation record.
              *  Track its shape here.
+             *
+             *  Local variables will be formal parameters to a nested lambda;
              **/
             this->env_stack_.push(activation_record());
 
