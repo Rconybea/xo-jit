@@ -280,6 +280,22 @@ namespace xo {
                 return llvm_struct_type;
             } /*struct_td_to_llvm_type*/
 
+            llvm::PointerType *
+            pointer_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
+                                    TypeDescr pointer_td)
+            {
+                assert(pointer_td->is_pointer());
+
+                TypeDescr dest_td = pointer_td->fixed_child_td(0);
+
+                llvm::Type * llvm_dest_type = td_to_llvm_type(llvm_cx, dest_td);
+
+                llvm::PointerType * llvm_ptr_type
+                    = llvm::PointerType::getUnqual(llvm_dest_type);
+
+                return llvm_ptr_type;
+            } /*pointer_td_llvm_type*/
+
             llvm::Type *
             td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx, TypeDescr td) {
                 auto & llvm_cx_ref = llvm_cx->llvm_cx_ref();
@@ -291,6 +307,8 @@ namespace xo {
                     return function_td_to_llvm_fnptr_type(llvm_cx, td);
                 } else if (td->is_struct()) {
                     return struct_td_to_llvm_type(llvm_cx, td);
+                } else if (td->is_pointer()) {
+                    return pointer_td_to_llvm_type(llvm_cx, td);
                 } else if (Reflect::is_native<bool>(td)) {
                     return llvm::Type::getInt1Ty(llvm_cx_ref);
                 } else if (Reflect::is_native<char>(td)) {
