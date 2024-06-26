@@ -231,7 +231,11 @@ namespace xo {
 
             REQUIRE(struct_td);
 
+            // ----- build AST -----
+
             auto fn_ast = make_ratio();
+
+            // ----- convert AST -> llvm IR datastructure -----
 
             llvm::Value * llvm_ircode = jit->codegen_toplevel(fn_ast);
 
@@ -249,11 +253,37 @@ namespace xo {
 
             REQUIRE(llvm_ircode);
 
+            // ----- inspect alignment -----
+
+            llvm::StructType * struct_llvm_type
+                = static_cast<llvm::StructType *>(jit->codegen_type(struct_td));
+
+            auto struct_layout = jit->data_layout().getStructLayout(struct_llvm_type);
+
+            log && log(xtag("struct-size", struct_layout->getSizeInBytes()),
+                       xtag("struct-alignment", struct_layout->getAlignment().value()));
+            for (int i = 0, n = struct_llvm_type->getNumElements(); i < n; ++i) {
+                llvm::TypeSize llvm_tz = struct_layout->getElementOffset(i);
+                auto offset = reinterpret_cast<uint64_t>(struct_td->struct_member(i).get_member_tp(nullptr).address());
+
+                log && log(xtag("i", i),
+                           xtag("name(c++)", struct_td->struct_member(i).member_name()),
+                           xtag("type(c++)", struct_td->struct_member(i).get_member_td()->short_name()),
+                           xtag("offset(c++)", offset),
+                           xtag("offset(llvm)", llvm_tz.getKnownMinValue()));
+
+                REQUIRE(offset == llvm_tz.getKnownMinValue());
+            }
+
+            // ----- generate JIT machine code -----
+
             jit->machgen_current_module();
 
             log && log("execution session after codegen:");
             //log && log(jit->xsession());  // segfaults
             jit->dump_execution_session();
+
+            // ----- verify: lookup symbol
 
             /** lookup compiled function pointer in jit **/
             auto llvm_addr = jit->lookup_symbol(fn_ast->name());
@@ -275,6 +305,8 @@ namespace xo {
             auto fn_ptr = llvm_addr.get().toPtr<ratio_type(*)(int,int)>();
 
             REQUIRE(fn_ptr);
+
+            // ---- invoke compiled function -----
 
             auto value = (*fn_ptr)(2, 3);
 
