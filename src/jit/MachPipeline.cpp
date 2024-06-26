@@ -248,9 +248,6 @@ namespace xo {
 
                 /* structs with names:  within an llvmcontext, must be unique
                  *
-                 * If we don't set isPacked,  then padding will be chosen based on DataLayout,
-                 * which might C++ compiler's padding,  but no guarantees.
-                 *
                  * We can however compare the offsets recorded in xo::reflect with
                  * offsets chosen by llvm, *once we've created the llvm type*
                  *
@@ -268,7 +265,7 @@ namespace xo {
                     = llvm::StructType::create(llvm_cx_ref,
                                                llvm_membertype_v,
                                                llvm::StringRef(struct_name),
-                                               true /*isPacked*/);
+                                               false /*!isPacked*/);
 
                 /* TODO: inspect (how) offsets that llvm is using
                  * we need them to match what C++ chose
