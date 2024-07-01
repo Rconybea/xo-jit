@@ -20,6 +20,7 @@
 #include "xo/expression/Lambda.hpp"
 #include "xo/expression/Variable.hpp"
 #include "xo/expression/IfExpr.hpp"
+#include "xo/expression/GlobalEnv.hpp"
 
 /* stuff from kaleidoscope.cpp */
 #include "llvm/ADT/APFloat.h"
@@ -57,6 +58,7 @@ namespace xo {
         public:
             using Expression = xo::ast::Expression;
             using Lambda = xo::ast::Lambda;
+            using GlobalEnv = xo::ast::GlobalEnv;
             using TypeDescr = xo::reflect::TypeDescr;
             using ExecutionSession = llvm::orc::ExecutionSession;
             using DataLayout = llvm::DataLayout;
@@ -211,7 +213,7 @@ namespace xo {
             std::unique_ptr<llvm::Module> llvm_module_;
 
             /** map global names to functions/variables **/
-            std::map<std::string, xo::ref::rp<Expression>> global_env_;
+            ref::rp<GlobalEnv> global_env_;
 
             /** map variable names (formal parameters) to
              *  corresponding llvm IR.
