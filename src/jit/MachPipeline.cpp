@@ -736,7 +736,7 @@ namespace xo {
             /** Actual parameters will need their own activation record.
              *  Track its shape here.
              **/
-            this->env_stack_.push(activation_record());
+            this->env_stack_.push(activation_record(lambda.get()));
 
             {
                 log && log("lambda: stack size Z", xtag("Z", env_stack_.size()));
@@ -769,7 +769,7 @@ namespace xo {
                      * in lambda body.
                      *
                      */
-                    env_stack_.top().alloc_var(arg_name, alloca);
+                    env_stack_.top().alloc_var(i, arg_name, alloca);
                     ++i;
                 }
             }

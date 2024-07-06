@@ -25,7 +25,8 @@ namespace xo {
         } /*lookup_var*/
 
         llvm::AllocaInst *
-        activation_record::alloc_var(const std::string & x,
+        activation_record::alloc_var(std::size_t j_slot,
+                                     const std::string & x,
                                      llvm::AllocaInst * alloca)
         {
             if (frame_.find(x) != frame_.end()) {
@@ -34,6 +35,11 @@ namespace xo {
                      << endl;
                 return nullptr;
             }
+
+            if (j_slot >= binding_v_.size())
+                binding_v_.resize(j_slot + 1);
+
+            binding_v_[j_slot] = runtime_binding_path::local(j_slot);
 
             frame_[x] = alloca;
             return alloca;
