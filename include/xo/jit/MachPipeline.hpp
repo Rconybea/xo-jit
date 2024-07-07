@@ -111,6 +111,16 @@ namespace xo {
             llvm::Type * codegen_type(TypeDescr td);
             llvm::Value * codegen_constant(ref::brw<xo::ast::ConstantInterface> expr);
             llvm::Function * codegen_primitive(ref::brw<xo::ast::PrimitiveInterface> expr);
+
+            /** like @ref codegen_primitive , but create wrapper function that accepts (and discards)
+             *  environment pointer as first argument.
+             *
+             *  Implementation consists of tail call to natural primitive, that skips the unused
+             *  environment pointer
+             **/
+            llvm::Function * codegen_primitive_wrapper(ref::brw<xo::ast::PrimitiveInterface> expr,
+                                                       llvm::IRBuilder<> & ir_builder);
+
             llvm::Value * codegen_apply(ref::brw<xo::ast::Apply> expr, llvm::IRBuilder<> & ir_builder);
             /* NOTE: codegen_lambda() needs to be reentrant too.
              *       for example can have a lambda in apply position.

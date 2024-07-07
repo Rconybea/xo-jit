@@ -29,9 +29,17 @@ namespace xo {
 
             /** establish llvm representation for a function type
              *  described by @p fn_td
+             *
+             *  @param wrapper_flag  If true, create function type for a wrapper
+             *                       to be associated with a closure.
+             *  The wrapper accepts (and ignores) an envapi pointer as first argument.
+             *  Necessary to (for example) support function pointers that may refer
+             *  to either {primitive functions, functions-requiring-closures},
+             *  with choice deferred until runtime
              **/
             static llvm::FunctionType * function_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                                                 TypeDescr fn_td);
+                                                                 TypeDescr fn_td,
+                                                                 bool wrapper_flag = false);
 
             /** establish llvm concrete representation for a particular lambda's
              *  runtime local environment:

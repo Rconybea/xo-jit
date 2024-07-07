@@ -58,12 +58,16 @@ namespace xo {
          **/
         llvm::FunctionType *
         type2llvm::function_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                            TypeDescr fn_td)
+                                            TypeDescr fn_td,
+                                            bool wrapper_flag)
         {
             int n_fn_arg = fn_td->n_fn_arg();
 
             std::vector<llvm::Type *> llvm_argtype_v;
-            llvm_argtype_v.reserve(n_fn_arg);
+            llvm_argtype_v.reserve(n_fn_arg + (wrapper_flag ? 1 : 0));
+
+            if (wrapper_flag)
+                llvm_argtype_v.push_back(env_api_llvm_ptr_type(llvm_cx));
 
             /** check function args are all known **/
             for (int i = 0; i < n_fn_arg; ++i) {
