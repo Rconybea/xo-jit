@@ -183,7 +183,66 @@ namespace xo {
                     REQUIRE(actual == expected);
                 }
             }
-        } /*TEST_CASE(machpipeline)*/
+        } /*TEST_CASE(machpipeline.fptr)*/
+
+        TEST_CASE("machpipeline.wrap", "[llvm][llvm_closure]") {
+            constexpr bool c_debug_flag = true;
+
+            scope log(XO_DEBUG2(c_debug_flag, "TEST_CASE.machpipelin.wrap"));
+
+            auto jit = MachPipeline::make();
+
+            auto root = make_primitive("sqrt",
+                                       ::sqrt,
+                                       false /*!explicit_symbol_def*/,
+                                       llvmintrinsic::fp_sqrt);
+
+            llvm::Value * llvm_ircode
+                = jit->codegen_primitive_wrapper(root, *(jit->llvm_current_ir_builder()));
+
+            /* TODO: printer for llvm::Value* */
+            if (llvm_ircode) {
+                /* note: llvm:errs() is 'raw stderr stream' */
+                cerr << "llvm_ircode for primitive wrapper:" << endl;
+                llvm_ircode->print(llvm::errs());
+                cerr << endl;
+            } else {
+                cerr << "code generation failed"
+                     << xtag("root", root)
+                     << endl;
+            }
+
+            REQUIRE(llvm_ircode);
+
+            std::string wrapper_name = std::string("w.") + root->name();
+
+            jit->machgen_current_module();
+
+            auto llvm_addr = jit->lookup_symbol(wrapper_name);
+
+            bool llvm_addr_flag = static_cast<bool>(llvm_addr);
+
+            if (!llvm_addr_flag) {
+                cerr << "ex2: lookup: symbol not found"
+                     << xtag("symbol", wrapper_name)
+                     << endl;
+            } else {
+                cerr << "ex2: lookup: symbol found"
+                     << xtag("llvm_addr", llvm_addr.get().getValue())
+                     << xtag("symbol", wrapper_name)
+                     << endl;
+            }
+
+            REQUIRE(llvm_addr_flag);
+
+            auto fn_ptr = llvm_addr.get().toPtr<double(*)(void*, double)>();
+
+            REQUIRE(fn_ptr);
+
+            auto actual = (*fn_ptr)(nullptr, 4.0);
+
+            REQUIRE(actual == 2.0);
+        }
 
         rp<Lambda>
         make_ratio() {
