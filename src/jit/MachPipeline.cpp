@@ -1,6 +1,8 @@
 /* @file MachPipeline.cpp */
 
 #include "MachPipeline.hpp"
+#include "activation_record.hpp"
+#include "type2llvm.hpp"
 #include <string>
 
 namespace xo {
@@ -156,187 +158,9 @@ namespace xo {
             return nullptr;
         } /*codegen_constant*/
 
-        namespace {
-            /** REMINDER:
-             *  1. creation of llvm types is idempotent
-             *     (duplicate calls will receive the same llvm::Type* pointer)
-             *  2. llvm::Types are never deleted.
-             **/
-
-            llvm::Type *
-            td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx, TypeDescr td);
-
-            /** obtain llvm representation for a function type with the same signature as
-             *  that represented by @p fn_td
-             **/
-            llvm::FunctionType *
-            function_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                     TypeDescr fn_td)
-            {
-                int n_fn_arg = fn_td->n_fn_arg();
-
-                std::vector<llvm::Type *> llvm_argtype_v;
-                llvm_argtype_v.reserve(n_fn_arg);
-
-                /** check function args are all known **/
-                for (int i = 0; i < n_fn_arg; ++i) {
-                    TypeDescr arg_td = fn_td->fn_arg(i);
-
-                    llvm::Type * llvm_argtype = td_to_llvm_type(llvm_cx, arg_td);
-
-                    if (!llvm_argtype)
-                        return nullptr;
-
-                    llvm_argtype_v.push_back(llvm_argtype);
-                }
-
-                TypeDescr retval_td = fn_td->fn_retval();
-                llvm::Type * llvm_retval = td_to_llvm_type(llvm_cx, retval_td);
-
-                if (!llvm_retval)
-                    return nullptr;
-
-                auto * llvm_fn_type = llvm::FunctionType::get(llvm_retval,
-                                                              llvm_argtype_v,
-                                                              false /*!varargs*/);
-                return llvm_fn_type;
-            }
-
-            llvm::PointerType *
-            function_td_to_llvm_fnptr_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                           TypeDescr fn_td)
-            {
-                auto * llvm_fn_type = function_td_to_llvm_type(llvm_cx, fn_td);
-
-                /** like C: llvm IR doesn't support function-valued variables;
-                 *  it does however support pointer-to-function-valued variables
-                 **/
-                auto * llvm_ptr_type
-                    = llvm::PointerType::get(llvm_fn_type,
-                                             0 /*numbered address space*/);
-
-                return llvm_ptr_type;
-            }
-
-            /**
-             *  Generate llvm::Type correspoinding to a TypeDescr for a struct.
-             **/
-            llvm::StructType *
-            struct_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                   TypeDescr struct_td)
-            {
-                // see
-                //   [[https://stackoverflow.com/questions/32299166/accessing-struct-members-and-arrays-of-structs-from-llvm-ir]]
-
-                auto & llvm_cx_ref = llvm_cx->llvm_cx_ref();
-
-                /* note: object pointer ignored for struct types,
-                 *       since number of members is known at compile time
-                 */
-                int n_member = struct_td->n_child(nullptr /*&object*/);
-
-                /* one type for each struct member */
-                std::vector<llvm::Type *> llvm_membertype_v;
-                llvm_membertype_v.reserve(n_member);
-
-                for (int i = 0; i < n_member; ++i) {
-                    StructMember const & sm = struct_td->struct_member(i);
-
-                    llvm_membertype_v.push_back(td_to_llvm_type(llvm_cx,
-                                                                sm.get_member_td()));
-               }
-
-                std::string struct_name = std::string(struct_td->short_name());
-
-                /* structs with names:  within an llvmcontext, must be unique
-                 *
-                 * We can however compare the offsets recorded in xo::reflect with
-                 * offsets chosen by llvm, *once we've created the llvm type*
-                 *
-                 * Also,  we can't guarantee that a c++ type was completely reflected --
-                 * it's possible one or more members were omitted, in which case
-                 * it's unlikely at best that llvm chooses the same layout.
-                 *
-                 * Instead: tell llvm to make packed struct,
-                 *          and introduce dummy members for padding.
-                 *
-                 * A consequence is we have to maintain mapping between llvm's
-                 * member numbering and xo::reflect's
-                 */
-                llvm::StructType * llvm_struct_type
-                    = llvm::StructType::create(llvm_cx_ref,
-                                               llvm_membertype_v,
-                                               llvm::StringRef(struct_name),
-                                               false /*!isPacked*/);
-
-                /* TODO: inspect (how) offsets that llvm is using
-                 * we need them to match what C++ chose
-                 *
-                 * (because we want jitted llvm code to interoperate with
-                 *  C++ library code that has structs)
-                 */
-
-                // GetElementPtrInst is interesting,
-                // but I think that's for generating code
-
-                return llvm_struct_type;
-            } /*struct_td_to_llvm_type*/
-
-            llvm::PointerType *
-            pointer_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                    TypeDescr pointer_td)
-            {
-                assert(pointer_td->is_pointer());
-
-                TypeDescr dest_td = pointer_td->fixed_child_td(0);
-
-                llvm::Type * llvm_dest_type = td_to_llvm_type(llvm_cx, dest_td);
-
-                llvm::PointerType * llvm_ptr_type
-                    = llvm::PointerType::getUnqual(llvm_dest_type);
-
-                return llvm_ptr_type;
-            } /*pointer_td_llvm_type*/
-
-            llvm::Type *
-            td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx, TypeDescr td) {
-                auto & llvm_cx_ref = llvm_cx->llvm_cx_ref();
-
-                if (td->is_function()) {
-                    /* in this context,  we're looking for a representation for a value,
-                     * i.e. something that can be stored in a variable
-                     */
-                    return function_td_to_llvm_fnptr_type(llvm_cx, td);
-                } else if (td->is_struct()) {
-                    return struct_td_to_llvm_type(llvm_cx, td);
-                } else if (td->is_pointer()) {
-                    return pointer_td_to_llvm_type(llvm_cx, td);
-                } else if (Reflect::is_native<bool>(td)) {
-                    return llvm::Type::getInt1Ty(llvm_cx_ref);
-                } else if (Reflect::is_native<char>(td)) {
-                    return llvm::Type::getInt8Ty(llvm_cx_ref);
-                } else if (Reflect::is_native<short>(td)) {
-                    return llvm::Type::getInt16Ty(llvm_cx_ref);
-                } else if (Reflect::is_native<int>(td)) {
-                    return llvm::Type::getInt32Ty(llvm_cx_ref);
-                } else if (Reflect::is_native<long>(td)) {
-                    return llvm::Type::getInt64Ty(llvm_cx_ref);
-                } else if (Reflect::is_native<float>(td)) {
-                    return llvm::Type::getFloatTy(llvm_cx_ref);
-                } else if (Reflect::is_native<double>(td)) {
-                    return llvm::Type::getDoubleTy(llvm_cx_ref);
-                } else {
-                    cerr << "td_to_llvm_type: no llvm type available for T"
-                         << xtag("T", td->short_name())
-                         << endl;
-                    return nullptr;
-                }
-            }
-        }
-
         llvm::Type *
         MachPipeline::codegen_type(TypeDescr td) {
-            return td_to_llvm_type(llvm_cx_.borrow(), td);
+            return type2llvm::td_to_llvm_type(llvm_cx_.borrow(), td);
         }
 
         llvm::Function *
@@ -368,7 +192,7 @@ namespace xo {
             TypeDescr fn_td = expr->valuetype();
 
             llvm::FunctionType * llvm_fn_type
-                = function_td_to_llvm_type(llvm_cx_.borrow(), fn_td);
+                = type2llvm::function_td_to_llvm_type(llvm_cx_.borrow(), fn_td);
 
             if (!llvm_fn_type)
                 return nullptr;
@@ -577,7 +401,7 @@ namespace xo {
              */
 
             llvm::FunctionType * llvm_fn_type
-                = function_td_to_llvm_type(this->llvm_cx_, ast_fn_td);
+                = type2llvm::function_td_to_llvm_type(this->llvm_cx_, ast_fn_td);
 
             return ir_builder.CreateCall(llvm_fn_type,
                                          llvm_fnval,
@@ -586,6 +410,7 @@ namespace xo {
 
         } /*codegen_apply*/
 
+#ifdef OBSOLETE
         /* in kaleidoscope7.cpp: CreateEntryBlockAlloca */
         llvm::AllocaInst *
         MachPipeline::create_entry_block_alloca(llvm::Function * llvm_fn,
@@ -603,8 +428,8 @@ namespace xo {
             llvm::IRBuilder<> tmp_ir_builder(&llvm_fn->getEntryBlock(),
                                              llvm_fn->getEntryBlock().begin());
 
-            llvm::Type * llvm_var_type = td_to_llvm_type(llvm_cx_.borrow(),
-                                                         var_type);
+            llvm::Type * llvm_var_type = type2llvm::td_to_llvm_type(llvm_cx_.borrow(),
+                                                                    var_type);
 
             log && log(xtag("addr(llvm_var_type)", (void*)llvm_var_type));
             if (log) {
@@ -627,6 +452,7 @@ namespace xo {
 
             return retval;
         } /*create_entry_block_alloca*/
+#endif
 
 
         std::vector<ref::brw<Lambda>>
@@ -678,8 +504,8 @@ namespace xo {
 #endif
 
             llvm::FunctionType * llvm_fn_type
-                = function_td_to_llvm_type(llvm_cx_.borrow(),
-                                           lambda->valuetype());
+                = type2llvm::function_td_to_llvm_type(llvm_cx_.borrow(),
+                                                      lambda->valuetype());
 
             /* create (initially empty) function */
             fn = llvm::Function::Create(llvm_fn_type,
@@ -734,10 +560,18 @@ namespace xo {
             ir_builder.SetInsertPoint(block);
 
             /** Actual parameters will need their own activation record.
-             *  Track its shape here.
+             *  Track its shape + setup/teardown here.
              **/
             this->env_stack_.push(activation_record(lambda.get()));
 
+            bool ok_flag = this->env_stack_.top().bind_locals(llvm_cx_, llvm_fn, ir_builder);
+
+            if (!ok_flag) {
+                this->env_stack_.pop();
+                return nullptr;
+            }
+
+#ifdef OBSOLETE
             {
                 log && log("lambda: stack size Z", xtag("Z", env_stack_.size()));
 
@@ -773,6 +607,7 @@ namespace xo {
                     ++i;
                 }
             }
+#endif
 
             llvm::Value * retval = this->codegen(lambda->body(), ir_builder);
 
@@ -827,14 +662,16 @@ namespace xo {
                 return nullptr;
             }
 
-            llvm::AllocaInst * alloca = env_stack_.top().lookup_var(var->name());
+            activation_record & ar = env_stack_.top();
 
-            if (!alloca)
+            const runtime_binding_detail * binding = ar.lookup_var(var->name());
+
+            if (!binding)
                 return nullptr;
 
             /* code to load value from stack */
-            return ir_builder.CreateLoad(alloca->getAllocatedType(),
-                                         alloca,
+            return ir_builder.CreateLoad(binding->llvm_type_,
+                                         binding->llvm_addr_,
                                          var->name().c_str());
         } /*codegen_variable*/
 

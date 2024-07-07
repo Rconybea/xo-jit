@@ -161,6 +161,7 @@ namespace xo {
             llvm::AllocaInst * create_entry_frame_alloca(llvm::Function * llvm_fn,
                                                          llvm::StructType * frame_llvm_type);
 
+#ifdef OBSOLETE  // see activation_record::create_entry_block_alloca()
             /** codegen helper for a user-defined function (codegen_lambda()):
              *  create stack slot on behalf of some formal parameter to a function,
              *  so we can avoid SSA restriction on function body
@@ -170,6 +171,7 @@ namespace xo {
             llvm::AllocaInst * create_entry_block_alloca(llvm::Function * llvm_fn,
                                                          const std::string & var_name,
                                                          TypeDescr var_type);
+#endif
 
         private:
             /** (re)create pipeline to turn expressions into llvm IR code **/
