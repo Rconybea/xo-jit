@@ -303,6 +303,36 @@ namespace xo {
             return localenv_llvm_type;
         } /*create_localenv_llvm_type*/
 
+        llvm::StructType *
+        type2llvm::create_closure_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+                                         xo::ref::brw<Lambda> lambda)
+        {
+            constexpr const char * c_prefix = "c.";
+
+            /* would be precisely correct to use create_localenv_llvm_type()
+             * here.  However judged not sufficiently helpful.
+             * Would still
+             * need environment cast whenever closure in apply position is
+             * not known at compile time.
+             */
+            llvm::PointerType * fn_lvtype = function_td_to_llvm_fnptr_type(llvm_cx,
+                                                                            lambda->valuetype());
+            llvm::StructType * env_lvtype = env_api_llvm_type(llvm_cx);
+
+            std::vector<llvm::Type *> member_lvtype_v = { fn_lvtype, env_lvtype };
+
+            /* e.g. "c.foo" */
+            std::string closure_name = std::string(c_prefix) + lambda->name();
+
+            llvm::StructType * closure_lvtype
+                = llvm::StructType::create(llvm_cx->llvm_cx_ref(),
+                                           member_lvtype_v,
+                                           llvm::StringRef(closure_name),
+                                           false /*!is_packed*/);
+
+            return closure_lvtype;
+        } /*create_closure_lvtype*/
+
     } /*namespace jit*/
 } /*namespace xo*/
 

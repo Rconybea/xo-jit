@@ -41,6 +41,28 @@ namespace xo {
                                                                  TypeDescr fn_td,
                                                                  bool wrapper_flag = false);
 
+            /** establish llvm concrete representation for a closure.
+             *
+             *                  +-------+
+             *              [0] |   o-------> fnptr  T (*)(envptr, ...)
+             *                  +-------+
+             *              [1] |   o-------\
+             *                  +-------+   |
+             *                              |
+             *                              |
+             *                              v
+             *                          +-------+
+             *           parent_env [0] |   o-------> _env_api*
+             *                          +-------+
+             *           unwind_fn  [1] |   o-------> env * (*)(env*, ctl)
+             *                          +-------+
+             *
+             * @return struct type.  typename will be @c c.foo for lambda with name @c foo
+             **/
+            static llvm::StructType *
+            create_closure_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+                                  xo::ref::brw<Lambda> lambda);
+
             /** establish llvm concrete representation for a particular lambda's
              *  runtime local environment:
              *
@@ -62,6 +84,8 @@ namespace xo {
              *
              *   arg[] comprises the subset of lambda arg names arg[j] for which
              *   lambda->is_captured(arg[j]) is true
+             *
+             * @return struct type.  typename will be @c e.foo for lambda with name @c foo
              **/
             static llvm::StructType *
             create_localenv_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
