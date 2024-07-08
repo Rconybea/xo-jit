@@ -26,7 +26,8 @@ namespace xo {
                 /* in this context,  we're looking for a representation for a value,
                  * i.e. something that can be stored in a variable
                  */
-                return function_td_to_llvm_fnptr_type(llvm_cx, td);
+                //return function_td_to_llvm_fnptr_type(llvm_cx, td);
+                return function_td_to_closureapi_lvtype(llvm_cx, td, "");
             } else if (td->is_struct()) {
                 return struct_td_to_llvm_type(llvm_cx, td);
             } else if (td->is_pointer()) {
@@ -95,9 +96,10 @@ namespace xo {
 
         llvm::PointerType *
         type2llvm::function_td_to_llvm_fnptr_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                                  TypeDescr fn_td)
+                                                  TypeDescr fn_td,
+                                                  bool wrapper_flag)
         {
-            auto * llvm_fn_type = function_td_to_llvm_type(llvm_cx, fn_td);
+            auto * llvm_fn_type = function_td_to_llvm_type(llvm_cx, fn_td, wrapper_flag);
 
             /** like C: llvm IR doesn't support function-valued variables;
              *  it does however support pointer-to-function-valued variables
@@ -227,7 +229,7 @@ namespace xo {
             /* _env_api: base type for a local environment */
             llvm::StructType * env_llvm_type
                 = llvm::StructType::get(llvm_cx->llvm_cx_ref(),
-                    "_env_api");
+                                        "_env_api");
 
             /* _env_api[0]: pointer to a local environment */
             llvm::PointerType * envptr_llvm_type
@@ -253,25 +255,48 @@ namespace xo {
             return llvm::PointerType::getUnqual(env_llvm_type);
         } /*env_api_llvm_ptr_type*/
 
-#ifdef NOT_USING
         llvm::StructType *
-        type2llvm::function_td_to_llvm_closure_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                                    TypeDescr fn_td)
+        type2llvm::create_closureapi_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+                                            xo::ref::brw<FunctionInterface> fn)
         {
-            constexpr bool c_debug_flag = true;
-            using xo::scope;
+            constexpr const char * c_prefix = "c.";
 
-            scope log(XO_DEBUG(c_debug_flag));
+            /* e.g. "c.foo" */
+            std::string closure_name = std::string(c_prefix) + fn->name();
 
-            /* closure type doesn't need a name.
-             * (We might find it convenient to give one anyway)
+            return function_td_to_closureapi_lvtype(llvm_cx,
+                                                    fn->valuetype(),
+                                                    closure_name);
+        } /*create_closureapi_lvtype*/
+
+        llvm::StructType *
+        type2llvm::function_td_to_closureapi_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+                                                    TypeDescr fn_td,
+                                                    const std::string & hint_name)
+        {
+            /* would be precisely correct to use create_localenv_llvm_type()
+             * here.  However judged not sufficiently helpful.
+             * Would still
+             * need environment cast whenever closure in apply position is
+             * not known at compile time.
              */
-            llvm::StructType * closure_llvm_type
-                = llvm::StructType::get(llvm_cx->llvm_cx_ref());
+            llvm::PointerType * fn_lvtype = function_td_to_llvm_fnptr_type(llvm_cx,
+                                                                           fn_td,
+                                                                           true /*wrapper_flag*/);
+            llvm::StructType * env_lvtype = env_api_llvm_type(llvm_cx);
 
-            llvm::PointerType * parent_llvm_type
-        } /*function_td_to_llvm_fnptr_type*/
-#endif
+            std::vector<llvm::Type *> member_lvtype_v = { fn_lvtype, env_lvtype };
+
+            llvm::StructType * closure_lvtype
+                = llvm::StructType::get(llvm_cx->llvm_cx_ref(), member_lvtype_v);
+
+            //closure_lvtype->setBody(member_lvtype_v);
+
+            if (!hint_name.empty())
+                closure_lvtype->setName(llvm::StringRef(hint_name));
+
+            return closure_lvtype;
+        } /*function_td_to_closureapi_lvtype*/
 
         llvm::StructType *
         type2llvm::create_localenv_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
@@ -289,7 +314,7 @@ namespace xo {
 
             for (const auto & var : lambda->argv()) {
                 if (lambda->is_captured(var->name())) {
-                    /* var needs a slot in localenv_llvm_type for lambda */
+                    /* var is captured -> needs a slot in the localenv_llvm_type belonging to this lambda */
 
                     member_llvm_type_v.push_back(td_to_llvm_type(llvm_cx,
                                                                  var->valuetype()));
@@ -308,35 +333,6 @@ namespace xo {
             return localenv_lvtype;
         } /*create_localenv_llvm_type*/
 
-        llvm::StructType *
-        type2llvm::create_closure_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
-                                         xo::ref::brw<Lambda> lambda)
-        {
-            constexpr const char * c_prefix = "c.";
-
-            /* would be precisely correct to use create_localenv_llvm_type()
-             * here.  However judged not sufficiently helpful.
-             * Would still
-             * need environment cast whenever closure in apply position is
-             * not known at compile time.
-             */
-            llvm::PointerType * fn_lvtype = function_td_to_llvm_fnptr_type(llvm_cx,
-                                                                            lambda->valuetype());
-            llvm::StructType * env_lvtype = env_api_llvm_type(llvm_cx);
-
-            std::vector<llvm::Type *> member_lvtype_v = { fn_lvtype, env_lvtype };
-
-            /* e.g. "c.foo" */
-            std::string closure_name = std::string(c_prefix) + lambda->name();
-
-            llvm::StructType * closure_lvtype
-                = llvm::StructType::create(llvm_cx->llvm_cx_ref(),
-                                           member_lvtype_v,
-                                           llvm::StringRef(closure_name),
-                                           false /*!is_packed*/);
-
-            return closure_lvtype;
-        } /*create_closure_lvtype*/
 
     } /*namespace jit*/
 } /*namespace xo*/

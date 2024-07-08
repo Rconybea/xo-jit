@@ -155,7 +155,7 @@ namespace xo {
                 = llvm::ConstantInt::get(llvm_cx->llvm_cx_ref(),
                                          llvm::APInt(32 /*bits*/,
                                                      i_slot /*value*/));
-            std::array<llvm::Value*,2> index_v = {
+            std::array<llvm::Value*, 1> index_v = {
                 {i32_slot /*environment slot #0*/}};
 
             llvm::Value * llvm_localenv_slot_ptr
@@ -194,37 +194,44 @@ namespace xo {
             {
                 int i_arg = 0;
                 for (auto & arg : llvm_fn->args()) {
-                    std::string arg_name = std::string(arg.getName());
-
-                    log && log("nested environment",
-                               xtag("i", i_arg),
-                               xtag("arg[i]", arg_name),
-                               xtag("stackonly(i)", binding_v_[i_arg].is_stackonly()));
-
-                    if (binding_v_[i_arg].is_stackonly()) {
-                        /* stack location for arg[i] */
-                        runtime_binding_detail binding
-                            = create_entry_block_alloca(llvm_cx,
-                                                        //data_layout,
-                                                        llvm_fn,
-                                                        tmp_ir_builder,
-                                                        i_arg,
-                                                        arg_name,
-                                                        lambda_->fn_arg(i_arg));
-
-                        if (!binding.llvm_addr_)
-                            return false;
-
-                        /* store on function entry
-                         *   see codegen_variable() for corresponding load
+                    if (i_arg == 0) {
+                        /* 1st argument is injected environment pointer.
+                         * we don't need that to be on the stack,
+                         * since not modifiable and not user-referencable.
                          */
-                        ir_builder.CreateStore(&arg, binding.llvm_addr_);
+                    } else {
+                        std::string arg_name = std::string(arg.getName());
 
-                        /* remember stack location for reference + assignment
-                         * in lambda body.
-                         *
-                         */
-                        this->alloc_var(arg_name, binding);
+                        log && log("nested environment",
+                                   xtag("i", i_arg),
+                                   xtag("arg[i]", arg_name),
+                                   xtag("stackonly(i)", binding_v_[i_arg-1].is_stackonly()));
+
+                        if (binding_v_[i_arg-1].is_stackonly()) {
+                            /* stack location for arg[i] */
+                            runtime_binding_detail binding
+                                = create_entry_block_alloca(llvm_cx,
+                                                            //data_layout,
+                                                            llvm_fn,
+                                                            tmp_ir_builder,
+                                                            i_arg,
+                                                            arg_name,
+                                                            lambda_->fn_arg(i_arg));
+
+                            if (!binding.llvm_addr_)
+                                return false;
+
+                            /* store on function entry
+                             *   see codegen_variable() for corresponding load
+                             */
+                            ir_builder.CreateStore(&arg, binding.llvm_addr_);
+
+                            /* remember stack location for reference + assignment
+                             * in lambda body.
+                             *
+                             */
+                            this->alloc_var(arg_name, binding);
+                        }
                     }
 
                     ++i_arg;
@@ -297,7 +304,7 @@ namespace xo {
                 int i_localenv_slot = 0;
 
                 /* store localenv->parent_env */
-               {
+                {
                     llvm::Value * slot_addr
                         = runtime_localenv_slot_addr(llvm_cx,
                                                      localenv_llvm_type,
@@ -348,42 +355,48 @@ namespace xo {
                 int i_arg = 0;
 
                 for (llvm::Argument & arg : llvm_fn->args()) {
-                    std::string arg_name = std::string(arg.getName());
-
-                    log && log("nested environment",
-                               xtag("i", i_arg),
-                               xtag("arg[i]", arg_name),
-                               xtag("captured(i)", binding_v_[i_arg].is_captured()));
-
-                    if (binding_v_[i_arg].is_captured()) {
-                        // do something with runtime-local-env for this llvm_fn
-
-                        /* remember stack location for reference + assignment
-                         * in lambda body.
-                         *
+                    if (i_arg == 0) {
+                        /* to remove all doubt,  ignore first arg here.
+                         * it's non-captureable environment pointer
                          */
+                    } else {
+                        std::string arg_name = std::string(arg.getName());
 
-                        TypeDescr arg_td = lambda_->fn_arg(i_arg);
+                        log && log("nested environment",
+                                   xtag("i", i_arg),
+                                   xtag("arg[i]", arg_name),
+                                   xtag("captured(i)", binding_v_[i_arg-1].is_captured()));
 
-                        llvm::Type * llvm_var_type = type2llvm::td_to_llvm_type(llvm_cx, arg_td);
+                        if (binding_v_[i_arg-1].is_captured()) {
+                            // do something with runtime-local-env for this llvm_fn
 
-                        llvm::Value * slot_addr
-                            = runtime_localenv_slot_addr(llvm_cx,
-                                                         localenv_llvm_type,
-                                                         localenv_alloca,
-                                                         i_localenv_slot,
-                                                         tmp_ir_builder);
+                            /* remember stack location for reference + assignment
+                             * in lambda body.
+                             *
+                             */
 
-                        if (!slot_addr)
-                            return false;
+                            TypeDescr arg_td = lambda_->fn_arg(i_arg-1);
 
-                        ++i_localenv_slot;
+                            llvm::Type * llvm_var_type = type2llvm::td_to_llvm_type(llvm_cx, arg_td);
 
-                        tmp_ir_builder.CreateStore(&arg, slot_addr);
+                            llvm::Value * slot_addr
+                                = runtime_localenv_slot_addr(llvm_cx,
+                                                             localenv_llvm_type,
+                                                             localenv_alloca,
+                                                             i_localenv_slot,
+                                                             tmp_ir_builder);
 
-                        runtime_binding_detail binding = { i_arg, slot_addr, llvm_var_type };
+                            if (!slot_addr)
+                                return false;
 
-                        this->alloc_var(arg_name, binding);
+                            ++i_localenv_slot;
+
+                            tmp_ir_builder.CreateStore(&arg, slot_addr);
+
+                            runtime_binding_detail binding = { i_arg, slot_addr, llvm_var_type };
+
+                            this->alloc_var(arg_name, binding);
+                        }
                     }
 
                     ++i_arg;

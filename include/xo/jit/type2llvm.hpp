@@ -17,6 +17,7 @@ namespace xo {
          **/
         struct type2llvm {
         public:
+            using FunctionInterface = xo::ast::FunctionInterface;
             using Lambda = xo::ast::Lambda;
             using TypeDescr = xo::reflect::TypeDescr;
 
@@ -57,11 +58,55 @@ namespace xo {
              *           unwind_fn  [1] |   o-------> env * (*)(env*, ctl)
              *                          +-------+
              *
-             * @return struct type.  typename will be @c c.foo for lambda with name @c foo
+             * @return struct type.  typename will be @c c.foo for a function
+             *         (primitive or lambda) with name @c foo
              **/
             static llvm::StructType *
-            create_closure_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
-                                  xo::ref::brw<Lambda> lambda);
+            create_closureapi_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+                                     xo::ref::brw<FunctionInterface> fn);
+
+            /** establish llvm abstract representation for a closure:
+             *  struct with
+             *  - [0] function pointer
+             *  - [1] runtime localenv pointer
+             *
+             *                  +-------+
+             *                  |   o---------> native function
+             *                  +-------+
+             *                  |   o---------> runtime localenv
+             *                  +-------+       (possibly nullptr)
+             *
+             *  1. for primitives, localenv will be null pointer
+             *  2. for lambdas L with L->requires_closure_flag() = false,
+             *     localenv will also be null pointer
+             *  3. for lambdas with L->requires_closure_flag() = true,
+             *
+             *  localenv will (for lambdas requiring closures)
+             *  in practice be struct:
+             *
+             *                              ^
+             *                              | parent
+             *                  +-------+   |
+             *   parent_env [0] |   o-------/
+             *                  +-------+
+             *   unwind_fn  [1] |   o-------> env * (*)(env*, ctl)
+             *                  +-------+
+             *   arg[i]   [2+i] .  ...  .
+             *                  .  ...  .
+             *                  +-------+
+             *
+             *   ctl=0  unwind.  finalization for any arg[i] that requires it.
+             *                   returns nullptr
+             *   ctl=1  copy.    copy runtime environment to heap destination
+             *                   and return address of the copy
+             *
+             *  Implementation here will just use generic pointer for runtime
+             *  localenv.
+             **/
+            static llvm::StructType *
+            function_td_to_closureapi_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+                                             TypeDescr fn_td,
+                                             const std::string & hint_name);
 
             /** establish llvm concrete representation for a particular lambda's
              *  runtime local environment:
@@ -128,9 +173,17 @@ namespace xo {
         private:
             /** establish llvm representation for a function-pointer type
              *  described by @p fn_td
+             *
+             *  @param wrapper_flag  If true, create function type for a wrapper
+             *                       to be associated with a closure.
+             *  The wrapper accepts (and ignores) an envapi pointer as first argument.
+             *  Necessary to (for example) support function pointers that may refer
+             *  to either {primitive functions, functions-requiring-closures},
+             *  with choice deferred until runtime
              **/
             static llvm::PointerType * function_td_to_llvm_fnptr_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                                                      TypeDescr fn_td);
+                                                                      TypeDescr fn_td,
+                                                                      bool wrapper_flag);
 
             /** establish llvm representation for a struct type described by @p struct_td
              **/
@@ -163,48 +216,6 @@ namespace xo {
              **/
             static llvm::StructType *
             env_api_llvm_type(xo::ref::brw<LlvmContext> llvm_cx);
-
-            /** establish llvm abstract representation for a closure:
-             *  struct with
-             *  - [0] function pointer
-             *  - [1] runtime localenv pointer
-             *
-             *                  +-------+
-             *                  |   o---------> native function
-             *                  +-------+
-             *                  |   o---------> runtime localenv
-             *                  +-------+       (possibly nullptr)
-             *
-             *  1. for primitives, localenv will be null pointer
-             *  2. for lambdas L with L->requires_closure_flag() = false,
-             *     localenv will also be null pointer
-             *  3. for lambdas with L->requires_closure_flag() = true,
-             *
-             *  localenv will (for lambdas requiring closures)
-             *  in practice be struct:
-             *
-             *                              ^
-             *                              | parent
-             *                  +-------+   |
-             *   parent_env [0] |   o-------/
-             *                  +-------+
-             *   unwind_fn  [1] |   o-------> env * (*)(env*, ctl)
-             *                  +-------+
-             *   arg[i]   [2+i] .  ...  .
-             *                  .  ...  .
-             *                  +-------+
-             *
-             *   ctl=0  unwind.  finalization for any arg[i] that requires it.
-             *                   returns nullptr
-             *   ctl=1  copy.    copy runtime environment to heap destination
-             *                   and return address of the copy
-             *
-             *  Implementation here will just use generic pointer for runtime
-             *  localenv.
-             **/
-            static llvm::StructType *
-            function_td_to_llvm_closure_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                             TypeDescr fn_td);
 
         }; /*type2llvm*/
     } /*namespace jit*/
