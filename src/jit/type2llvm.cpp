@@ -277,6 +277,8 @@ namespace xo {
         type2llvm::create_localenv_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
                                              xo::ref::brw<Lambda> lambda)
         {
+            constexpr const char * c_prefix = "e.";
+
             llvm::PointerType * parentenvptr_llvm_type = env_api_llvm_ptr_type(llvm_cx);
             llvm::PointerType * unwind_llvm_fnptr_type
                 = type2llvm::require_localenv_unwind_llvm_fnptr_type(llvm_cx, parentenvptr_llvm_type);
@@ -294,13 +296,16 @@ namespace xo {
                 }
             }
 
-            /* this type doesn't need a name, right? would be "_" + lambda name + "_localenv" */
-            llvm::StructType * localenv_llvm_type
+            /* e.g. "e.foo" */
+            std::string env_name = std::string(c_prefix) + lambda->name();
+
+            llvm::StructType * localenv_lvtype
                 = llvm::StructType::get(llvm_cx->llvm_cx_ref());
 
-            localenv_llvm_type->setBody(member_llvm_type_v, false /*!is_packed*/);
+            localenv_lvtype->setName(env_name);
+            localenv_lvtype->setBody(member_llvm_type_v, false /*!is_packed*/);
 
-            return localenv_llvm_type;
+            return localenv_lvtype;
         } /*create_localenv_llvm_type*/
 
         llvm::StructType *
