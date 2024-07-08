@@ -4,6 +4,10 @@ Glossary
 --------
 
 .. glossary::
+    ABI
+      | Short for Application Binary Interface.
+      | In this context applies to conventions adopted by `xo-jit`.
+
     c.foo
       | llvm typename for automatically-generated closure type for a lambda
       | with name `foo`.
