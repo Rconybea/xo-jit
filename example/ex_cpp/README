@@ -1,0 +1,6 @@
+Not including this in build for now.
+Instead,  use to manually generate .ll output:
+
+$ clang -cc1 ex_cpp.cpp -emit-llvm
+
+and inspect ex_cpp.ll
