@@ -68,6 +68,17 @@ namespace xo {
             llvm::Type * llvm_type_ = nullptr;
         };
 
+        inline std::ostream &
+        operator<<(std::ostream & os, const runtime_binding_detail & x) {
+            os << "<runtime_binding_detail"
+               << xtag("i_argno", x.i_argno_)
+               << xtag("llvm_addr", (void*)x.llvm_addr_)
+               << xtag("llvm_type", (void*)x.llvm_type_)
+               << ">";
+
+            return os;
+        }
+
         /**
          *  1. pattern for a stack frame associated with a user-defined function (some Lambda lm)
          *

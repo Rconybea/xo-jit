@@ -58,20 +58,29 @@ namespace xo {
          *  that represented by @p fn_td
          **/
         llvm::FunctionType *
-        type2llvm::function_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                            TypeDescr fn_td,
-                                            bool wrapper_flag)
+        type2llvm::function_td_to_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+                                         TypeDescr fn_td,
+                                         bool wrapper_flag)
         {
-            int n_fn_arg = fn_td->n_fn_arg();
+            constexpr bool c_debug_flag = false;
+
+            scope log(XO_DEBUG(c_debug_flag));
+
+            int n_ast_fn_arg = fn_td->n_fn_arg();
+
+            if (log) {
+                log(xtag("fn_td", fn_td->short_name()));
+                log(xtag("n_ast_fn_arg", n_ast_fn_arg));
+            }
 
             std::vector<llvm::Type *> llvm_argtype_v;
-            llvm_argtype_v.reserve(n_fn_arg + (wrapper_flag ? 1 : 0));
+            llvm_argtype_v.reserve(n_ast_fn_arg + (wrapper_flag ? 1 : 0));
 
             if (wrapper_flag)
                 llvm_argtype_v.push_back(env_api_llvm_ptr_type(llvm_cx));
 
             /** check function args are all known **/
-            for (int i = 0; i < n_fn_arg; ++i) {
+            for (int i = 0; i < n_ast_fn_arg; ++i) {
                 TypeDescr arg_td = fn_td->fn_arg(i);
 
                 llvm::Type * llvm_argtype = type2llvm::td_to_llvm_type(llvm_cx, arg_td);
@@ -79,11 +88,25 @@ namespace xo {
                 if (!llvm_argtype)
                     return nullptr;
 
+                if (log) {
+                    log(xtag("arg_td", arg_td->short_name()));
+                    log(xtag("llvm_argtype", "..."));
+                    llvm_argtype->dump();
+                    log("...done");
+                }
+
                 llvm_argtype_v.push_back(llvm_argtype);
             }
 
             TypeDescr retval_td = fn_td->fn_retval();
             llvm::Type * llvm_retval = type2llvm::td_to_llvm_type(llvm_cx, retval_td);
+
+            if (log) {
+                log(xtag("retval_td", retval_td->short_name()));
+                log(xtag("llvm_retval", "..."));
+                llvm_retval->dump();
+                log("...done");
+            }
 
             if (!llvm_retval)
                 return nullptr;
@@ -96,17 +119,23 @@ namespace xo {
 
         llvm::PointerType *
         type2llvm::function_td_to_llvm_fnptr_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                                  TypeDescr fn_td,
-                                                  bool wrapper_flag)
+                                                  TypeDescr /*fn_td*/,
+                                                  bool /*wrapper_flag*/)
         {
-            auto * llvm_fn_type = function_td_to_llvm_type(llvm_cx, fn_td, wrapper_flag);
+#ifdef OBSOLETE
+            auto * llvm_fn_type = function_td_to_lvtype(llvm_cx, fn_td, wrapper_flag);
+#endif
 
             /** like C: llvm IR doesn't support function-valued variables;
              *  it does however support pointer-to-function-valued variables
              **/
             auto * llvm_ptr_type
+                = llvm::PointerType::getUnqual(llvm_cx->llvm_cx_ref());
+#ifdef OBSOLETE
+            auto * llvm_ptr_type
                 = llvm::PointerType::get(llvm_fn_type,
                                          0 /*numbered address space*/);
+#endif
 
             return llvm_ptr_type;
         }
@@ -181,20 +210,26 @@ namespace xo {
         {
             assert(pointer_td->is_pointer());
 
+#ifdef OBSOLETE
             TypeDescr dest_td = pointer_td->fixed_child_td(0);
 
             llvm::Type * llvm_dest_type = type2llvm::td_to_llvm_type(llvm_cx, dest_td);
 
             llvm::PointerType * llvm_ptr_type
                 = llvm::PointerType::getUnqual(llvm_dest_type);
+#endif
+
+            llvm::PointerType * llvm_ptr_type
+                = llvm::PointerType::getUnqual(llvm_cx->llvm_cx_ref());
 
             return llvm_ptr_type;
         } /*pointer_td_llvm_type*/
 
         llvm::PointerType *
         type2llvm::require_localenv_unwind_llvm_fnptr_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                                           llvm::PointerType * envptr_llvm_type)
+                                                           llvm::PointerType * /*envptr_llvm_type*/)
         {
+#ifdef OBSOLETE
             if (!envptr_llvm_type)
                 envptr_llvm_type = env_api_llvm_ptr_type(llvm_cx);
 
@@ -219,6 +254,9 @@ namespace xo {
             /* _env_api* (*)(_env_api*, i32) */
             auto * unwind_llvm_fnptr_type
                 = llvm::PointerType::getUnqual(unwind_llvm_type);
+#endif
+            auto * unwind_llvm_fnptr_type
+                = llvm::PointerType::getUnqual(llvm_cx->llvm_cx_ref());
 
             return unwind_llvm_fnptr_type;
         } /*require_localenv_unwind_llvm_fnptr_type*/
@@ -231,9 +269,13 @@ namespace xo {
                 = llvm::StructType::get(llvm_cx->llvm_cx_ref(),
                                         "_env_api");
 
+#ifdef OBSOLETE
             /* _env_api[0]: pointer to a local environment */
             llvm::PointerType * envptr_llvm_type
                 = llvm::PointerType::getUnqual(env_llvm_type);
+#endif
+            llvm::PointerType * envptr_llvm_type
+                = llvm::PointerType::getUnqual(llvm_cx->llvm_cx_ref());
 
             /* _env_api[1]: unwwind/copy function */
             llvm::PointerType * unwind_llvm_fnptr_type
@@ -250,9 +292,11 @@ namespace xo {
         llvm::PointerType *
         type2llvm::env_api_llvm_ptr_type(xo::ref::brw<LlvmContext> llvm_cx)
         {
+#ifdef OBSOLETE
             llvm::StructType * env_llvm_type = env_api_llvm_type(llvm_cx);
-
             return llvm::PointerType::getUnqual(env_llvm_type);
+#endif
+            return llvm::PointerType::getUnqual(llvm_cx->llvm_cx_ref());
         } /*env_api_llvm_ptr_type*/
 
         llvm::StructType *
@@ -274,6 +318,10 @@ namespace xo {
                                                     TypeDescr fn_td,
                                                     const std::string & hint_name)
         {
+            constexpr bool c_debug_flag = false;
+
+            scope log(XO_DEBUG(c_debug_flag));
+
             /* would be precisely correct to use create_localenv_llvm_type()
              * here.  However judged not sufficiently helpful.
              * Would still
@@ -283,9 +331,21 @@ namespace xo {
             llvm::PointerType * fn_lvtype = function_td_to_llvm_fnptr_type(llvm_cx,
                                                                            fn_td,
                                                                            true /*wrapper_flag*/);
-            llvm::StructType * env_lvtype = env_api_llvm_type(llvm_cx);
+            if (log) {
+                log(xtag("fn_lvtype", "..."));
+                fn_lvtype->dump();
+                log("...done");
+            }
 
-            std::vector<llvm::Type *> member_lvtype_v = { fn_lvtype, env_lvtype };
+            llvm::PointerType * envptr_lvtype = env_api_llvm_ptr_type(llvm_cx);
+
+            if (log) {
+                log(xtag("env_lvtype", "..."));
+                envptr_lvtype->dump();
+                log("...done");
+            }
+
+            std::vector<llvm::Type *> member_lvtype_v = { fn_lvtype, envptr_lvtype };
 
             llvm::StructType * closure_lvtype
                 = llvm::StructType::get(llvm_cx->llvm_cx_ref(), member_lvtype_v);
@@ -294,6 +354,12 @@ namespace xo {
 
             if (!hint_name.empty())
                 closure_lvtype->setName(llvm::StringRef(hint_name));
+
+            if (log) {
+                log(xtag("closure_lvtype", "..."));
+                closure_lvtype->dump();
+                log("...done");
+            }
 
             return closure_lvtype;
         } /*function_td_to_closureapi_lvtype*/

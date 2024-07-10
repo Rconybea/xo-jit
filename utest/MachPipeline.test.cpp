@@ -116,12 +116,19 @@ namespace xo {
 
             //auto rng = xo::rng::xoshiro256ss(seed);
 
-            scope log(XO_DEBUG2(c_debug_flag, "TEST_CASE.machpipeline"));
+            scope log(XO_DEBUG2(c_debug_flag, "TEST_CASE.machpipeline.fptr"));
             //log && log("(A)", xtag("foo", foo));
 
-            auto jit = MachPipeline::make();
 
             for (std::size_t i_tc = 0, n_tc = s_testcase_v.size(); i_tc < n_tc; ++i_tc) {
+                /** can't share jit across examples,
+                 *  until we fix treatment of primitives:
+                 *  now that we build a wrapper for each primitive,
+                 *  need some bookkeeping to avoid trying to build
+                 *  the same wrapper twice.
+                 **/
+                auto jit = MachPipeline::make();
+
                 TestCase const & testcase = s_testcase_v[i_tc];
 
                 INFO(tostr(xtag("i_tc", i_tc)));

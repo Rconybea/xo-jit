@@ -33,7 +33,12 @@ namespace xo {
         } /*ctor*/
 
         const runtime_binding_detail *
-        activation_record::lookup_var(const std::string & x) const {
+        activation_record::lookup_var(const std::string & x) const
+        {
+            constexpr bool c_debug_flag = true;
+            using xo::scope;
+
+            scope log(XO_DEBUG(c_debug_flag));
 
             auto ix = frame_.find(x);
 
@@ -41,6 +46,10 @@ namespace xo {
                 cerr << "activation_record::lookup_var: no binding for variable x"
                      << xtag("x", x)
                      << endl;
+                cerr << "frame:";
+                for (const auto & ix : frame_)
+                    cerr << xtag("var", ix.first) << xtag("->", ix.second) << endl;
+
                 return nullptr;
             }
 
@@ -51,6 +60,14 @@ namespace xo {
         activation_record::alloc_var(const std::string & x,
                                      const runtime_binding_detail & binding)
         {
+            constexpr bool c_debug_flag = true;
+            using xo::scope;
+
+            scope log(XO_DEBUG(c_debug_flag));
+
+            log && log(xtag("var", x),
+                       xtag("binding", binding));
+
             if (frame_.find(x) != frame_.end()) {
                 cerr << "activation_record::alloc_var: variable x already present in frame"
                      << xtag("x", x)
@@ -76,10 +93,12 @@ namespace xo {
             constexpr bool c_debug_flag = true;
             using xo::scope;
 
-            scope log(XO_DEBUG(c_debug_flag),
-                      xtag("llvm_fn", (void*)llvm_fn),
-                      xtag("var_name", var_name),
-                      xtag("var_type", var_type->short_name()));
+            scope log(XO_DEBUG(c_debug_flag));
+
+            log && log(xtag("llvm_fn", (void*)llvm_fn),
+                       xtag("i_arg", i_arg),
+                       xtag("var_name", var_name),
+                       xtag("var_type", var_type->short_name()));
 
             llvm::Type * llvm_var_type = type2llvm::td_to_llvm_type(llvm_cx,
                                                                     var_type);
@@ -151,12 +170,16 @@ namespace xo {
 #endif
                                                       llvm::IRBuilder<> & tmp_ir_builder)
         {
+            llvm::Value * i0_slot
+                = llvm::ConstantInt::get(llvm_cx->llvm_cx_ref(),
+                                         llvm::APInt(32 /*bits*/, 0));
+
             llvm::Value * i32_slot
                 = llvm::ConstantInt::get(llvm_cx->llvm_cx_ref(),
                                          llvm::APInt(32 /*bits*/,
                                                      i_slot /*value*/));
-            std::array<llvm::Value*, 1> index_v = {
-                {i32_slot /*environment slot #0*/}};
+            std::array<llvm::Value*, 2> index_v = {
+                {i0_slot, i32_slot /*environment slot #0*/}};
 
             llvm::Value * llvm_localenv_slot_ptr
                 = tmp_ir_builder.CreateInBoundsGEP(localenv_llvm_type,
@@ -216,7 +239,7 @@ namespace xo {
                                                             tmp_ir_builder,
                                                             i_arg,
                                                             arg_name,
-                                                            lambda_->fn_arg(i_arg));
+                                                            lambda_->fn_arg(i_arg-1));
 
                             if (!binding.llvm_addr_)
                                 return false;
