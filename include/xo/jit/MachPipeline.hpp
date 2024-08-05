@@ -111,16 +111,55 @@ namespace xo {
             llvm::Type * codegen_type(TypeDescr td);
             llvm::Value * codegen_constant(ref::brw<xo::ast::ConstantInterface> expr);
             llvm::Function * codegen_primitive(ref::brw<xo::ast::PrimitiveInterface> expr);
-            llvm::Value * codegen_apply(ref::brw<xo::ast::Apply> expr, llvm::IRBuilder<> & ir_builder);
+
+            /** like @ref codegen_primitive , but create wrapper function that accepts (and discards)
+             *  environment pointer as first argument.
+             *
+             *  Implementation consists of tail call to natural primitive, that skips the unused
+             *  environment pointer
+             **/
+            llvm::Function * codegen_primitive_wrapper(ref::brw<xo::ast::PrimitiveInterface> expr,
+                                                       llvm::IRBuilder<> & ir_builder);
+
+            /** Generate closure for invoking a primitive function.
+             *  Primitives don't benefit from a closure, but we need a consistent ABI
+             *  to support function-pointer-like behavior for a target function
+             *  that may resolve to primitive-or-lambda at runtime
+             **/
+            llvm::Value * codegen_primitive_closure(ref::brw<xo::ast::PrimitiveInterface> expr,
+                                                    llvm::IRBuilder<> & ir_builder);
+
+            llvm::Value * codegen_apply(ref::brw<xo::ast::Apply> expr,
+                                        llvm::Value * envptr,
+                                        llvm::IRBuilder<> & ir_builder);
             /* NOTE: codegen_lambda() needs to be reentrant too.
              *       for example can have a lambda in apply position.
              */
             llvm::Function * codegen_lambda_decl(ref::brw<xo::ast::Lambda> expr);
             llvm::Function * codegen_lambda_defn(ref::brw<xo::ast::Lambda> expr, llvm::IRBuilder<> & ir_builder);
-            llvm::Value * codegen_variable(ref::brw<xo::ast::Variable> var, llvm::IRBuilder<> & ir_builder);
-            llvm::Value * codegen_ifexpr(ref::brw<xo::ast::IfExpr> ifexpr, llvm::IRBuilder<> & ir_builder);
+            /** Generate closure for invoking a lambda (user-defined function).
+             *  See @ref MachPipeline::codegen_apply for invocation
+             *  Same ABI as @ref MachPipeline::codegen_primitive_closure
+             *
+             *  @param envptr.  Environment from surrounding lexical scope.
+             *                  This will be captured as envptr member by
+             *                  the IR code for creating a closure.
+             *                  @ref MachPipeline::codegen_toplevel and friends are responsible for
+             *                  assembling and propagating this.
+             **/
+            llvm::Value * codegen_lambda_closure(ref::brw<xo::ast::Lambda> lambda,
+                                                 llvm::Value * envptr,
+                                                 llvm::IRBuilder<> & ir_builder);
+            llvm::Value * codegen_variable(ref::brw<xo::ast::Variable> var,
+                                           llvm::Value * envptr,
+                                           llvm::IRBuilder<> & ir_builder);
+           llvm::Value * codegen_ifexpr(ref::brw<xo::ast::IfExpr> ifexpr,
+                                         llvm::Value * envptr,
+                                         llvm::IRBuilder<> & ir_builder);
 
-            llvm::Value * codegen(ref::brw<Expression> expr, llvm::IRBuilder<> & ir_builder);
+            llvm::Value * codegen(ref::brw<Expression> expr,
+                                  llvm::Value * envptr,
+                                  llvm::IRBuilder<> & ir_builder);
 
             llvm::Value * codegen_toplevel(ref::brw<Expression> expr);
 
@@ -161,6 +200,7 @@ namespace xo {
             llvm::AllocaInst * create_entry_frame_alloca(llvm::Function * llvm_fn,
                                                          llvm::StructType * frame_llvm_type);
 
+#ifdef OBSOLETE  // see activation_record::create_entry_block_alloca()
             /** codegen helper for a user-defined function (codegen_lambda()):
              *  create stack slot on behalf of some formal parameter to a function,
              *  so we can avoid SSA restriction on function body
@@ -170,6 +210,7 @@ namespace xo {
             llvm::AllocaInst * create_entry_block_alloca(llvm::Function * llvm_fn,
                                                          const std::string & var_name,
                                                          TypeDescr var_type);
+#endif
 
         private:
             /** (re)create pipeline to turn expressions into llvm IR code **/

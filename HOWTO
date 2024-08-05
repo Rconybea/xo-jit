@@ -43,3 +43,30 @@
       mp.machgen_current_module()
       fn=mp.lookup_fn('int (*)(int)', 'sq')
       fn(16) # -> 256
+
+** to figure out what 'IR should look like' for something simple
+
+   write some c++:
+
+    #include <cmath>
+
+    struct env_type {
+        env_type * parent;
+        env_type * (*unwind)(env_type *, int);
+    };
+
+    double wrap_sqrt(env_type * env, double x) {
+        return ::sqrt(x);
+    }
+
+    int main() {
+        wrap_sqrt(nullptr, 2.0);
+    }
+
+   compile to emit IR
+
+    $ clang -cc1 ex_cpp.cpp -emit-llvm
+
+   inspect
+
+    ex_cpp.ll

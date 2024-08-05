@@ -1,6 +1,8 @@
 /* @file MachPipeline.cpp */
 
 #include "MachPipeline.hpp"
+#include "activation_record.hpp"
+#include "type2llvm.hpp"
 #include <string>
 
 namespace xo {
@@ -18,6 +20,7 @@ namespace xo {
     using xo::reflect::Reflect;
     using xo::reflect::StructMember;
     using xo::reflect::TypeDescr;
+    using xo::scope;
     using llvm::orc::ExecutionSession;
     using llvm::DataLayout;
     using std::cerr;
@@ -156,194 +159,15 @@ namespace xo {
             return nullptr;
         } /*codegen_constant*/
 
-        namespace {
-            /** REMINDER:
-             *  1. creation of llvm types is idempotent
-             *     (duplicate calls will receive the same llvm::Type* pointer)
-             *  2. llvm::Types are never deleted.
-             **/
-
-            llvm::Type *
-            td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx, TypeDescr td);
-
-            /** obtain llvm representation for a function type with the same signature as
-             *  that represented by @p fn_td
-             **/
-            llvm::FunctionType *
-            function_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                     TypeDescr fn_td)
-            {
-                int n_fn_arg = fn_td->n_fn_arg();
-
-                std::vector<llvm::Type *> llvm_argtype_v;
-                llvm_argtype_v.reserve(n_fn_arg);
-
-                /** check function args are all known **/
-                for (int i = 0; i < n_fn_arg; ++i) {
-                    TypeDescr arg_td = fn_td->fn_arg(i);
-
-                    llvm::Type * llvm_argtype = td_to_llvm_type(llvm_cx, arg_td);
-
-                    if (!llvm_argtype)
-                        return nullptr;
-
-                    llvm_argtype_v.push_back(llvm_argtype);
-                }
-
-                TypeDescr retval_td = fn_td->fn_retval();
-                llvm::Type * llvm_retval = td_to_llvm_type(llvm_cx, retval_td);
-
-                if (!llvm_retval)
-                    return nullptr;
-
-                auto * llvm_fn_type = llvm::FunctionType::get(llvm_retval,
-                                                              llvm_argtype_v,
-                                                              false /*!varargs*/);
-                return llvm_fn_type;
-            }
-
-            llvm::PointerType *
-            function_td_to_llvm_fnptr_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                           TypeDescr fn_td)
-            {
-                auto * llvm_fn_type = function_td_to_llvm_type(llvm_cx, fn_td);
-
-                /** like C: llvm IR doesn't support function-valued variables;
-                 *  it does however support pointer-to-function-valued variables
-                 **/
-                auto * llvm_ptr_type
-                    = llvm::PointerType::get(llvm_fn_type,
-                                             0 /*numbered address space*/);
-
-                return llvm_ptr_type;
-            }
-
-            /**
-             *  Generate llvm::Type correspoinding to a TypeDescr for a struct.
-             **/
-            llvm::StructType *
-            struct_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                   TypeDescr struct_td)
-            {
-                // see
-                //   [[https://stackoverflow.com/questions/32299166/accessing-struct-members-and-arrays-of-structs-from-llvm-ir]]
-
-                auto & llvm_cx_ref = llvm_cx->llvm_cx_ref();
-
-                /* note: object pointer ignored for struct types,
-                 *       since number of members is known at compile time
-                 */
-                int n_member = struct_td->n_child(nullptr /*&object*/);
-
-                /* one type for each struct member */
-                std::vector<llvm::Type *> llvm_membertype_v;
-                llvm_membertype_v.reserve(n_member);
-
-                for (int i = 0; i < n_member; ++i) {
-                    StructMember const & sm = struct_td->struct_member(i);
-
-                    llvm_membertype_v.push_back(td_to_llvm_type(llvm_cx,
-                                                                sm.get_member_td()));
-               }
-
-                std::string struct_name = std::string(struct_td->short_name());
-
-                /* structs with names:  within an llvmcontext, must be unique
-                 *
-                 * We can however compare the offsets recorded in xo::reflect with
-                 * offsets chosen by llvm, *once we've created the llvm type*
-                 *
-                 * Also,  we can't guarantee that a c++ type was completely reflected --
-                 * it's possible one or more members were omitted, in which case
-                 * it's unlikely at best that llvm chooses the same layout.
-                 *
-                 * Instead: tell llvm to make packed struct,
-                 *          and introduce dummy members for padding.
-                 *
-                 * A consequence is we have to maintain mapping between llvm's
-                 * member numbering and xo::reflect's
-                 */
-                llvm::StructType * llvm_struct_type
-                    = llvm::StructType::create(llvm_cx_ref,
-                                               llvm_membertype_v,
-                                               llvm::StringRef(struct_name),
-                                               false /*!isPacked*/);
-
-                /* TODO: inspect (how) offsets that llvm is using
-                 * we need them to match what C++ chose
-                 *
-                 * (because we want jitted llvm code to interoperate with
-                 *  C++ library code that has structs)
-                 */
-
-                // GetElementPtrInst is interesting,
-                // but I think that's for generating code
-
-                return llvm_struct_type;
-            } /*struct_td_to_llvm_type*/
-
-            llvm::PointerType *
-            pointer_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                    TypeDescr pointer_td)
-            {
-                assert(pointer_td->is_pointer());
-
-                TypeDescr dest_td = pointer_td->fixed_child_td(0);
-
-                llvm::Type * llvm_dest_type = td_to_llvm_type(llvm_cx, dest_td);
-
-                llvm::PointerType * llvm_ptr_type
-                    = llvm::PointerType::getUnqual(llvm_dest_type);
-
-                return llvm_ptr_type;
-            } /*pointer_td_llvm_type*/
-
-            llvm::Type *
-            td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx, TypeDescr td) {
-                auto & llvm_cx_ref = llvm_cx->llvm_cx_ref();
-
-                if (td->is_function()) {
-                    /* in this context,  we're looking for a representation for a value,
-                     * i.e. something that can be stored in a variable
-                     */
-                    return function_td_to_llvm_fnptr_type(llvm_cx, td);
-                } else if (td->is_struct()) {
-                    return struct_td_to_llvm_type(llvm_cx, td);
-                } else if (td->is_pointer()) {
-                    return pointer_td_to_llvm_type(llvm_cx, td);
-                } else if (Reflect::is_native<bool>(td)) {
-                    return llvm::Type::getInt1Ty(llvm_cx_ref);
-                } else if (Reflect::is_native<char>(td)) {
-                    return llvm::Type::getInt8Ty(llvm_cx_ref);
-                } else if (Reflect::is_native<short>(td)) {
-                    return llvm::Type::getInt16Ty(llvm_cx_ref);
-                } else if (Reflect::is_native<int>(td)) {
-                    return llvm::Type::getInt32Ty(llvm_cx_ref);
-                } else if (Reflect::is_native<long>(td)) {
-                    return llvm::Type::getInt64Ty(llvm_cx_ref);
-                } else if (Reflect::is_native<float>(td)) {
-                    return llvm::Type::getFloatTy(llvm_cx_ref);
-                } else if (Reflect::is_native<double>(td)) {
-                    return llvm::Type::getDoubleTy(llvm_cx_ref);
-                } else {
-                    cerr << "td_to_llvm_type: no llvm type available for T"
-                         << xtag("T", td->short_name())
-                         << endl;
-                    return nullptr;
-                }
-            }
-        }
-
         llvm::Type *
         MachPipeline::codegen_type(TypeDescr td) {
-            return td_to_llvm_type(llvm_cx_.borrow(), td);
+            return type2llvm::td_to_llvm_type(llvm_cx_.borrow(), td);
         }
 
         llvm::Function *
         MachPipeline::codegen_primitive(ref::brw<PrimitiveInterface> expr)
         {
             constexpr bool c_debug_flag = true;
-            using xo::scope;
 
             scope log(XO_DEBUG(c_debug_flag));
 
@@ -368,7 +192,7 @@ namespace xo {
             TypeDescr fn_td = expr->valuetype();
 
             llvm::FunctionType * llvm_fn_type
-                = function_td_to_llvm_type(llvm_cx_.borrow(), fn_td);
+                = type2llvm::function_td_to_lvtype(llvm_cx_.borrow(), fn_td);
 
             if (!llvm_fn_type)
                 return nullptr;
@@ -425,12 +249,153 @@ namespace xo {
             return fn;
         } /*codegen_primitive*/
 
+        llvm::Function *
+        MachPipeline::codegen_primitive_wrapper(ref::brw<PrimitiveInterface> expr,
+                                                llvm::IRBuilder<> & /*ir_builder*/)
+        {
+            constexpr bool c_debug_flag = true;
+
+            scope log(XO_DEBUG(c_debug_flag),
+                      xtag("primitive-name", expr->name()));
+
+            constexpr const char * c_prefix = "w.";
+
+            /* unique name for wrapper.  Note we don't allow period in schematica identifiers
+             * (though we could if we replace . with .. when lowering)
+             */
+            std::string wrap_name = std::string(c_prefix) + expr->name();
+
+            /* original primitive */
+            auto * native_lvfn = this->codegen_primitive(expr);
+
+            /* wrapped primitive */
+            auto * wrap_lvfn = llvm_module_->getFunction(wrap_name);
+
+            if (wrap_lvfn) {
+                /* wrapper already defined */
+                return wrap_lvfn;
+            }
+
+            TypeDescr fn_td = expr->valuetype();
+
+            llvm::FunctionType * native_lvtype
+                = type2llvm::function_td_to_lvtype(llvm_cx_.borrow(),
+                                                   fn_td,
+                                                   false /*!wrapper_flag*/);
+
+            if (!native_lvtype)
+                return nullptr;
+
+            llvm::FunctionType * wrapper_lvtype
+                = type2llvm::function_td_to_lvtype(llvm_cx_.borrow(),
+                                                      fn_td,
+                                                      true /*wrapper_flag (for closure)*/);
+
+            wrap_lvfn = llvm::Function::Create(wrapper_lvtype,
+                                               llvm::Function::ExternalLinkage,
+                                               wrap_name,
+                                               llvm_module_.get());
+
+            /* at least we know the name of the 1st argument :) */
+            auto ix = wrap_lvfn->args().begin();
+            ix->setName(".env");
+
+            auto block = llvm::BasicBlock::Create(llvm_cx_->llvm_cx_ref(),
+                                                  "entry", wrap_lvfn);
+
+            /* don't call SetInsertPoint() on incoming ir_builder argument.
+             * Want to avoid disturbing top-to-bottom flow
+             */
+            llvm::IRBuilder<> tmp_ir_builder(llvm_cx_->llvm_cx_ref());
+            tmp_ir_builder.SetInsertPoint(block);
+
+            std::vector<llvm::Value *> args;
+
+            /* call to native_lvfn,
+             * forwarding all args of wrap_lvfn, except the first
+             */
+            {
+                args.reserve(expr->n_arg());
+
+                int i_wrap_arg = 0;
+                for (auto & arg : wrap_lvfn->args()) {
+                    if (i_wrap_arg > 0)
+                        args.push_back(&arg);
+
+                    ++i_wrap_arg;
+                }
+            }
+
+            /* {caller,callee} must agree on calling convention,
+             * so for primitives we need to assume c.
+             */
+            llvm::CallInst * call = tmp_ir_builder.CreateCall(native_lvtype,
+                                                              native_lvfn,
+                                                              args,
+                                                              "w.calltmp");
+            if (call) {
+                call->setTailCall(true);
+
+                /* does this work if call returns void? Is this needed with tail call? */
+                tmp_ir_builder.CreateRet(call);
+
+                llvm::verifyFunction(*wrap_lvfn);
+
+                if (log) {
+                    std::string buf;
+                    llvm::raw_string_ostream ss(buf);
+                    wrap_lvfn->print(ss);
+
+                    log(xtag("IR-before-opt", buf));
+                }
+
+                /* optimize! */
+                ir_pipeline_->run_pipeline(*wrap_lvfn);
+
+                if (log) {
+                    std::string buf;
+                    llvm::raw_string_ostream ss(buf);
+                    wrap_lvfn->print(ss);
+
+                    log(xtag("IR-after-opt", buf));
+                }
+            } else {
+                wrap_lvfn->eraseFromParent();
+                wrap_lvfn = nullptr;
+            }
+
+            return wrap_lvfn;
+        } /*codegen_primitive_wrapper*/
+
+        llvm::Value *
+        MachPipeline::codegen_primitive_closure(ref::brw<xo::ast::PrimitiveInterface> expr,
+                                                llvm::IRBuilder<> & ir_builder)
+        {
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag));
+
+            llvm::StructType * closure_lvtype
+                = type2llvm::create_closureapi_lvtype(llvm_cx_.borrow(), expr);
+
+            llvm::Function * pm_wrapper = codegen_primitive_wrapper(expr, ir_builder);
+            llvm::Value * env_0ptr = llvm::ConstantPointerNull::get(type2llvm::env_api_llvm_ptr_type(llvm_cx_));
+
+            llvm::Value * lv_closure = nullptr;
+
+            lv_closure = ir_builder.CreateInsertValue(llvm::UndefValue::get(closure_lvtype),
+                                                      pm_wrapper, {0}, "wrapfnptr" /*name*/);
+            lv_closure = ir_builder.CreateInsertValue(lv_closure,
+                                                      env_0ptr,   {1}, "nullenvptr" /*name*/);
+
+            return lv_closure;
+        } /*codegen_primitive_closure*/
+
         llvm::Value *
         MachPipeline::codegen_apply(ref::brw<Apply> apply,
+                                    llvm::Value * envptr,
                                     llvm::IRBuilder<> & ir_builder)
         {
             constexpr bool c_debug_flag = true;
-            using xo::scope;
 
             scope log(XO_DEBUG(c_debug_flag),
                       xtag("apply", apply));
@@ -441,14 +406,16 @@ namespace xo {
             using std::cerr;
             using std::endl;
 
-            /* IR for value in function position.
-             * Although it will generate a function (or pointer-to-function),
-             * it need not have inherited type llvm::Function.
+            /* IR for closure in function position
+             * see:
+             * - MachPipeline::codegen_primitive_closure
+             * - MachPipeline::codegen_lambda_closure
+             * - type2llvm::create_closure_lvtype
+             *
+             * although this refers to a closure, llvm doesn't know that
              */
-            llvm::Value * llvm_fnval = nullptr;
+            llvm::Value * llvm_closure = nullptr;
             llvmintrinsic intrinsic = llvmintrinsic::invalid;
-            /* function type in apply node's function position */
-            TypeDescr ast_fn_td = apply->fn()->valuetype();
             {
                 /* special treatement for primitive in apply position:
                  * allows substituting LLVM intrinsic
@@ -457,12 +424,12 @@ namespace xo {
                     auto pm = PrimitiveInterface::from(apply->fn());
 
                     if (pm) {
-                        llvm_fnval = this->codegen_primitive(pm);
+                        llvm_closure = this->codegen_primitive_closure(pm, ir_builder);
                         /* hint, when available. use faster alternative to IRBuilder::CreateCall below */
                         intrinsic = pm->intrinsic();
                     }
                 } else {
-                    llvm_fnval = this->codegen(apply->fn(), ir_builder);
+                    llvm_closure = this->codegen(apply->fn(), envptr, ir_builder);
 
                     /* we don't need any special checking here.
                      * already know (from xo-level checking) that pointer has the right type.
@@ -479,56 +446,126 @@ namespace xo {
                 }
             }
 
-            if (!llvm_fnval) {
+            if (!llvm_closure) {
                 return nullptr;
             }
 
-#ifdef NOT_USING_DEBUG
-            cerr << "MachPipeline::codegen_apply: fn:" << endl;
-            fn->print(llvm::errs());
-            cerr << endl;
-#endif
+            /* function type in apply node's function position */
+            TypeDescr ast_fn_td = apply->fn()->valuetype();
+
+            if (log) {
+                log("MachPipeline::codegen_apply: fn in apply pos...");
+                llvm_closure->print(llvm::errs());
+                log("...done");
+                log("llvm type...");
+                llvm_closure->getType()->dump();
+                log("...done");
+            }
 
             /* checks here will be redundant */
 
-#ifdef REDUNDANT_TYPECHECK
-            if (apply->argv().size() != ast_fn_td->n_fn_arg()) {
-                cerr << "MachPipeline::codegen_apply: error: callee f expecting n1 args where n2 supplied"
-                    //<< xtag("f", ast_fn->name())
-                     << xtag("n1", ast_fn_td->n_fn_arg())
-                     << xtag("n2", apply->argv().size())
-                     << endl;
-
-                return nullptr;
-            }
-
-            /** also check argument types **/
-            for (size_t i = 0, n = ast_fn_td->n_fn_arg(); i < n; ++i) {
-                if (apply->argv()[i]->valuetype() != ast_fn_td->fn_arg(i)) {
-                    cerr << "MachPipeline::codegen_apply: error: callee F for arg# I seeeing U instead of expected T"
-                         << xtag("F", apply->fn())
-                         << xtag("I", i)
-                         << xtag("U", apply->argv()[i]->valuetype()->short_name())
-                         << xtag("T", ast_fn_td->fn_arg(i)->short_name())
-                         << endl;
-
-                    return nullptr;
-                }
-            }
+#ifdef OBSOLETE
+            llvm::StructType * closure_lvtype
+                = type2llvm::function_td_to_closureapi_lvtype(llvm_cx_,
+                                                              ast_fn_td,
+                                                              "" /*name - not required*/);
 #endif
 
+            llvm::Value * lv_fnptr = nullptr;
+            {
+#ifdef MAYBE_VERBOSE
+                llvm::Value * i0_slot
+                    = llvm::ConstantInt::get(llvm_cx_->llvm_cx_ref(),
+                                             llvm::APInt(32 /*bits*/, 0 /*value*/));
+
+                llvm::Value * fnptr_slot
+                    = llvm::ConstantInt::get(llvm_cx_->llvm_cx_ref(),
+                                             llvm::APInt(32 /*bits*/, 0 /*value*/));
+
+                std::array<llvm::Value*, 2> index_v
+                    = {{i0_slot,
+                        fnptr_slot /*fnptr slot = closure[0]*/}};
+
+                llvm::Value * lv_fnptr_addr
+                    = ir_builder.CreateInBoundsGEP(llvm_closure->getType(), //closure_lvtype,
+                                                   llvm_closure,
+                                                   index_v);
+
+                llvm::Type * fnptr_lvtype
+                    = type2llvm::function_td_to_llvm_fnptr_type(llvm_cx_,
+                                                                apply->fn()->valuetype(),
+                                                                true /*wrapper_flag*/);
+
+                /* the thing we're going to call */
+                lv_fnptr = ir_builder.CreateLoad(fnptr_lvtype, lv_fnptr_addr);
+#endif
+
+                std::array<unsigned int, 1> index_v = {{ 0 }};
+
+                //ir_builder.CreateExtractValue(Value *Agg, ArrayRef<unsigned int> Idxs)
+
+                lv_fnptr = ir_builder.CreateExtractValue(llvm_closure,
+                                                         index_v,
+                                                         "fnptr");
+            }
+
+            llvm::Value * lv_fnenvptr = nullptr;
+            {
+#ifdef MAYBE_VERBOSE
+                llvm::Value * i0_slot
+                    = llvm::ConstantInt::get(llvm_cx_->llvm_cx_ref(),
+                                             llvm::APInt(32 /*bits*/, 0 /*value*/));
+
+                llvm::Value * envptr_slot
+                    = llvm::ConstantInt::get(llvm_cx_->llvm_cx_ref(),
+                                             llvm::APInt(32 /*bits*/, 1 /*value*/));
+
+                std::array<llvm::Value*, 2> index_v
+                    = {{i0_slot,
+                        envptr_slot /*envptr slot = closure[1]*/}};
+
+                llvm::Value * lv_fnenvptr_addr
+                    = ir_builder.CreateInBoundsGEP(llvm_closure->getType(), //closure_lvtype,
+                                                   llvm_closure,
+                                                   index_v);
+
+                llvm::Type * fnenvptr_lvtype
+                    = type2llvm::env_api_llvm_ptr_type(llvm_cx_);
+
+                lv_fnenvptr = ir_builder.CreateLoad(fnenvptr_lvtype, lv_fnenvptr_addr);
+#endif
+
+                std::array<unsigned int, 1> index_v = {{ 1 }};
+
+                lv_fnenvptr = ir_builder.CreateExtractValue(llvm_closure,
+                                                            index_v,
+                                                            "envptr");
+            }
+
             std::vector<llvm::Value *> args;
-            args.reserve(apply->argv().size());
+            /* +1 for envptr */
+            args.reserve(1 + apply->argv().size());
+
+
+            /* we must take envptr from closure,
+             * and we need to do this using some version of getelementptr
+             */
+            args.push_back(lv_fnenvptr);
 
             int i = 0;
             for (const auto & arg_expr : apply->argv()) {
-                auto * arg = this->codegen(arg_expr, ir_builder);
+                auto * arg = this->codegen(arg_expr, envptr, ir_builder);
 
                 if (log) {
                     /* TODO: print helper for llvm::Value* */
                     std::string llvm_value_str;
-                    llvm::raw_string_ostream ss(llvm_value_str);
-                    arg->print(ss);
+
+                    if (arg) {
+                        llvm::raw_string_ostream ss(llvm_value_str);
+                        arg->print(ss);
+                    } else {
+                        llvm_value_str = "<null llvm::Value>";
+                    }
 
                     log(xtag("i_arg", i),
                         xtag("arg", llvm_value_str));
@@ -536,31 +573,41 @@ namespace xo {
 
                 args.push_back(arg);
                 ++i;
+
+                if (!arg) {
+                    cerr << "MachPipeline::codegen_apply: failed for i'th argument"
+                         << xtag("i", i)
+                         << endl;
+
+                    return nullptr;
+                }
             }
 
             /* if we have an intrinsic hint,
              * then instead of invoking a function,
              * we use some native machine instruction instead.
+             *
+             * args[0] not used here,  that holds envptr from faux closure
              */
             switch(intrinsic) {
             case llvmintrinsic::i_neg:
-                return ir_builder.CreateNeg(args[0]);
+                return ir_builder.CreateNeg(args[1]);
             case llvmintrinsic::i_add:
-                return ir_builder.CreateAdd(args[0], args[1]);
+                return ir_builder.CreateAdd(args[1], args[2]);
             case llvmintrinsic::i_sub:
-                return ir_builder.CreateSub(args[0], args[1]);
+                return ir_builder.CreateSub(args[1], args[2]);
             case llvmintrinsic::i_mul:
-                return ir_builder.CreateMul(args[0], args[1]);
+                return ir_builder.CreateMul(args[1], args[2]);
             case llvmintrinsic::i_sdiv:
-                return ir_builder.CreateSDiv(args[0], args[1]);
+                return ir_builder.CreateSDiv(args[1], args[2]);
             case llvmintrinsic::i_udiv:
-                return ir_builder.CreateUDiv(args[0], args[1]);
+                return ir_builder.CreateUDiv(args[1], args[2]);
             case llvmintrinsic::fp_add:
-                return ir_builder.CreateFAdd(args[0], args[1]);
+                return ir_builder.CreateFAdd(args[1], args[2]);
             case llvmintrinsic::fp_mul:
-                return ir_builder.CreateFMul(args[0], args[1]);
+                return ir_builder.CreateFMul(args[1], args[2]);
             case llvmintrinsic::fp_div:
-                return ir_builder.CreateFDiv(args[0], args[1]);
+                return ir_builder.CreateFDiv(args[1], args[2]);
             case llvmintrinsic::invalid:
             case llvmintrinsic::fp_sqrt:
             case llvmintrinsic::fp_pow:
@@ -571,63 +618,17 @@ namespace xo {
                 break;
             }
 
-            /* At least as of 18.1.5,  LLVM needs us to supply function type
-             * when making a function call.   In particular it doesn't remember
-             * the function type with each function pointer
-             */
-
             llvm::FunctionType * llvm_fn_type
-                = function_td_to_llvm_type(this->llvm_cx_, ast_fn_td);
+                = type2llvm::function_td_to_lvtype(this->llvm_cx_,
+                                                   ast_fn_td,
+                                                   true /*wrapper_flag*/);
 
             return ir_builder.CreateCall(llvm_fn_type,
-                                         llvm_fnval,
+                                         lv_fnptr,
                                          args,
                                          "calltmp");
 
         } /*codegen_apply*/
-
-        /* in kaleidoscope7.cpp: CreateEntryBlockAlloca */
-        llvm::AllocaInst *
-        MachPipeline::create_entry_block_alloca(llvm::Function * llvm_fn,
-                                                const std::string & var_name,
-                                                TypeDescr var_type)
-        {
-            constexpr bool c_debug_flag = true;
-            using xo::scope;
-
-            scope log(XO_DEBUG(c_debug_flag),
-                      xtag("llvm_fn", (void*)llvm_fn),
-                      xtag("var_name", var_name),
-                      xtag("var_type", var_type->short_name()));
-
-            llvm::IRBuilder<> tmp_ir_builder(&llvm_fn->getEntryBlock(),
-                                             llvm_fn->getEntryBlock().begin());
-
-            llvm::Type * llvm_var_type = td_to_llvm_type(llvm_cx_.borrow(),
-                                                         var_type);
-
-            log && log(xtag("addr(llvm_var_type)", (void*)llvm_var_type));
-            if (log) {
-                std::string llvm_var_type_str;
-                llvm::raw_string_ostream ss(llvm_var_type_str);
-                llvm_var_type->print(ss);
-
-                log(xtag("llvm_var_type", llvm_var_type_str));
-            }
-
-            if (!llvm_var_type)
-                return nullptr;
-
-            llvm::AllocaInst * retval = tmp_ir_builder.CreateAlloca(llvm_var_type,
-                                                                    nullptr,
-                                                                    var_name);
-            log && log(xtag("alloca", (void*)retval),
-                       xtag("align", retval->getAlign().value()),
-                       xtag("size", retval->getAllocationSize(jit_->data_layout()).value()));
-
-            return retval;
-        } /*create_entry_block_alloca*/
-
 
         std::vector<ref::brw<Lambda>>
         MachPipeline::find_lambdas(ref::brw<Expression> expr) const
@@ -649,7 +650,6 @@ namespace xo {
         MachPipeline::codegen_lambda_decl(ref::brw<Lambda> lambda)
         {
             constexpr bool c_debug_flag = true;
-            using xo::scope;
 
             scope log(XO_DEBUG(c_debug_flag),
                       xtag("lambda-name", lambda->name()));
@@ -665,36 +665,40 @@ namespace xo {
 
             /* establish prototype for this function */
 
-#ifdef OBSOLETE
-            llvm::Type * llvm_retval = td_to_llvm_type(llvm_cx_.borrow(),
-                                                       lambda->fn_retval());
-
-            std::vector<llvm::Type *> arg_type_v(lambda->n_arg());
-
-            for (size_t i = 0, n = lambda->n_arg(); i < n; ++i) {
-                arg_type_v[i] = td_to_llvm_type(llvm_cx_.borrow(),
-                                                lambda->fn_arg(i));
-            }
-#endif
-
-            llvm::FunctionType * llvm_fn_type
-                = function_td_to_llvm_type(llvm_cx_.borrow(),
-                                           lambda->valuetype());
+            /* wrapper_flag: llvm function type takes extra first argument,
+             * supplying environment pointer from surrounding closure.
+             *
+             * Note that this argument is not present in lambda,
+             * so we need care.  lambda->fn_arg(i) -> lvfn->arg [i+1]
+             */
+            llvm::FunctionType * fn_lvtype
+                = type2llvm::function_td_to_lvtype(llvm_cx_.borrow(),
+                                                   lambda->valuetype(),
+                                                   true /*wrapper_flag*/);
 
             /* create (initially empty) function */
-            fn = llvm::Function::Create(llvm_fn_type,
+            fn = llvm::Function::Create(fn_lvtype,
                                         llvm::Function::ExternalLinkage,
                                         lambda->name(),
                                         llvm_module_.get());
-            /* also capture argument names */
+
+            /* also adopt lambda's formal argument names */
             {
                 int i = 0;
                 for (auto & arg : fn->args()) {
-                    log && log("llvm formal param names",
-                               xtag("i", i),
-                               xtag("param", lambda->argv().at(i)));
+                    if (i == 0) {
+                        log && log("llvm inserted env param",
+                                   xtag("i", i));
 
-                    arg.setName(lambda->argv().at(i)->name());
+                        arg.setName(".env");
+                    } else {
+                        log && log("llvm formal param names",
+                                   xtag("i", i),
+                                   xtag("param", lambda->argv().at(i-1)));
+
+                        arg.setName(lambda->argv().at(i-1)->name());
+                    }
+
                     ++i;
                 }
             }
@@ -704,10 +708,9 @@ namespace xo {
 
         llvm::Function *
         MachPipeline::codegen_lambda_defn(ref::brw<Lambda> lambda,
-                                          llvm::IRBuilder<> & ir_builder)
+                                          llvm::IRBuilder<> & /*ir_builder*/)
         {
             constexpr bool c_debug_flag = true;
-            using xo::scope;
 
             scope log(XO_DEBUG(c_debug_flag),
                       xtag("lambda-name", lambda->name()));
@@ -729,6 +732,10 @@ namespace xo {
                 return nullptr;
             }
 
+            /* environment for this lambda's clsoure
+             * passed as extra 1st argument
+             */
+            llvm::Value * envptr = llvm_fn->args().begin();
 
             /* generate function body */
 
@@ -736,54 +743,32 @@ namespace xo {
                                                   "entry",
                                                   llvm_fn);
 
-            ir_builder.SetInsertPoint(block);
+            /* since we need to explictly set builder's insert point,
+             * make a new builder instead of disturbing the top-to-bottom flow of the
+             * called ir_builder
+             */
+            llvm::IRBuilder<> tmp_ir_builder(llvm_cx_->llvm_cx_ref());
+            tmp_ir_builder.SetInsertPoint(block);
 
             /** Actual parameters will need their own activation record.
-             *  Track its shape here.
+             *  Track its shape + setup/teardown here.
              **/
-            this->env_stack_.push(activation_record());
+            this->env_stack_.push(activation_record(lambda.get()));
 
-            {
-                log && log("lambda: stack size Z", xtag("Z", env_stack_.size()));
+            bool ok_flag = this->env_stack_.top().bind_locals(llvm_cx_, llvm_fn, tmp_ir_builder);
 
-                int i = 0;
-                for (auto & arg : llvm_fn->args()) {
-                    log && log("nested environment",
-                               xtag("i", i),
-                               xtag("param", std::string(arg.getName())));
-
-                    std::string arg_name = std::string(arg.getName());
-
-                    /* stack location for arg[i] */
-                    llvm::AllocaInst * alloca
-                        = create_entry_block_alloca(llvm_fn,
-                                                    arg_name,
-                                                    lambda->fn_arg(i));
-
-                    if (!alloca) {
-                        this->env_stack_.pop();
-                        return nullptr;
-                    }
-
-                    /* store on function entry
-                     *   see codegen_variable() for corresponding load
-                     */
-                    ir_builder.CreateStore(&arg, alloca);
-
-                    /* remember stack location for reference + assignment
-                     * in lambda body.
-                     *
-                     */
-                    env_stack_.top().alloc_var(arg_name, alloca);
-                    ++i;
-                }
+            if (!ok_flag) {
+                this->env_stack_.pop();
+                return nullptr;
             }
 
-            llvm::Value * retval = this->codegen(lambda->body(), ir_builder);
+            llvm::Value * retval = this->codegen(lambda->body(),
+                                                 envptr,
+                                                 tmp_ir_builder);
 
             if (retval) {
                 /* completes the function.. */
-                ir_builder.CreateRet(retval);
+                tmp_ir_builder.CreateRet(retval);
 
                 /* validate!  always validate! */
                 llvm::verifyFunction(*llvm_fn);
@@ -815,15 +800,47 @@ namespace xo {
 
             this->env_stack_.pop();
 
-            log && log("after pop, env stack size Z", xtag("Z", env_stack_.size()));
+            log && log("after pop, env stack size Z",
+                       xtag("Z", env_stack_.size()),
+                       xtag("llvm_fn", (void*)llvm_fn));
 
             return llvm_fn;
         } /*codegen_lambda_defn*/
 
         llvm::Value *
+        MachPipeline::codegen_lambda_closure(ref::brw<Lambda> lambda,
+                                             llvm::Value * envptr,
+                                             llvm::IRBuilder<> & ir_builder)
+        {
+            llvm::StructType * closure_lvtype
+                = type2llvm::create_closureapi_lvtype(llvm_cx_.borrow(), lambda);
+
+            llvm::Function * lvfn = codegen_lambda_defn(lambda, ir_builder);
+
+            if (!lvfn) {
+                cerr << "MachPipeline::codegen_lambda_closure: codegen lambda failed"
+                     << endl;
+                return nullptr;
+            }
+
+            llvm::Value * lv_closure = nullptr;
+            {
+                lv_closure = ir_builder.CreateInsertValue(llvm::UndefValue::get(closure_lvtype),
+                                                          lvfn,   {0}); //, "lmfnptr" /*name*/);
+                lv_closure = ir_builder.CreateInsertValue(lv_closure,
+                                                          envptr, {1}, "closure" /*name*/);
+            }
+
+            return lv_closure;
+        } /*codegen_lambda_closure*/
+
+        llvm::Value *
         MachPipeline::codegen_variable(ref::brw<Variable> var,
+                                       llvm::Value * /*envptr*/,
                                        llvm::IRBuilder<> & ir_builder)
         {
+            /* TODO: navigate envptr to handle non-local variables */
+
             if (env_stack_.empty()) {
                 cerr << "MachPipeline::codegen_variable: expected non-empty environment stack"
                      << xtag("x", var->name())
@@ -832,21 +849,25 @@ namespace xo {
                 return nullptr;
             }
 
-            llvm::AllocaInst * alloca = env_stack_.top().lookup_var(var->name());
+            activation_record & ar = env_stack_.top();
 
-            if (!alloca)
+            const runtime_binding_detail * binding = ar.lookup_var(var->name());
+
+            if (!binding)
                 return nullptr;
 
             /* code to load value from stack */
-            return ir_builder.CreateLoad(alloca->getAllocatedType(),
-                                         alloca,
+            return ir_builder.CreateLoad(binding->llvm_type_,
+                                         binding->llvm_addr_,
                                          var->name().c_str());
         } /*codegen_variable*/
 
         llvm::Value *
-        MachPipeline::codegen_ifexpr(ref::brw<IfExpr> expr, llvm::IRBuilder<> & ir_builder)
+        MachPipeline::codegen_ifexpr(ref::brw<IfExpr> expr,
+                                     llvm::Value * envptr,
+                                     llvm::IRBuilder<> & ir_builder)
         {
-            llvm::Value * test_ir = this->codegen(expr->test(), ir_builder);
+            llvm::Value * test_ir = this->codegen(expr->test(), envptr, ir_builder);
 
             /** need test result in a variable **/
             llvm::Value * test_with_cmp_ir
@@ -882,41 +903,45 @@ namespace xo {
                                     when_false_bb);
 
             /* populate when_true_bb */
-            ir_builder.SetInsertPoint(when_true_bb);
+            llvm::IRBuilder<> tmp_ir_builder(llvm_cx_->llvm_cx_ref());
+            tmp_ir_builder.SetInsertPoint(when_true_bb);
 
             llvm::Value * when_true_ir = this->codegen(expr->when_true(),
-                                                       ir_builder);
+                                                       envptr,
+                                                       tmp_ir_builder);
 
             if (!when_true_ir)
                 return nullptr;
 
             /* at end of when-true sequence, jump to merge suffix */
-            ir_builder.CreateBr(merge_bb);
+            tmp_ir_builder.CreateBr(merge_bb);
             /* note: codegen for expr->when_true() may have altered builder's "current block" */
-            when_true_bb = ir_builder.GetInsertBlock();
+            when_true_bb = tmp_ir_builder.GetInsertBlock();
 
             /* populate when_false_bb */
             parent_fn->insert(parent_fn->end(), when_false_bb);
-            ir_builder.SetInsertPoint(when_false_bb);
+            tmp_ir_builder.SetInsertPoint(when_false_bb);
 
-            llvm::Value * when_false_ir = this->codegen(expr->when_false(), ir_builder);
+            llvm::Value * when_false_ir = this->codegen(expr->when_false(),
+                                                        envptr,
+                                                        tmp_ir_builder);
             if (!when_false_ir)
                 return nullptr;
 
             /* at end of when-false sequence, jump to merge suffix */
-            ir_builder.CreateBr(merge_bb);
+            tmp_ir_builder.CreateBr(merge_bb);
             /* note: codegen for expr->when_false() may have altered builder's "current block" */
-            when_false_bb = ir_builder.GetInsertBlock();
+            when_false_bb = tmp_ir_builder.GetInsertBlock();
 
             /* merged suffix sequence */
             parent_fn->insert(parent_fn->end(), merge_bb);
-            ir_builder.SetInsertPoint(merge_bb);
+            tmp_ir_builder.SetInsertPoint(merge_bb);
 
             /** TODO: switch to getInt1Ty here **/
             llvm::PHINode * phi_node
-                = ir_builder.CreatePHI(llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref()),
-                                       2 /*#of branches being merged (?)*/,
-                                       "iftmp");
+                = tmp_ir_builder.CreatePHI(llvm::Type::getDoubleTy(llvm_cx_->llvm_cx_ref()),
+                                           2 /*#of branches being merged (?)*/,
+                                           "iftmp");
             phi_node->addIncoming(when_true_ir, when_true_bb);
             phi_node->addIncoming(when_false_ir, when_false_bb);
 
@@ -924,21 +949,24 @@ namespace xo {
         } /*codegen_ifexpr*/
 
         llvm::Value *
-        MachPipeline::codegen(ref::brw<Expression> expr, llvm::IRBuilder<> & ir_builder)
+        MachPipeline::codegen(ref::brw<Expression> expr,
+                              llvm::Value * envptr,
+                              llvm::IRBuilder<> & ir_builder)
         {
             switch(expr->extype()) {
             case exprtype::constant:
                 return this->codegen_constant(ConstantInterface::from(expr));
             case exprtype::primitive:
-                return this->codegen_primitive(PrimitiveInterface::from(expr));
+                return this->codegen_primitive_closure(PrimitiveInterface::from(expr), ir_builder);
             case exprtype::apply:
-                return this->codegen_apply(Apply::from(expr), ir_builder);
+                return this->codegen_apply(Apply::from(expr), envptr, ir_builder);
             case exprtype::lambda:
-                return this->codegen_lambda_decl(Lambda::from(expr));
+                return this->codegen_lambda_closure(Lambda::from(expr), envptr, ir_builder);
+                //return this->codegen_lambda_decl(Lambda::from(expr));
             case exprtype::variable:
-                return this->codegen_variable(Variable::from(expr), ir_builder);
+                return this->codegen_variable(Variable::from(expr), envptr, ir_builder);
             case exprtype::ifexpr:
-                return this->codegen_ifexpr(IfExpr::from(expr), ir_builder);
+                return this->codegen_ifexpr(IfExpr::from(expr), envptr, ir_builder);
             case exprtype::invalid:
             case exprtype::n_expr:
                 return nullptr;
@@ -993,6 +1021,8 @@ namespace xo {
                 this->codegen_lambda_decl(lambda);
             }
 
+#ifdef OBSOLETE  /* don't do this anymore,  obscures lexical context */
+
             /* Pass 2 */
             for (auto lambda : fn_v) {
                 this->codegen_lambda_defn(lambda,
@@ -1014,6 +1044,19 @@ namespace xo {
                 return this->codegen(expr,
                                      *(this->llvm_toplevel_ir_builder_.get()));
             }
+#endif
+
+            /* 1. using nullptr as runtime representation for global environment
+             * 2. may have to elaborate this later?  not clear to me
+             */
+
+            llvm::Value * env_0ptr
+                = (llvm::ConstantPointerNull::get
+                   (type2llvm::env_api_llvm_ptr_type(llvm_cx_)));
+
+            return this->codegen(expr,
+                                 env_0ptr,
+                                 *(this->llvm_toplevel_ir_builder_.get()));
         } /*codegen_toplevel*/
 
         void
