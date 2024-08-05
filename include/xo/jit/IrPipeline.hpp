@@ -51,7 +51,7 @@ namespace xo {
          **/
         class IrPipeline : public ref::Refcount {
         public:
-            explicit IrPipeline(ref::rp<LlvmContext> llvm_cx);
+            explicit IrPipeline(rp<LlvmContext> llvm_cx);
 
             void run_pipeline(llvm::Function & fn);
 
@@ -59,7 +59,7 @@ namespace xo {
             // ----- transforms (also adapted from kaleidescope.cpp) ------
 
             /** keepalive for contained llvm::LLVMContext **/
-            ref::rp<LlvmContext> llvm_cx_;
+            rp<LlvmContext> llvm_cx_;
 
             /** manages all the passes+analaysis (?) **/
             std::unique_ptr<llvm::FunctionPassManager> llvm_fpmgr_;

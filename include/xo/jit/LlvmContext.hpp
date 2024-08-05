@@ -24,7 +24,7 @@ namespace xo {
          **/
         class LlvmContext : public ref::Refcount {
         public:
-            static xo::ref::rp<LlvmContext> make();
+            static rp<LlvmContext> make();
 
             llvm::LLVMContext & llvm_cx_ref() { return *llvm_cx_; }
             std::unique_ptr<llvm::LLVMContext> & llvm_cx() { return llvm_cx_; }

@@ -4,7 +4,7 @@
 
 namespace xo {
     namespace jit {
-        xo::ref::rp<LlvmContext>
+        rp<LlvmContext>
         LlvmContext::make() {
             return new LlvmContext();
         }

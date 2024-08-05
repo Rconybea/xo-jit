@@ -4,7 +4,7 @@
 
 namespace xo {
     namespace jit {
-        IrPipeline::IrPipeline(ref::rp<LlvmContext> llvm_cx)
+        IrPipeline::IrPipeline(rp<LlvmContext> llvm_cx)
         {
             using std::make_unique;
 

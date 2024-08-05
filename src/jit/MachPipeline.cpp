@@ -60,7 +60,7 @@ namespace xo {
                                             ));
         } /*make*/
 
-        xo::ref::rp<MachPipeline>
+        rp<MachPipeline>
         MachPipeline::make() {
             static llvm::ExitOnError llvm_exit_on_err;
 
@@ -729,7 +729,9 @@ namespace xo {
 
             /* generate function body */
 
-            auto block = llvm::BasicBlock::Create(llvm_cx_->llvm_cx_ref(), "entry", llvm_fn);
+            auto block = llvm::BasicBlock::Create(llvm_cx_->llvm_cx_ref(),
+                                                  "entry",
+                                                  llvm_fn);
 
             ir_builder.SetInsertPoint(block);
 

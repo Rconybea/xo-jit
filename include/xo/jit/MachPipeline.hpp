@@ -67,7 +67,7 @@ namespace xo {
         public:
             /* tracking KaleidoscopeJIT::Create() here.. */
             static llvm::Expected<std::unique_ptr<MachPipeline>> make_aux();
-            static xo::ref::rp<MachPipeline> make();
+            static rp<MachPipeline> make();
 
             // ----- access -----
 
@@ -192,7 +192,7 @@ namespace xo {
              *    jit_->addModule()
              *  Note that this makes the module itself unavailable to us
              **/
-            xo::ref::rp<IrPipeline> ir_pipeline_;
+            rp<IrPipeline> ir_pipeline_;
 
             /** owns + manages core "global" llvm data,
              *  including type- and constant- unique-ing tables.
@@ -200,7 +200,7 @@ namespace xo {
              *  Not threadsafe,  but ok to have multiple threads,
              *  each with its own LLVMContext
              **/
-            ref::rp<LlvmContext> llvm_cx_;
+            rp<LlvmContext> llvm_cx_;
 
             /** builder for intermediate-representation objects **/
             std::unique_ptr<llvm::IRBuilder<>> llvm_toplevel_ir_builder_;
@@ -213,7 +213,7 @@ namespace xo {
             std::unique_ptr<llvm::Module> llvm_module_;
 
             /** map global names to functions/variables **/
-            ref::rp<GlobalEnv> global_env_;
+            rp<GlobalEnv> global_env_;
 
             /** map variable names (formal parameters) to
              *  corresponding llvm IR.
