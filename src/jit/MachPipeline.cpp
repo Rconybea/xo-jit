@@ -714,6 +714,9 @@ namespace xo {
 
             global_env_->require_global(lambda->name(), lambda.get());
 
+            /* correct PROVIDED this is a toplevel lambda */
+            lambda->attach_envs(this->global_env_);
+
             /* do we already know a function with this name? */
             auto * llvm_fn = llvm_module_->getFunction(lambda->name());
 
