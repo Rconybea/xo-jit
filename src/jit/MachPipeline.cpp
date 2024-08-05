@@ -975,6 +975,17 @@ namespace xo {
              *   generate code for it too
              */
 
+            /* WIP.  STRATEGY:
+             * - xo::ast::ClosureExpr (an expression that generates a closure)
+             *   closure = {lambda, env}
+             *
+             * - pass 1:
+             *   return list of closure expressions;
+             *   codegen the lambda decls using lambda from each closure
+             * - pass 2:
+             *   codegen closures: use env chain to resolve variables
+             */
+
             /* Pass 1. */
             auto fn_v = this->find_lambdas(expr);
 
