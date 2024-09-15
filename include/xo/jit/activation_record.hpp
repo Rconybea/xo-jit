@@ -114,9 +114,9 @@ namespace xo {
             using TypeDescr = xo::reflect::TypeDescr;
 
         public:
-            activation_record(const ref::rp<Lambda> & lm);
+            activation_record(const rp<Lambda> & lm);
 
-            const ref::rp<Lambda> lambda() const { return lambda_; }
+            const rp<Lambda> lambda() const { return lambda_; }
 
             /** retrieve @c llvm::Value* representing the primary stack location
              *  for formal parameter @p var_name
@@ -189,7 +189,7 @@ namespace xo {
              *  runtime environment records.
              *
              **/
-            ref::rp<Lambda> lambda_;
+            rp<Lambda> lambda_;
 
             /** @c binding_v_[i] specifies how/where we mean to navigate to
              *  location for formal parameter number *i* of @ref lambda_.
