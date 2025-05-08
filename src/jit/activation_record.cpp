@@ -10,7 +10,7 @@ namespace xo {
         using std::cerr;
         using std::endl;
 
-        activation_record::activation_record(const ref::rp<Lambda> & lm)
+        activation_record::activation_record(const rp<Lambda> & lm)
             : lambda_{lm},
               binding_v_(lm->n_arg())
         {

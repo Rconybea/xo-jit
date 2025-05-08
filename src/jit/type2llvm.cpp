@@ -205,9 +205,12 @@ namespace xo {
         } /*struct_td_to_llvm_type*/
 
         llvm::PointerType *
-        type2llvm::pointer_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                           TypeDescr pointer_td)
+        type2llvm::pointer_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx
+                                           , TypeDescr pointer_td
+            )
         {
+            (void)pointer_td;
+
             assert(pointer_td->is_pointer());
 
 #ifdef OBSOLETE

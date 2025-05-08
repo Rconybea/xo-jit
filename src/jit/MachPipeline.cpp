@@ -604,6 +604,8 @@ namespace xo {
                 return ir_builder.CreateUDiv(args[1], args[2]);
             case llvmintrinsic::fp_add:
                 return ir_builder.CreateFAdd(args[1], args[2]);
+            case llvmintrinsic::fp_sub:
+                return ir_builder.CreateFSub(args[1], args[2]);
             case llvmintrinsic::fp_mul:
                 return ir_builder.CreateFMul(args[1], args[2]);
             case llvmintrinsic::fp_div:
@@ -954,6 +956,11 @@ namespace xo {
                               llvm::IRBuilder<> & ir_builder)
         {
             switch(expr->extype()) {
+            case exprtype::define:
+            case exprtype::assign:
+            case exprtype::sequence:
+            case exprtype::convert:
+                break;
             case exprtype::constant:
                 return this->codegen_constant(ConstantInterface::from(expr));
             case exprtype::primitive:
