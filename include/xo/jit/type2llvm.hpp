@@ -8,7 +8,10 @@
 #include "LlvmContext.hpp"
 #include "xo/expression/Lambda.hpp"
 #include "xo/reflect/TypeDescr.hpp"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <llvm/IR/DerivedTypes.h>
+#pragma GCC diagnostic pop
 //#include <cstdint>
 
 namespace xo {
