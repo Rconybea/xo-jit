@@ -14,7 +14,7 @@ xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 $
 xo_dependency(${SELF_LIB} xo_expression)
 
 # llvm {16,17} api will not build without some retro work
-find_package(LLVM 18 REQUIRED CONFIG)
+find_package(LLVM 18.1 REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 message(STATUS "LLVM_DIR=${LLVM_DIR}")
