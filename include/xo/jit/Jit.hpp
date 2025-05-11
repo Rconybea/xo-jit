@@ -6,6 +6,7 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wredundant-move"
 # include "llvm/ADT/StringRef.h"
 # include "llvm/ExecutionEngine/JITSymbol.h"
 # include "llvm/ExecutionEngine/Orc/CompileUtils.h"
