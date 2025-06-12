@@ -27,6 +27,7 @@ Options:
   --configure       run cmake for xo library NAME in immediate subdir
                     Will use NAME/.build as build directory
   --build           run cmake build for xo library NAME in immediate subdir
+  --build-docs      build documentation for xo library NAME in immediate subdir
   --install         run cmake install for xo library NAME in immediate subdir
   -S=SOURCEDIR      override path/to/source
   -B=BUILDDIR       override path/to/build
@@ -85,6 +86,9 @@ while [[ $# > 0 ]]; do
             ;;
         --build)
             build_flag=1
+            ;;
+        --build-docs)
+            build_docs_flag=1
             ;;
         --install)
             install_flag=1
@@ -198,6 +202,18 @@ fi
 if [[ $build_flag -eq 1 ]]; then
     if [[ -n "$xoname" ]]; then
         cmd="cmake --build $pathtobuild -j"
+
+        if [[ $noop_flag -eq 1 ]]; then
+            echo $cmd
+        else
+            $cmd
+        fi
+    fi
+fi
+
+if [[ $build_docs_flag -eq 1 ]]; then
+    if [[ -n "$xoname" ]]; then
+        cmd="cmake --build $pathtobuild -- docs"
 
         if [[ $noop_flag -eq 1 ]]; then
             echo $cmd
