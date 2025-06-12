@@ -97,6 +97,7 @@ namespace xo {
             std::size_t r = find_toplevel_sep(s4, false /*!last_flag*/);
             std::string_view s5 = s4.substr(r); /*no namespace qualifier (unless function)*/
 
+            //std::cerr << "print_streamlined: __GNUC__=" << __GNUC__ << ", __GNUC_MINOR__=" << __GNUC_MINOR__ << std::endl;
             //std::cerr << "print_streamlined:  s=[" << s << "]" << std::endl;
             //std::cerr << "print_streamlined: s2=[" << s2 << "] (excluded [with ..] suffix)" << std::endl;
             //std::cerr << "print_streamlined: s3=[" << s3 << "] (excluded const suffix)" << std::endl;
@@ -147,8 +148,8 @@ namespace xo {
             /* clang footnote like [CharT = char] instead of [with CharT = char] */
             std::size_t p = s.find(" [");
 #else
-# if (__GNUC__ > 13) || ((__GNUC__ == 13) && (__GNUC_MINOR__ >= 3))
-            /* gcc footnote like [CharT = char] instead of [with CharT = char] starting w/ gcc 13.3 (approximately ?)*/
+# if (__GNUC__ > 13) || ((__GNUC__ == 13) && (__GNUC_MINOR__ >= 2))
+            /* gcc footnote like [CharT = char] instead of [with CharT = char] starting w/ gcc 13.2 (approximately ?)*/
             std::size_t p = s.find(" [");
 # else
             std::size_t p = s.find(" [with ");

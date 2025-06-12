@@ -19,7 +19,7 @@ namespace ut {
         color_spec_type spec_;
         /* function signature (as per __PRETTY_FUNCTION__) */
         std::string_view pretty_;
-        /* output text */
+        /* output text: expected output from function_name(.style .spec .pretty) */
         std::string_view output_;
     }; /*function_tcase*/
 
