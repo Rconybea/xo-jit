@@ -127,6 +127,7 @@ repo() {
     xoname=$1
 
     case "$xoname" in
+        # carve-outs for 4 snowflake xo repo names
         xo-indentlog)
             echo "${XO_REPO_STEM}/indentlog.git"
             ;;
@@ -189,7 +190,7 @@ fi
 
 if [[ $configure_flag -eq 1 ]]; then
     if [[ -n "$xoname" ]]; then
-        cmd="cmake -DCMAKE_INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@ -S $pathtosource -B $pathtobuild"
+        cmd="cmake -DCMAKE_INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@ -DCMAKE_MODULE_PATH=@CMAKE_INSTALL_PREFIX@/share/cmake -S $pathtosource -B $pathtobuild"
 
         if [[ $noop_flag -eq 1 ]]; then
             echo $cmd
