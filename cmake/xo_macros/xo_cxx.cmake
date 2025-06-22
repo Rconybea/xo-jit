@@ -14,7 +14,7 @@ endmacro()
 
 # deprecated -- prefer xo_cxx_toplevel_options2()
 macro(xo_cxx_toplevel_options)
-    message(WARNING "deprecated: prefer xo_cxx_toplevel_options2")
+    message(WARNING "deprecated: prefer xo_cxx_toplevel_options3")
 
     message("xo_cxx_toplevel_options: PROJECT=${PROJECT_NAME}")
 
@@ -55,6 +55,11 @@ macro(xo_cxx_toplevel_options2)
         add_custom_target(all_utest_executables_${PROJECT_NAME})
         set_property(
             TARGET all_utest_executables_${PROJECT_NAME}
+            PROPERTY targets "")
+
+        add_custom_target(docs_${PROJECT_NAME})
+        set_property(
+            TARGET docs_${PROJECT_NAME}
             PROPERTY targets "")
     endif()
 endmacro()
@@ -307,18 +312,37 @@ macro(xo_doxygen_collect_deps)
     message(DEBUG "_all_libs=${_all_libs}")
     message(DEBUG "_all_utests=${_all_utests}")
 
-    ## .hpp files reachable from xo-flatstring/include
-    ##
-    ## REMINDER: for reliability will need to re-run cmake when the set of .hpp files changes
-    ##
-    #file(GLOB_RECURSE DOX_HPP_FILES_GLOB ${PROJECT_SOURCE_DIR}/include "*.hpp")
-    #message(STATUS "DOX_HPP_FILES_GLOB=${DOX_HPP_FILES_GLOB}")
-    #set(DOX_DEPS ${_all_libs} ${_all_utests} ${DOX_HPP_FILES_GLOB})
-
     set(DOX_DEPS ${_all_exes} ${_all_libs} ${_all_utests})
 
     message(STATUS "DOX_DEPS=${DOX_DEPS}")
 endmacro()
+
+# for example
+#   xo_umbrella_doxygen_deps(xo_flatstring xo-pyjit ...)
+# use
+#   cmake --build path/to/build --target help
+# to review available targets
+#
+macro(xo_umbrella_doxygen_deps)
+    # using a target here for symmetry with satellite builds
+    add_custom_target(umbrella_libs)
+
+    foreach(arg IN ITEMS ${ARGN})
+        message(arg=${arg})
+
+        set_property(
+            TARGET umbrella_libs
+            APPEND
+            PROPERTY targets all_libraries_${arg})
+    endforeach()
+
+    get_target_property(_all_libs umbrella_libs targets)
+
+    set(DOX_DEPS ${_all_libs})
+
+    message(STATUS "DOX_DEPS=${DOX_DEPS}")
+endmacro()
+
 
 # caller must set DOX_DEPS before invoking xo_toplevel_doxygen_config()
 #
@@ -334,6 +358,8 @@ macro(xo_docdir_doxygen_config)
 
         execute_process(COMMAND ${XO_CMAKE_CONFIG_EXECUTABLE} --doxygen-template OUTPUT_VARIABLE DOXYGEN_CONFIG_TEMPLATE)
         message(STATUS "DOXYGEN_CONFIG_TEMPLATE=${DOXYGEN_CONFIG_TEMPLATE}")
+        message(STATUS "DOX_EXCLUDE=${DOX_EXCLUDE}")
+        message(STATUS "DOX_EXCLUDE_PATTERNS=${DOX_EXCLUDE_PATTERNS}")
 
         set(DOX_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
@@ -342,6 +368,9 @@ macro(xo_docdir_doxygen_config)
 
         set(DOX_INDEX_FILE ${DOX_OUTPUT_DIR}/html/index.html)
 
+        # note: expansion variables in Doxyfile.in:
+        #   @PROJECT_NAME@ @DOX_INPUT_DIR@ @DOX_OUTPUT_DIR@ @DOX_EXCLUDE@ @DOX_EXCLUDE_PATTERNS@
+        #
         configure_file(
             ${DOXYGEN_CONFIG_TEMPLATE} ${DOX_CONFIG_FILE}
             FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
@@ -350,7 +379,7 @@ macro(xo_docdir_doxygen_config)
         file(MAKE_DIRECTORY ${DOX_OUTPUT_DIR})
         add_custom_command(
             OUTPUT ${DOX_INDEX_FILE}
-            DEPENDS ${DOX_DEPS}
+            DEPENDS "${DOX_DEPS}" ${DOX_CONFIG_FILE}
             COMMAND "${DOXYGEN_EXECUTABLE}" ${DOX_CONFIG_FILE}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             MAIN_DEPENDENCY ${DOX_CONFIG_FILE}
@@ -363,12 +392,62 @@ macro(xo_docdir_doxygen_config)
         #   $ make doxygen
         #
         add_custom_target(
-            doxygen
+            doxygen_${PROJECT_NAME}
             DEPENDS ${DOX_INDEX_FILE} ${DOX_DEPS}
         )
 
     endif()
 endmacro()
+
+# config for an umbrella project that composes standalone subprojects
+macro(xo_umbrella_doxygen_config)
+    # look for doxygen executable
+    find_program(DOXYGEN_EXECUTABLE NAMES doxygen REQUIRED)
+    message(STATUS "DOXYGEN_EXECUTABLE=${DOXYGEN_EXECUTABLE}")
+
+    message(STATUS "XO_CMAKE_CONFIG_EXECUTABLE=${XO_CMAKE_CONFIG_EXECUTABLE}")
+
+    execute_process(COMMAND ${XO_CMAKE_CONFIG_EXECUTABLE} --doxygen-template OUTPUT_VARIABLE DOXYGEN_CONFIG_TEMPLATE)
+    message(STATUS "DOXYGEN_CONFIG_TEMPLATE=${DOXYGEN_CONFIG_TEMPLATE}")
+    message(STATUS "DOX_EXCLUDE=${DOX_EXCLUDE}")
+    message(STATUS "DOX_EXCLUDE_PATTERNS=${DOX_EXCLUDE_PATTERNS}")
+
+    set(DOX_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    set(DOX_INPUT_DIR ${PROJECT_SOURCE_DIR})
+    set(DOX_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/dox)
+
+    set(DOX_INDEX_FILE ${DOX_OUTPUT_DIR}/html/index.html)
+
+        # note: expansion variables in Doxyfile.in:
+        #   @PROJECT_NAME@ @DOX_INPUT_DIR@ @DOX_OUTPUT_DIR@ @DOX_EXCLUDE@ @DOX_EXCLUDE_PATTERNS@
+        #
+    configure_file(
+        ${DOXYGEN_CONFIG_TEMPLATE} ${DOX_CONFIG_FILE}
+        FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        @ONLY)
+
+    file(MAKE_DIRECTORY ${DOX_OUTPUT_DIR})
+    add_custom_command(
+        OUTPUT ${DOX_INDEX_FILE}
+        DEPENDS "${DOX_DEPS}"
+        COMMAND "${DOXYGEN_EXECUTABLE}" ${DOX_CONFIG_FILE}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        MAIN_DEPENDENCY ${DOX_CONFIG_FILE}
+        COMMENT "Generating docs (doxygen)")
+
+    # To build this target
+    #   $ cmake --build .build -j -- doxygen
+    # or
+    #   $ cd .build
+    #   $ make doxygen
+    #
+    add_custom_target(
+        doxygen_${PROJECT_NAME}
+        DEPENDS ${DOX_INDEX_FILE} ${DOX_DEPS}
+    )
+endmacro()
+
 
 macro(xo_docdir_sphinx_config rst_files)
     list(APPEND SPHINX_RST_FILES ${rst_files})
@@ -382,10 +461,7 @@ macro(xo_docdir_sphinx_config rst_files)
         # in submodule build, rely on toplevel docs/CMakeLists.txt file instead
     else()
         # build docs starting from here only in standalone build.
-        # otherwise use top-level doxygen setup instead.
-
-        #set(ALL_LIBRARY_TARGETS xo_flatstring)  # todo: automate this from xo-cmake macros
-        #set(ALL_UTEST_TARGETS xo_flatstring_ex1 utest.flatstring) # todo: automate this from xo-cmake macros
+        # otherwise use top-level doxygen setup.
 
         # look for sphinx-build executable
         find_program(SPHINX_EXECUTABLE NAMES sphinx-build REQUIRED)
@@ -396,7 +472,8 @@ macro(xo_docdir_sphinx_config rst_files)
 
         # root of sphinx doc tree
         set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
-        set(SPHINX_DEPS doxygen conf.py ${SPHINX_RST_FILES} ${SPHINX_RST_FILES_GLOB} ${DOX_DEPS})
+        set(SPHINX_DEPS doxygen_${PROJECT_NAME} conf.py ${SPHINX_RST_FILES} ${SPHINX_RST_FILES_GLOB} ${DOX_DEPS})
+        #set(SPHINX_DEPS conf.py ${SPHINX_RST_FILES} ${SPHINX_RST_FILES_GLOB} ${DOX_DEPS})
 
         add_custom_command(
             OUTPUT ${SPHINX_INDEX_FILE}
@@ -410,7 +487,7 @@ macro(xo_docdir_sphinx_config rst_files)
         # make sphinx --> generate sphinx documentation
         #
         add_custom_target(
-            sphinx
+            sphinx_${PROJECT_NAME}
             DEPENDS ${SPHINX_INDEX_FILE})
 
         # - html docs generated in build/docs/sphinx
@@ -431,8 +508,63 @@ macro(xo_docdir_sphinx_config rst_files)
         # make docs --> generate sphinx documentation
         add_custom_target(
             docs
-            DEPENDS sphinx)
+            DEPENDS sphinx_${PROJECT_NAME})
     endif()
+endmacro()
+
+# config for an umbrella project that composes standalone subprojects
+#
+macro(xo_umbrella_sphinx_config rst_files)
+    list(APPEND SPHINX_RST_FILES ${rst_files})
+    foreach(arg IN ITEMS ${ARGN})
+        list(APPEND SPHINX_RST_FILES ${arg})
+    endforeach()
+
+    # look for sphinx-build executable
+    find_program(SPHINX_EXECUTABLE NAMES sphinx-build REQUIRED)
+    message(STATUS "SPHINX_EXECUTABLE=${SPHINX_EXECUTABLE}")
+
+    set(SPHINX_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/sphinx/html)
+    set(SPHINX_INDEX_FILE ${SPHINX_OUTPUT_DIR}/index.html)
+
+    # root of sphinx doc tree
+    set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
+    set(SPHINX_DEPS doxygen_${PROJECT_NAME} conf.py ${SPHINX_RST_FILES} ${SPHINX_RST_FILES_GLOB} ${DOX_DEPS})
+
+    add_custom_command(
+        OUTPUT ${SPHINX_INDEX_FILE}
+        DEPENDS ${SPHINX_DEPS}
+        COMMAND ${SPHINX_EXECUTABLE}
+        -b html -Dbreathe_projects.xodoxxml=${CMAKE_CURRENT_BINARY_DIR}/dox/xml
+        ${SPHINX_SOURCE} ${SPHINX_OUTPUT_DIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating docs (sphinx) -> [${SPHINX_OUTPUT_DIR}]")
+
+    # make sphinx --> generate sphinx documentation
+    #
+    add_custom_target(
+        sphinx_${PROJECT_NAME}
+        DEPENDS ${SPHINX_INDEX_FILE})
+
+    # - html docs generated in build/docs/sphinx
+    # - copy the doc tree to share/doc/xo_unit/html
+    #
+    #  DESTINATION: CMAKE_INSTALL_DOCDIR
+    #                => DATAROOTDIR/doc/PROJECT_NAME
+    #                => CMAKE_INSTALL_PREFIX/share/doc/xo_flatstring
+    #  OPTIONAL:    install directory tree if it exists,
+    #               but don't complain if it's missing
+    install(
+        DIRECTORY ${SPHINX_OUTPUT_DIR}
+        FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+        DESTINATION ${CMAKE_INSTALL_DOCDIR}
+        COMPONENT Documentation
+        OPTIONAL)
+
+    # make docs --> generate sphinx documentation
+    add_custom_target(
+        docs
+        DEPENDS sphinx_${PROJECT_NAME})
 
 endmacro()
 
@@ -1197,16 +1329,19 @@ macro(xo_headeronly_dependency target dep)
     #   INTERFACE library can only be used with the INTERFACE keyword of
     #   target_link_libraries
     # Unfortunately target_link_libraries() does not copy dependent's INTERFACE_INCLUDE_DIRECTORIES property
-    # (at least asof cmake 3.25.3).  Dependent's INCLUDE_DIRECTORIES property will be empty,  since it's header-only.
+    # (at least asof cmake 3.25.3, cmake 3.29.2).
+    # Dependent's INCLUDE_DIRECTORIES property will be empty,  since it's header-only.
     #
-    # Workaround by copying property explicity,  which we do below
+    # Workaround by copying property explicity,  which we do below.
+    #
+    # See xo-unit/examples/ex1 for an executable that needs this workaround to build
     #
     target_link_libraries(${target} INTERFACE ${dep})
 
-    #  get_target_property(xo_dependency_headeronly__tmp ${dep} INTERFACE_INCLUDE_DIRECTORIES)
-    #  set_property(
-    #      TARGET ${target}
-    #      APPEND PROPERTY INCLUDE_DIRECTORIES ${xo_dependency_headeronly__tmp})
+    get_target_property(xo_dependency_headeronly__tmp ${dep} INTERFACE_INCLUDE_DIRECTORIES)
+    set_property(
+        TARGET ${target}
+        APPEND PROPERTY INCLUDE_DIRECTORIES ${xo_dependency_headeronly__tmp})
 endmacro()
 
 # dependency on external (non-xo) namespaced target
