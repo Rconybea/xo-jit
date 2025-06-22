@@ -8,7 +8,7 @@
 #include <cstdint>
 
 namespace xo {
-    /* Tag here b/c we want header-only library */
+    /* Tag here because we want header-only library */
     template <typename Tag>
     struct log_config_impl {
         /* display log messages with severity >= .log_level */
