@@ -33,6 +33,15 @@
 
 //double foo(double x) { return x; }
 
+namespace {
+    // need wrappers to pin type signature for osx/clang15
+    double
+    xo_sqrt(double x)
+    {
+        return ::sqrt(x);
+    }
+}
+
 int
 main() {
     using xo::scope;
@@ -68,7 +77,7 @@ main() {
 
     {
         auto sqrt = make_primitive("sqrt",
-                                   ::sqrt,
+                                   &xo_sqrt,
                                    false /*!explicit_symbol_def*/,
                                    llvmintrinsic::fp_sqrt);
 
@@ -115,7 +124,7 @@ main() {
 #elif CHOICE == 2
 #define FUNCTION_SYMBOL "twice"
         auto root = make_primitive("sqrt",
-                                   ::sqrt,
+                                   &xo_sqrt,
                                    false /*!explicit_symbol_def*/,
                                    llvmintrinsic::fp_sqrt);
 

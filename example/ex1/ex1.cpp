@@ -29,8 +29,28 @@
 #include "llvm/Transforms/Scalar/GVN.h"
 #include "llvm/Transforms/Scalar/Reassociate.h"
 #include "llvm/Transforms/Scalar/SimplifyCFG.h"
+#include <cmath>
 
-//double foo(double x) { return x; }
+namespace {
+    // need wrappers to fix type signature for osx/clang15.  Perhaps sqrt() is a macro or template (?)
+    double
+    xo_sqrt(double x)
+    {
+        return ::sqrt(x);
+    }
+
+    double
+    xo_sin(double x)
+    {
+        return ::sin(x);
+    }
+
+    double
+    xo_cos(double x)
+    {
+        return ::cos(x);
+    }
+}
 
 int
 main() {
@@ -82,7 +102,7 @@ main() {
     }
 
     {
-        auto expr = make_primitive("sqrt", &sqrt,
+        auto expr = make_primitive("sqrt", &xo_sqrt,
                                    false /*!explicit_symbol_def*/,
                                    llvmintrinsic::fp_sqrt);
 
@@ -105,7 +125,7 @@ main() {
     {
         /* (sqrt 2) */
 
-        auto fn = make_primitive("sqrt", &sqrt,
+        auto fn = make_primitive("sqrt", &xo_sqrt,
                                  false /*!explicit_symbol_def*/,
                                  llvmintrinsic::fp_sqrt);
         auto arg = make_constant(2.0);
@@ -132,11 +152,11 @@ main() {
         /* (lambda (x) (sin (cos x))) */
 
         auto sin = make_primitive("sin",
-                                  ::sin,
+                                  &xo_sin,
                                   false /*!explicit_symbol_def*/,
                                   llvmintrinsic::fp_sin);
         auto cos = make_primitive("cos",
-                                  ::cos,
+                                  &xo_cos,
                                   false /*!explicit_symbol_def*/,
                                   llvmintrinsic::fp_cos);
 
