@@ -133,13 +133,13 @@ namespace xo {
                                                      const runtime_binding_detail & binding);
 
 #ifdef NOT_USING
-            llvm::AllocaInst * create_runtime_localenv_alloca(ref::brw<LlvmContext> llvm_cx,
+            llvm::AllocaInst * create_runtime_localenv_alloca(bp<LlvmContext> llvm_cx,
                                                               //const llvm::DataLayout & data_layout,
                                                               llvm::Function * llvm_fn,
                                                               llvm::IRBuilder<> & fn_ir_builder);
 #endif
 
-            runtime_binding_detail create_entry_block_alloca(ref::brw<LlvmContext> llvm_cx,
+            runtime_binding_detail create_entry_block_alloca(bp<LlvmContext> llvm_cx,
                                                              //const llvm::DataLayout & data_layout,
                                                              llvm::Function * llvm_fn,
                                                              llvm::IRBuilder<> & fn_ir_builder,
@@ -161,7 +161,7 @@ namespace xo {
              *         then use the localenv copy exclusively.
              *  @return value representing localenv slot address
              **/
-            llvm::Value * runtime_localenv_slot_addr(ref::brw<LlvmContext> llvm_cx,
+            llvm::Value * runtime_localenv_slot_addr(bp<LlvmContext> llvm_cx,
                                                      llvm::StructType * localenv_llvm_type,
                                                      llvm::AllocaInst * localenv_alloca,
                                                      int i_slot,
@@ -177,7 +177,7 @@ namespace xo {
              *  - for stackonly parameters, use individual @c llvm::AllocaInst instances
              *  - create custom @c llvm::StructType for captured parameters,  also initially stack-allocated
              **/
-            bool bind_locals(ref::brw<LlvmContext> llvm_cx,
+            bool bind_locals(bp<LlvmContext> llvm_cx,
                              //const llvm::DataLayout & data_layout,
                              llvm::Function * llvm_fn,
                              llvm::IRBuilder<> & ir_builder);

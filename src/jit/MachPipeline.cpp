@@ -138,7 +138,7 @@ namespace xo {
         }
 
         llvm::Value *
-        MachPipeline::codegen_constant(ref::brw<ConstantInterface> expr)
+        MachPipeline::codegen_constant(bp<ConstantInterface> expr)
         {
             TypeDescr td = expr->value_td();
 
@@ -165,7 +165,7 @@ namespace xo {
         }
 
         llvm::Function *
-        MachPipeline::codegen_primitive(ref::brw<PrimitiveInterface> expr)
+        MachPipeline::codegen_primitive(bp<PrimitiveInterface> expr)
         {
             constexpr bool c_debug_flag = true;
 
@@ -250,7 +250,7 @@ namespace xo {
         } /*codegen_primitive*/
 
         llvm::Function *
-        MachPipeline::codegen_primitive_wrapper(ref::brw<PrimitiveInterface> expr,
+        MachPipeline::codegen_primitive_wrapper(bp<PrimitiveInterface> expr,
                                                 llvm::IRBuilder<> & /*ir_builder*/)
         {
             constexpr bool c_debug_flag = true;
@@ -368,7 +368,7 @@ namespace xo {
         } /*codegen_primitive_wrapper*/
 
         llvm::Value *
-        MachPipeline::codegen_primitive_closure(ref::brw<xo::ast::PrimitiveInterface> expr,
+        MachPipeline::codegen_primitive_closure(bp<xo::ast::PrimitiveInterface> expr,
                                                 llvm::IRBuilder<> & ir_builder)
         {
             constexpr bool c_debug_flag = true;
@@ -391,7 +391,7 @@ namespace xo {
         } /*codegen_primitive_closure*/
 
         llvm::Value *
-        MachPipeline::codegen_apply(ref::brw<Apply> apply,
+        MachPipeline::codegen_apply(bp<Apply> apply,
                                     llvm::Value * envptr,
                                     llvm::IRBuilder<> & ir_builder)
         {
@@ -632,13 +632,13 @@ namespace xo {
 
         } /*codegen_apply*/
 
-        std::vector<ref::brw<Lambda>>
-        MachPipeline::find_lambdas(ref::brw<Expression> expr) const
+        std::vector<bp<Lambda>>
+        MachPipeline::find_lambdas(bp<Expression> expr) const
         {
-            std::vector<ref::brw<Lambda>> retval_v;
+            std::vector<bp<Lambda>> retval_v;
 
             expr->visit_preorder(
-                [&retval_v](ref::brw<Expression> x)
+                [&retval_v](bp<Expression> x)
                     {
                         if (x->extype() == exprtype::lambda) {
                             retval_v.push_back(Lambda::from(x));
@@ -649,7 +649,7 @@ namespace xo {
         } /*find_lambdas*/
 
         llvm::Function *
-        MachPipeline::codegen_lambda_decl(ref::brw<Lambda> lambda)
+        MachPipeline::codegen_lambda_decl(bp<Lambda> lambda)
         {
             constexpr bool c_debug_flag = true;
 
@@ -709,7 +709,7 @@ namespace xo {
         } /*codegen_lambda_decl*/
 
         llvm::Function *
-        MachPipeline::codegen_lambda_defn(ref::brw<Lambda> lambda,
+        MachPipeline::codegen_lambda_defn(bp<Lambda> lambda,
                                           llvm::IRBuilder<> & /*ir_builder*/)
         {
             constexpr bool c_debug_flag = true;
@@ -810,7 +810,7 @@ namespace xo {
         } /*codegen_lambda_defn*/
 
         llvm::Value *
-        MachPipeline::codegen_lambda_closure(ref::brw<Lambda> lambda,
+        MachPipeline::codegen_lambda_closure(bp<Lambda> lambda,
                                              llvm::Value * envptr,
                                              llvm::IRBuilder<> & ir_builder)
         {
@@ -837,7 +837,7 @@ namespace xo {
         } /*codegen_lambda_closure*/
 
         llvm::Value *
-        MachPipeline::codegen_variable(ref::brw<Variable> var,
+        MachPipeline::codegen_variable(bp<Variable> var,
                                        llvm::Value * /*envptr*/,
                                        llvm::IRBuilder<> & ir_builder)
         {
@@ -865,7 +865,7 @@ namespace xo {
         } /*codegen_variable*/
 
         llvm::Value *
-        MachPipeline::codegen_ifexpr(ref::brw<IfExpr> expr,
+        MachPipeline::codegen_ifexpr(bp<IfExpr> expr,
                                      llvm::Value * envptr,
                                      llvm::IRBuilder<> & ir_builder)
         {
@@ -951,7 +951,7 @@ namespace xo {
         } /*codegen_ifexpr*/
 
         llvm::Value *
-        MachPipeline::codegen(ref::brw<Expression> expr,
+        MachPipeline::codegen(bp<Expression> expr,
                               llvm::Value * envptr,
                               llvm::IRBuilder<> & ir_builder)
         {
@@ -988,7 +988,7 @@ namespace xo {
         } /*codegen*/
 
         llvm::Value *
-        MachPipeline::codegen_toplevel(ref::brw<Expression> expr)
+        MachPipeline::codegen_toplevel(bp<Expression> expr)
         {
             /* - Pass 1.
              *   get set of lambdas.

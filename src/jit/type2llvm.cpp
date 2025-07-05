@@ -19,7 +19,7 @@ namespace xo {
          **/
 
         llvm::Type *
-        type2llvm::td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx, TypeDescr td) {
+        type2llvm::td_to_llvm_type(xo::bp<LlvmContext> llvm_cx, TypeDescr td) {
             auto & llvm_cx_ref = llvm_cx->llvm_cx_ref();
 
             if (td->is_function()) {
@@ -58,7 +58,7 @@ namespace xo {
          *  that represented by @p fn_td
          **/
         llvm::FunctionType *
-        type2llvm::function_td_to_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+        type2llvm::function_td_to_lvtype(xo::bp<LlvmContext> llvm_cx,
                                          TypeDescr fn_td,
                                          bool wrapper_flag)
         {
@@ -118,7 +118,7 @@ namespace xo {
         } /*function_td_to_llvm_type*/
 
         llvm::PointerType *
-        type2llvm::function_td_to_llvm_fnptr_type(xo::ref::brw<LlvmContext> llvm_cx,
+        type2llvm::function_td_to_llvm_fnptr_type(xo::bp<LlvmContext> llvm_cx,
                                                   TypeDescr /*fn_td*/,
                                                   bool /*wrapper_flag*/)
         {
@@ -144,7 +144,7 @@ namespace xo {
          *  Generate llvm::Type correspoinding to a TypeDescr for a struct.
          **/
         llvm::StructType *
-        type2llvm::struct_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
+        type2llvm::struct_td_to_llvm_type(xo::bp<LlvmContext> llvm_cx,
                                           TypeDescr struct_td)
         {
             // see
@@ -205,7 +205,7 @@ namespace xo {
         } /*struct_td_to_llvm_type*/
 
         llvm::PointerType *
-        type2llvm::pointer_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx
+        type2llvm::pointer_td_to_llvm_type(xo::bp<LlvmContext> llvm_cx
                                            , TypeDescr pointer_td
             )
         {
@@ -229,7 +229,7 @@ namespace xo {
         } /*pointer_td_llvm_type*/
 
         llvm::PointerType *
-        type2llvm::require_localenv_unwind_llvm_fnptr_type(xo::ref::brw<LlvmContext> llvm_cx,
+        type2llvm::require_localenv_unwind_llvm_fnptr_type(xo::bp<LlvmContext> llvm_cx,
                                                            llvm::PointerType * /*envptr_llvm_type*/)
         {
 #ifdef OBSOLETE
@@ -265,7 +265,7 @@ namespace xo {
         } /*require_localenv_unwind_llvm_fnptr_type*/
 
         llvm::StructType *
-        type2llvm::env_api_llvm_type(xo::ref::brw<LlvmContext> llvm_cx)
+        type2llvm::env_api_llvm_type(xo::bp<LlvmContext> llvm_cx)
         {
             /* _env_api: base type for a local environment */
             llvm::StructType * env_llvm_type
@@ -293,7 +293,7 @@ namespace xo {
         } /*env_api_llvm_type*/
 
         llvm::PointerType *
-        type2llvm::env_api_llvm_ptr_type(xo::ref::brw<LlvmContext> llvm_cx)
+        type2llvm::env_api_llvm_ptr_type(xo::bp<LlvmContext> llvm_cx)
         {
 #ifdef OBSOLETE
             llvm::StructType * env_llvm_type = env_api_llvm_type(llvm_cx);
@@ -303,8 +303,8 @@ namespace xo {
         } /*env_api_llvm_ptr_type*/
 
         llvm::StructType *
-        type2llvm::create_closureapi_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
-                                            xo::ref::brw<FunctionInterface> fn)
+        type2llvm::create_closureapi_lvtype(xo::bp<LlvmContext> llvm_cx,
+                                            xo::bp<FunctionInterface> fn)
         {
             constexpr const char * c_prefix = "c.";
 
@@ -317,7 +317,7 @@ namespace xo {
         } /*create_closureapi_lvtype*/
 
         llvm::StructType *
-        type2llvm::function_td_to_closureapi_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+        type2llvm::function_td_to_closureapi_lvtype(xo::bp<LlvmContext> llvm_cx,
                                                     TypeDescr fn_td,
                                                     const std::string & hint_name)
         {
@@ -368,8 +368,8 @@ namespace xo {
         } /*function_td_to_closureapi_lvtype*/
 
         llvm::StructType *
-        type2llvm::create_localenv_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                             xo::ref::brw<Lambda> lambda)
+        type2llvm::create_localenv_llvm_type(xo::bp<LlvmContext> llvm_cx,
+                                             xo::bp<Lambda> lambda)
         {
             constexpr const char * c_prefix = "e.";
 

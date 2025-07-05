@@ -82,7 +82,7 @@ namespace xo {
 
         /* in kaleidoscope7.cpp: CreateEntryBlockAlloca */
         runtime_binding_detail
-        activation_record::create_entry_block_alloca(ref::brw<LlvmContext> llvm_cx,
+        activation_record::create_entry_block_alloca(bp<LlvmContext> llvm_cx,
                                                      //const llvm::DataLayout & data_layout,
                                                      llvm::Function * llvm_fn,
                                                      llvm::IRBuilder<> & fn_ir_builder,
@@ -129,7 +129,7 @@ namespace xo {
 
 #ifdef NOT_USING
         llvm::AllocaInst *
-        activation_record::create_runtime_localenv_alloca(ref::brw<LlvmContext> llvm_cx,
+        activation_record::create_runtime_localenv_alloca(bp<LlvmContext> llvm_cx,
                                                           //const llvm::DataLayout & data_layout,
                                                           llvm::Function * llvm_fn,
                                                           llvm::IRBuilder<> & ir_builder)
@@ -161,7 +161,7 @@ namespace xo {
 #endif
 
         llvm::Value *
-        activation_record::runtime_localenv_slot_addr(ref::brw<LlvmContext> llvm_cx,
+        activation_record::runtime_localenv_slot_addr(bp<LlvmContext> llvm_cx,
                                                       llvm::StructType * localenv_llvm_type,
                                                       llvm::AllocaInst * localenv_alloca,
                                                       int i_slot,
@@ -195,7 +195,7 @@ namespace xo {
         } /*runtime_localenv_slot_addr*/
 
         bool
-        activation_record::bind_locals(ref::brw<LlvmContext> llvm_cx,
+        activation_record::bind_locals(bp<LlvmContext> llvm_cx,
                                        //const llvm::DataLayout & data_layout,
                                        llvm::Function * llvm_fn,
                                        llvm::IRBuilder<> & ir_builder)

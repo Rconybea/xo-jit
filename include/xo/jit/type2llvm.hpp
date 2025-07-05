@@ -28,7 +28,7 @@ namespace xo {
             /** establish suitable llvm representation for a c++ type (described by @p td)
              *  llvm types are unique'd, at least within @p llvm_cx
              **/
-            static llvm::Type * td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
+            static llvm::Type * td_to_llvm_type(xo::bp<LlvmContext> llvm_cx,
                                                 TypeDescr td);
 
             /** establish llvm representation for a function type
@@ -41,7 +41,7 @@ namespace xo {
              *  to either {primitive functions, functions-requiring-closures},
              *  with choice deferred until runtime
              **/
-            static llvm::FunctionType * function_td_to_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+            static llvm::FunctionType * function_td_to_lvtype(xo::bp<LlvmContext> llvm_cx,
                                                               TypeDescr fn_td,
                                                               bool wrapper_flag = false);
 
@@ -55,7 +55,7 @@ namespace xo {
              *  to either {primitive functions, functions-requiring-closures},
              *  with choice deferred until runtime
              **/
-            static llvm::PointerType * function_td_to_llvm_fnptr_type(xo::ref::brw<LlvmContext> llvm_cx,
+            static llvm::PointerType * function_td_to_llvm_fnptr_type(xo::bp<LlvmContext> llvm_cx,
                                                                       TypeDescr fn_td,
                                                                       bool wrapper_flag);
 
@@ -79,8 +79,8 @@ namespace xo {
              *         (primitive or lambda) with name @c foo
              **/
             static llvm::StructType *
-            create_closureapi_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
-                                     xo::ref::brw<FunctionInterface> fn);
+            create_closureapi_lvtype(xo::bp<LlvmContext> llvm_cx,
+                                     xo::bp<FunctionInterface> fn);
 
             /** establish llvm abstract representation for a closure:
              *  struct with
@@ -121,7 +121,7 @@ namespace xo {
              *  localenv.
              **/
             static llvm::StructType *
-            function_td_to_closureapi_lvtype(xo::ref::brw<LlvmContext> llvm_cx,
+            function_td_to_closureapi_lvtype(xo::bp<LlvmContext> llvm_cx,
                                              TypeDescr fn_td,
                                              const std::string & hint_name);
 
@@ -150,8 +150,8 @@ namespace xo {
              * @return struct type.  typename will be @c e.foo for lambda with name @c foo
              **/
             static llvm::StructType *
-            create_localenv_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
-                                      xo::ref::brw<Lambda> lambda);
+            create_localenv_llvm_type(xo::bp<LlvmContext> llvm_cx,
+                                      xo::bp<Lambda> lambda);
 
             /** establish llvm rep'n for a pointer to an abstract local environment:
              *
@@ -169,7 +169,7 @@ namespace xo {
              *                  +-------+
              **/
             static llvm::PointerType *
-            env_api_llvm_ptr_type(xo::ref::brw<LlvmContext> llvm_cx);
+            env_api_llvm_ptr_type(xo::bp<LlvmContext> llvm_cx);
 
             /** function type:
              *  @code
@@ -184,18 +184,18 @@ namespace xo {
              * returns function-pointer type
              **/
             static llvm::PointerType *
-            require_localenv_unwind_llvm_fnptr_type(xo::ref::brw<LlvmContext> llvm_cx,
+            require_localenv_unwind_llvm_fnptr_type(xo::bp<LlvmContext> llvm_cx,
                                                     llvm::PointerType * hint_envptr_llvm_type = nullptr);
 
         private:
 
             /** establish llvm representation for a struct type described by @p struct_td
              **/
-            static llvm::StructType * struct_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
+            static llvm::StructType * struct_td_to_llvm_type(xo::bp<LlvmContext> llvm_cx,
                                                              TypeDescr struct_td);
 
             /** establish llvm representation for a pointer type described by @p pointer_td **/
-            static llvm::PointerType * pointer_td_to_llvm_type(xo::ref::brw<LlvmContext> llvm_cx,
+            static llvm::PointerType * pointer_td_to_llvm_type(xo::bp<LlvmContext> llvm_cx,
                                                                TypeDescr pointer_td);
 
             /** establish llvm abstract representation for a local environment:
@@ -219,7 +219,7 @@ namespace xo {
              * @see type2llvm::function_td_to_llvm_closure_type
              **/
             static llvm::StructType *
-            env_api_llvm_type(xo::ref::brw<LlvmContext> llvm_cx);
+            env_api_llvm_type(xo::bp<LlvmContext> llvm_cx);
 
         }; /*type2llvm*/
     } /*namespace jit*/
