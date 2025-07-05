@@ -1348,10 +1348,13 @@ endmacro()
 # e.g.
 #   add_library(foo ..) or add_executable(foo ...)
 # then
-#   xo_external_namespaced_dependency(foo Catch2 Catch2::Catch2)
+#   xo_external_target_dependency(foo Catch2 Catch2::Catch2)
 # equivalent to
 #   find_package(Catch2 CONFIG REQUIRED)
 #   target_link_libraries(foo PUBLIC Catch2::Catch2)
+#
+# NOTE: this won't work for builtin module targets. For Threads we need just
+#   find_package(${pkg} Threads)
 #
 macro(xo_external_target_dependency target pkg pkgtarget)
     message("-- [${target}] find_package(${pkg}) (xo_external_target_dependency)")
