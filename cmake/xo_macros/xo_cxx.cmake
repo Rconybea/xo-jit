@@ -1363,7 +1363,7 @@ macro(xo_external_target_dependency target pkg pkgtarget)
     #target_link_libraries(${target} ${pkgtarget})
 endmacro()
 
-# dependency on external (non-xo) target
+# dependency on external (non-XO) target
 #
 macro(xo_external_dependency target pkg)
     xo_external_target_dependency(${target} ${pkg} ${target})
