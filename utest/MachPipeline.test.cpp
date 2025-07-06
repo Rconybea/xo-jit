@@ -19,7 +19,6 @@ namespace xo {
     using xo::ast::exprtype;
     using xo::reflect::Reflect;
     using xo::reflect::reflect_struct;
-    using xo::ref::rp;
     using xo::ref::brw;
     using std::cerr;
     using std::endl;
@@ -41,7 +40,8 @@ namespace xo {
 
             auto fn_ast = make_lambda("root4",
                                       {x_var},
-                                      call2);
+                                      call2,
+                                      nullptr /*parent_env*/);
 
             return fn_ast;
         }
@@ -65,7 +65,8 @@ namespace xo {
             /*   def twice(f :: double->double, x :: double) { f(f(x)); } */
             auto twice = make_lambda("twice",
                                      {f_var, x_var},
-                                     call2);
+                                     call2,
+                                     nullptr /*parent_env*/);
 
             auto x2_var = make_var("x2", Reflect::require<double>());
             auto call3 = make_apply(twice, {root, x2_var});
@@ -77,7 +78,8 @@ namespace xo {
              */
             auto fn_ast = make_lambda("root_2x",
                                       {x2_var},
-                                      call3);
+                                      call3,
+                                      nullptr /*parent_env*/);
 
             return fn_ast;
         }
@@ -270,7 +272,8 @@ namespace xo {
 
             auto make_ratio = make_lambda("make_ratio",
                                           {n_var, d_var},
-                                          call1);
+                                          call1,
+                                          nullptr /*parent_env*/);
 
             return make_ratio;
         }

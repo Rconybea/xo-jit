@@ -109,7 +109,8 @@ main() {
 
         auto lambda = make_lambda("callit",
                                   {f_var, x_var},
-                                  call1);
+                                  call1,
+                                  nullptr /*parent_env*/);
 #elif CHOICE == 1
 #define FUNCTION_SYMBOL "root4"
         /* def root4(x : double) { sqrt(sqrt(x)) } */
@@ -120,7 +121,8 @@ main() {
 
         auto lambda = make_lambda("root4",
                                   {x_var},
-                                  call2);
+                                  call2,
+                                  nullptr /*parent_env*/);
 #elif CHOICE == 2
 #define FUNCTION_SYMBOL "twice"
         auto root = make_primitive("sqrt",
@@ -137,7 +139,8 @@ main() {
         /* (define (twice f ::int->int x ::int) (f (f x))) */
         auto lambda = make_lambda("twice",
                                   {f_var, x_var},
-                                  call2);
+                                  call2,
+                                  nullptr /*parent_env*/);
 #endif
 
         log && log(xtag("lambda", lambda));

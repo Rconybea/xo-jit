@@ -167,7 +167,8 @@ main() {
         /* (define (lm_1 x) (sin (cos x))) */
         auto lambda = make_lambda("lm_1",
                                   {x_var},
-                                  call2);
+                                  call2,
+                                  nullptr /*parent_env*/);
 
         log && log(xtag("expr", lambda));
 
