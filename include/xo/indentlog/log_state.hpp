@@ -142,7 +142,7 @@ namespace xo {
         std::ostream ss_;
     }; /*state_impl*/
 
-    constexpr uint32_t c_default_buf_size = 1024;
+    constexpr uint32_t c_default_buf_size = 1024*1024;
 
     template <typename CharT, typename Traits>
     state_impl<CharT, Traits>::state_impl()
