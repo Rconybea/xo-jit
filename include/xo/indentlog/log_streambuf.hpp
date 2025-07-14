@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "print/quoted_char.hpp"
 #include <iostream>
 #include <vector>
 #include <cstring>   // e.g. for std::memcpy()
@@ -9,13 +10,14 @@
 #include <cassert>
 
 namespace xo {
-    /* recycling buffer for logging.
-     * write to self-extending storage array;
-     */
-    template <typename CharT, typename Traits>
+    /** recycling buffer for logging and pretty-printing
+     *  - write to self-extending storage array
+     *  - track position relative to start of line
+     **/
+    template <typename CharT, typename Traits = std::char_traits<CharT>>
     class log_streambuf : public std::streambuf {
     public:
-        log_streambuf(std::uint32_t buf_z) {
+        log_streambuf(std::uint32_t buf_z, bool debug_flag = false) : debug_flag_{debug_flag} {
             this->buf_v_.resize(buf_z);
             this->reset_stream();
         } /*ctor*/
@@ -25,40 +27,93 @@ namespace xo {
         char const * hi() const { return this->lo() + this->capacity(); }
         std::uint32_t pos() const { return this->pptr() - this->pbase(); }
 
+        /** number of characters since start of line (last \n or \r) **/
+        std::uint32_t lpos() const { return pos() - solpos_; }
+
+        bool debug_flag() const { return debug_flag_; }
+
         void reset_stream() {
             char * p_lo = &(this->buf_v_[0]);
             char * p_hi = p_lo + this->capacity();
 
             /* tells parent our buffer extent */
             this->setp(p_lo, p_hi);
+
+            this->solpos_ = 0;
         } /*reset_stream*/
 
+        void rewind_to(std::uint32_t p) {
+            /* .setp(): using for side effect: sets .pptr to .pbase */
+            this->setp(this->pbase(), this->epptr());
+            this->pbump(p);
+        }
+
     protected:
+        /** expand buffer storage (by 2x), preserve current contents **/
+        void
+        expand_to(std::size_t new_z) {
+            char * old_pptr = pptr();
+            std::streamsize old_n = old_pptr - pbase();
+
+            assert(old_n <= static_cast<std::streamsize>(buf_v_.size()));
+            assert(new_z > buf_v_.capacity());
+
+            this->buf_v_.resize(new_z);
+
+            char * p_base = &(this->buf_v_[0]);
+            char * p_hi = p_base + this->buf_v_.capacity();
+
+            this->setp(p_base, p_hi);
+            this->pbump(old_n);
+        } /*expand*/
+
         virtual std::streamsize
         xsputn(char const * s, std::streamsize n) override {
             /* s must be an address in [this->lo() .. this->lo() + capacity()] */
 
-            assert(this->hi() >= this->pptr());
+            assert(hi() >= pptr());
 
-#ifdef NOT_USING_DEBUG
-            std::cout << "xsputn: pbase=" << (void *)(this->pbase())
-                      << ", pptr=" << (void*)(this->pptr())
-                      << "(+" << (this->pptr() - this->lo()) << ")"
-                      << ", n=" << n << " -> (+" << (this->pptr() + n - this->lo()) << ")"
-                      << ", buf_v.size=" << this->buf_v_.size()
-                      << std::endl;
-#endif
-            //std::cout << "xsputn: s=" << quot(string_view(s, n)) << ", n=" << n << std::endl;
+            if (pptr() + n > hi()) {
+                this->expand_to(std::max(2 * this->buf_v_.capacity(), std::size_t(this->pos() + n + 1)));
+            }
+
+            if (debug_flag_) {
+                std::cout << "xsputn: pbase=" << (void *)(this->pbase())
+                          << ", pptr=" << (void*)(this->pptr())
+                          << "(+" << (this->pptr() - this->lo()) << ")"
+                          << ", n=" << n << " -> (+" << (this->pptr() + n - this->lo()) << ")"
+                          << ", buf_v.size=" << this->buf_v_.size()
+                          << std::endl;
+            }
+
+            std::streamsize ncopied = 0;
 
             if (this->pptr() + n > this->hi()) {
-                n = this->hi() - this->pptr();
-                std::memcpy(this->pptr(), s, n);
+                ncopied = this->hi() - this->pptr();
             } else {
-                std::memcpy(this->pptr(), s, n);
+                ncopied = n;
             }
-            this->pbump(n);
 
-            return n;
+            if (debug_flag_) {
+                std::cout << "xsputn: copying ncopied=" << ncopied << " (/n=" << n << ") bytes into range [lo,hi)"
+                          << ", lo=" << (void*)this->pptr()
+                          << ", hi=" << (void*)(this->pptr() + n)
+                          << std::endl;
+            }
+
+            std::memcpy(this->pptr(), s, ncopied);
+
+            /* scan range [pptr, pptr+n] backwards, to account for newline (if any) */
+            for (char const * p_lo = this->pptr(), * p_hi = p_lo + n - 1, * p = p_hi; p >= p_lo; --p) {
+                if (*p == '\n' || *p == '\r') {
+                    this->solpos_ = (p+1 - this->pbase());
+                    break;
+                }
+            }
+
+            this->pbump(ncopied);
+
+            return ncopied;
         } /*xsputn*/
 
         virtual int_type
@@ -69,25 +124,31 @@ namespace xo {
 
                 assert(old_n <= static_cast<std::streamsize>(this->buf_v_.size()));
 
-                std::size_t new_z = 2 * this->buf_v_.size();
+                if (debug_flag_) {
+                    std::cout << "overflow: new_ch=" << quoted_char(new_ch) << std::endl;
+                }
 
-                this->buf_v_.resize(new_z);
+                this->expand_to(2 * buf_v_.size());
+
                 this->buf_v_[old_n] = new_ch;
+                this->pbump(1);
 
-                /* 'buffered range' will now be .buf_v[old_n .. new_z] */
-                char * p_base = &(this->buf_v_[0]);
-                //char * p_lo = &(this->buf_v_[old_n+1]);
-                char * p_hi = p_base + this->buf_v_.capacity();
+                if ((new_ch == static_cast<int_type>('\n')) || (new_ch == static_cast<int_type>('\r')))
+                    this->solpos_ = this->pos();
 
-                this->setp(p_base, p_hi);
-                this->pbump(old_n + 1);  /*see 'this->buf_v_[old_n] - new_ch' above*/
-
-                return new_ch;
+                if (new_ch == Traits::eof()) {
+                    /* reminder: returning eof sets badbit on ostream */
+                    return Traits::not_eof(new_ch);
+                } else {
+                    return new_ch;
+                }
             } /*overflow*/
 
         /* off.   offset, relative to starting point dir.
          * dir.
          * which. in|out|both
+         *
+         * Note that off=0,dir=cur,which=out reads offset
          */
         virtual pos_type seekoff(off_type off,
                                  std::ios_base::seekdir dir,
@@ -114,8 +175,14 @@ namespace xo {
         } /*seekoff*/
 
     private:
-        /* buffered output stored here */
+        /** position (relative to pbase) one character after last \n or \r.
+         *  Use to drive @ref lpos
+         **/
+        std::size_t solpos_ = 0;
+        /** buffered output stored here **/
         std::vector<char> buf_v_;
+        /** true to debug log_streambuf itself **/
+        bool debug_flag_ = false;
     }; /*log_streambuf*/
 
 } /*namespace xo*/

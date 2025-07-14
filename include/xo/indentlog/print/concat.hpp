@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "ppdetail_atomic.hpp"
 #include <ostream>
 #include <utility>  // for std::move()
 
@@ -37,6 +38,25 @@ namespace xo {
         return os;
     } /*operator<<*/
 
+#ifndef ppdetail_atomic
+    namespace print {
+        /* concat expected to be used on short string-like things.
+         * i.e. don't want structure visible to pretty-printer.
+         * could be using it like concat("boeing", 777)
+         */
+        template <typename T1, typename T2>
+        struct ppdetail<concat_impl<T1,T2>> {
+            using target_type = concat_impl<T1,T2>;
+
+            static bool print_upto(ppstate * pps, const target_type & x) {
+                return ppdetail_atomic<target_type>::print_upto(pps, x);
+            }
+            static void print_pretty(ppstate * pps, const target_type & x) {
+                ppdetail_atomic<target_type>::print_pretty(pps, x);
+            }
+        };
+    }
+#endif
 } /*namespace xo*/
 
 /* end concat.hpp */

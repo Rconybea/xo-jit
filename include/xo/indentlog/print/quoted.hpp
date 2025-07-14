@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "ppdetail_atomic.hpp"
 #include "tostr.hpp"
 #include <sstream>
 #include <string_view>
@@ -147,6 +148,11 @@ namespace xo {
         auto unq(T && x) {
             return quot_impl(true /*unq_flag*/, std::forward<T>(x));
         }
+
+#ifndef ppdetail_atomic
+        template <typename T>
+        PPDETAIL_ATOMIC_BODY(quot_impl<T>);
+#endif
     } /*namespace print*/
 } /*namespace xo*/
 

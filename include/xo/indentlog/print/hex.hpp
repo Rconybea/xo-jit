@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "ppdetail_atomic.hpp"
 #include <iostream>
 #include <cstdint>
 
@@ -139,6 +140,12 @@ namespace xo {
         ins.print(os);
         return os;
     }
+
+#ifndef ppdetail_atomic
+    namespace print {
+        PPDETAIL_ATOMIC(hex_view);
+    }
+#endif
 
 } /*namespace xo*/
 

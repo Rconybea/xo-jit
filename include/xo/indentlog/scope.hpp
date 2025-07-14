@@ -3,9 +3,12 @@
 #pragma once
 
 #include "log_state.hpp"
+#include "print/ppconfig.hpp"
 #include "print/filename.hpp"
+#include "print/ppstr.hpp"
 #include "print/tostr.hpp"
-#include "print/tag.hpp"
+#include "print/pretty_concat.hpp"
+#include "print/pretty_tag.hpp"
 
 #include <stdexcept>
 #include <cstdint>
@@ -31,15 +34,18 @@ namespace xo {
     /* throw exception if condition not met*/
 #  define XO_EXPECT(f,msg) if(!(f)) { throw std::runtime_error(msg); }
     /* establish scope using current function name */
-#  define XO_SCOPE(name, lvl) xo::scope name(xo::scope_setup(xo::log_level::lvl, xo::log_config::style, __PRETTY_FUNCTION__, __FILE__, __LINE__))
+#  define XO_SCOPE(varname, lvl) xo::scope varname(xo::scope_setup(xo::log_level::lvl, xo::log_config::style, __PRETTY_FUNCTION__, __FILE__, __LINE__))
     /* like XO_SCOPE(name),  but also set enabled flag */
 //#  define XO_SCOPE2(name, debug_flag) xo::scope name(xo::scope_setup(xo::log_config::style, __PRETTY_FUNCTION__, __FILE__, __LINE__, debug_flag))
 #  define XO_SCOPE_DISABLED(name) xo::scope name(xo::scope_setup(xo::log_level::never, xo::log_config::style, __PRETTY_FUNCTION__, __FILE__, __LINE__))
 #  define XO_STUB() { XO_SCOPE(logr); logr.log("STUB"); }
 
-    /* convenience class for basic_scope<..> construction (see below).
-     * use to disambiguate setup from other arguments
-     */
+    /** @class scope_setup
+     *  @brief Collect code-location information.
+     *
+     *  Typically used with logging macros like @ref XO_SCOPE
+     *  Application code isn't expected to interact with this class directly
+     **/
     struct scope_setup {
         scope_setup(log_level level, function_style style, std::string_view name1, std::string_view name2,
                     std::string_view file, std::uint32_t line)
@@ -53,21 +59,33 @@ namespace xo {
         //static scope_setup literal(std::string_view name1, bool enabled_flag = true) { return scope_setup(FS_Literal, name1, enabled_flag); }
         //static scope_setup literal(std::string_view name1, std::string_view name2, bool enabled_flag = true) { return scope_setup(FS_Literal, name1, name2, enabled_flag); }
 
-        /* threshold level for logging -- write messages with severity >= this level */
+        /** @defgroup scope_setup-instance-vars scope_setup instance variables **/
+        ///@{
+
+        /** minimum severity level for logging -- write messages with severity >= this level **/
         log_level log_level_ = log_level::error;
-        /* FS_Pretty | FS_Streamlined | FS_Simple */
+        /** @c FS_Pretty | @c FS_Streamlined | @c FS_Simple **/
         function_style style_ = function_style::pretty;
+        /** name extracted from left-hand side of symbol split (e.g. foo in method foo::bar) **/
         std::string_view name1_ = "<.name1>";
+        /** name extracted from right-hand side of symbol split (e.g. bar in method foo::bar) **/
         std::string_view name2_ = "<.name2>";
-        /* __FILE__ */
+        /** captured value of `__FILE__` **/
         std::string_view file_ = "<.file>";
-        /* __LINE__ */
+        /** captured value of `__LINE__` **/
         std::uint32_t line_ = 0;
+
+        ///@}
     }; /*scope_setup*/
 
-    /* nesting logger
+    /** @class basic_scope
+     *  @brief Track nesting level across participating function calls use to drive indentation.
      *
-     * Use:
+     *  @tparam CharT character representation type.  Usually @c char
+     *  @tparam Traits character traits,  usually @c std::char_traits<ChartT>
+     *
+     * Example:
+     *  @code
      *   using xo::scope;
      *
      *   void myfunc() {
@@ -78,7 +96,7 @@ namespace xo {
      *   }
      *
      *   void anotherfunc() {
-     *     XO_SCOPE(x); // or scope x("anotherfunc")
+     *     XO_SCOPE(x); // or scope x("anotherfunc").
      *     x.log(y);
      *   }
      *
@@ -98,14 +116,15 @@ namespace xo {
      *     -anotherfunc:
      *     d,e,f
      *    -myfunc:
-     */
+     *  @endcode
+     **/
     template <typename CharT, typename Traits = std::char_traits<CharT>>
     class basic_scope {
     public:
         using state_impl_type = state_impl<CharT, Traits>;
+        using log_streambuf_type = log_streambuf<CharT, Traits>;
 
     public:
-        //basic_scope(std::string_view name1, bool enabled_flag);
         template <typename... Tn>
         basic_scope(scope_setup setup, Tn&&... rest);
         ~basic_scope();
@@ -119,6 +138,7 @@ namespace xo {
 
         void set_dest_sbuf(std::streambuf * x) { this->dest_sbuf_ = x; }
 
+        /** Log arguments in pack @p rest **/
         template<typename... Tn>
         bool log(Tn&&... rest) {
             if(this->finalized_) {
@@ -129,8 +149,23 @@ namespace xo {
                 /* indent for timestamp (not printed on this line) */
                 logstate->time_indent();
 
-                /* log to per-thread stream to prevent data races */
-                tosn(logstate2stream(logstate), std::forward<Tn>(rest)...);
+                if (log_config::pretty_print_enabled) {
+                    print::ppconfig ppc = {
+                        .right_margin_ = log_config::right_margin,
+                        .indent_width_ = log_config::indent_width
+                    };
+                    std::ostream& ss = logstate2stream(logstate);
+                    log_streambuf_type & sbuf = logstate2streambuf(logstate);
+
+                    /* use 0 for indent because flush2sbuf responsible for basic_scope toplevel indent */
+                    print::ppstate pps(0 /*ci*/, &ppc, &ss, &sbuf);
+
+                    pps.prettyn(ppconcat<std::decay_t<Tn>...>{{std::forward<Tn>(rest)...}});
+
+                } else {
+                    /* log to per-thread stream to prevent data races */
+                    tosn(logstate2stream(logstate), std::forward<Tn>(rest)...);
+                }
 
                 this->flush2sbuf(logstate);
             }
@@ -138,18 +173,21 @@ namespace xo {
             return true;
         } /*log*/
 
+        /** Log argument in pack @p args **/
         template<typename... Tn>
         bool operator()(Tn&&... args) { return this->log(std::forward<Tn>(args)...); }
 
-        /* call once to end scope before dtor */
+        /** Optionally, call once to end scope before dtor.
+         *  Logs arguments in pack @p args
+         **/
         template<typename... Tn>
         void end_scope(Tn&&... args);
 
     private:
-        /* establish stream for logging;  use thread-local storage for threadsafetỵ
-         * stream, if recycled (ịẹ after 1st call to scopẹlog() from a particular thread),
-         * will be in 'reset-to-beginning of buffer' statẹ
-         */
+        /** establish stream for logging;  use thread-local storage for threadsafetỵ
+         *  stream, if recycled (ịẹ after 1st call to scopẹlog() from a particular thread),
+         *  will be in 'reset-to-beginning of buffer' statẹ
+         **/
         static state_impl_type * require_indent_thread_local_state();
 
         /* establish logging state;  use thread-local storage for threadsafety */
@@ -157,6 +195,9 @@ namespace xo {
 
         /* retrieve permanently-associated ostream for logging-state */
         static std::ostream & logstate2stream(state_impl_type * logstate);
+
+        /* retreive permanently-associated streambuf for logging-state */
+        static log_streambuf_type & logstate2streambuf(state_impl_type * logstate);
 
         /* write collected output to std::clog,  or chosen streambuf */
         void flush2sbuf(state_impl_type * logstate);
@@ -260,6 +301,13 @@ namespace xo {
     {
         return logstate->ss();
     } /*logstate2stream*/
+
+    template <typename CharT, typename Traits>
+    log_streambuf<CharT, Traits> &
+    basic_scope<CharT, Traits>::logstate2streambuf(state_impl_type * logstate)
+    {
+        return logstate->sbuf();
+    }
 
     template <typename CharT, typename Traits>
     void

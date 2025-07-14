@@ -18,18 +18,45 @@
 #define TAG2(x, y) xo::make_tag(x, y)
 
 #define XTAG(x) xo::xtag(STRINGIFY(x), x)
-//#define XTAG2(x, y) xo::xtag(x, y)
 
 namespace xo {
-    // associate a name with a value
-    //
-    // will print like
-    //   :name value
-    //
-    // NOTE: will search for operator<< overloads in the logutil
-    //       namespace
-    //*/
-    template <bool PrefixSpace, typename Name, typename Value>
+    enum class tagstyle {
+        /** print with automatic escapes for embedded special characters
+         *  (any of ' ','"','\','\n','\r','\t').
+         *  print inside double-quotes if an escape is required.
+         **/
+        autoescape,
+        /** print literally. caller responsible for machine-readability **/
+        raw,
+    };
+
+    /** K,V pair for printing.
+     *
+     *  @tparam PrefixSpace if true print one space before :K
+     *  @tparam TagStyle    controls printing format
+     *  @tparam Name        typename for key K.
+     *  @tparam Value       typename for value V.
+     *
+     *  1. Uses escapes to preserve machine-readability of V.
+     *  2. Optionally colors K for readability.
+     *     Can disable with
+     *     @code
+     *     xo::tag_config::tag_color = xo::color_spec_type::none()
+     *     @endcode
+     *
+     *  Printing styles
+     *    @pre
+     *    :name value                     // unadorned
+     *    :name "value needing\nescapes"  // with escapes
+     *    :name <foo :nested 1 :param 2>  // autoescape disabled
+     *    @endpre
+     *
+     * NOTE: will search for operator<< overloads in the xo
+     *       namespace
+     *
+     *
+     **/
+    template <bool PrefixSpace, tagstyle TagStyle, typename Name, typename Value>
     struct tag_impl {
         tag_impl(Name const & n, Value const & v)
             : name_{n}, value_{v} {}
@@ -42,71 +69,58 @@ namespace xo {
     private:
         Name name_;
         Value value_;
-    }; /*tag_impl*/
+    };
 
-    /* deduce tag template-type from arguments */
-    template<typename Name, typename Value>
-    tag_impl<false, Name, Value>
-    make_tag(Name && n, Value && v)
-    {
-        return tag_impl<false, Name, Value>(n, v);
-    } /*make_tag*/
-
-    template<typename Value>
-    tag_impl<false, char const *, Value>
-    make_tag(char const * n, Value && v) {
-        return tag_impl<false, char const *, Value>(n, v);
-    } /*make_tag*/
+    // ----- xtag -----
 
     template<typename Name, typename Value>
-    tag_impl<true, Name, Value>
+    auto //tag_impl<true, tagstyle::autoescape, Name, std::decay_t<Value>>
     xtag(Name && n, Value && v)
     {
-        return tag_impl<true, Name, Value>(n, v);
+        return tag_impl<true, tagstyle::autoescape, Name, std::decay_t<Value>>(n, v);
     } /*xtag*/
 
     template<typename Value>
-    tag_impl<true, char const *, Value>
+    auto //tag_impl<true, tagstyle::autoescape, char const *, std::decay_t<Value>>
     xtag(char const * n, Value && v) {
-        return tag_impl<true, char const *, Value>(n, v);
+        return tag_impl<true, tagstyle::autoescape, char const *, std::decay_t<Value>>(n, v);
     } /*xtag*/
-
-    inline
-    tag_impl<true, char const *, char const *>
-    xtag_pre(char const * n) {
-        return tag_impl<true, char const *, char const *>(n, "");
-    } /*xtag_pre*/
 
     // ----- tag -----
 
     template<typename Name, typename Value>
-    tag_impl<false, Name, Value>
+    tag_impl<false, tagstyle::autoescape, Name, Value>
     tag(Name && n, Value && v)
     {
-        return tag_impl<false, Name, Value>(n, v);
-    } /*tag*/
+        return tag_impl<false, tagstyle::autoescape, Name, Value>(n, v);
+    }
 
     template<typename Value>
-    tag_impl<false, char const *, Value>
+    tag_impl<false, tagstyle::autoescape, char const *, Value>
     tag(char const * n, Value && v)
     {
-        return tag_impl<false, char const *, Value>(n, v);
-    } /*tag*/
+        return tag_impl<false, tagstyle::autoescape, char const *, Value>(n, v);
+    }
 
     // ----- operator<< on tag_impl -----
 
-    template <bool PrefixSpace, typename Name, typename Value>
+    template <bool PrefixSpace, tagstyle TagStyle, typename Name, typename Value>
     inline std::ostream &
     operator<<(std::ostream &s,
-               tag_impl<PrefixSpace, Name, Value> const & tag)
+               tag_impl<PrefixSpace, TagStyle, Name, Value> const & tag)
     {
         using xo::print::unq;
 
-        if(PrefixSpace)
+        if (PrefixSpace)
             s << " ";
 
         s << with_color(tag_config::tag_color, concat((char const *)":", tag.name()))
-          << " " << unq(tag.value());
+          << " ";
+
+        if (TagStyle == tagstyle::autoescape)
+            s << unq(tag.value());
+        else
+            s << tag.value();
 
         return s;
     } /*operator<<*/

@@ -60,7 +60,7 @@ namespace xo {
      */
 
     /* no-op terminal case */
-    template<class Stream>
+    template <class Stream>
     Stream & tos(Stream & s) {
         return s;
     }
@@ -70,14 +70,14 @@ namespace xo {
     // is the same as
     //   s << a << b << c;
     //
-    template<class Stream, typename T>
+    template <class Stream, typename T>
     Stream & tos(Stream & s, T && x) {
         s << x;
         return s;
     } /*tos*/
 
     template <class Stream, typename T, typename... Tn>
-    Stream &tos(Stream &s, T &&x, Tn &&...rest) {
+    Stream &tos(Stream & s, T && x, Tn && ...rest) {
         s << x;
         return tos(s, rest...);
     } /*tos*/

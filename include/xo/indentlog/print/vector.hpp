@@ -7,12 +7,13 @@
 
 #include <iostream>
 #include <vector>
+#include <cstdint>
 
 namespace std {
     template<typename T>
     inline std::ostream &
     operator<<(std::ostream & os,
-               std::vector<T> const & v)
+               const std::vector<T> & v)
     {
         os << "[";
         for(size_t i=0, z=v.size(); i<z; ++i) {

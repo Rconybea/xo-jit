@@ -1,4 +1,4 @@
-# indentlog/CMakeLists.txt
+# xo-indentlog/CMakeLists.txt
 
 cmake_minimum_required(VERSION 3.10)
 
@@ -28,12 +28,8 @@ add_subdirectory(utest)
 set(SELF_LIB indentlog)
 xo_add_headeronly_library(${SELF_LIB})
 xo_install_library4(${SELF_LIB} ${PROJECT_NAME}Targets)
-xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets)
 
-# ----------------------------------------------------------------
-# docs targets depend on all the other library/utest targets
-#
-#add_subdirectory(docs)
+xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets)
 
 # ----------------------------------------------------------------
 
@@ -44,5 +40,11 @@ if (XO_ENABLE_EXAMPLES)
     install(TARGETS indentlog_ex3 DESTINATION bin/indentlog/example)
     install(TARGETS indentlog_ex4 DESTINATION bin/indentlog/example)
 endif()
+
+# ----------------------------------------------------------------
+# docs targets depends on other library/utest/exec targets,
+# must come after them
+#
+add_subdirectory(docs)
 
 # end CMakeLists.txt

@@ -35,6 +35,7 @@ namespace xo {
         void decr_nesting() { --nesting_level_; }
 
         std::ostream & ss() { return ss_; }
+        log_streambuf_type & sbuf() { return *p_sbuf_phase1_.get(); }
 
         void check_print_time(utc_nanos now_tm) {
             using xo::time::timeutil;
@@ -115,12 +116,6 @@ namespace xo {
          * reused across tos() and scope::log() calls
          */
         std::unique_ptr<log_streambuf_type> p_sbuf_phase1_;
-
-        /* #of characters found in .p_sbuf_phase1 since last \n.
-         * this value is established+updated in .flush2sbuf().
-         * (in particular ignored by stream .ss())
-         */
-        std::size_t lpos_ = 0;
 
         /* whenever .set_location() is called:
          * - capture (file, line)
@@ -256,9 +251,14 @@ namespace xo {
     state_impl<CharT, Traits>::flush2sbuf(std::streambuf * p_sbuf)
     {
         log_streambuf_type * sbuf1 = this->p_sbuf_phase1_.get();
+
+        // instead of post-processing, rely on newline-aware log_streambuf
+        // to indent in advance
+
+#ifdef OBSOLETE
         log_streambuf_type * sbuf2 = this->p_sbuf_phase2_.get();
 
-        /* generally expecting sbuf to contain one line of output.
+        /* often sbuf contains one line of output.
          * if it contains multiple newlines,  need to indent
          * after each one.
          *
@@ -269,8 +269,8 @@ namespace xo {
          *       in the unlikely event that it's non-zero
          */
         char const * s = sbuf1->lo();
-        char const * e = s + sbuf1->pos();
 
+        char const * e = s + sbuf1->pos();
         char const * p = s;
 
         /* point to first space following a non-space character.
@@ -290,8 +290,14 @@ namespace xo {
 
             /* for indenting,  looking for first 'space following non-space, on first line', if any */
 
-            std::size_t lpos_on_newline = 0;
+#ifdef OBSOLETE
+            // ..multiline input should have already been indented by custom log_streambuf.
+            //   may need to extend to recognize terminal control sequences like below
 
+            std::size_t lpos_on_newline = 0;
+#endif
+
+#ifdef OBSOLETE
             while(p < e) {
                 if(space_after_nonspace) {
                     ;
@@ -318,8 +324,10 @@ namespace xo {
 
                     in_color_escape = false;
 
+#ifdef OBSOLETE
                     lpos_on_newline = this->lpos_;
                     this->lpos_ = 0;
+#endif
 
                     ++p;
                     break;
@@ -329,6 +337,7 @@ namespace xo {
                     ++p;
                 }
             }
+#endif
 
             /* p=e or *p=\n */
 
@@ -382,9 +391,11 @@ namespace xo {
             n_indent += std::min(this->nesting_level_ * log_config::indent_width,
                                  log_config::max_indent_width);
 
+#ifdef OBSOLETE // nice try, broken for multiline input + written before log_streambuf calculated lpos
             /* this is just to indent for per-line entry/exit label */
             if(space_after_nonspace)
                 n_indent += (space_after_nonspace - s);
+#endif
 
             for(std::uint32_t i = 0; i < n_indent; ++i)
                 sbuf2->sputc(' ');
@@ -394,6 +405,8 @@ namespace xo {
 
         /* now write entire contents of *sbuf2 to clog */
         p_sbuf->sputn(sbuf2->lo(), sbuf2->pos());
+#endif
+        p_sbuf->sputn(sbuf1->lo(), sbuf1->pos());
 
         /* reset streams for next message */
         this->reset_stream();

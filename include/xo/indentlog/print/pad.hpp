@@ -38,6 +38,9 @@ namespace xo {
     inline pad_impl
     pad(std::uint32_t n, char pad_char = ' ') { return pad_impl(n, pad_char); }
 
+    inline pad_impl
+    spaces(std::uint32_t n) { return pad_impl(n, ' '); }
+
     inline std::ostream &
     operator<<(std::ostream & s,
                pad_impl const & pad)

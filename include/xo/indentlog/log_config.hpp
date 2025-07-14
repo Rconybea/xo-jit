@@ -19,6 +19,10 @@ namespace xo {
         static bool time_local_flag;
         /* true to log time-of-day with microsecond precision;  false for millisecond precision */
         static bool time_usec_flag;
+        /* true to enable pretty-printing (see basic_scope::log()) */
+        static bool pretty_print_enabled;
+        /* when pretty-printing enabled, use newlines in effort to avoid writing beyond this margin */
+        static std::uint32_t right_margin;
         /* spaces per nesting level.  0 -> no indenting */
         static std::uint32_t indent_width;
         /* max #of spaces to introduce when indenting */
@@ -57,6 +61,14 @@ namespace xo {
     template <typename Tag>
     bool
     log_config_impl<Tag>::time_usec_flag = true;
+
+    template <typename Tag>
+    bool
+    log_config_impl<Tag>::pretty_print_enabled = true;
+
+    template <typename Tag>
+    std::uint32_t
+    log_config_impl<Tag>::right_margin = 130;
 
     template <typename Tag>
     std::uint32_t
