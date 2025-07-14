@@ -1,0 +1,41 @@
+standalone build
+
+        +-----------------------------------------------+
+        | cmake                                         |
+        |   CMakeLists.txt                              |
+        |   $PREFIX/share/cmake/xo_macros/xo_cxx.cmake  |
+        +-----------------------------------------------+
+           |
+           |                                                  +----------------------+
+           +------------------------------------------------->| .build/docs/Doxyfile |
+           |                                                  +----------------------+
+           |                                                     ^
+           |                                 (cmake)             |
+           |                                        /------------/
+           |                                        |
+           |     +---------------------------------------+          +-----------------+
+           +---->| doxygen                               |--------->| .build/docs/dox |
+           |     |   $PREFIX/share/xo-macros/Doxyfile.in | (doxygen)|   +- html/      |
+           |     +---------------------------------------+          |   +- xml/       |
+           |                                                        +-----------------+
+           |                                                             |
+           |                                                             |(sphinx)
+           |                                                             |
+           |                                                             v
+           |     +---------------------------------------+        +--------------------+
+           \---->| sphinx                                |------->| .build/docs/sphinx |
+                 |   +- conf.py                          |        |   +- html/         |
+                 |   +- _static/                         |        +--------------------+
+                 |   +- *.rst                            |
+                 +---------------------------------------+
+
+umbrella build relies on top-level cmake macros
+
+files
+
+   README            this file
+   CMakeLists.txt    build entry point
+   conf.py           sphinx config
+   _static           static files for sphinx
+
+   index.rst         toplevel sphinx document; entry point
