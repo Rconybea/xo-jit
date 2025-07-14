@@ -3,8 +3,9 @@
 usage() {
     cat <<EOF
 $0 [-u|--usage|-h|--help]
-    [--list] [-n] [--xoname=NAME]
+    [--list] [-n|--dry-run] [--xoname=NAME]
     [--repo|--clone|--configure|--build|--install]
+    [--with-examples] [--with-utests] [--debug-build]
     [-S=SOURCEDIR] [-B=BUILDDIR]
 EOF
 }
@@ -20,7 +21,7 @@ Options:
   -u | --usage      brief help message
   -h | --help       this help message
   --list            list known xo libraries
-  -n                dry-run: don't actually invoke state-changing commands
+  -n | --dry-run    dry-run: don't actually invoke state-changing commands
   --xoname=NAME     operate on xo subsystem NAME
   --repo            report github repo for NAME
   --clone           git clone xo library NAME in current directory
@@ -29,8 +30,14 @@ Options:
   --build           run cmake build for xo library NAME in immediate subdir
   --build-docs      build documentation for xo library NAME in immediate subdir
   --install         run cmake install for xo library NAME in immediate subdir
+
   -S=SOURCEDIR      override path/to/source
   -B=BUILDDIR       override path/to/build
+
+  --with-examples   in configure step, set -DXO_ENABLE_EXAMPLES=1
+  --with-utests     in configure step, set -DENABLE_TESTING=1
+  --debug-build     in configure step, set -DCMAKE_BUILD_TYPE=Debug
+
 EOF
 }
 
@@ -43,6 +50,9 @@ build_flag=0
 install_flag=0
 pathtosource=
 pathtobuild=
+with_examples=0
+with_utests=0
+debug_build=0
 
 while [[ $# > 0 ]]; do
     case "$1" in
@@ -52,7 +62,7 @@ while [[ $# > 0 ]]; do
         -h | --help)
             cmd='help'
             ;;
-        -n)
+        -n | --dry-run)
             noop_flag=1
             ;;
         -S)
@@ -93,6 +103,15 @@ while [[ $# > 0 ]]; do
         --install)
             install_flag=1
             ;;
+        --with-examples)
+            with_examples=1
+            ;;
+        --with-utests)
+            with_utests=1
+            ;;
+        --debug-build)
+            debug_build=1
+            ;;
         xo-*)
             xoname="$1"
             ;;
@@ -105,7 +124,7 @@ while [[ $# > 0 ]]; do
     shift
 done
 
-echo xoname=$xoname pathtosource=$pathtosource pathtobuild=$pathtobuild
+#echo xoname=$xoname pathtosource=$pathtosource pathtobuild=$pathtobuild
 
 if [[ -z "$pathtosource" ]]; then
     pathtosource=$xoname
@@ -190,7 +209,22 @@ fi
 
 if [[ $configure_flag -eq 1 ]]; then
     if [[ -n "$xoname" ]]; then
-        cmd="cmake -DCMAKE_INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@ -DCMAKE_MODULE_PATH=@CMAKE_INSTALL_PREFIX@/share/cmake -S $pathtosource -B $pathtobuild"
+        testingarg=
+        if [[ $with_utests -eq 1 ]]; then
+            testingarg="-DENABLE_TESTING=1"
+        fi
+
+        examplearg=
+        if [[ $with_examples -eq 1 ]]; then
+            examplearg="-DXO_ENABLE_EXAMPLES=1"
+        fi
+
+        cmakebuildtype=
+        if [[ $debug_build -eq 1 ]]; then
+            cmakebuildtype="-DCMAKE_BUILD_TYPE=Debug"
+        fi
+
+        cmd="cmake -DCMAKE_INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@ -DCMAKE_MODULE_PATH=@CMAKE_INSTALL_PREFIX@/share/cmake -S $pathtosource -B $pathtobuild ${testingarg} ${examplearg} ${cmakebuildtype}"
 
         if [[ $noop_flag -eq 1 ]]; then
             echo $cmd
