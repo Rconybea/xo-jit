@@ -42,7 +42,7 @@ Include as git submodule
 
     cd myproject
     git submodule add -b main https://github.com/rconybea/xo-flatstring ext/xo-flatstring
-    git submodule update --init
+    git submodule update --init ext/xo-flatstring
 
 This assumes you organize directly-incorporated dependencies under directory ``myproject/ext``.
 You would then add ``myproject/ext/xo-flatstring/include`` to your compiler's include path,
@@ -53,11 +53,6 @@ and from c++ do something like
     #include <xo/flatstring/flatstring.hpp>
 
 in c++ source files that rely on xo-flatstring
-
-Supported compilers
--------------------
-
-* developed with gcc 13.2.0;  github CI using gcc 11.4.0 (asof April 2024)
 
 Building from source
 --------------------
@@ -84,3 +79,8 @@ To build documentation, will also need:
 * `sphinx`
 * `breathe`
 * `sphinx_rtd_theme`
+
+Supported compilers
+-------------------
+
+* developed with gcc 13.2.0;  github CI using gcc 11.4.0 (asof April 2024)
