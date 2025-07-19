@@ -78,7 +78,16 @@ namespace xo {
 
             return os;
         }
+    }
 
+#ifndef ppdetail_atomic
+    namespace print {
+        PPDETAIL_ATOMIC(xo::jit::runtime_binding_path);
+        PPDETAIL_ATOMIC(xo::jit::runtime_binding_detail);
+    }
+#endif
+
+    namespace jit {
         /**
          *  1. pattern for a stack frame associated with a user-defined function (some Lambda lm)
          *

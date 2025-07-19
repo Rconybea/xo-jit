@@ -3,6 +3,7 @@
 #include "MachPipeline.hpp"
 #include "activation_record.hpp"
 #include "type2llvm.hpp"
+#include "xo/expression/pretty_variable.hpp"
 #include <string>
 
 namespace xo {
