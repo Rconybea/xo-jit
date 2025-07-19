@@ -2,8 +2,8 @@
 
 #pragma once
 
+#include "ppdetail_atomic.hpp"
 #include <ostream>
-//#include <utility>  // for std::move
 #include <cstdint>
 
 namespace xo {
@@ -17,11 +17,11 @@ namespace xo {
     inline std::ostream &
     operator<< (std::ostream & os, color_encoding x) {
         switch(x) {
-        case color_encoding::none: os << "none"; break;
-        case color_encoding::ansi: os << "ansi"; break;
+        case color_encoding::none:  os << "none";  break;
+        case color_encoding::ansi:  os << "ansi";  break;
         case color_encoding::xterm: os << "xterm"; break;
-        case color_encoding::rgb: os << "rgb"; break;
-        default: os << "???"; break;
+        case color_encoding::rgb:   os << "rgb";   break;
+        default:                    os << "???";   break;
         }
         return os;
     } /*operator<<*/
@@ -125,11 +125,11 @@ namespace xo {
     } /*operator<<*/
 
     enum class coloring_control_flags : std::uint8_t {
-        none = 0x0,
-        color_on = 0x01,
-        contents = 0x02,
+        none      = 0x0,
+        color_on  = 0x01,
+        contents  = 0x02,
         color_off = 0x04,
-        all = 0x07
+        all       = 0x07
     };
 
     inline std::uint8_t operator& (coloring_control_flags x, coloring_control_flags y) {
@@ -177,25 +177,42 @@ namespace xo {
     template <typename Contents>
     color_impl<Contents> with_color(color_spec_type const & spec, Contents && contents) {
         return color_impl<Contents>(coloring_control_flags::all, spec, std::forward<Contents>(contents));
-    } /*with_color*/
+    }
 
     inline color_impl<int>
     color_on(color_spec_type const & spec) {
         return color_impl<int>(coloring_control_flags::color_on, spec, 0);
-    } /*color_on*/
+    }
 
     inline color_impl<int>
     color_off(color_spec_type const & spec) {
         /* any spec other than color_spec_type::none() works here */
         return color_impl<int>(coloring_control_flags::color_off, spec, 0);
-    } /*color_off*/
+    }
 
     template <typename Contents>
     inline std::ostream &
     operator<<(std::ostream & os, color_impl<Contents> const & x) {
         x.print(os);
         return os;
-    } /*operator<<*/
+    }
+
+#ifndef ppdetail_atomic
+    namespace print {
+        /* concat expected to be used on short string-like things.
+         * i.e. don't want structure visible to pretty-printer.
+         * could be using it like concat("boeing", 777)
+         */
+        template <typename Contents>
+        struct ppdetail<color_impl<Contents>> {
+            using target_type = color_impl<Contents>;
+
+            static bool print_pretty(const ppindentinfo & ppii, const target_type & x) {
+                return ppdetail_atomic<target_type>::print_pretty(ppii, x);
+            }
+        };
+    }
+#endif
 
 } /*namespace xo*/
 

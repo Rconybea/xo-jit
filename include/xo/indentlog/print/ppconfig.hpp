@@ -23,10 +23,13 @@ namespace xo {
              *  Pretty-printer will introduce newlines if needed
              *  to stay to the left of this margin
              **/
-            std::uint32_t right_margin_ = 135;
+            std::uint32_t right_margin_ = 80;
 
             /** amount of additional indent per nesting level **/
             std::uint32_t indent_width_ = 2;
+
+            /** assert if attempting this much indent **/
+            std::uint32_t assert_indent_threshold = 10000;
 
             ///@}
         };

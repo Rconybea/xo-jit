@@ -48,11 +48,8 @@ namespace xo {
         struct ppdetail<concat_impl<T1,T2>> {
             using target_type = concat_impl<T1,T2>;
 
-            static bool print_upto(ppstate * pps, const target_type & x) {
-                return ppdetail_atomic<target_type>::print_upto(pps, x);
-            }
-            static void print_pretty(ppstate * pps, const target_type & x) {
-                ppdetail_atomic<target_type>::print_pretty(pps, x);
+            static bool print_pretty(const ppindentinfo & ppii, const target_type & x) {
+                return ppdetail_atomic<target_type>::print_pretty(ppii, x);
             }
         };
     }

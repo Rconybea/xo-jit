@@ -103,13 +103,13 @@ namespace xo {
             } /*print*/
 
         private:
-            /* .unq_flag:  if true,  omit surrounding " chars
-             *             whenever printed value satisfies both:
-             *             - no escaped chars
-             *             - no spaces
-             */
+            /** .unq_flag:  if true,  omit surrounding " chars
+             *              whenever printed value satisfies both:
+             *              - no escaped chars
+             *              - no spaces
+             **/
             bool unq_flag_ = false;
-            /* .value:  value to be printed */
+            /** .value:  value to be printed **/
             T value_;
         }; /*quot_impl*/
 
@@ -120,7 +120,7 @@ namespace xo {
             return os;
         } /*operator*/
 
-        /* writing out std::forward<T> behavior for completeness' sake:
+        /** writing out std::forward<T> behavior for completeness' sake:
          *
          * 1. call quoted(x) with rvalue std::string x, then:
          *    - T will be deduced to [std::string]
@@ -134,7 +134,7 @@ namespace xo {
          * 2b. call quoted(x) with std::string const & x, then:
          *    - T deduced to [std::string const &]
          *    - std::string const & passed to quot_impl ctor
-         */
+         **/
         template<typename T>
         auto quot(T && x) {
             return quot_impl(false /*unq_flag*/, std::forward<T>(x));

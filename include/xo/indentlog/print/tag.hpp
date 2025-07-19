@@ -30,7 +30,7 @@ namespace xo {
         raw,
     };
 
-    /** K,V pair for printing.
+    /** key-value pair for printing.
      *
      *  @tparam PrefixSpace if true print one space before :K
      *  @tparam TagStyle    controls printing format
@@ -63,6 +63,8 @@ namespace xo {
         tag_impl(Name && n, Value && v)
             : name_{std::forward<Name>(n)}, value_{std::forward<Value>(v)} {}
 
+        constexpr bool prefix_space() const { return PrefixSpace; }
+
         Name const & name() const { return name_; }
         Value const & value() const { return value_; }
 
@@ -71,20 +73,52 @@ namespace xo {
         Value value_;
     };
 
+    /** key-value pair for printing.
+     *  Like tag_impl<..> but uses reference for value.
+     *  Use in context where value can't be a temporary rvalue.
+     **/
+    template <bool PrefixSpace, tagstyle TagStyle, typename Name, typename Value>
+    struct ref_tag_impl {
+        ref_tag_impl(Name const & n, Value const & v) : name_{n}, value_{v} {}
+        ref_tag_impl(Name && n, Value && v) : name_{std::forward<Name>(n)}, value_{std::forward<Value>(v)} {}
+
+        constexpr bool prefix_space() const { return PrefixSpace; }
+
+        Name const & name() const { return name_; }
+        Value const & value() const { return value_; }
+
+    private:
+        Name name_;
+        const Value& value_;
+    };
+
     // ----- xtag -----
 
+    /** Write name,value pair @p n, @p v with format like
+     *    :name value
+     *  Precede with initial space
+     *  Escape whitespace/special characters in @p v
+     **/
     template<typename Name, typename Value>
-    auto //tag_impl<true, tagstyle::autoescape, Name, std::decay_t<Value>>
+    auto
     xtag(Name && n, Value && v)
     {
-        return tag_impl<true, tagstyle::autoescape, Name, std::decay_t<Value>>(n, v);
+        return tag_impl<true, tagstyle::autoescape, std::decay_t<Name>, std::decay_t<Value>>(n, v);
     } /*xtag*/
 
-    template<typename Value>
-    auto //tag_impl<true, tagstyle::autoescape, char const *, std::decay_t<Value>>
-    xtag(char const * n, Value && v) {
-        return tag_impl<true, tagstyle::autoescape, char const *, std::decay_t<Value>>(n, v);
-    } /*xtag*/
+    // ----- xrtag ----
+
+    /** Write name,value pair @p n, @p v with format like
+     *     :name value
+     *  Precede with initial space.
+     *  Do not escape whitespace/special characters in @p v.
+     **/
+    template<typename Name, typename Value>
+    auto
+    xrtag(Name && n, Value && v)
+    {
+        return tag_impl<true, tagstyle::raw, std::decay_t<Name>, std::decay_t<Value>>(n, v);
+    }
 
     // ----- tag -----
 
@@ -102,12 +136,57 @@ namespace xo {
         return tag_impl<false, tagstyle::autoescape, char const *, Value>(n, v);
     }
 
+    // ----- rtag -----
+
+    template<typename Name, typename Value>
+    auto
+    rtag(Name && n, Value && v)
+    {
+        return tag_impl<false, tagstyle::raw, std::decay_t<Name>, std::decay_t<Value>>(n, v);
+    }
+
+    // ----- refrtag -----
+
+    /** 'reference raw tag'.
+     *  1. @p v must survive until refrtag is used (i.e. until tag inserted into some stream)
+     *  2. don't escape whitespace when printing value (pretty-printing with parseable structure)
+     **/
+    template <typename Name, typename Value>
+    auto
+    refrtag(Name && n, Value && v)
+    {
+        return ref_tag_impl<false, tagstyle::raw, std::decay_t<Name>, std::decay_t<Value>>(n, v);
+    }
+
     // ----- operator<< on tag_impl -----
 
     template <bool PrefixSpace, tagstyle TagStyle, typename Name, typename Value>
     inline std::ostream &
     operator<<(std::ostream &s,
                tag_impl<PrefixSpace, TagStyle, Name, Value> const & tag)
+    {
+        using xo::print::unq;
+
+        if (PrefixSpace)
+            s << " ";
+
+        s << with_color(tag_config::tag_color, concat((char const *)":", tag.name()))
+          << " ";
+
+        if (TagStyle == tagstyle::autoescape)
+            s << unq(tag.value());
+        else
+            s << tag.value();
+
+        return s;
+    } /*operator<<*/
+
+    // ----- operator<< on ref_tag_impl -----
+
+    template <bool PrefixSpace, tagstyle TagStyle, typename Name, typename Value>
+    inline std::ostream &
+    operator<<(std::ostream &s,
+               ref_tag_impl<PrefixSpace, TagStyle, Name, Value> const & tag)
     {
         using xo::print::unq;
 

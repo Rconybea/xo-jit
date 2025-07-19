@@ -94,44 +94,45 @@ namespace xo {
         /** implement pretty-printing for template @c ppconcat r**/
         template <typename... Args>
         struct ppdetail<ppconcat<Args...>> {
-            /** try to print @p target on one line.
+            /** upto=true:
+             *  try to print @p target on one line.
              *  return false if budget (space until right margin) exhausted
              *  or if an embedded newline appears
              *
              *  @return true on success, otherwise false.
+             *
+             * upto=false:
+             *  pretty-print @p target using multiple lines
              **/
-            static bool print_upto(ppstate * pps, ppconcat<Args...> target) {
-                std::uint32_t saved = pps->pos();
+            static bool print_pretty(const ppindentinfo & ppii, ppconcat<Args...> target) {
+                if (ppii.upto()) {
+                    std::uint32_t saved = ppii.pps()->pos();
 
-                if (!pps->has_margin())
-                    return false;
+                    if (!ppii.pps()->has_margin())
+                        return false;
 
-                if (std::apply(
-                        [pps](auto &&... args) {
-                            return detail::ppconcat_printupto_aux(pps, std::forward<decltype(args)>(args)...);
+                    if (std::apply(
+                            [ppii](auto &&... args) {
+                                return detail::ppconcat_printupto_aux(ppii.pps(), std::forward<decltype(args)>(args)...);
+                            },
+                            std::forward<std::tuple<Args...>>(target.contents_)
+                            ) == false)
+                    {
+                        return false;
+                    }
+
+                    return ppii.pps()->scan_no_newline(saved);
+                } else {
+                    std::apply(
+                        [ppii](auto &&... args) {
+                            detail::ppconcat_print_pretty_aux(ppii.pps(), ppii.ci1(),
+                                                              std::forward<decltype(args)>(args)...);
                         },
                         std::forward<std::tuple<Args...>>(target.contents_)
-                        ) == false)
-                {
+                        );
+
                     return false;
                 }
-
-                return pps->scan_no_newline(saved);
-            }
-
-            /** pretty-print @p target using multiple lines
-             **/
-            static void print_pretty(ppstate * pps, ppconcat<Args...> target) {
-                std::uint32_t ci0 = pps->lpos();
-                std::uint32_t ci1 = ci0 + pps->indent_width();
-
-                std::apply(
-                    [pps, ci1](auto &&... args) {
-                        detail::ppconcat_print_pretty_aux(pps, ci1,
-                                                          std::forward<decltype(args)>(args)...);
-                    },
-                    std::forward<std::tuple<Args...>>(target.contents_)
-                    );
             }
         };
     } /*namespace print*/
