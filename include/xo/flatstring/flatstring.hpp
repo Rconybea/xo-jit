@@ -636,6 +636,7 @@ namespace xo {
         return ((s1 <=> s2) == std::strong_ordering::equal);
     }
     ///@}
+
 } /*namespace xo*/
 
 /** end flatstring.hpp **/
