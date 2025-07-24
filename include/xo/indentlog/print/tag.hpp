@@ -158,6 +158,17 @@ namespace xo {
         return ref_tag_impl<false, tagstyle::raw, std::decay_t<Name>, std::decay_t<Value>>(n, v);
     }
 
+    // ----- xrefrtag -----
+
+    /** 'reference raw tag'.  Like @ref refrtag, but precede with a single space
+     **/
+    template <typename Name, typename Value>
+    auto
+    xrefrtag(Name && n, Value && v)
+    {
+        return ref_tag_impl<true, tagstyle::raw, std::decay_t<Name>, std::decay_t<Value>>(n, v);
+    }
+
     // ----- operator<< on tag_impl -----
 
     template <bool PrefixSpace, tagstyle TagStyle, typename Name, typename Value>
