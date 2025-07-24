@@ -603,6 +603,20 @@ namespace xo {
                 return ir_builder.CreateSDiv(args[1], args[2]);
             case llvmintrinsic::i_udiv:
                 return ir_builder.CreateUDiv(args[1], args[2]);
+
+            case llvmintrinsic::i_eq:
+                return ir_builder.CreateICmpEQ(args[1], args[2]);
+            case llvmintrinsic::i_ne:
+                return ir_builder.CreateICmpNE(args[1], args[2]);
+            case llvmintrinsic::i_sgt:
+                return ir_builder.CreateICmpSGT(args[1], args[2]);
+            case llvmintrinsic::i_sge:
+                return ir_builder.CreateICmpSGE(args[1], args[2]);
+            case llvmintrinsic::i_slt:
+                return ir_builder.CreateICmpSLT(args[1], args[2]);
+            case llvmintrinsic::i_sle:
+                return ir_builder.CreateICmpSLE(args[1], args[2]);
+
             case llvmintrinsic::fp_add:
                 return ir_builder.CreateFAdd(args[1], args[2]);
             case llvmintrinsic::fp_sub:
