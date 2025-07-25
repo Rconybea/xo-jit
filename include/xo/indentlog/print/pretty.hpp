@@ -39,6 +39,8 @@ namespace xo {
             uint32_t indent_width() const { return config_->indent_width_; }
             ppindentinfo indent_info(bool upto) { return ppindentinfo(this, lpos(), indent_width(), upto); }
 
+            std::uint32_t current_indent_unused() const { return current_indent_; }
+
             std::uint32_t pos() const { return scratch_sbuf_->pos(); }
             /** current position relative to start of line (last \n or \r),
              *  excluding color escape sequences
@@ -170,7 +172,7 @@ namespace xo {
 
             /** readonly pretty-printer config **/
             const ppconfig * config_ = nullptr;
-        };
+        }; /*ppstate*/
 
         /** @class ppstate_standalone
          *  @brief like ppstate, but also holds streambuf

@@ -23,6 +23,7 @@ namespace xo {
                 : pps_{pps}, ci0_{ci0}, ci1_{ci0 + indent_width}, upto_{upto} {}
 
             ppstate * pps() const { return pps_; }
+            std::uint32_t ci0_unused() const { return ci0_; }
             std::uint32_t ci1() const { return ci1_; }
             bool upto() const { return upto_; }
 
