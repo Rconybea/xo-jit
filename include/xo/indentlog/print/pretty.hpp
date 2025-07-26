@@ -440,7 +440,8 @@ namespace xo {
         ppstate &
         ppstate::newline_pretty_tag(std::uint32_t ci, Name && name, Value && value)
         {
-            newline_indent(ci);
+            this->newline_indent(ci);
+            this->current_indent_ = ci;
             this->pretty(rtag(name, value));
 
             return *this;
