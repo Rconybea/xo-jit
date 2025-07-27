@@ -107,7 +107,7 @@ namespace xo {
 
             /** pretty-print empty struct **/
             template <typename StructName, typename... Members>
-            std::uint32_t pretty_struct(const ppindentinfo & ppii, StructName && structname, Members&&...);
+            bool pretty_struct(const ppindentinfo & ppii, StructName && structname, Members&&...);
 
             /** auxiliary function supporting @ref pretty_stuct .
              *  pretty-print a single member name on behalf of a struct/class.
@@ -224,7 +224,7 @@ namespace xo {
         };
 
         template <typename StructName, typename... Members>
-        std::uint32_t
+        bool
         ppstate::pretty_struct(const ppindentinfo & ppii, StructName && structname, Members&&... members)
         {
             if (ppii.upto()) {
