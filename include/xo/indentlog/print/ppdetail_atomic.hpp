@@ -112,7 +112,10 @@ namespace xo {
 
         PPDETAIL_ATOMIC(bool);
         PPDETAIL_ATOMIC(char);
+#ifdef __APPLE__
+        // unsigned long != std::uint64_t.
         PPDETAIL_ATOMIC(unsigned long);
+#endif
         PPDETAIL_ATOMIC(std::int64_t);
         PPDETAIL_ATOMIC(std::uint64_t);
         PPDETAIL_ATOMIC(std::int32_t);
