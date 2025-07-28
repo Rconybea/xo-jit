@@ -75,7 +75,7 @@ namespace xo {
 
         MachPipeline::MachPipeline(std::unique_ptr<Jit> jit)
             : jit_{std::move(jit)},
-              global_env_{GlobalEnv::make()}
+              global_env_{GlobalEnv::make_empty()}
         {
             this->recreate_llvm_ir_pipeline();
         }
