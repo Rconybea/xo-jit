@@ -17,7 +17,7 @@
 
 namespace xo {
     namespace jit {
-        /** analagous to xo::ast::binding_path,
+        /** analagous to xo::scm::binding_path,
          *  but with locations renumbered to include only vars that belong to an explict runtime
          *  environment object;  in other words we exclude vars with stack-only storage
          **/
@@ -119,7 +119,7 @@ namespace xo {
          **/
         class activation_record {
         public:
-            using Lambda = xo::ast::Lambda;
+            using Lambda = xo::scm::Lambda;
             using TypeDescr = xo::reflect::TypeDescr;
 
         public:

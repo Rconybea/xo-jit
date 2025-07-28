@@ -10,13 +10,13 @@
 
 namespace xo {
     using xo::jit::MachPipeline;
-    using xo::ast::make_apply;
-    using xo::ast::make_var;
-    using xo::ast::make_primitive;
-    using xo::ast::llvmintrinsic;
-    using xo::ast::Expression;
-    using xo::ast::Lambda;
-    using xo::ast::exprtype;
+    using xo::scm::make_apply;
+    using xo::scm::make_var;
+    using xo::scm::make_primitive;
+    using xo::scm::llvmintrinsic;
+    using xo::scm::Expression;
+    using xo::scm::Lambda;
+    using xo::scm::exprtype;
     using xo::reflect::Reflect;
     using xo::reflect::reflect_struct;
     using xo::ref::brw;

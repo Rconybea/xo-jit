@@ -4,16 +4,16 @@
 #include <string>
 
 namespace xo {
-    using xo::ast::exprtype;
-    using xo::ast::Expression;
-    using xo::ast::ConstantInterface;
-    //using xo::ast::FunctionInterface;
-    using xo::ast::PrimitiveInterface;
-    using xo::ast::Lambda;
-    using xo::ast::Variable;
-    using xo::ast::Apply;
-    using xo::ast::IfExpr;
-    using xo::ast::llvmintrinsic;
+    using xo::scm::exprtype;
+    using xo::scm::Expression;
+    using xo::scm::ConstantInterface;
+    //using xo::scm::FunctionInterface;
+    using xo::scm::PrimitiveInterface;
+    using xo::scm::Lambda;
+    using xo::scm::Variable;
+    using xo::scm::Apply;
+    using xo::scm::IfExpr;
+    using xo::scm::llvmintrinsic;
     using xo::reflect::Reflect;
     using xo::reflect::StructMember;
     using xo::reflect::TypeDescr;
@@ -465,7 +465,7 @@ namespace xo {
                     /* we don't need any special checking here.
                      * already know (from xo-level checking) that pointer has the right type.
                      *
-                     * Specifically, xo::ast::Apply::make() requires the expression in function position
+                     * Specifically, xo::scm::Apply::make() requires the expression in function position
                      * have suitable function type.
                      *
                      * Now: we have an llvm::Value (fn_value) representing the pointer.

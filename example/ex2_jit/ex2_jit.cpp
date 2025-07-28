@@ -47,18 +47,18 @@ main() {
     using xo::scope;
     using xo::jit::MachPipeline;
     using xo::jit::activation_record;
-    using xo::ast::make_constant;
-    using xo::ast::make_primitive;
-    using xo::ast::llvmintrinsic;
-    using xo::ast::make_apply;
-    using xo::ast::make_var;
-    using xo::ast::make_lambda;
+    using xo::scm::make_constant;
+    using xo::scm::make_primitive;
+    using xo::scm::llvmintrinsic;
+    using xo::scm::make_apply;
+    using xo::scm::make_var;
+    using xo::scm::make_lambda;
     using xo::reflect::Reflect;
     using xo::xtag;
     using std::cerr;
     using std::endl;
 
-    //using xo::ast::make_constant;
+    //using xo::scm::make_constant;
 
     static llvm::ExitOnError llvm_exit_on_err;
 

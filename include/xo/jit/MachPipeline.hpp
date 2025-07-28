@@ -56,13 +56,13 @@ namespace xo {
         **/
         class MachPipeline : public ref::Refcount {
         public:
-            using Expression = xo::ast::Expression;
-            using Lambda = xo::ast::Lambda;
-            using GlobalEnv = xo::ast::GlobalEnv;
+            using Expression = xo::scm::Expression;
+            using Lambda = xo::scm::Lambda;
+            using GlobalEnv = xo::scm::GlobalEnv;
             using TypeDescr = xo::reflect::TypeDescr;
             using ExecutionSession = llvm::orc::ExecutionSession;
             using DataLayout = llvm::DataLayout;
-            //using ConstantInterface = xo::ast::ConstantInterface;
+            //using ConstantInterface = xo::scm::ConstantInterface;
 
         public:
             /* tracking KaleidoscopeJIT::Create() here.. */
@@ -109,8 +109,8 @@ namespace xo {
              *  @c llvm::Type instances are *immortal* (llvm interns them into opaque global lookup tables)
              **/
             llvm::Type * codegen_type(TypeDescr td);
-            llvm::Value * codegen_constant(bp<xo::ast::ConstantInterface> expr);
-            llvm::Function * codegen_primitive(bp<xo::ast::PrimitiveInterface> expr);
+            llvm::Value * codegen_constant(bp<xo::scm::ConstantInterface> expr);
+            llvm::Function * codegen_primitive(bp<xo::scm::PrimitiveInterface> expr);
 
             /** like @ref codegen_primitive , but create wrapper function that accepts (and discards)
              *  environment pointer as first argument.
@@ -118,7 +118,7 @@ namespace xo {
              *  Implementation consists of tail call to natural primitive, that skips the unused
              *  environment pointer
              **/
-            llvm::Function * codegen_primitive_wrapper(bp<xo::ast::PrimitiveInterface> expr,
+            llvm::Function * codegen_primitive_wrapper(bp<xo::scm::PrimitiveInterface> expr,
                                                        llvm::IRBuilder<> & ir_builder);
 
             /** Generate closure for invoking a primitive function.
@@ -126,17 +126,17 @@ namespace xo {
              *  to support function-pointer-like behavior for a target function
              *  that may resolve to primitive-or-lambda at runtime
              **/
-            llvm::Value * codegen_primitive_closure(bp<xo::ast::PrimitiveInterface> expr,
+            llvm::Value * codegen_primitive_closure(bp<xo::scm::PrimitiveInterface> expr,
                                                     llvm::IRBuilder<> & ir_builder);
 
-            llvm::Value * codegen_apply(bp<xo::ast::Apply> expr,
+            llvm::Value * codegen_apply(bp<xo::scm::Apply> expr,
                                         llvm::Value * envptr,
                                         llvm::IRBuilder<> & ir_builder);
             /* NOTE: codegen_lambda() needs to be reentrant too.
              *       for example can have a lambda in apply position.
              */
-            llvm::Function * codegen_lambda_decl(bp<xo::ast::Lambda> expr);
-            llvm::Function * codegen_lambda_defn(bp<xo::ast::Lambda> expr, llvm::IRBuilder<> & ir_builder);
+            llvm::Function * codegen_lambda_decl(bp<xo::scm::Lambda> expr);
+            llvm::Function * codegen_lambda_defn(bp<xo::scm::Lambda> expr, llvm::IRBuilder<> & ir_builder);
             /** Generate closure for invoking a lambda (user-defined function).
              *  See @ref MachPipeline::codegen_apply for invocation
              *  Same ABI as @ref MachPipeline::codegen_primitive_closure
@@ -147,13 +147,13 @@ namespace xo {
              *                  @ref MachPipeline::codegen_toplevel and friends are responsible for
              *                  assembling and propagating this.
              **/
-            llvm::Value * codegen_lambda_closure(bp<xo::ast::Lambda> lambda,
+            llvm::Value * codegen_lambda_closure(bp<xo::scm::Lambda> lambda,
                                                  llvm::Value * envptr,
                                                  llvm::IRBuilder<> & ir_builder);
-            llvm::Value * codegen_variable(bp<xo::ast::Variable> var,
+            llvm::Value * codegen_variable(bp<xo::scm::Variable> var,
                                            llvm::Value * envptr,
                                            llvm::IRBuilder<> & ir_builder);
-           llvm::Value * codegen_ifexpr(bp<xo::ast::IfExpr> ifexpr,
+           llvm::Value * codegen_ifexpr(bp<xo::scm::IfExpr> ifexpr,
                                          llvm::Value * envptr,
                                          llvm::IRBuilder<> & ir_builder);
 
