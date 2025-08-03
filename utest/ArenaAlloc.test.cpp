@@ -1,4 +1,4 @@
-/* @file LinearAlloc.test.cpp
+/* @file ArenaAlloc.test.cpp
  *
  * author: Roland Conybeare, Jul 2025
  */
@@ -7,7 +7,7 @@
 #include <catch2/catch.hpp>
 
 namespace xo {
-    using xo::gc::LinearAlloc;
+    using xo::gc::ArenaAlloc;
 
     namespace ut {
 
@@ -35,7 +35,7 @@ namespace xo {
 
                 constexpr bool c_debug_flag = false;
 
-                auto alloc = LinearAlloc::make("linearalloc", tc.redline_z_, tc.arena_z_, c_debug_flag);
+                auto alloc = ArenaAlloc::make("linearalloc", tc.redline_z_, tc.arena_z_, c_debug_flag);
 
                 REQUIRE(alloc.get());
                 REQUIRE(alloc->name() == "linearalloc");

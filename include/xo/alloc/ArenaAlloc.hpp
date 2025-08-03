@@ -1,4 +1,4 @@
-/* file LinearAlloc.hpp
+/* file ArenaAlloc.hpp
  *
  * author: Roland Conybeare, Jul 2025
  */
@@ -9,7 +9,7 @@
 
 namespace xo {
     namespace gc {
-        /** @class LinearAlloc
+        /** @class ArenaAlloc
          *  @brief Bump allocator with fixed capacity
          *
          *  @text
@@ -33,34 +33,39 @@ namespace xo {
          *
          *  TODO: rename to ArenaAlloc
          **/
-        class LinearAlloc : public IAlloc {
+        class ArenaAlloc : public IAlloc {
         public:
-            ~LinearAlloc();
+            ~ArenaAlloc();
 
             /** create allocator with capacity @p z,
              *  with reserved capacity @p redline_z.
              **/
-            static up<LinearAlloc> make(std::size_t redline_z, std::size_t z);
+            static up<ArenaAlloc> make(const std::string & name,
+                                        std::size_t redline_z,
+                                        std::size_t z,
+                                        bool debug_flag);
 
-            std::uint8_t * free_ptr() const { return free_ptr_; }
-            void       set_free_ptr(std::uint8_t * x);
+            const std::string & name() const { return name_; }
+            std::byte * free_ptr() const { return free_ptr_; }
+            void       set_free_ptr(std::byte * x);
 
             // inherited from IAlloc...
 
             virtual std::size_t size() const override;
             virtual std::size_t available() const override;
             virtual std::size_t allocated() const override;
-            virtual bool is_before_checkpoint(const std::uint8_t * x) const override;
+            virtual bool contains(const void * x) const override;
+            virtual bool is_before_checkpoint(const void * x) const override;
             virtual std::size_t before_checkpoint() const override;
             virtual std::size_t after_checkpoint() const override;
 
             virtual void clear() override;
             virtual void checkpoint() override;
-            virtual std::uint8_t * alloc(std::size_t z) override;
-
+            virtual std::byte * alloc(std::size_t z) override;
+            virtual void release_redline_memory() override;
 
         private:
-            LinearAlloc(std::size_t rz, std::size_t z);
+            ArenaAlloc(const std::string & name, std::size_t rz, std::size_t z, bool debug_flag);
 
         private:
             /**
@@ -68,23 +73,30 @@ namespace xo {
              *  - @ref free_ always a multiple of word size (assumed to be sizeof(void*))
              **/
 
+            /** optional instance name, for diagnostics **/
+            std::string name_;
+
             /** allocator owns memory in range [@ref lo_, @ref hi_) **/
-            std::uint8_t * lo_ = nullptr;
+            std::byte * lo_ = nullptr;
             /** checkpoint (for GC support); divides objects into
              *  older (addresses below checkpoint)
              *  and younger (addresses above checkpoint)
              **/
-            std::uint8_t * checkpoint_;
+            std::byte * checkpoint_;
             /** free pointer. memory in range [@ref free_, @ref limit_) available **/
-            std::uint8_t * free_ptr_ = nullptr;
+            std::byte * free_ptr_ = nullptr;
             /** soft limit: end of released memory **/
-            std::uint8_t * limit_ = nullptr;
+            std::byte * limit_ = nullptr;
+            /** amount of last-resort memory to reserve **/
+            std::size_t redline_z_ = 0;
             /** hard limit: end of allocated memory **/
-            std::uint8_t * hi_ = nullptr;
+            std::byte * hi_ = nullptr;
+            /** true to enable detailed debug logging **/
+            bool debug_flag_ = false;
         };
 
     } /*namespace gc*/
 } /*namespace xo*/
 
 
-/* end LinearAlloc.hpp */
+/* end ArenaAlloc.hpp */

@@ -1,29 +1,33 @@
-/* file LinearAlloc.cpp
+/* file ArenaAlloc.cpp
  *
  * author: Roland Conybeare
  */
 
-#include "LinearAlloc.hpp"
+#include "ArenaAlloc.hpp"
+#include "xo/indentlog/scope.hpp"
 #include "xo/indentlog/print/tag.hpp"
 #include <cassert>
 
 namespace xo {
     namespace gc {
-        LinearAlloc::LinearAlloc(std::size_t rz, std::size_t z)
+        ArenaAlloc::ArenaAlloc(const std::string & name, std::size_t rz, std::size_t z, bool debug_flag)
         {
-            this->lo_         = (new std::uint8_t [rz + z]);
+            this->name_       = name;
+            this->lo_         = (new std::byte [rz + z]);
             this->checkpoint_ = lo_;
             this->free_ptr_   = lo_;
             this->limit_      = lo_ + z;
+            this->redline_z_  = rz;
             this->hi_         = limit_ + rz;
+            this->debug_flag_ = debug_flag;
 
             if (!lo_) {
-                throw std::runtime_error(tostr("LinearAlloc: allocation failed",
+                throw std::runtime_error(tostr("ArenaAlloc: allocation failed",
                                                xtag("size", rz + z)));
             }
         }
 
-        LinearAlloc::~LinearAlloc()
+        ArenaAlloc::~ArenaAlloc()
         {
             delete [] this->lo_;
 
@@ -33,17 +37,19 @@ namespace xo {
             this->checkpoint_ = nullptr;
             this->free_ptr_ = nullptr;
             this->limit_ = nullptr;
+            this->redline_z_ = 0;
             this->hi_ = nullptr;
+            this->debug_flag_ = false;
         }
 
-        up<LinearAlloc>
-        LinearAlloc::make(std::size_t rz, std::size_t z)
+        up<ArenaAlloc>
+        ArenaAlloc::make(const std::string & name, std::size_t rz, std::size_t z, bool debug_flag)
         {
-            return up<LinearAlloc>(new LinearAlloc(rz, z));
+            return up<ArenaAlloc>(new ArenaAlloc(name, rz, z, debug_flag));
         }
 
         void
-        LinearAlloc::set_free_ptr(std::uint8_t * x)
+        ArenaAlloc::set_free_ptr(std::byte * x)
         {
             assert(lo_ <= x);
             assert(x < limit_);
@@ -57,70 +63,79 @@ namespace xo {
         }
 
         std::size_t
-        LinearAlloc::size() const {
+        ArenaAlloc::size() const {
             return limit_ - lo_;
         }
 
         std::size_t
-        LinearAlloc::available() const {
+        ArenaAlloc::available() const {
             return limit_ - free_ptr_;
         }
 
         std::size_t
-        LinearAlloc::allocated() const {
+        ArenaAlloc::allocated() const {
             return free_ptr_ - lo_;
         }
 
         bool
-        LinearAlloc::is_before_checkpoint(const std::uint8_t * x) const {
+        ArenaAlloc::contains(const void * x) const {
+            return (lo_ <= x) && (x < hi_);
+        }
+
+        bool
+        ArenaAlloc::is_before_checkpoint(const void * x) const {
             return (lo_ <= x) && (x < checkpoint_);
         }
 
         std::size_t
-        LinearAlloc::before_checkpoint() const
+        ArenaAlloc::before_checkpoint() const
         {
             return checkpoint_ - lo_;
         }
 
         std::size_t
-        LinearAlloc::after_checkpoint() const
+        ArenaAlloc::after_checkpoint() const
         {
             return free_ptr_ - checkpoint_;
         }
 
         void
-        LinearAlloc::clear()
+        ArenaAlloc::clear()
         {
             this->checkpoint_ = lo_;
             this->free_ptr_ = lo_;
-            this->limit_ = lo_;
+            this->limit_ = hi_ - redline_z_;
         }
 
         void
-        LinearAlloc::checkpoint()
+        ArenaAlloc::checkpoint()
         {
             this->checkpoint_ = this->free_ptr_;
         }
 
-        std::uint8_t *
-        LinearAlloc::alloc(std::size_t z)
+        std::byte *
+        ArenaAlloc::alloc(std::size_t z0)
         {
+            scope log(XO_DEBUG(debug_flag_));
+
             /* word size for alignment */
-            constexpr uint32_t c_bpw = sizeof(void*);
+            constexpr uint32_t c_bpw = sizeof(std::uintptr_t);
 
             std::uintptr_t free_u64 = reinterpret_cast<std::uintptr_t>(free_ptr_);
 
             assert(free_u64 % c_bpw == 0ul);
 
-            /* round up to multiple of c_bpw */
-            std::uint32_t dz = (c_bpw - (z % c_bpw));
-            z += dz;
+            std::uint32_t dz = alloc_padding(z0);
 
-            assert(z % c_bpw == 0ul);
+            std::size_t z1 = z0 + dz;
 
-            std::uint8_t * retval = this->free_ptr_;
+            assert(z1 % c_bpw == 0ul);
 
-            this->free_ptr_ += z;
+            std::byte * retval = this->free_ptr_;
+
+            this->free_ptr_ += z1;
+
+            log && log(xtag("self", name_), xtag("z0", z0), xtag("+pad", dz), xtag("z1", z1));
 
             if (free_ptr_ > limit_) {
                 return nullptr;
@@ -128,8 +143,14 @@ namespace xo {
 
             return retval;
         }
+
+        void
+        ArenaAlloc::release_redline_memory() {
+            this->limit_ = this->hi_;
+        }
+
     } /*namespace gc*/
 } /*namespace xo*/
 
 
-/* end LinearAlloc.cpp */
+/* end ArenaAlloc.cpp */

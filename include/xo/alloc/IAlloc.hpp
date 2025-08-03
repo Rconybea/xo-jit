@@ -20,6 +20,13 @@ namespace xo {
         public:
             virtual ~IAlloc() {}
 
+            /** compute padding to add to an allocation of size z to bring it up to
+             *  a multiple of word size (8 bytes on x86_64)
+             **/
+            static std::uint32_t alloc_padding(std::size_t z);
+            /** z + alloc_padding(z) **/
+            static std::size_t with_padding(std::size_t z);
+
             /** allocator size in bytes (up to soft limit).
              *  Includes unallocated mmeory
              **/
@@ -30,10 +37,12 @@ namespace xo {
             virtual std::size_t available() const = 0;
             /** number of bytes allocated from this allocator **/
             virtual std::size_t allocated() const = 0;
+            /** true iff pointer x comes from this allocator **/
+            virtual bool contains(const void * x) const = 0;
             /** true iff object at address @p x was allocated by this allocator,
              *  and before checkpoint
              **/
-            virtual bool is_before_checkpoint(const std::uint8_t * x) const = 0;
+            virtual bool is_before_checkpoint(const void * x) const = 0;
             /** number of bytes allocated before @ref checkpoint **/
             virtual std::size_t before_checkpoint() const = 0;
             /** number of bytes allocated since @ref checkpoint **/
@@ -48,10 +57,39 @@ namespace xo {
              **/
             virtual void checkpoint() = 0;
             /** allocate @p z bytes of memory. returns pointer to first address **/
-            virtual std::uint8_t * alloc(std::size_t z) = 0;
+            virtual std::byte * alloc(std::size_t z) = 0;
+            /** allocate @p z bytes for copy of object at @p src.
+             *  Only used in @ref GC.  Default implementation asserts and returns nullptr
+             **/
+            virtual std::byte * alloc_gc_copy(std::size_t z, const void * src);
+            /** release last-resort reserved memory **/
+            virtual void release_redline_memory() = 0;
         };
     } /*namespace gc*/
+
+    class MMPtr {
+    public:
+        explicit MMPtr(gc::IAlloc * mm) : mm_{mm} {}
+
+        gc::IAlloc * mm_ = nullptr;
+    };
 } /*namespace xo*/
+
+inline void * operator new (std::size_t z, const xo::MMPtr & mmp) {
+    return mmp.mm_->alloc(z);
+}
+
+//inline void operator delete (void * p, const MMPtr & mmp) {
+//    mmp.mm_->free(reinterpret_cast<std::byte *>(p));
+//}
+
+inline void * operator new[] (std::size_t z, const xo::MMPtr & mmp) {
+    return mmp.mm_->alloc(z);
+}
+
+//inline void operator delete[] (void * p, const MMPtr & mmp) {
+//    mmp.mm_->free(reinterpret_cast<std::byte *>(p));
+//}
 
 
 /* end IAlloc.hpp */
