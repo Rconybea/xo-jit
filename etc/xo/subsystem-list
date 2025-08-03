@@ -1,5 +1,7 @@
 xo-cmake
 xo-indentlog
+xo-alloc
+xo-object
 xo-refcnt
 xo-subsys
 xo-randomgen
