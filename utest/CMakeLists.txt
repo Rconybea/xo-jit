@@ -1,11 +1,13 @@
 # build unittest alloc/utest
+#
+# NOTE: more GC tests in xo-object/utest
 
-set(SELF_EXE utest.alloc)
-set(SELF_SRCS
+set(UTEST_EXE utest.alloc)
+set(UTEST_SRCS
     alloc_utest_main.cpp
     ArenaAlloc.test.cpp
     GC.test.cpp)
 
-xo_add_utest_executable(${SELF_EXE} ${SELF_SRCS})
-xo_self_dependency(${SELF_EXE} xo_alloc)
-xo_external_target_dependency(${SELF_EXE} Catch2 Catch2::Catch2)
+xo_add_utest_executable(${UTEST_EXE} ${UTEST_SRCS})
+xo_self_dependency(${UTEST_EXE} xo_alloc)
+xo_external_target_dependency(${UTEST_EXE} Catch2 Catch2::Catch2)

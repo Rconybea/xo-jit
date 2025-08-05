@@ -65,5 +65,8 @@ namespace xo {
                 REQUIRE(gc->gc_statistics().gen_v_[gen2int(generation::tenured)].n_gc_ == 1);
             }
         }
+
     } /*namespace ut*/
 } /*namespace xo*/
+
+/* GC.test.cpp */

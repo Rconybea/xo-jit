@@ -12,3 +12,6 @@ xo-alloc provides arena allocators and a generation garbage collector
    install
    introduction
    implementation
+   glossary
+   genindex
+   search

@@ -34,7 +34,7 @@ namespace xo {
 
         bool full_move = gc->runstate().full_move();
 
-        if (!full_move && (gc->generation_of(src) == gc::generation::tenured)) {
+        if (!full_move && (gc->tospace_generation_of(src) == gc::generation_result::tenured)) {
             /* don't move tenured objects during incremental collection */
             return src;
         }
@@ -61,7 +61,7 @@ namespace xo {
 
         bool full_move = gc->runstate().full_move();
 
-        if (!full_move && gc->generation_of(from_src) == generation::tenured) {
+        if (!full_move && gc->tospace_generation_of(from_src) == gc::generation_result::tenured) {
             /** incremental collection does not move already-tenured objects **/
             return from_src;
         }

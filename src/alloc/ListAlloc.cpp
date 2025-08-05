@@ -50,6 +50,16 @@ namespace xo {
             return retval;
         }
 
+        const std::string &
+        ListAlloc::name() const {
+            if (hd_) {
+                return hd_->name();
+            }
+
+            static std::string s_default_name = "ListAlloc";
+            return s_default_name;
+        }
+
         std::size_t
         ListAlloc::size() const {
             return total_z_;

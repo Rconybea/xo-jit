@@ -41,6 +41,12 @@ namespace xo {
             return z + alloc_padding(z);
         }
 
+        void
+        IAlloc::assign_member(Object * /*parent*/, Object ** lhs, Object * rhs)
+        {
+            *lhs = rhs;
+        }
+
         std::byte *
         IAlloc::alloc_gc_copy(std::size_t /*z*/, const void * /*src*/)
         {

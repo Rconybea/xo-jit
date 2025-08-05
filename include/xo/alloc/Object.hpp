@@ -15,8 +15,6 @@ namespace xo {
         class ObjectStatistics;
     };
 
-    class Object;
-
     template <typename T>
     class gc_ptr;
 
@@ -88,6 +86,13 @@ namespace xo {
          **/
         static gc::IAlloc * mm;
 
+        /** assign value @p rhs to member @p *lhs of @p parent.
+         *  if assignment creates a cross-generational or cross-checkpoint pointer,
+         *  add mutation log entry
+         **/
+        template <typename T>
+        static void assign_member(gp<Object> parent, gp<T> * lhs, gp<Object> rhs);
+
         /** use from GC aux functions **/
         static gc::GC * _gc() { return reinterpret_cast<gc::GC*>(mm); }
 
@@ -127,6 +132,13 @@ namespace xo {
          *  initially all reachable objects are black.
          *  GC is complete when all reachable objects are white.
          *  GC needs a variable amount of temporary storage to keep track of all gray objects
+         *
+         *  Evacuate reachable object graph rooted at @p src to to-space.
+         *  On return all objects reachable from @p src are white
+         *
+         *  @param src     address of object to evacuate
+         *  @param gc      garbage collector
+         *  @param stats   per-object-type GC statistics
          **/
         static Object * _deep_move(Object * src, gc::GC * gc, gc::ObjectStatistics * stats);
 
@@ -212,6 +224,15 @@ namespace xo {
          **/
         virtual std::size_t _forward_children() = 0;
     };
+
+    template <typename T>
+    void
+    Object::assign_member(gp<Object> parent, gp<T> * lhs, gp<Object> rhs)
+    {
+        Object::mm->assign_member(parent.ptr(),
+                                  reinterpret_cast<Object **>(lhs->ptr_address()),
+                                  rhs.ptr());
+    }
 
     /** @class Cpof
      *  @brief argument to operator new used for garbage collector evacuation phase

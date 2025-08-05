@@ -71,6 +71,51 @@ namespace xo {
                << ">";
         }
 
+        bool
+        MutationLogEntry::is_child_forwarded() const
+        {
+            assert(!parent_->_is_forwarded());
+
+            return (*lhs_)->_is_forwarded();
+        }
+
+        bool
+        MutationLogEntry::is_parent_forwarded() const
+        {
+            return parent_->_is_forwarded();
+        }
+
+        Object *
+        MutationLogEntry::parent_destination() const
+        {
+            //const bool c_debug_flag = true;
+            //scope log(XO_DEBUG(c_debug_flag));
+
+            if (parent_->_is_forwarded()) {
+                //log && log("parent is forwarded", xtag("parent", (void*)parent_));
+
+                return parent_->_destination();
+            } else {
+                //log && log("parent is ordinary", xtag("parent", (void*)parent_));
+
+                return parent_;
+            }
+        }
+
+        MutationLogEntry
+        MutationLogEntry::update_parent_moved(Object * parent_to) const
+        {
+            std::byte * parent_from = reinterpret_cast<std::byte *>(parent_);
+            std::byte * lhs_from = reinterpret_cast<std::byte *>(lhs_);
+
+            std::ptrdiff_t offset = (lhs_from - parent_from);
+
+            std::byte * lhs_to = reinterpret_cast<std::byte *>(parent_to) + offset;
+
+            return MutationLogEntry(parent_to,
+                                    reinterpret_cast<Object **>(lhs_to));
+        }
+
         GC::GC(const Config & config)
             : config_{config}
         {
@@ -89,6 +134,10 @@ namespace xo {
             tenured_[role2int(role::to_space)  ]
                 = ListAlloc::make("TB", tenured_size, 2 * tenured_size, config.debug_flag_);
 
+            mutation_log_[role2int(role::from_space)] = std::make_unique<MutationLog>();
+            mutation_log_[role2int(role::to_space)] = std::make_unique<MutationLog>();
+            defer_mutation_log_ = std::make_unique<MutationLog>();
+
             this->checkpoint();
         }
 
@@ -98,6 +147,13 @@ namespace xo {
             GC * gc = new GC(config);
 
             return up<GC>{gc};
+        }
+
+        const std::string &
+        GC::name() const
+        {
+            static std::string s_default_name = "GC";
+            return s_default_name;
         }
 
         std::size_t
@@ -151,22 +207,34 @@ namespace xo {
             return nursery_[role2int(role::to_space)]->after_checkpoint();
         }
 
-        generation
+        bool
+        GC::debug_flag() const
+        {
+            return config_.debug_flag_;
+        }
+
+        generation_result
         GC::fromspace_generation_of(const void * x) const
         {
             if (tenured_[role2int(role::from_space)]->contains(x))
-                return generation::tenured;
+                return generation_result::tenured;
 
-            return generation::nursery;
+            if (nursery_[role2int(role::from_space)]->contains(x))
+                return generation_result::nursery;
+
+            return generation_result::not_found;
         }
 
-        generation
-        GC::generation_of(const void * x) const
+        generation_result
+        GC::tospace_generation_of(const void * x) const
         {
             if (tenured_[role2int(role::to_space)]->contains(x))
-                return generation::tenured;
+                return generation_result::tenured;
 
-            return generation::nursery;
+            if (nursery_[role2int(role::to_space)]->contains(x))
+                return generation_result::nursery;
+
+            return generation_result::not_found;
         }
 
         std::byte *
@@ -182,6 +250,11 @@ namespace xo {
             }
 
             return nullptr;
+        }
+
+        std::size_t
+        GC::mlog_size() const {
+            return mutation_log_[role2int(role::to_space)]->size();
         }
 
         void
@@ -231,44 +304,117 @@ namespace xo {
         {
             scope log(XO_DEBUG(config_.debug_flag_), xtag("z", z), xtag("+pad", IAlloc::alloc_padding(z)));
 
-            generation g = this->fromspace_generation_of(src);
+            generation_result gr = this->fromspace_generation_of(src);
 
             std::byte * retval = nullptr;
 
-            if (g == generation::tenured)
-            {
-                log && log("tenured");
+            switch (gr) {
+            case generation_result::tenured:
+                {
+                    log && log("tenured");
 
-                retval = tenured_[role2int(role::to_space)]->alloc(z);
-            } else if (nursery_[role2int(role::from_space)]->is_before_checkpoint(src))
-            {
-                log && log("promote");
-
-                /* nursery object has survived 2nd collection cycle
-                 *  -> promote into tenured generation
-                 */
-                retval = tenured_[role2int(role::to_space)]->alloc(z);
-
-                this->gc_statistics_.total_promoted_ += IAlloc::with_padding(z);
-            } else {
-                log && log("nursery");
-
-                retval = nursery_[role2int(role::to_space)]->alloc(z);
-
-                if (!retval) {
-                    /* nursery space exhausted */
-
-                    this->request_gc(generation::nursery);
-
-                    nursery_[role2int(role::to_space)]->release_redline_memory();
-
-                    retval = nursery_[role2int(role::to_space)]->alloc(z);
+                    retval = tenured_[role2int(role::to_space)]->alloc(z);
                 }
+                break;
+            case generation_result::nursery:
+                {
+                    if (nursery_[role2int(role::from_space)]->is_before_checkpoint(src))
+                    {
+                        /* nursery object has survived 2nd collection cycle
+                         *  -> promote into tenured generation
+                         */
+                        retval = tenured_[role2int(role::to_space)]->alloc(z);
+
+                        log && log("promote", xtag("addr", (void*)retval));
+
+                        assert(this->tospace_generation_of(retval) == generation_result::tenured);
+
+                        this->gc_statistics_.total_promoted_ += IAlloc::with_padding(z);
+                    } else {
+                        log && log("nursery");
+
+                        retval = nursery_[role2int(role::to_space)]->alloc(z);
+
+                        if (!retval) {
+                            /* nursery space exhausted !? */
+
+                            this->request_gc(generation::nursery);
+
+                            nursery_[role2int(role::to_space)]->release_redline_memory();
+
+                            retval = nursery_[role2int(role::to_space)]->alloc(z);
+                        }
+                    }
+                }
+                break;
+            case generation_result::not_found:
+                /* something wrong -- we only copy objects that are known to be in from-space
+                 */
+
+                assert(false);
+                break;
             }
 
             assert(retval);
 
             return retval;
+        }
+
+        void
+        GC::assign_member(Object * parent, Object ** lhs, Object * rhs)
+        {
+            ++gc_statistics_.n_mutation_;
+
+            *lhs = rhs;
+
+            if (runstate_.in_progress()) {
+                /* don't log mutations (if any) during GC */
+                return;
+            }
+
+            if (!config_.allow_incremental_gc_) {
+                /* full GCs don't need mutation log, since no cross-generational pointers */
+                return;
+            }
+
+            switch (tospace_generation_of(rhs))
+            {
+            case generation_result::tenured:
+                /* only need to log mutations that create tenured->nursery pointers */
+                return;
+
+            case generation_result::nursery:
+                switch (tospace_generation_of(parent)) {
+                case generation_result::nursery:
+                    if (is_before_checkpoint(parent)) {
+                        // N1->N0, so must log
+                        this->mutation_log_[role2int(role::to_space)]->push_back(MutationLogEntry(parent, lhs));
+                        ++(this->gc_statistics_.n_logged_mutation_);
+                        ++(this->gc_statistics_.n_xckp_mutation_);
+                    } else {
+                        // parent in N0, not an xckp mutation
+                        return;
+                    }
+                    break;
+                case generation_result::tenured:
+                    // T->N, so must log
+                    this->mutation_log_[role2int(role::to_space)]->push_back(MutationLogEntry(parent, lhs));
+                    ++(this->gc_statistics_.n_logged_mutation_);
+                    ++(this->gc_statistics_.n_xgen_mutation_);
+                    break;
+                case generation_result::not_found:
+                    // parent is global
+                    // This may be ok (provided lhs is a gc root)
+                    break;
+                }
+                break;
+
+            case generation_result::not_found:
+
+                // child is global;
+                // logging not required
+                break;
+            }
         }
 
         void
@@ -294,9 +440,19 @@ namespace xo {
         }
 
         void
+        GC::swap_mutation_log()
+        {
+            up<MutationLog> tmp = std::move(mutation_log_[role2int(role::to_space)]);
+            mutation_log_[role2int(role::to_space)] = std::move(mutation_log_[role2int(role::from_space)]);
+            mutation_log_[role2int(role::from_space)] = std::move(tmp);
+        }
+
+        void
         GC::swap_spaces(generation target)
         {
-            // will be copying into storage currently labelled FromSpace
+            scope log(XO_DEBUG(this->debug_flag()));
+
+            // will be copying into the memory regions currently labelled FromSpace
 
             /* gc will copy some to-be-determined amount in [0..promote_z]
                from nursery->tenured generation.
@@ -321,6 +477,14 @@ namespace xo {
                                              - promote_z
                                              + incr_gc_threshold_);
             this->swap_nursery();
+
+            this->swap_mutation_log();
+
+            log && log(xtag("nursery.from", nursery_[role2int(role::from_space)]->name()));
+            log && log(xtag("nursery.to",   nursery_[role2int(role::to_space)  ]->name()));
+            log && log(xtag("tenured.from", tenured_[role2int(role::from_space)]->name()));
+            log && log(xtag("tenured.to",   tenured_[role2int(role::to_space)  ]->name()));
+
         } /*swap_spaces*/
 
         void
@@ -348,6 +512,242 @@ namespace xo {
         {
             for (Object ** pp_root : gc_root_v_) {
                 this->copy_object(pp_root, upto, &gc_statistics_.per_type_stats_);
+            }
+        }
+
+        void
+        GC::incremental_gc_forward_mlog_phase(MutationLog * from_mlog,
+                                              MutationLog * to_mlog,
+                                              MutationLog * defer_mlog,
+                                              ObjectStatistics * per_type_stats)
+        {
+            scope log(XO_DEBUG(config_.debug_flag_), xtag("from_mlog.size", from_mlog->size()));
+
+            /* categorize pointers based on combination of {source address, destination address},
+             * only care about the generation associated with an address.
+             *
+             * N0 : nursery(from), before checkpoint
+             * N0': nursery(to),   before checkpoint
+             * N1 : nursery(from), after  checkpoint
+             * N1': nursery(to),   after  checkpoint
+             *  T : tenured(to)
+             *
+             * loc(P): parent region before GC
+             * loc(C): child  region before GC
+             *
+             *     |               |   forwarded  | loc now post  | loc after     |
+             *     |               |   already?   | root copy     | action        |
+             *     | loc(P) loc(C) |     P      C |     P'     C' |     P'     C' | defer | action
+             * ----|---------------+--------------+---------------+---------------+-------+---------------
+             * (a) |      T     N0 |    no     no |     T     N0  |     T     N1' |       | C->N1', +mlog
+             * (b) |               |          yes |           N1' |           N1' |       | +mlog
+             * (c) |      T     N1 |    no     no |     T     N1  |     T      T  |       | C->T, -mlog
+             * (d) |               |          yes |     T      T  |     T      T  |       | -mlog
+             * (e) |     N1     N0 |    no     no |    N1     N0  |    N1     N0  | P ->C | defer
+             * (f) |               |          yes |    N1     N1' |    N1     N1' | P ->C'| defer
+             * (g) |               |   yes    yes |     T     N1' |     T     N1' |       | +mlog
+             *
+             * notes:
+             * (a) C survives due to xgen ptr {T -> N0}; after collection have xgen ptr {T -> N1}.
+             * (b) C already evac'd; after collection stil have xgen ptr {T -> N1}
+             * (c) C survives due to xgen ptr (T -> N1): promote to T, so no longer xgen
+             * (d) C already evac'd: after collection no longer xgen (T -> T)
+             * (e) P,C maybe garbage. don't move either, but defer mlog incase P saved by a subsequent mutation.
+             *     in that case C saved alto, + will still have an xgen ptr, so still need an mlog entry
+             * (f) P maybe garbage, C survives. defer mlog incase P saved+promoted by a subsequent mutation;
+             *     in that case will still have an xgen (T -> N) ptr, so still need an mlog entry.
+             */
+
+            std::size_t i_from = 0;
+            // number of rescued subgraphs via mutation log entries
+            std::size_t n_rescue = 0;
+
+            for (MutationLogEntry & from_entry : *from_mlog)
+            {
+                if (log) {
+                    if (i_from % 10000 == 0)
+                        log(xtag("i_from", i_from));
+                }
+
+                void * parent = from_entry.parent();
+
+                if (tospace_generation_of(parent) == generation_result::tenured)
+                {
+                    // cases (a)(b)(c)(d)
+                    // loc(P) is T. T didn't move b/c incremental gc.
+
+                    if (from_entry.is_dead()) {
+                        // obsolete mutation -- no longer belongs to parent, discard
+                    } else {
+                        // note: child obtained (as it must be) by reading from parent's memory _now_.
+                        Object * child_from = from_entry.child();
+
+                        if (child_from) {
+                            if (!child_from->_is_forwarded()) {
+                                // P->C*.
+                                // either:
+                                // - C*=C  in from-space, so needs evac
+                                // - C*=C' in to-space, P already updated b/c of another mutation
+                                //
+                                if (fromspace_generation_of(child_from) != generation_result::not_found) {
+                                    // C*=C in from-space. needs evac, along with reachable descendants
+                                    //
+                                    // Includes cases:
+                                    // (a) T->N0
+                                    // (c) T->N1
+
+                                    ++n_rescue;
+
+                                    Object::_deep_move(child_from, this, per_type_stats);
+
+                                    // C forwards to C', fall thru to parent fixup below
+                                    // (a) T->N1'
+                                    // (c) T->T
+                                } else {
+                                    // P updated via some other mutation
+                                    // so don't need this mlog
+                                    ;
+                                }
+                            }
+
+                            // re-test, state may have changed above
+                            if (from_entry.is_child_forwarded()) {
+                                // P->C, C moved to C'
+                                // Includes cases (a),(c) from above
+
+                                Object * child_to = child_from->_destination();
+
+                                from_entry.fixup_parent_child_moved(child_to);
+
+                                // P->C', loc(C') in {N1', T'}
+
+                                if (tospace_generation_of(child_to) == generation_result::nursery) {
+                                    // (b) loc(P)=T, loc(C')=N1';  also case (a)
+
+                                    // still have xgen pointer, so need mlog for it
+                                    to_mlog->push_back(from_entry);
+                                } else {
+                                    // (d) loc(P)=T, loc(C')=T;  also case (c)
+                                    // no longer xgen, so does not require mlog
+                                }
+                            }
+
+                        } else {
+                            // nullptr child, discard
+                        }
+                    }
+                } else if (from_entry.is_parent_forwarded()) {
+                    // Must have:
+                    // loc(P) = N1, because:
+                    //    loc(P)=N0 -> ineligible for mlog;
+                    //    loc(P)=T  -> not moved on incr GC
+                    //
+                    // follows that loc(P') = T
+                    // already have P'->C' when parent moved separately
+
+                    Object * parent_to = from_entry.parent_destination();
+
+                    log(xtag("parent_to", (void*)parent_to));
+
+                    assert(tospace_generation_of(parent_to) == generation_result::tenured);
+
+                    MutationLogEntry to_entry = from_entry.update_parent_moved(parent_to);
+
+                    Object * child_to = to_entry.child(); // after moving
+
+                    if (tospace_generation_of(child_to) == generation_result::nursery) {
+                        if (to_entry.is_dead()) {
+                            ;
+                        } else {
+                            // (g) loc(P)=N1, loc(C)=N0, loc(P')=T, loc(C')=N1
+                            to_mlog->push_back(to_entry);
+                        }
+
+                    }
+                } else {
+                    // loc(P) = N1, loc(C) = N0, P may be garbage
+                    // Includes cases:
+                    // (e) P->C, C not moved
+                    // (f) P->C, C moved to C'
+                    //
+                    // P may yet be rescued by another mlog entry, so defer
+
+                    if (!from_entry.is_dead()) {
+                        defer_mlog->push_back(from_entry);
+                    }
+                }
+
+                ++i_from;
+            }
+
+            from_mlog->clear();
+
+            if (n_rescue == 0) {
+                // if we didn't rescue any objects
+                // then we now confirm that otherwise-unreachable parents in defer_mlog
+                // are garbage
+
+                defer_mlog->clear();
+            }
+        }
+
+        void
+        GC::incremental_gc_forward_mlog(ObjectStatistics * per_type_stats)
+        {
+            /* control here:
+             * - incremental gc.
+             * - gc roots have been copied, along with everything reachable from them.
+             *
+             * plan:
+             * - forward mutation in *from_mutation_log, writing them to
+             *   *to_mutationlog and/or *defer_mutation_log.
+             *   Use defer when mutation P->C encountered, but P was not copied.
+             *   P appears to be garbage, but may turn out to be live if encountered
+             *   in another mutation.
+             *
+             */
+
+            MutationLog *   to_mlog = mutation_log_[role2int(role::to_space)].get();
+
+            for (;;) {
+                MutationLog * from_mlog = mutation_log_[role2int(role::from_space)].get();
+                MutationLog * defer_mlog = defer_mutation_log_.get();
+
+                this->incremental_gc_forward_mlog_phase(from_mlog,
+                                                        to_mlog,
+                                                        defer_mlog,
+                                                        per_type_stats);
+
+                assert(from_mlog->empty());
+
+                if (defer_mlog->empty()) {
+                    /* fixpoint reached */
+                    break;
+                }
+
+                /* control here:
+                 * 1. at least one mlog triggered a rescue
+                 * 2. at least one mlog was deferred (b/c otherwise-unreachable parent)
+                 *
+                 * it's conceivable deferred parent now reachable thanks to rescues;
+                 * revisit entries in defer_mlog,
+                 *
+                 * using now-empty from_mlog as scratch for any remaining deferred entries
+                 */
+
+                std::swap(mutation_log_[role2int(role::from_space)], defer_mutation_log_);
+            }
+        }
+
+        void
+        GC::forward_mutation_log(generation upto)
+        {
+            scope log(XO_DEBUG(config_.debug_flag_));
+
+            if (upto == generation::tenured) {
+                log && log("TODO: forward mutation log for full GC");
+            } else {
+                this->incremental_gc_forward_mlog(&gc_statistics_.per_type_stats_);
             }
         }
 
@@ -401,11 +801,11 @@ namespace xo {
         }
 
         void
-        GC::execute_gc(generation target)
+        GC::execute_gc(generation upto)
         {
             scope log(XO_DEBUG(config_.debug_flag_));
 
-            bool full_move = (target == generation::tenured);
+            bool full_move = (upto == generation::tenured);
 
             // TODO: RAII version in case of exceptions
             this->runstate_ = GCRunstate(true /*in_progress*/, full_move);
@@ -415,7 +815,7 @@ namespace xo {
             /* new allocation since last GC */
             std::size_t new_alloc = this->after_checkpoint();
 
-            ++(gc_statistics_.gen_v_[static_cast<std::size_t>(target)].n_gc_);
+            ++(gc_statistics_.gen_v_[static_cast<std::size_t>(upto)].n_gc_);
             gc_statistics_.total_allocated_ += new_alloc;
             gc_statistics_.total_promoted_sab_ = gc_statistics_.total_promoted_;
 
@@ -423,15 +823,17 @@ namespace xo {
 
             log && log("step 1:  swap to/from roles");
 
-            this->swap_spaces(target);
+            this->swap_spaces(upto);
 
             log && log("step 2a: copy globals");
 
-            this->copy_globals(target);
+            this->copy_globals(upto);
 
             log && log("step 2b: TODO: copy pinned");
 
-            log && log("step 3:  TODO: forward mutation log");
+            log && log("step 3:  forward mutation log");
+
+            this->forward_mutation_log(upto);
 
             log && log("step 4:  TODO: notify destructor log");
 
@@ -439,7 +841,7 @@ namespace xo {
 
             log && log("step 6:  cleanup");
 
-            this->cleanup_phase(target);
+            this->cleanup_phase(upto);
 
             this->runstate_ = GCRunstate();
 

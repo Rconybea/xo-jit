@@ -45,18 +45,19 @@ namespace xo {
 
             // inherited from IAlloc..
 
-            virtual std::size_t size() const override;
-            virtual std::size_t available() const override;
-            virtual std::size_t allocated() const override;
-            virtual bool contains(const void * x) const override;
-            virtual bool is_before_checkpoint(const void * x) const override;
-            virtual std::size_t before_checkpoint() const override;
-            virtual std::size_t after_checkpoint() const override;
+            virtual const std::string & name() const final override;
+            virtual std::size_t size() const final override;
+            virtual std::size_t available() const final override;
+            virtual std::size_t allocated() const final override;
+            virtual bool contains(const void * x) const final override;
+            virtual bool is_before_checkpoint(const void * x) const final override;
+            virtual std::size_t before_checkpoint() const final override;
+            virtual std::size_t after_checkpoint() const final override;
 
-            virtual void clear() override;
-            virtual void checkpoint() override;
-            virtual std::byte * alloc(std::size_t z) override;
-            virtual void release_redline_memory() override;
+            virtual void clear() final override;
+            virtual void checkpoint() final override;
+            virtual std::byte * alloc(std::size_t z) final override;
+            virtual void release_redline_memory() final override;
 
         private:
             /** **/

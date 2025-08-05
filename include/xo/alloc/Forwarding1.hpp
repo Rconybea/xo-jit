@@ -12,11 +12,15 @@ namespace xo {
             explicit Forwarding1(gp<Object> dest);
 
             // inherited from Object..
-            virtual bool        _is_forwarded() const override { return true; }
-            virtual Object *    _offset_destination(Object * src) const;
-            virtual std::size_t _shallow_size() const override;
-            virtual Object *    _shallow_copy() const override;
-            virtual std::size_t _forward_children() override;
+            virtual bool        _is_forwarded() const final override { return true; }
+            virtual Object *    _offset_destination(Object * src) const final override;
+            virtual Object *    _destination() final override;
+            /** never called on Forwarding1 **/
+            virtual std::size_t _shallow_size() const final override;
+            /** never called on Forwarding1 **/
+            virtual Object *    _shallow_copy() const final override;
+            /** never called on Forwarding1 **/
+            virtual std::size_t _forward_children() final override;
 
         private:
             /** the object that used to be located at this address (i.e. @c this)

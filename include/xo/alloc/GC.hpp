@@ -23,6 +23,12 @@ namespace xo {
 
         constexpr std::size_t gen2int(generation x) { return static_cast<std::size_t>(x); }
 
+        enum class generation_result {
+            nursery,
+            tenured,
+            not_found
+        };
+
         enum class role {
             /** nursery: generation for new objects **/
             from_space,
@@ -131,6 +137,17 @@ namespace xo {
             /** total bytes promoted from nursery->tenured since inception **/
             std::size_t total_promoted_ = 0;
 
+            /** total number of mutations to already-allocated objects,
+             *  whether or not GC needs to log them.
+             **/
+            std::size_t n_mutation_ = 0;
+            /** total number of mutation eligible for logging **/
+            std::size_t n_logged_mutation_ = 0;
+            /** total number of cross-generation mutations (tenured->nursery when reported) **/
+            std::size_t n_xgen_mutation_ = 0;
+            /** total number of cross-checkpoint mutations (N0 -> N1 when reported) **/
+            std::size_t n_xckp_mutation_ = 0;
+
             /** per-type statistics (placeholder) **/
             ObjectStatistics per_type_stats_;
         };
@@ -163,6 +180,35 @@ namespace xo {
             bool full_move_ = false;
         };
 
+        class MutationLogEntry {
+        public:
+            MutationLogEntry(Object * parent, Object ** lhs) : parent_{parent}, lhs_{lhs} {}
+
+            Object * parent() const { return parent_; }
+            Object ** lhs() const { return lhs_; }
+
+            Object * child() const { return *lhs_; }
+
+            bool is_child_forwarded() const;
+            bool is_parent_forwarded() const;
+
+            Object * parent_destination() const;
+
+            /** Flag obsolete mutation.
+             *  Future proofing, never happens for regular objects
+             **/
+            bool is_dead() const { return false; }
+
+            MutationLogEntry update_parent_moved(Object * parent_to) const;
+            void fixup_parent_child_moved(Object * child_to) { *lhs_ = child_to; }
+
+        private:
+            Object * parent_;
+            Object ** lhs_;
+        };
+
+        using MutationLog = std::vector<MutationLogEntry>;
+
         /** @class GC
          *  @brief generational garbage collector
          *
@@ -185,16 +231,18 @@ namespace xo {
 
             /** true iff GC permitted in current state **/
             bool is_gc_enabled() const { return gc_enabled_ == 0; }
-            /** @return generation to which object at @p x belongs **/
-            generation generation_of(const void * x) const;
-            /** @return generation that contains @p x, given it's in from-space **/
-            generation fromspace_generation_of(const void * x) const;
-            /** true iff from-space contains @p x **/
-            bool fromspace_contains(const void * x) const;
             /** true during (and only during) a GC cycle **/
             bool gc_in_progress() const { return runstate_.in_progress(); }
-            /** return free pointer for generation @p gen, i.e. nursery or tenured space **/
+            /** @return generation to which object at @p x belongs **/
+            generation_result tospace_generation_of(const void * x) const;
+            /** @return generation that contains @p x, given it's in from-space **/
+            generation_result fromspace_generation_of(const void * x) const;
+            /** true iff from-space contains @p x **/
+            bool fromspace_contains(const void * x) const;
+            /** @return free pointer for generation @p gen, i.e. nursery or tenured space **/
             std::byte * free_ptr(generation gen);
+            /** @return current size of (number of entries in) mutation log **/
+            std::size_t mlog_size() const;
 
             /** add gc root at address @p addr .  Gc will keep alive anything reachable
              *  from @c *addr
@@ -217,27 +265,43 @@ namespace xo {
 
             // inherited from IAlloc..
 
+            virtual const std::string & name() const final override;
             /** capacity in bytes (counting both free+allocated) for object storage.
              *  only counts one of {to-space, from-space},
              *  since one role is always held empty between collections.
              **/
-            virtual std::size_t size() const override;
+            virtual std::size_t size() const final override;
 
-            virtual std::size_t allocated() const override;
-            virtual std::size_t available() const override;
+            virtual std::size_t allocated() const final override;
+            virtual std::size_t available() const final override;
             /** only tests to-space **/
-            virtual bool contains(const void * x) const override;
-            virtual bool is_before_checkpoint(const void * x) const override;
-            virtual std::size_t before_checkpoint() const override;
-            virtual std::size_t after_checkpoint() const override;
+            virtual bool contains(const void * x) const final override;
+            virtual bool is_before_checkpoint(const void * x) const final override;
+            virtual std::size_t before_checkpoint() const final override;
+            virtual std::size_t after_checkpoint() const final override;
+            virtual bool debug_flag() const final override;
 
-            virtual void clear() override;
-            virtual void checkpoint() override;
+            virtual void clear() final override;
+            virtual void checkpoint() final override;
 
-            virtual std::byte * alloc(std::size_t z) override;
-            virtual std::byte * alloc_gc_copy(std::size_t z, const void * src) override;
+            /** GC bookkeeping for an assignment that modifes an Object reference.
+             *  Whenever an @ref Object instance P contains a member variable that can refer
+             *  to another @ref Object, then we need to involve GC to perform the assignment.
+             *  In particular a side-effect that changes the target of such reference to Q after P
+             *  has been promoted, may lead to a tenured->nursery cross-generational pointer.
+             *  GC needs to know about such pointers to it can update them as part of subsequent
+             *  incremental collections.
+             *
+             *  @param parent.  object with member variable being modified
+             *  @param lhs.     address of a member variable within the allocation of @p parent.
+             *  @param rhs.     new target for @p *lhs
+             **/
+            virtual void assign_member(Object * parent, Object ** lhs, Object* rhs) final override;
 
-            virtual void release_redline_memory() override;
+            virtual std::byte * alloc(std::size_t z) final override;
+            virtual std::byte * alloc_gc_copy(std::size_t z, const void * src) final override;
+
+            virtual void release_redline_memory() final override;
 
         private:
             /** begin GC now **/
@@ -248,12 +312,35 @@ namespace xo {
             void swap_nursery();
             /** swap roles of From/To spaces for tenured generation **/
             void swap_tenured();
+            /** swap roles of From/To spaces for mutation log **/
+            void swap_mutation_log();
             /** swap roles of FromSpace/ToSpace **/
             void swap_spaces(generation g);
             /** copy object **/
             void copy_object(Object ** addr, generation upto, ObjectStatistics * object_stats);
             /** copy everything reachable from global gc roots **/
             void copy_globals(generation g);
+            /** review mutation log; may discover+rescue reachable objects.
+             **/
+            void forward_mutation_log(generation upto);
+            /** Aux function for @ref execute_gc. Updates bookkeeping for cross-generational
+             *  (T->N, aka xgen) and (N1->N0, aka xckp) pointers
+             **/
+            void incremental_gc_forward_mlog(ObjectStatistics * per_type_stats);
+
+            /**
+             *  Aux function for @ref incremental_gc_forward_mlog.  Calls this function until
+             *  fixpoint.
+             *
+             *  @param from_mlog incoming mutation log. Contains {xgen,xckp} pointers before GC.
+             *  Contents of this log is consumed (+discarded) before method returns.
+             *  @param to_mlog    outgoing mutation log. Will contain {xgen,xckp} pointers after GC.
+             *  @param defer_mlog contains log entries associated with possible garbage.
+             **/
+            void incremental_gc_forward_mlog_phase(MutationLog * from_mlog,
+                                                   MutationLog * to_mlog,
+                                                   MutationLog * defer_mlog,
+                                                   ObjectStatistics * per_type_stats);
 
         private:
             /** garbage collector configuration **/
@@ -262,11 +349,11 @@ namespace xo {
             /** contains allocated objects, along with unreachable garbage to be collected.
              *  roles reverse after each incremental, or full, collection.
              **/
-            std::array<up<ListAlloc>, static_cast<std::size_t>(role::N)> nursery_;
+            std::array<up<ListAlloc>, role2int(role::N)> nursery_;
             /** empty space, destination for objects that survive collection.
              *  roles reverse after each full collection.
              **/
-            std::array<up<ListAlloc>, static_cast<std::size_t>(role::N)> tenured_;
+            std::array<up<ListAlloc>, role2int(role::N)> tenured_;
 
             /** current state of GC activity.
              *  @text
@@ -285,6 +372,13 @@ namespace xo {
              *  but cannot withdraw them.
              **/
             std::vector<Object**> gc_root_v_;
+
+            /** log cross-generational and cross-checkpoint mutations.
+             *  These need to be adjusted on next incremental collection
+             **/
+            std::array<up<MutationLog>, role2int(role::N)> mutation_log_;
+            /** temporary mutation log (for deferred entries) **/
+            up<MutationLog> defer_mutation_log_;
 
             /** allocation/collection counters **/
             GcStatistics gc_statistics_;

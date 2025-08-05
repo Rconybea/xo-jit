@@ -21,6 +21,11 @@ namespace xo {
             return dest_.ptr() + offset;
         }
 
+        Object *
+        Forwarding1::_destination() {
+            return dest_.ptr();
+        }
+
         std::size_t
         Forwarding1::_shallow_size() const {
             assert(false);
