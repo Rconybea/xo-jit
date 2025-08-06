@@ -16,7 +16,7 @@ namespace xo {
         // Defining this means ppdetail_atomic is not used.
         // In that case where not explicitly specialized ppdetail will revert to ordinary printing for a type,
         // instead of giving compile-time error about missing template specialization of ppdetail.
-#define ppdetail_atomic ppdetail
+//#define ppdetail_atomic ppdetail
 
         struct ppindentinfo {
             ppindentinfo(ppstate * pps, std::uint32_t ci0, std::uint32_t indent_width, bool upto)

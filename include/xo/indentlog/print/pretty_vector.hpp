@@ -6,8 +6,11 @@
 #pragma once
 
 #include "pretty.hpp"
+#include "array.hpp" /*printing*/
 #include "pad.hpp"
 #include <vector>
+#include <array>
+#include <cstdint>
 
 namespace xo {
     namespace print {
@@ -52,6 +55,13 @@ namespace xo {
         struct ppdetail<std::vector<T>> {
             static bool print_pretty(const ppindentinfo & ppii, const std::vector<T> & x) {
                 return ppdetail_vector<std::vector<T>>::print_pretty(ppii, x);
+            }
+        };
+
+        template <typename T, std::size_t N>
+        struct ppdetail<std::array<T, N>> {
+            static bool print_pretty(const ppindentinfo & ppii, const std::array<T,N> & x) {
+                return ppdetail_vector<std::array<T, N>>::print_pretty(ppii, x);
             }
         };
     }
