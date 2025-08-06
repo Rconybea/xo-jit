@@ -3,6 +3,7 @@
  * author: Roland Conybeare, Jul 2025
  */
 
+#include "GcStatistics.hpp"
 #include "GC.hpp"
 #include "Object.hpp"
 #include "xo/indentlog/scope.hpp"
@@ -67,6 +68,31 @@ namespace xo {
             os << "<GcStatistics"
                << xtag("gen_v", gen_v_)
                << xtag("total_allocated", total_allocated_)
+               << xtag("total_promoted_sab", total_promoted_sab_)
+                // total_promoted
+                // n_mtuation
+                // n_logged_mutation
+                // n_xgen_mutation
+                // n_xckp_mutation
+                // << xtag("per_type_stats", per_type_stats_)
+               << ">";
+        }
+
+        void
+        GcStatisticsExt::display(std::ostream & os) const
+        {
+            os << "<GcStatisticsExt"
+               << xtag("gen_v", gen_v_)
+               << xtag("total_allocated", total_allocated_)
+               << xtag("total_promoted_sab", total_promoted_)
+               << xtag("nursery_z", nursery_z_)
+               << xtag("nursery_before_ckp_z", nursery_before_checkpoint_z_)
+               << xtag("nursery_after_ckp_z", nursery_after_checkpoint_z_)
+               << xtag("tenured_z", tenured_z_)
+               << xtag("n_mutation", n_mutation_)
+               << xtag("n_logged_mutation", n_logged_mutation_)
+               << xtag("n_xgen_mutation", n_xgen_mutation_)
+               << xtag("n_xkcp_mutation", n_xckp_mutation_)
                 // << xtag("per_type_stats", per_type_stats_)
                << ">";
         }
@@ -226,6 +252,18 @@ namespace xo {
         GC::debug_flag() const
         {
             return config_.debug_flag_;
+        }
+
+        GcStatisticsExt
+        GC::get_gc_statistics() const
+        {
+            GcStatisticsExt retval = GcStatisticsExt(this->native_gc_statistics());
+
+            retval.nursery_z_ = nursery_[role2int(role::to_space)]->size();
+            retval.nursery_before_checkpoint_z_ = nursery_[role2int(role::to_space)]->before_checkpoint();
+            retval.tenured_z_ = tenured_[role2int(role::to_space)]->size();
+
+            return retval;
         }
 
         generation_result

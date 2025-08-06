@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "xo/reflect/SelfTagging.hpp"
 #include "IAlloc.hpp"
 #include <concepts>
 #include <cstdint>

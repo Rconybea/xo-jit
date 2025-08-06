@@ -47,22 +47,22 @@ namespace xo {
 
                 REQUIRE(gc->gc_in_progress() == false);
                 REQUIRE(gc->is_gc_enabled() == true);
-                REQUIRE(gc->gc_statistics().gen_v_[gen2int(generation::nursery)].n_gc_ == 0);
-                REQUIRE(gc->gc_statistics().gen_v_[gen2int(generation::tenured)].n_gc_ == 0);
+                REQUIRE(gc->native_gc_statistics().gen_v_[gen2int(generation::nursery)].n_gc_ == 0);
+                REQUIRE(gc->native_gc_statistics().gen_v_[gen2int(generation::tenured)].n_gc_ == 0);
 
                 /* gc with empty state */
                 gc->request_gc(generation::nursery);
 
                 REQUIRE(gc->gc_in_progress() == false);
-                REQUIRE(gc->gc_statistics().gen_v_[gen2int(generation::nursery)].n_gc_ == 1);
-                REQUIRE(gc->gc_statistics().gen_v_[gen2int(generation::tenured)].n_gc_ == 0);
+                REQUIRE(gc->native_gc_statistics().gen_v_[gen2int(generation::nursery)].n_gc_ == 1);
+                REQUIRE(gc->native_gc_statistics().gen_v_[gen2int(generation::tenured)].n_gc_ == 0);
 
                 /* still empty state */
                 gc->request_gc(generation::tenured);
 
                 REQUIRE(gc->gc_in_progress() == false);
-                REQUIRE(gc->gc_statistics().gen_v_[gen2int(generation::nursery)].n_gc_ == 1);
-                REQUIRE(gc->gc_statistics().gen_v_[gen2int(generation::tenured)].n_gc_ == 1);
+                REQUIRE(gc->native_gc_statistics().gen_v_[gen2int(generation::nursery)].n_gc_ == 1);
+                REQUIRE(gc->native_gc_statistics().gen_v_[gen2int(generation::tenured)].n_gc_ == 1);
             }
         }
 
