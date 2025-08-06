@@ -56,6 +56,8 @@ namespace xo {
 
             if (lo_ <= x && x < limit_) {
                 this->free_ptr_ = x;
+                if (this->checkpoint_ > free_ptr_)
+                    this->checkpoint_ = free_ptr_;
             } else {
                 throw std::runtime_error(tostr("LinearAllog::set_free_ptr(x): expected lo <= x < limit",
                                                xtag("lo", lo_), xtag("x", x), xtag("limit", limit_)));
@@ -102,8 +104,7 @@ namespace xo {
         void
         ArenaAlloc::clear()
         {
-            this->checkpoint_ = lo_;
-            this->free_ptr_ = lo_;
+            this->set_free_ptr(lo_);
             this->limit_ = hi_ - redline_z_;
         }
 
@@ -133,13 +134,13 @@ namespace xo {
 
             std::byte * retval = this->free_ptr_;
 
-            this->free_ptr_ += z1;
-
             log && log(xtag("self", name_), xtag("z0", z0), xtag("+pad", dz), xtag("z1", z1));
 
-            if (free_ptr_ > limit_) {
+            if (free_ptr_ + z1 > limit_) {
                 return nullptr;
             }
+
+            this->free_ptr_ += z1;
 
             return retval;
         }

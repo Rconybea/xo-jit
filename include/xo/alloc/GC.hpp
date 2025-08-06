@@ -218,6 +218,7 @@ namespace xo {
         public:
             /** create new GC instance with configuration @p config **/
             explicit GC(const Config & config);
+            virtual ~GC();
 
             /** create GC allocator.
              *

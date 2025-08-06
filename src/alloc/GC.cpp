@@ -141,6 +141,21 @@ namespace xo {
             this->checkpoint();
         }
 
+        GC::~GC() {
+            /* hygiene */
+            this->clear();
+
+            nursery_[role2int(role::from_space)].reset();
+            nursery_[role2int(role::to_space)  ].reset();
+
+            tenured_[role2int(role::from_space)].reset();
+            tenured_[role2int(role::to_space)  ].reset();
+
+            mutation_log_[role2int(role::from_space)].reset();
+            mutation_log_[role2int(role::to_space)  ].reset();
+            defer_mutation_log_.reset();
+        }
+
         up<GC>
         GC::make(const Config & config)
         {
@@ -245,8 +260,10 @@ namespace xo {
                 return nursery_[role2int(role::to_space)]->free_ptr();
             case generation::tenured:
                 return tenured_[role2int(role::to_space)]->free_ptr();
+                // LCOV_EXCL_START
             case generation::N:
                 assert(false);
+                // LCOV_EXCL_STOP
             }
 
             return nullptr;
@@ -647,7 +664,7 @@ namespace xo {
 
                     Object * parent_to = from_entry.parent_destination();
 
-                    log(xtag("parent_to", (void*)parent_to));
+                    log && log(xtag("parent_to", (void*)parent_to));
 
                     assert(tospace_generation_of(parent_to) == generation_result::tenured);
 

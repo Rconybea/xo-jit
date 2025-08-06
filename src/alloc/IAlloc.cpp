@@ -47,12 +47,14 @@ namespace xo {
             *lhs = rhs;
         }
 
+        // LCOV_EXCL_START
         std::byte *
         IAlloc::alloc_gc_copy(std::size_t /*z*/, const void * /*src*/)
         {
             assert(false);
             return nullptr;
         }
+        // LCOV_EXCL_STOP
 
     } /*namespace gc*/
 } /*namespace xo*/

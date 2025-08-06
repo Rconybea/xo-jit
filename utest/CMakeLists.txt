@@ -5,6 +5,7 @@
 set(UTEST_EXE utest.alloc)
 set(UTEST_SRCS
     alloc_utest_main.cpp
+    IAlloc.test.cpp
     ArenaAlloc.test.cpp
     GC.test.cpp)
 
