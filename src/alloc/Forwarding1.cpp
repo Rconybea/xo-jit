@@ -4,14 +4,24 @@
  */
 
 #include "Forwarding1.hpp"
+#include "xo/reflect/Reflect.hpp"
 #include <cstddef>
 #include <cassert>
 
 namespace xo {
+    using xo::reflect::Reflect;
+    using xo::reflect::TaggedPtr;
+
     namespace obj {
         Forwarding1::Forwarding1(gp<Object> dest)
             : dest_{dest}
         {}
+
+        TaggedPtr
+        Forwarding1::self_tp() const
+        {
+            return Reflect::make_tp(const_cast<Forwarding1*>(this));
+        }
 
         Object *
         Forwarding1::_offset_destination(Object * src) const

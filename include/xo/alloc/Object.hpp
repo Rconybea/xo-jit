@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "xo/reflect/SelfTagging.hpp"
+#include "xo/reflect/TaggedPtr.hpp"
 #include "IAlloc.hpp"
 #include <concepts>
 #include <cstdint>
@@ -80,6 +80,9 @@ namespace xo {
      **/
     class Object {
     public:
+        using TaggedPtr = xo::reflect::TaggedPtr;
+
+    public:
         virtual ~Object() = default;
 
         /** memory allocator for objects.  Likely this will be a GC instance,
@@ -147,6 +150,12 @@ namespace xo {
          *  return the new location
          **/
         static Object * _shallow_move(Object * src, gc::GC * gc);
+
+        // Reflection support
+
+        /** tagged pointer with runtime type information
+         **/
+        virtual TaggedPtr self_tp() const = 0;
 
         // GC support
 
