@@ -78,7 +78,7 @@ namespace ut {
             const test_case & tc = s_testcase_v[i];
 
             std::size_t z = tc.buf_capacity_;
-            log_streambuf<char> sbuf(z, true /*debug_flag*/);
+            log_streambuf<char> sbuf(z, false /*debug_flag*/);
             std::ostream ss(&sbuf);
 
             REQUIRE(sbuf.capacity() == z);

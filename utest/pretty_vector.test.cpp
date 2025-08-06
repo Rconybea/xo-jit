@@ -62,7 +62,7 @@ namespace ut {
 
         pps.pretty(test);
 
-        REQUIRE(ss.str() == "[\n  1,\n  2,\n  3,\n  4,\n  5,\n  6\n]");
+        REQUIRE(ss.str() == "[ 1,\n  2,\n  3,\n  4,\n  5,\n  6 ]");
     }
 
     TEST_CASE("prettyvec3", "[pretty]") {
@@ -77,7 +77,7 @@ namespace ut {
 
         pps.pretty(test);
 
-        REQUIRE(ss.str() == "[\n  [1, 2, 3, 4],\n  [4, 5, 6, 7]\n]");
+        REQUIRE(ss.str() == "[ [1, 2, 3, 4],\n  [4, 5, 6, 7] ]");
     }
 
     TEST_CASE("prettyvec4", "[pretty]") {
@@ -92,6 +92,6 @@ namespace ut {
 
         pps.pretty(test);
 
-        REQUIRE(ss.str() == "[\n  [\n    1,\n    2,\n    3,\n    4\n  ],\n  [\n    4,\n    5,\n    6,\n    7\n  ]\n]");
+        REQUIRE(ss.str() == "[ [ 1,\n    2,\n    3,\n    4 ],\n  [ 4,\n    5,\n    6,\n    7 ] ]");
     }
 }
