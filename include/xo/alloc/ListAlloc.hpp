@@ -6,6 +6,7 @@
 #pragma once
 
 #include "IAlloc.hpp"
+#include "ObjectStatistics.hpp"
 #include <list>
 #include <memory>
 #include <cstdint>
@@ -42,6 +43,14 @@ namespace xo {
 
             /** current free pointer **/
             std::byte * free_ptr() const;
+
+            /** scan space (must not contain forwarding pointers, because loses size info)
+             *  + gather stats by object type
+             *
+             *  See @ref Object::self_tp
+             **/
+            void capture_object_statistics(capture_phase phase,
+                                           ObjectStatistics * p_dest) const;
 
             // inherited from IAlloc..
 

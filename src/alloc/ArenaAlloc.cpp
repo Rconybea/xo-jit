@@ -4,6 +4,8 @@
  */
 
 #include "ArenaAlloc.hpp"
+#include "Object.hpp"
+#include "ObjectStatistics.hpp"
 #include "xo/indentlog/scope.hpp"
 #include "xo/indentlog/print/tag.hpp"
 #include <cassert>
@@ -62,6 +64,43 @@ namespace xo {
                 throw std::runtime_error(tostr("LinearAllog::set_free_ptr(x): expected lo <= x < limit",
                                                xtag("lo", lo_), xtag("x", x), xtag("limit", limit_)));
             }
+        }
+
+        void
+        ArenaAlloc::capture_object_statistics(capture_phase phase,
+                                              ObjectStatistics * p_dest) const
+        {
+            using xo::reflect::TaggedPtr;
+
+            std::byte * p = lo_;
+
+            while (p < free_ptr_) {
+                Object * obj = reinterpret_cast<Object *>(p);
+                TaggedPtr tp = obj->self_tp();
+                std::size_t z = obj->_shallow_size();
+                std::uint32_t id = tp.td()->id().id();
+
+                if (p_dest->per_type_stats_v_.size() < id + 1)
+                    p_dest->per_type_stats_v_.resize(id + 1);
+
+                PerObjectTypeStatistics & dest = p_dest->per_type_stats_v_.at(id);
+
+                dest.td_ = tp.td();
+                switch (phase) {
+                case capture_phase::sab:
+                    ++dest.scanned_n_;
+                    dest.scanned_z_ += z;
+                    break;
+                case capture_phase::sae:
+                    ++dest.survive_n_;
+                    dest.survive_z_ += z;
+                    break;
+                }
+
+                p += z;
+            }
+
+            assert(p == free_ptr_);
         }
 
         std::size_t

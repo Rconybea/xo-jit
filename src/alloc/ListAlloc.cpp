@@ -50,6 +50,17 @@ namespace xo {
             return retval;
         }
 
+        void
+        ListAlloc::capture_object_statistics(capture_phase phase,
+                                             ObjectStatistics * p_dest) const
+        {
+            hd_->capture_object_statistics(phase, p_dest);
+
+            for (const auto & arena : full_l_)
+                arena->capture_object_statistics(phase, p_dest);
+
+        }
+
         const std::string &
         ListAlloc::name() const {
             if (hd_) {

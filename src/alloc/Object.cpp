@@ -191,6 +191,18 @@ namespace xo {
         (void)fwd;
     }
 
+    std::ostream &
+    operator<< (std::ostream & os, gp<Object> x)
+    {
+        if (x.ptr()) {
+            x->display(os);
+        } else {
+            os << "<nullptr>";
+        }
+
+        return os;
+    }
+
 } /*namespace xo*/
 
 /* end Object.cpp*/

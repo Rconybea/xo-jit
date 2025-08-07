@@ -157,6 +157,9 @@ namespace xo {
          **/
         virtual TaggedPtr self_tp() const = 0;
 
+        /** print on stream @p os **/
+        virtual void display(std::ostream & os) const = 0;
+
         // GC support
 
         /** true iff this object represents a forwarding pointer.
@@ -243,6 +246,9 @@ namespace xo {
                                   reinterpret_cast<Object **>(lhs->ptr_address()),
                                   rhs.ptr());
     }
+
+    std::ostream &
+    operator<< (std::ostream & os, gp<Object> x);
 
     /** @class Cpof
      *  @brief argument to operator new used for garbage collector evacuation phase

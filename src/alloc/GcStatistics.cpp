@@ -7,6 +7,93 @@
 #include "xo/indentlog/print/pretty_vector.hpp"
 
 namespace xo {
+    namespace gc {
+        void
+        PerGenerationStatistics::include_gc(std::size_t alloc_z,
+                                            std::size_t before_z,
+                                            std::size_t after_z,
+                                            std::size_t promote_z)
+        {
+            this->update_snapshot(after_z);
+
+            new_alloc_z_ += alloc_z;
+            scanned_z_   += before_z;
+            survive_z_   += after_z;
+            promote_z_   += promote_z;
+        }
+
+        void
+        PerGenerationStatistics::update_snapshot(std::size_t after_z)
+        {
+            used_z_ = after_z;
+        }
+
+        void
+        PerGenerationStatistics::display(std::ostream & os) const
+        {
+            os << "<PerGenerationStatistics"
+               << rtag("used", used_z_)
+               << rtag("n_gc", n_gc_)
+               << rtag("new_alloc_z", new_alloc_z_)
+               << rtag("scanned_z", scanned_z_)
+               << rtag("survive_z", survive_z_)
+               << rtag("promote_z", promote_z_)
+               << ">";
+        }
+
+        void
+        GcStatistics::include_gc(generation upto,
+                                 std::size_t alloc_z,
+                                 std::size_t before_z,
+                                 std::size_t after_z,
+                                 std::size_t promote_z)
+        {
+            gen_v_[static_cast<std::size_t>(upto)].include_gc(alloc_z, before_z, after_z, promote_z);
+        }
+
+        void
+        GcStatistics::update_snapshot(generation upto,
+                                      std::size_t after_z)
+        {
+            gen_v_[static_cast<std::size_t>(upto)].update_snapshot(after_z);
+        }
+
+        void
+        GcStatistics::display(std::ostream & os) const
+        {
+            os << "<GcStatistics"
+               << rtag("gen_v", gen_v_)
+               << rtag("total_allocated", total_allocated_)
+               << rtag("total_promoted_sab", total_promoted_sab_)
+                // total_promoted
+                // n_mtuation
+                // n_logged_mutation
+                // n_xgen_mutation
+                // n_xckp_mutation
+                // << xtag("per_type_stats", per_type_stats_)
+               << ">";
+        }
+
+        void
+        GcStatisticsExt::display(std::ostream & os) const
+        {
+            os << "<GcStatisticsExt"
+               << rtag("gen_v", gen_v_)
+               << rtag("total_allocated", total_allocated_)
+               << rtag("total_promoted_sab", total_promoted_)
+               << rtag("nursery_z", nursery_z_)
+               << rtag("nursery_before_ckp_z", nursery_before_checkpoint_z_)
+               << rtag("nursery_after_ckp_z", nursery_after_checkpoint_z_)
+               << rtag("tenured_z", tenured_z_)
+               << rtag("n_mutation", n_mutation_)
+               << rtag("n_logged_mutation", n_logged_mutation_)
+               << rtag("n_xgen_mutation", n_xgen_mutation_)
+               << rtag("n_xkcp_mutation", n_xckp_mutation_)
+                // << xtag("per_type_stats", per_type_stats_)
+               << ">";
+        }
+    } /*namespace gc*/
+
     namespace print {
         bool
         ppdetail<xo::gc::PerGenerationStatistics>::print_pretty(const ppindentinfo & ppii,

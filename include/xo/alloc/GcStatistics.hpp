@@ -6,20 +6,13 @@
 #pragma once
 
 #include "generation.hpp"
+#include "xo/reflect/TypeDescr.hpp"
 #include "xo/indentlog/print/pretty.hpp"
 #include <ostream>
 #include <array>
 
 namespace xo {
     namespace gc {
-        /** @class ObjectStatistics
-         *  @brief placeholder for type-driven allocation statistics
-         *
-         *  Passed to @ref Object::deep_move for example
-         **/
-        class ObjectStatistics {
-        };
-
         /** @class PerGenerationStatistics
          *  @brief garbage collection statistics for particular GC generation
          **/
@@ -103,9 +96,6 @@ namespace xo {
              *  (N0 -> N1 when reported; cumulative across GCs)
              **/
             std::size_t n_xckp_mutation_ = 0;
-
-            /** per-type statistics (placeholder) **/
-            ObjectStatistics per_type_stats_;
         };
 
         inline std::ostream & operator<< (std::ostream & os, const GcStatistics & x) {

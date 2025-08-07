@@ -13,6 +13,7 @@ namespace xo {
 
             // inherited from Object..
             virtual TaggedPtr   self_tp() const final override;
+            virtual void        display(std::ostream & os) const final override;
             virtual bool        _is_forwarded() const final override { return true; }
             virtual Object *    _offset_destination(Object * src) const final override;
             virtual Object *    _destination() final override;

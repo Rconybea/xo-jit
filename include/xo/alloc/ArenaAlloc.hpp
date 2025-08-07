@@ -6,6 +6,7 @@
 #pragma once
 
 #include "IAlloc.hpp"
+#include "ObjectStatistics.hpp"
 
 namespace xo {
     namespace gc {
@@ -47,6 +48,9 @@ namespace xo {
 
             std::byte * free_ptr() const { return free_ptr_; }
             void       set_free_ptr(std::byte * x);
+
+            void capture_object_statistics(capture_phase phase,
+                                           ObjectStatistics * p_dest) const;
 
             // inherited from IAlloc...
 

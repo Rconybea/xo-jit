@@ -12,91 +12,6 @@
 
 namespace xo {
     namespace gc {
-        void
-        PerGenerationStatistics::include_gc(std::size_t alloc_z,
-                                            std::size_t before_z,
-                                            std::size_t after_z,
-                                            std::size_t promote_z)
-        {
-            this->update_snapshot(after_z);
-
-            new_alloc_z_ += alloc_z;
-            scanned_z_   += before_z;
-            survive_z_   += after_z;
-            promote_z_   += promote_z;
-        }
-
-        void
-        PerGenerationStatistics::update_snapshot(std::size_t after_z)
-        {
-            used_z_ = after_z;
-        }
-
-        void
-        PerGenerationStatistics::display(std::ostream & os) const
-        {
-            os << "<PerGenerationStatistics"
-               << xtag("used", used_z_)
-               << xtag("n_gc", n_gc_)
-               << xtag("new_alloc_z", new_alloc_z_)
-               << xtag("scanned_z", scanned_z_)
-               << xtag("survive_z", survive_z_)
-               << xtag("promote_z", promote_z_)
-               << ">";
-        }
-
-        void
-        GcStatistics::include_gc(generation upto,
-                                 std::size_t alloc_z,
-                                 std::size_t before_z,
-                                 std::size_t after_z,
-                                 std::size_t promote_z)
-        {
-            gen_v_[static_cast<std::size_t>(upto)].include_gc(alloc_z, before_z, after_z, promote_z);
-        }
-
-        void
-        GcStatistics::update_snapshot(generation upto,
-                                      std::size_t after_z)
-        {
-            gen_v_[static_cast<std::size_t>(upto)].update_snapshot(after_z);
-        }
-
-        void
-        GcStatistics::display(std::ostream & os) const
-        {
-            os << "<GcStatistics"
-               << xtag("gen_v", gen_v_)
-               << xtag("total_allocated", total_allocated_)
-               << xtag("total_promoted_sab", total_promoted_sab_)
-                // total_promoted
-                // n_mtuation
-                // n_logged_mutation
-                // n_xgen_mutation
-                // n_xckp_mutation
-                // << xtag("per_type_stats", per_type_stats_)
-               << ">";
-        }
-
-        void
-        GcStatisticsExt::display(std::ostream & os) const
-        {
-            os << "<GcStatisticsExt"
-               << xtag("gen_v", gen_v_)
-               << xtag("total_allocated", total_allocated_)
-               << xtag("total_promoted_sab", total_promoted_)
-               << xtag("nursery_z", nursery_z_)
-               << xtag("nursery_before_ckp_z", nursery_before_checkpoint_z_)
-               << xtag("nursery_after_ckp_z", nursery_after_checkpoint_z_)
-               << xtag("tenured_z", tenured_z_)
-               << xtag("n_mutation", n_mutation_)
-               << xtag("n_logged_mutation", n_logged_mutation_)
-               << xtag("n_xgen_mutation", n_xgen_mutation_)
-               << xtag("n_xkcp_mutation", n_xckp_mutation_)
-                // << xtag("per_type_stats", per_type_stats_)
-               << ">";
-        }
-
         bool
         MutationLogEntry::is_child_forwarded() const
         {
@@ -543,6 +458,22 @@ namespace xo {
         } /*swap_spaces*/
 
         void
+        GC::capture_object_statistics(generation upto, capture_phase phase)
+        {
+            /* scan nursery */
+            this->nursery_[role2int(role::to_space)]->capture_object_statistics
+                (phase,
+                 &object_statistics_sab_[gen2int(generation::nursery)]);
+
+            if (upto == generation::tenured) {
+                /* scan tenured */
+                this->tenured_[role2int(role::to_space)]->capture_object_statistics
+                    (phase,
+                     &object_statistics_sab_[gen2int(generation::tenured)]);
+            }
+        }
+
+        void
         GC::copy_object(Object ** pp_object, generation upto, ObjectStatistics * object_stats)
         {
             void * object_address = *pp_object;
@@ -566,7 +497,7 @@ namespace xo {
         GC::copy_globals(generation upto)
         {
             for (Object ** pp_root : gc_root_v_) {
-                this->copy_object(pp_root, upto, &gc_statistics_.per_type_stats_);
+                this->copy_object(pp_root, upto, &object_statistics_sae_[gen2int(upto)]);
             }
         }
 
@@ -802,7 +733,7 @@ namespace xo {
             if (upto == generation::tenured) {
                 log && log("TODO: forward mutation log for full GC");
             } else {
-                this->incremental_gc_forward_mlog(&gc_statistics_.per_type_stats_);
+                this->incremental_gc_forward_mlog(&object_statistics_sae_[gen2int(generation::nursery)]);
             }
         }
 
@@ -858,7 +789,7 @@ namespace xo {
         void
         GC::execute_gc(generation upto)
         {
-            scope log(XO_DEBUG(config_.debug_flag_));
+            scope log(XO_DEBUG(config_.stats_flag_));
 
             bool full_move = (upto == generation::tenured);
 
@@ -876,7 +807,11 @@ namespace xo {
 
             log && log(xtag("new_alloc", new_alloc));
 
-            log && log("step 1:  swap to/from roles");
+            log && log("step 0: (optional) scan for object statistics");
+
+            this->capture_object_statistics(upto, capture_phase::sab);
+
+            log && log("step 1 :  swap to/from roles");
 
             this->swap_spaces(upto);
 
@@ -886,17 +821,24 @@ namespace xo {
 
             log && log("step 2b: TODO: copy pinned");
 
-            log && log("step 3:  forward mutation log");
+            log && log("step 3 :  forward mutation log");
 
             this->forward_mutation_log(upto);
 
-            log && log("step 4:  TODO: notify destructor log");
+            log && log("step 4 :  TODO: notify destructor log");
 
-            log && log("step 5:  TODO: keep reachable weak pointers");
+            log && log("step 5 :  TODO: keep reachable weak pointers");
 
-            log && log("step 6:  cleanup");
+            log && log("step 6 :  cleanup");
 
             this->cleanup_phase(upto);
+
+            this->capture_object_statistics(upto, capture_phase::sae);
+
+            log && log("object statistics [nursery]:");
+            log && log(refrtag("stats", object_statistics_sab_[gen2int(generation::nursery)]));
+            log && log("object statistics [tenured]:");
+            log && log(refrtag("stats", object_statistics_sab_[gen2int(generation::tenured)]));
 
             this->runstate_ = GCRunstate();
 

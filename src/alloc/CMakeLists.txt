@@ -7,6 +7,7 @@ set(SELF_SRCS
     ListAlloc.cpp
     GC.cpp
     GcStatistics.cpp
+    ObjectStatistics.cpp
     Object.cpp
     Forwarding1.cpp
 )

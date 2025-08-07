@@ -42,6 +42,8 @@ namespace xo {
             std::size_t initial_tenured_z_ = 0;
             /** true to permit incremental garbage collection **/
             bool allow_incremental_gc_ = true;
+            /** true to report statistics **/
+            bool stats_flag_ = false;
             /** true to enable debug logging **/
             bool debug_flag_ = false;
         };
@@ -207,6 +209,8 @@ namespace xo {
             void swap_mutation_log();
             /** swap roles of FromSpace/ToSpace **/
             void swap_spaces(generation g);
+            /** scan to-space for object statistics before GC */
+            void capture_object_statistics(generation upto, capture_phase phase);
             /** copy object **/
             void copy_object(Object ** addr, generation upto, ObjectStatistics * object_stats);
             /** copy everything reachable from global gc roots **/
@@ -273,6 +277,10 @@ namespace xo {
 
             /** allocation/collection counters **/
             GcStatistics gc_statistics_;
+            /** optional per-object-type counters. snapshot at beginning of collection cycle **/
+            std::array<ObjectStatistics, gen2int(generation::N)> object_statistics_sab_;
+            /** optional per-object-type counters. snapshot at end of collection cycle **/
+            std::array<ObjectStatistics, gen2int(generation::N)> object_statistics_sae_;
 
             /** trigger full GC whenever this much data arrives in tenured generation **/
             std::size_t full_gc_threshold_ = 0;

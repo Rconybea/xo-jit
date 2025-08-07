@@ -23,6 +23,12 @@ namespace xo {
             return Reflect::make_tp(const_cast<Forwarding1*>(this));
         }
 
+        void
+        Forwarding1::display(std::ostream & os) const
+        {
+            os << "<fwd" << xtag("dest", (void*)dest_.ptr()) << ">";
+        }
+
         Object *
         Forwarding1::_offset_destination(Object * src) const
         {
