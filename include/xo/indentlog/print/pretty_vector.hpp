@@ -34,15 +34,38 @@ namespace xo {
                 } else {
                     ppii.pps()->write('[');
 
-                    for (size_t i = 0, z = x.size(); i < z; ++i) {
-                        if (i == 0)
-                            ppii.pps()->indent(std::max(ppii.pps()->indent_width(), 1u) - 1);
-                        else
-                            ppii.pps()->newline_indent(ppii.ci1());
-                        ppii.pps()->pretty(x[i]);
+                    bool skip_next_indent = false;
 
-                        if (i+1 < z)
-                            ppii.pps()->write(',');
+                    for (size_t i = 0, z = x.size(); i < z; ++i) {
+                        if (!skip_next_indent) {
+                            if (i == 0)
+                                ppii.pps()->indent(std::max(ppii.pps()->indent_width(), 1u) - 1);
+                            else
+                                ppii.pps()->newline_indent(ppii.ci1());
+                        }
+
+                        std::uint32_t pos0 = ppii.pps()->pos();
+                        ppii.pps()->pretty(x[i]);
+                        std::uint32_t pos1 = ppii.pps()->pos();
+
+                        bool skip_prev_indent = skip_next_indent;
+
+                        /* special case, did not print anything */
+                        skip_next_indent = (pos0 == pos1);
+
+                        if (skip_next_indent) {
+                            if (skip_prev_indent) {
+                                /* compress consecutive empty items */
+                                ;
+                            } else {
+                                /* catch edge from non-empty -> empty */
+                                ppii.pps()->write(",.. ,");
+                                ppii.pps()->newline_indent(ppii.ci1());
+                            }
+                        } else {
+                            if (i+1 < z)
+                                ppii.pps()->write(',');
+                        }
                     }
 
                     ppii.pps()->write(" ]");
