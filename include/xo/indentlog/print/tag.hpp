@@ -181,7 +181,7 @@ namespace xo {
         if (PrefixSpace)
             s << " ";
 
-        s << with_color(tag_config::tag_color, concat((char const *)":", tag.name()))
+        s << with_color_if(tag_config::tag_color_enabled, tag_config::tag_color, concat((char const *)":", tag.name()))
           << " ";
 
         if (TagStyle == tagstyle::autoescape)
@@ -204,7 +204,7 @@ namespace xo {
         if (PrefixSpace)
             s << " ";
 
-        s << with_color(tag_config::tag_color, concat((char const *)":", tag.name()))
+        s << with_color_if(tag_config::tag_color_enabled, tag_config::tag_color, concat((char const *)":", tag.name()))
           << " ";
 
         if (TagStyle == tagstyle::autoescape)

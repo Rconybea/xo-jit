@@ -20,12 +20,19 @@ namespace xo {
         /** @class ppstate
          *  @brief hold pretty-printer state
          *
+         *  Need a log_streambuf instance to keep track of indent.
+         *  Application code will likely prefer @ref pretty_printer
+         *
          *  Use:
+         *  @code
          *    ppconfig ppc;
-         *    ppstate pps(&cout, 0, &ppc);
+         *    log_streambuf sbuf(buf_z);
+         *    stringstream ss(&sbuf);
+         *    ppstate pps(0, &ppc, &ss, &sbuf);
          *
          *    pps.pretty("first");
          *    pps.pretty("second");
+         * @endcode
          **/
         struct ppstate {
             using streambuf_type = log_streambuf<char, std::char_traits<char>>;
@@ -176,6 +183,8 @@ namespace xo {
 
         /** @class ppstate_standalone
          *  @brief like ppstate, but also holds streambuf
+         *
+         *  editor bait: pretty_printer prettyprinter
          */
         struct ppstate_standalone : public ppstate {
             explicit ppstate_standalone(std::ostream * os, std::uint32_t ci, const ppconfig * config)
@@ -377,8 +386,9 @@ namespace xo {
                                 ppii.pps()->write(" ");
 
                             /* must color here, because we may keep the output if it fits! */
-                            if (!ppii.pps()->print_upto(with_color(color_spec_type::yellow(), // tag_config::tag_color,
-                                                                   concat((char const *)":", tag.name()))))
+                            if (!ppii.pps()->print_upto(with_color_if(tag_config::tag_color_enabled,
+                                                                      color_spec_type::yellow(), // tag_config::tag_color,
+                                                                      concat((char const *)":", tag.name()))))
                                 return false;
 
                             ppii.pps()->write(" ");
@@ -395,8 +405,9 @@ namespace xo {
 
                             if (tag.prefix_space())
                                 ppii.pps()->write(" ");
-                            ppii.pps()->write(with_color(color_spec_type::yellow(),  //tag_config::tag_color,
-                                                         concat((char const *)":", tag.name())));
+                            ppii.pps()->write(with_color_if(tag_config::tag_color_enabled,
+                                                            color_spec_type::yellow(),  //tag_config::tag_color,
+                                                            concat((char const *)":", tag.name())));
 
                             ppii.pps()->newline_indent(ppii.ci1());
                             ppii.pps()->pretty(tag.value());
@@ -446,6 +457,5 @@ namespace xo {
 
             return *this;
         }
-
     } /*namespace print*/
 } /*namespace xo*/

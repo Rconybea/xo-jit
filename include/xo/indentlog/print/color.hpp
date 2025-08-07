@@ -144,7 +144,8 @@ namespace xo {
     class color_impl {
     public:
         color_impl(coloring_control_flags flags, color_spec_type spec, Contents && contents)
-            : flags_{flags}, spec_{spec}, contents_{std::forward<Contents>(contents)} {}
+            : flags_{flags},
+              spec_{spec}, contents_{std::forward<Contents>(contents)} {}
 
         color_spec_type const & spec() const { return spec_; }
         std::uint32_t color() const { return spec_.code(); }
@@ -162,32 +163,49 @@ namespace xo {
         } /*print*/
 
     private:
-        /* controls independently what to print
+        /** controls independently what to print
          *     \033[38;5;117m hello, world! \033[0m
          *     <------------> <-----------> <----->
          *        color_on       contents    color_off
-         */
+         **/
         coloring_control_flags flags_ = coloring_control_flags::none;
 
+        /** color to use, when @ref color_enabled_ is on **/
         color_spec_type spec_;
 
+        /** contents to print surrounded by color escapes **/
         Contents contents_;
     }; /*color_impl*/
 
     template <typename Contents>
+    color_impl<Contents> with_color_if(bool color_enabled, color_spec_type const & spec, Contents && contents) {
+        return color_impl<Contents>((color_enabled
+                                     ? coloring_control_flags::all
+                                     : coloring_control_flags::contents),
+                                    spec,
+                                    std::forward<Contents>(contents));
+    }
+
+    template <typename Contents>
     color_impl<Contents> with_color(color_spec_type const & spec, Contents && contents) {
-        return color_impl<Contents>(coloring_control_flags::all, spec, std::forward<Contents>(contents));
+        return color_impl<Contents>(coloring_control_flags::all,
+                                    spec,
+                                    std::forward<Contents>(contents));
     }
 
     inline color_impl<int>
     color_on(color_spec_type const & spec) {
-        return color_impl<int>(coloring_control_flags::color_on, spec, 0);
+        return color_impl<int>(coloring_control_flags::color_on,
+                               spec,
+                               0);
     }
 
     inline color_impl<int>
     color_off(color_spec_type const & spec) {
         /* any spec other than color_spec_type::none() works here */
-        return color_impl<int>(coloring_control_flags::color_off, spec, 0);
+        return color_impl<int>(coloring_control_flags::color_off,
+                               spec,
+                               0);
     }
 
     template <typename Contents>
