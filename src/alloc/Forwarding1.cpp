@@ -26,7 +26,7 @@ namespace xo {
         void
         Forwarding1::display(std::ostream & os) const
         {
-            os << "<fwd" << xtag("dest", (void*)dest_.ptr()) << ">";
+            os << "<fwd" << xtag("dest-td", dest_->self_tp().td()->short_name()) << ">";
         }
 
         Object *

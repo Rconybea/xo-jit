@@ -199,6 +199,15 @@ namespace xo {
 #endif
 
         private:
+            ListAlloc * nursery_to() const { return nursery(role::to_space); }
+            ListAlloc * nursery_from() const { return nursery(role::from_space); }
+
+            ListAlloc * tenured_to() const { return tenured(role::to_space); }
+            ListAlloc * tenured_from() const { return tenured(role::from_space); }
+
+            ListAlloc * nursery(role r) const { return nursery_[role2int(r)].get(); }
+            ListAlloc * tenured(role r) const { return tenured_[role2int(r)].get(); }
+
             /** begin GC now **/
             void execute_gc(generation g);
             /** cleanup phase.  aux function for @ref execute_gc **/

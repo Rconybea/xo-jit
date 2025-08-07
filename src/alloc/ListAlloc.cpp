@@ -5,6 +5,7 @@
 
 #include "ListAlloc.hpp"
 #include "ArenaAlloc.hpp"
+#include "xo/indentlog/scope.hpp"
 #include <cassert>
 #include <cstddef>
 
@@ -13,9 +14,6 @@ namespace xo {
         ListAlloc::ListAlloc(std::unique_ptr<ArenaAlloc> hd,
                              ArenaAlloc * marked,
                              std::size_t cz, std::size_t nz, std::size_t tz,
-#ifdef REDLINE_MEMORY
-                             bool use_redline,
-#endif
                              bool debug_flag)
             : start_z_{cz},
               hd_{std::move(hd)},
@@ -24,9 +22,6 @@ namespace xo {
               current_z_{cz},
               next_z_{nz},
               total_z_{tz},
-#ifdef REDLINE_MEMOORY
-              use_redline_{use_redline},
-#endif
               debug_flag_{debug_flag}
         {}
 
@@ -39,9 +34,6 @@ namespace xo {
         ListAlloc::make(const std::string & name, std::size_t cz, std::size_t nz, bool debug_flag)
         {
             std::unique_ptr<ArenaAlloc> hd{ArenaAlloc::make(name,
-#ifdef REDLINE_MEMORY
-                                                            0,
-#endif
                                                             cz, debug_flag)};
 
             if (!hd)
@@ -52,9 +44,6 @@ namespace xo {
             up<ListAlloc> retval{new ListAlloc(std::move(hd),
                                                marked,
                                                cz, nz, cz,
-#ifdef REDLINE_MEMORY
-                                               false /*!use_redline*/,
-#endif
                                                debug_flag)};
 
             return retval;
@@ -134,34 +123,31 @@ namespace xo {
         bool
         ListAlloc::is_before_checkpoint(const void * x) const {
             if (!marked_)
-                return false;
+                return true;
 
-            if ((marked_ == hd_.get()) && hd_->contains(x))
-                return hd_->is_before_checkpoint(x);
+            if (marked_ && marked_->contains(x))
+                return marked_->is_before_checkpoint(x);
 
             /*
-             * 1. allocs in full_l_ appear in youngest-to-oldest order
-             * 2. allocators that appear before marked_ in full_l_ count as 'after checkpoint'
-             * 3. allocators that appear after  marked_ in full_l_ count as 'before checkpoint'
+             * 1. allocs in full_l_ appear in oldest-to-youngest order
+             * 2. allocators that appear before marked_ in full_l_ count as 'before checkpoint'
+             * 3. allocators that appear after  marked_ in full_l_ count as 'after checkpoint'
              */
 
-            bool younger_than_marked = true;
+            bool older_than_marked = true;
 
             for (const auto & alloc : full_l_) {
-                if (younger_than_marked) {
+                if (older_than_marked) {
                     if (alloc.get() == marked_) {
                         /* nothing else to test on this iteration,
                          * already checked .marked_ specifically
                          */
-                        younger_than_marked = false;
+                        break;
                     } else {
-                        /* after checkpoint */
+                        /* before checkpoint */
                         if (alloc->contains(x))
-                            return false;
+                            return true;
                     }
-                } else {
-                    if (alloc->contains(x))
-                        return true;
                 }
             }
 
@@ -171,55 +157,63 @@ namespace xo {
         std::size_t
         ListAlloc::before_checkpoint() const
         {
+            scope log(XO_DEBUG(false && debug_flag_), xtag("marked", marked_ ? marked_->name() : ""));
+
             if (marked_) {
                 if (full_l_.empty()) {
                     assert(marked_ == hd_.get());
 
                     return marked_->before_checkpoint();
+                } else {
+                    std::size_t z = 0;
+
+                    /* control here: .marked & .full_l non-empty. */
+                    if (hd_.get() == marked_) {
+                        z += hd_->before_checkpoint();
+
+                        /* anything in .full_l is older than marked .hd */
+                        for (const auto & alloc : full_l_) {
+                            z += alloc->allocated();
+                        }
+
+                        return z;
+                    } else {
+                        /* messiest case: .marked is true,
+                         * and not the youngest arena
+                         */
+
+                        /* full_l always in increasing time order: oldest-to-youngest order */
+                        size_t i_alloc = 0;
+                        for (const auto & alloc : full_l_) {
+                            log && log(xtag("i_alloc", i_alloc),
+                                       xtag("alloc", alloc->name()),
+                                       xtag("z", z));
+
+                            if (alloc.get() == marked_) {
+                                log && log("marked", xtag("+z", marked_->before_checkpoint()));
+                                z += marked_->before_checkpoint();
+                                break;
+                            } else {
+                                log && log("older than marked", xtag("+z", alloc->allocated()));
+                                z += alloc->allocated();
+                            }
+                            ++i_alloc;
+                        }
+                    }
+
+                    return z;
                 }
             } else {
-                /* count everything allocated */
+                /* count *everything* allocated */
                 return this->allocated();
             }
-
-            std::size_t z = 0;
-
-            /* control here: .marked & .full_l non-empty. */
-            if (hd_.get() == marked_) {
-                z += hd_->before_checkpoint();
-
-                /* anything in .full_l older than marked .hd */
-                for (const auto & alloc : full_l_) {
-                    z += alloc->allocated();
-                }
-
-                return z;
-            } else {
-                /* messiest case: .marked is true,
-                 * and not the youngest arena
-                 */
-                bool younger_than_marked = true;
-
-                for (const auto & alloc : full_l_) {
-                    if (younger_than_marked) {
-                        if (alloc.get() == marked_) {
-                            younger_than_marked = false;
-                            z += marked_->before_checkpoint();
-                        } else {
-                            ;
-                        }
-                    } else {
-                        z += alloc->allocated();
-                    }
-                }
-            }
-
-            return z;
         }
 
         std::size_t
         ListAlloc::after_checkpoint() const
         {
+            scope log(XO_DEBUG(false && debug_flag_), xtag("marked", marked_ ? marked_->name() : ""));
+
             if (!marked_)
                 return 0;
 
@@ -229,23 +223,42 @@ namespace xo {
                 return marked_->after_checkpoint();
             }
 
-            bool younger_than_marked = true;
+            bool older_than_marked = true;
 
             std::size_t z = 0;
 
+            std::size_t i_alloc = 0;
             for (const auto & alloc : full_l_) {
-                if (younger_than_marked) {
+                log && log(xtag("i_alloc", i_alloc),
+                           xtag("alloc", alloc->name()),
+                           xtag("z", z));
+
+                if (older_than_marked) {
                     if (alloc.get() == marked_) {
-                        younger_than_marked = false;
+                        log && log("marked", xtag("+z", marked_->after_checkpoint()));
+                        older_than_marked = false;
                         z += marked_->after_checkpoint();
-                        break;
-                    } else {
-                        z += alloc->allocated();
                     }
+                } else {
+                    /* younger than marked */
+                    log && log("younger", xtag("+z", alloc->allocated()));
+                    z += alloc->allocated();
                 }
+
+                ++i_alloc;
             }
 
+            /** head must be included, since it's always the youngest bucket **/
+            z += hd_->after_checkpoint();
+
+            log && log("z", z);
+
             return z;
+        }
+
+        bool
+        ListAlloc::debug_flag() const {
+            return debug_flag_;
         }
 
         void
@@ -258,26 +271,17 @@ namespace xo {
             current_z_ = 0;
             next_z_ = 0;
             total_z_ = 0;
-#ifdef REDLINE_MEMORY
-            use_redline_ = false;
-#endif
         }
 
         bool
         ListAlloc::reset(std::size_t z)
         {
-#ifdef REDLINE_MEMORY
-            // warning: hd_->size() does not include redline memory
-            hd_->release_redline_memory();
-#endif
+            scope log(XO_DEBUG(debug_flag_), xtag("z", z));
 
             bool recycle_head_bucket = hd_ && (z <= hd_->size());
 
             this->full_l_.clear();
             this->marked_ = nullptr;
-#ifdef REDLINE_MEMORY
-            this->redlined_flag_ = false;
-#endif
 
             if (recycle_head_bucket) {
                 this->hd_->clear();
@@ -285,16 +289,22 @@ namespace xo {
 
                 return true;
             } else {
+                std::string old_name = this->hd_->name();
+
                 this->hd_.reset(nullptr);
                 this->total_z_ = 0;
 
-                return this->expand(z);
+                return this->expand(z, old_name + "+");
             }
         }
 
         bool
-        ListAlloc::expand(std::size_t z)
+        ListAlloc::expand(std::size_t z, const std::string & name)
         {
+            scope log(XO_DEBUG(debug_flag_), xtag("name", name));
+
+            //log && log("before", xtag("before_ckp", this->before_checkpoint()));
+
             std::size_t cz = current_z_;
             std::size_t nz = next_z_;
             std::size_t tz;
@@ -305,12 +315,9 @@ namespace xo {
                 nz = tz;
             } while (cz < z);
 
-            std::string name = hd_->name() + "+exp";
+            log && log("expand to", xtag("cz", cz));
 
             std::unique_ptr<ArenaAlloc> new_alloc = ArenaAlloc::make(name,
-#ifdef REDLINE_MEMORY
-                                                                     0,
-#endif
                                                                      cz, debug_flag_);
 
             if (!new_alloc)
@@ -320,41 +327,43 @@ namespace xo {
             this->next_z_ = nz;
             this->total_z_ += cz;
 
+            if (hd_)
+                this->full_l_.push_back(std::move(hd_));
+
             this->hd_ = std::move(new_alloc);
+
+            //log && log("after", xtag("before_ckp", this->before_checkpoint()));
 
             return true;
         }
 
         void
         ListAlloc::checkpoint() {
+            scope log(XO_DEBUG(debug_flag_));
+
             hd_->checkpoint();
 
             this->marked_ = hd_.get();
+
+            log && log(xtag("hd", (void*)hd_.get()), xtag("marked", (void*)marked_));
         }
 
         std::byte *
         ListAlloc::alloc(std::size_t z) {
+            scope log(XO_DEBUG(debug_flag_));
+
             std::byte * retval = hd_->alloc(z);
 
             if (retval)
                 return retval;
 
-            if (this->expand(z))
+            log && log("space exhausted -> expand");
+
+            if (this->expand(z, hd_->name() + "+"))
                 return hd_->alloc(z);
 
             return nullptr;
         }
-
-#ifdef REDLINE_MEMORY
-        void
-        ListAlloc::release_redline_memory()
-        {
-            if (use_redline_)
-                redlined_flag_ = true;
-
-            this->hd_->release_redline_memory();
-        }
-#endif
     } /*namespace gc*/
 } /*namespace xo*/
 

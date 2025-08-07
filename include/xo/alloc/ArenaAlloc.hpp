@@ -15,36 +15,20 @@ namespace xo {
          *
          *  @text
          *
-         *  before @ref release_redline_memory
-         *
-         *    <-----allocated----> <-free-> <-reserved->
-         *    XXXXXXXXXXXXXXXXXXXX______________________
-         *    ^                   ^        ^            ^
-         *    lo                  free     redline      hi
-         *                                 limit
-         *
-         *  after @ref release_redline_memory
-         *
          *    <-----allocated----> <--------free------->
          *    XXXXXXXXXXXXXXXXXXXX______________________
          *    ^                   ^                     ^
          *    lo                  free                  hi
          *                                              limit
          *  @endtext
-         *
-         *  TODO: rename to ArenaAlloc
          **/
         class ArenaAlloc : public IAlloc {
         public:
             ~ArenaAlloc();
 
             /** create allocator with capacity @p z,
-             *  with reserved capacity @p redline_z.
              **/
             static up<ArenaAlloc> make(const std::string & name,
-#ifdef REDLINE_MEMORY
-                                        std::size_t redline_z,
-#endif
                                         std::size_t z,
                                         bool debug_flag);
 
@@ -56,7 +40,7 @@ namespace xo {
 
             // inherited from IAlloc...
 
-            virtual const std::string & name() const final override { return name_; }
+            virtual const std::string & name() const final override;
             virtual std::size_t size() const final override;
             virtual std::size_t available() const final override;
             virtual std::size_t allocated() const final override;
@@ -64,19 +48,14 @@ namespace xo {
             virtual bool is_before_checkpoint(const void * x) const final override;
             virtual std::size_t before_checkpoint() const final override;
             virtual std::size_t after_checkpoint() const final override;
+            virtual bool debug_flag() const final override;
 
             virtual void clear() final override;
             virtual void checkpoint() final override;
             virtual std::byte * alloc(std::size_t z) final override;
-#ifdef REDLINE_MEMORY
-            virtual void release_redline_memory() final override;
-#endif
 
         private:
             ArenaAlloc(const std::string & name,
-#ifdef REDLINE_MEMORY
-                       std::size_t rz,
-#endif
                        std::size_t z, bool debug_flag);
 
         private:
@@ -99,10 +78,6 @@ namespace xo {
             std::byte * free_ptr_ = nullptr;
             /** soft limit: end of released memory **/
             std::byte * limit_ = nullptr;
-#ifdef REDLINE_MEMORY
-            /** amount of last-resort memory to reserve **/
-            std::size_t redline_z_ = 0;
-#endif
             /** hard limit: end of allocated memory **/
             std::byte * hi_ = nullptr;
             /** true to enable detailed debug logging **/

@@ -29,9 +29,6 @@ namespace xo {
             ListAlloc(std::unique_ptr<ArenaAlloc> hd,
                       ArenaAlloc * marked,
                       std::size_t cz, std::size_t nz, std::size_t tz,
-#ifdef REDLINE_MEMORY
-                      bool use_redline,
-#endif
                       bool debug_flag);
             ~ListAlloc();
 
@@ -40,8 +37,8 @@ namespace xo {
             /** reset to have at least @p z bytes of storage **/
             bool reset(std::size_t z);
 
-            /** expand bucket list to accomodate a requrest of size @p z **/
-            bool expand(std::size_t z);
+            /** expand bucket list to accomodate a request of size @p z **/
+            bool expand(std::size_t z, const std::string & name);
 
             /** current free pointer **/
             std::byte * free_ptr() const;
@@ -64,13 +61,11 @@ namespace xo {
             virtual bool is_before_checkpoint(const void * x) const final override;
             virtual std::size_t before_checkpoint() const final override;
             virtual std::size_t after_checkpoint() const final override;
+            virtual bool debug_flag() const final override;
 
             virtual void clear() final override;
             virtual void checkpoint() final override;
             virtual std::byte * alloc(std::size_t z) final override;
-#ifdef REDLINE_MEMORY
-            virtual void release_redline_memory() final override;
-#endif
 
         private:
             /** **/
@@ -89,11 +84,6 @@ namespace xo {
             std::size_t next_z_ = 0;
             /** total size of @ref hd_ + contents of @ref full_l_ **/
             std::size_t total_z_ = 0;
-#ifdef REDLINE_MEMORY
-            bool use_redline_ = false;
-            bool redlined_flag_ = false;
-#endif
-
             /** true to enable debug logging **/
             bool debug_flag_ = false;
         };

@@ -32,12 +32,12 @@ namespace xo {
         PerGenerationStatistics::display(std::ostream & os) const
         {
             os << "<PerGenerationStatistics"
-               << rtag("used", used_z_)
-               << rtag("n_gc", n_gc_)
-               << rtag("new_alloc_z", new_alloc_z_)
-               << rtag("scanned_z", scanned_z_)
-               << rtag("survive_z", survive_z_)
-               << rtag("promote_z", promote_z_)
+               << xrtag("used", used_z_)
+               << xrtag("n_gc", n_gc_)
+               << xrtag("new_alloc_z", new_alloc_z_)
+               << xrtag("scanned_z", scanned_z_)
+               << xrtag("survive_z", survive_z_)
+               << xrtag("promote_z", promote_z_)
                << ">";
         }
 
@@ -62,9 +62,9 @@ namespace xo {
         GcStatistics::display(std::ostream & os) const
         {
             os << "<GcStatistics"
-               << rtag("gen_v", gen_v_)
-               << rtag("total_allocated", total_allocated_)
-               << rtag("total_promoted_sab", total_promoted_sab_)
+               << xrtag("gen_v", gen_v_)
+               << xrtag("total_allocated", total_allocated_)
+               << xrtag("total_promoted_sab", total_promoted_sab_)
                 // total_promoted
                 // n_mtuation
                 // n_logged_mutation
@@ -78,17 +78,17 @@ namespace xo {
         GcStatisticsExt::display(std::ostream & os) const
         {
             os << "<GcStatisticsExt"
-               << rtag("gen_v", gen_v_)
-               << rtag("total_allocated", total_allocated_)
-               << rtag("total_promoted_sab", total_promoted_)
-               << rtag("nursery_z", nursery_z_)
-               << rtag("nursery_before_ckp_z", nursery_before_checkpoint_z_)
-               << rtag("nursery_after_ckp_z", nursery_after_checkpoint_z_)
-               << rtag("tenured_z", tenured_z_)
-               << rtag("n_mutation", n_mutation_)
-               << rtag("n_logged_mutation", n_logged_mutation_)
-               << rtag("n_xgen_mutation", n_xgen_mutation_)
-               << rtag("n_xkcp_mutation", n_xckp_mutation_)
+               << xrtag("gen_v", gen_v_)
+               << xrtag("total_allocated", total_allocated_)
+               << xrtag("total_promoted_sab", total_promoted_)
+               << xrtag("nursery_z", nursery_z_)
+               << xrtag("nursery_before_ckp_z", nursery_before_checkpoint_z_)
+               << xrtag("nursery_after_ckp_z", nursery_after_checkpoint_z_)
+               << xrtag("tenured_z", tenured_z_)
+               << xrtag("n_mutation", n_mutation_)
+               << xrtag("n_logged_mutation", n_logged_mutation_)
+               << xrtag("n_xgen_mutation", n_xgen_mutation_)
+               << xrtag("n_xckp_mutation", n_xckp_mutation_)
                 // << xtag("per_type_stats", per_type_stats_)
                << ">";
         }

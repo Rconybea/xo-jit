@@ -37,6 +37,7 @@ namespace xo {
                      .initial_tenured_z_ = tc.tenured_z_});
 
                 REQUIRE(gc.get());
+                REQUIRE(gc->name() == "GC");
                 REQUIRE(gc->size() == tc.nursery_z_ + tc.tenured_z_);
                 REQUIRE(gc->allocated() == 0);
                 REQUIRE(gc->available() == tc.nursery_z_);

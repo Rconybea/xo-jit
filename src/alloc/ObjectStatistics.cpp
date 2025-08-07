@@ -14,13 +14,13 @@ namespace xo {
         {
             os << "<PerObjectTypeStatistics";
             if (td_)
-                os << rtag("td", td_->short_name());
+                os << xrtag("td", td_->short_name());
             else
-                os << rtag("td", "nullptr");
-            os << rtag("scanned_n", scanned_n_)
-               << rtag("scanned_z", scanned_z_)
-               << rtag("survive_n", survive_n_)
-               << rtag("survive_z", survive_z_)
+                os << xrtag("td", "nullptr");
+            os << xrtag("scanned_n", scanned_n_)
+               << xrtag("scanned_z", scanned_z_)
+               << xrtag("survive_n", survive_n_)
+               << xrtag("survive_z", survive_z_)
                << ">";
         }
 

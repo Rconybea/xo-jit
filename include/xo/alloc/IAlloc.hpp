@@ -52,7 +52,7 @@ namespace xo {
             /** number of bytes allocated since @ref checkpoint **/
             virtual std::size_t after_checkpoint() const = 0;
             /** @return true iff debug logging enabled **/
-            virtual bool debug_flag() const { return false; }
+            virtual bool debug_flag() const = 0;
 
             /** reset allocator to empty state. **/
             virtual void clear() = 0;
@@ -76,10 +76,6 @@ namespace xo {
              *  Only used in @ref GC.  Default implementation asserts and returns nullptr
              **/
             virtual std::byte * alloc_gc_copy(std::size_t z, const void * src);
-#ifdef REDLINE_MEMORY
-            /** release last-resort reserved memory **/
-            virtual void release_redline_memory() = 0;
-#endif
         };
     } /*namespace gc*/
 

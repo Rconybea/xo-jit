@@ -175,7 +175,8 @@ namespace xo {
             GcStatisticsExt retval = GcStatisticsExt(this->native_gc_statistics());
 
             retval.nursery_z_ = nursery_[role2int(role::to_space)]->size();
-            retval.nursery_before_checkpoint_z_ = nursery_[role2int(role::to_space)]->before_checkpoint();
+            retval.nursery_before_checkpoint_z_ = this->nursery_to()->before_checkpoint();
+            retval.nursery_after_checkpoint_z_ = this->nursery_to()->after_checkpoint();
             retval.tenured_z_ = tenured_[role2int(role::to_space)]->size();
 
             return retval;
@@ -254,21 +255,9 @@ namespace xo {
         {
             std::byte * x = nursery_[role2int(role::to_space)]->alloc(z);
 
-            if (!x) {
-                /* ListAlloc won't fail -- instead will increase heap size */
+            /* ListAlloc won't fail unless we exhaust memory -- instead will increase heap size */
 
-                this->request_gc(generation::nursery);
-
-#ifdef REDLINE_MEMORY
-                if (incr_gc_pending_ || full_gc_pending_)
-                    nursery_[role2int(role::to_space)]->release_redline_memory();
-
-                /* try (just once) more, maybe request fits in redline space */
-                x = nursery_[role2int(role::to_space)]->alloc(z);
-#endif
-
-                assert(x);
-            }
+            assert(x);
 
             return x;
         }
@@ -308,18 +297,6 @@ namespace xo {
                         log && log("nursery");
 
                         retval = nursery_[role2int(role::to_space)]->alloc(z);
-
-                        if (!retval) {
-                            /* nursery space exhausted !? */
-
-                            this->request_gc(generation::nursery);
-
-#ifdef REDLINE_MEMORY
-                            nursery_[role2int(role::to_space)]->release_redline_memory();
-#endif
-
-                            retval = nursery_[role2int(role::to_space)]->alloc(z);
-                        }
                     }
                 }
                 break;
@@ -393,14 +370,6 @@ namespace xo {
             }
         }
 
-#ifdef REDLINE_MEMORY
-        void
-        GC::release_redline_memory()
-        {
-            // not supported feature for GC
-        }
-#endif
-
         void
         GC::swap_nursery()
         {
@@ -428,40 +397,62 @@ namespace xo {
         void
         GC::swap_spaces(generation target)
         {
-            scope log(XO_DEBUG(this->debug_flag()));
+            scope log(XO_DEBUG(this->debug_flag()), xtag("upto", target));
 
             // will be copying into the memory regions currently labelled FromSpace
 
             /* gc will copy some to-be-determined amount in [0..promote_z]
                from nursery->tenured generation.
              */
-            std::size_t promote_z = nursery_[role2int(role::to_space)]->before_checkpoint();
+            std::size_t max_promote_z = nursery_[role2int(role::to_space)]->before_checkpoint();
+
+            log && log(xtag("max_promote_z", max_promote_z));
+
             if (target == generation::tenured) {
                 /* gc on tenured generation may need this much space */
-                std::size_t tenured_z = (tenured_[role2int(role::to_space)]->allocated()
-                                         + promote_z
-                                         + full_gc_threshold_);
+                std::size_t need_tenured_z = (tenured_[role2int(role::to_space)]->allocated()
+                                              + max_promote_z
+                                              + full_gc_threshold_);
 
-                tenured_[role2int(role::from_space)]->reset(tenured_z);
+                log && log("need_tenured_z", need_tenured_z);
+
+                tenured_from()->reset(need_tenured_z);
 
                 this->swap_tenured();
             } else {
-                if (tenured_[role2int(role::to_space)]->available() < promote_z) {
-                    tenured_[role2int(role::to_space)]->expand(promote_z);
+                std::size_t avail_tenured_z = tenured_[role2int(role::to_space)]->available();
+
+                log && log(xtag("avail_tenured_z", avail_tenured_z));
+
+                if (avail_tenured_z < max_promote_z) {
+                    ListAlloc * tenured_to = this->tenured_to();
+
+                    tenured_to->expand(max_promote_z, tenured_to->name() + "+");
                 }
             }
 
-            nursery_[role2int(role::from_space)]->reset(nursery_[role2int(role::to_space)]->allocated()
-                                             - promote_z
-                                             + incr_gc_threshold_);
+            /* subtracting max_promote_z is correct here, since anything not promoted is garbage */
+            std::size_t need_nursery_z = (nursery(role::to_space)->allocated()
+                                          - max_promote_z
+                                          + incr_gc_threshold_);
+
+            log && log(xtag("need_nursery_z", need_nursery_z));
+
+            /* (from-space is about to become to-space, to receive surviving nursery objects) */
+            nursery(role::from_space)->reset(need_nursery_z);
+
             this->swap_nursery();
 
             this->swap_mutation_log();
 
-            log && log(xtag("nursery.from", nursery_[role2int(role::from_space)]->name()));
-            log && log(xtag("nursery.to",   nursery_[role2int(role::to_space)  ]->name()));
-            log && log(xtag("tenured.from", tenured_[role2int(role::from_space)]->name()));
-            log && log(xtag("tenured.to",   tenured_[role2int(role::to_space)  ]->name()));
+            ListAlloc * N_from = nursery(role::from_space);
+            log && log(xtag("nursery.from", N_from->name()), xtag("size", N_from->size()));
+            ListAlloc * N_to = nursery(role::to_space);
+            log && log(xtag("nursery.to",   N_to->name()), xtag("size", N_to->size()));
+            ListAlloc * T_from = tenured(role::from_space);
+            log && log(xtag("tenured.from", T_from->name()), xtag("size", T_from->size()));
+            ListAlloc * T_to = tenured(role::to_space);
+            log && log(xtag("tenured.to", T_to->name()), xtag("size", T_to->size()));
 
         } /*swap_spaces*/
 
@@ -504,8 +495,12 @@ namespace xo {
         void
         GC::copy_globals(generation upto)
         {
+            scope log(XO_DEBUG(config_.debug_flag_),
+                      xtag("roots", gc_root_v_.size()));
+
             for (Object ** pp_root : gc_root_v_) {
-                this->copy_object(pp_root, upto, &object_statistics_sae_[gen2int(upto)]);
+                this->copy_object(pp_root, upto,
+                                  &object_statistics_sae_[gen2int(upto)]);
             }
         }
 
@@ -750,28 +745,30 @@ namespace xo {
         {
             scope log(XO_DEBUG(config_.debug_flag_));
 
-            std::size_t N_allocated = nursery_[role2int(role::from_space)]->after_checkpoint();
-            std::size_t T_allocated = tenured_[role2int(role::from_space)]->after_checkpoint();
+            std::size_t N_allocated = nursery_from()->after_checkpoint();
+            std::size_t T_allocated = tenured_from()->after_checkpoint();
 
-            std::size_t N_before_gc = nursery_[role2int(role::from_space)]->allocated();
-            std::size_t T_before_gc = tenured_[role2int(role::from_space)]->allocated();
+            std::size_t N_before_gc = nursery_from()->allocated();
+            std::size_t T_before_gc = tenured_from()->allocated();
 
-            std::size_t N_after_gc = nursery_[role2int(role::to_space)]->allocated();
-            std::size_t T_after_gc = tenured_[role2int(role::to_space)]->allocated();
+            std::size_t N_after_gc = nursery_to()->allocated();
+            std::size_t T_after_gc = tenured_to()->allocated();
             //std::byte * N_free_ptr = nursery_[role2int(role::to_space)]->free_ptr();
 
-            std::size_t promote_z = gc_statistics_.total_promoted_ - gc_statistics_.total_promoted_sab_;
+            std::size_t promote_z = (gc_statistics_.total_promoted_
+                                     - gc_statistics_.total_promoted_sab_);
 
-            this->nursery_[role2int(role::from_space)]->reset(0);
-            this->tenured_[role2int(role::from_space)]->reset(0);
+            /* Don't reset from-space here, it's unnecessary.
+             * Would be permissible, but interferes with GC object modelling in
+             * xo-object/utest/GC.test.cpp
+             */
+            //this->nursery_[role2int(role::from_space)]->reset(0);
+            //this->tenured_[role2int(role::from_space)]->reset(0);
 
             /* objects currenty in to-space nursery have survived one collection */
-            this->nursery_[role2int(role::to_space)]->checkpoint();
-
-            // nursery_[role2int(role::to_space)]->set_redline(nursery_[role2int(role::to_space)]->allocated() + incr_gc_threshold_)
-
+            this->nursery_to()->checkpoint();
             if (upto == generation::tenured)
-                this->tenured_[role2int(role::to_space)]->checkpoint();
+                this->tenured_to()->checkpoint();
 
             if (log) {
                 log(xtag("N_allocated", N_allocated));
@@ -819,7 +816,7 @@ namespace xo {
 
             this->capture_object_statistics(upto, capture_phase::sab);
 
-            log && log("step 1 :  swap to/from roles");
+            log && log("step 1 : swap to/from roles");
 
             this->swap_spaces(upto);
 
@@ -829,15 +826,15 @@ namespace xo {
 
             log && log("step 2b: TODO: copy pinned");
 
-            log && log("step 3 :  forward mutation log");
+            log && log("step 3 : forward mutation log");
 
             this->forward_mutation_log(upto);
 
-            log && log("step 4 :  TODO: notify destructor log");
+            log && log("step 4 : TODO: notify destructor log");
 
-            log && log("step 5 :  TODO: keep reachable weak pointers");
+            log && log("step 5 : TODO: keep reachable weak pointers");
 
-            log && log("step 6 :  cleanup");
+            log && log("step 6 : cleanup");
 
             this->cleanup_phase(upto);
 
