@@ -194,7 +194,9 @@ namespace xo {
             virtual std::byte * alloc(std::size_t z) final override;
             virtual std::byte * alloc_gc_copy(std::size_t z, const void * src) final override;
 
+#ifdef REDLINE_MEMORY
             virtual void release_redline_memory() final override;
+#endif
 
         private:
             /** begin GC now **/

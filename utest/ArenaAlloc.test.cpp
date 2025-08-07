@@ -14,9 +14,15 @@ namespace xo {
         namespace {
             struct testcase_alloc {
                 testcase_alloc(std::size_t rz, std::size_t z)
-                    : redline_z_{rz}, arena_z_{z} {}
+                    :
+#ifdef REDLINE_MEMORY
+                    redline_z_{rz},
+#endif
+                    arena_z_{z} {}
 
+#ifdef REDLINE_MEMORY
                 std::size_t redline_z_;
+#endif
                 std::size_t arena_z_;
 
             };
@@ -35,7 +41,11 @@ namespace xo {
 
                 constexpr bool c_debug_flag = false;
 
-                auto alloc = ArenaAlloc::make("linearalloc", tc.redline_z_, tc.arena_z_, c_debug_flag);
+                auto alloc = ArenaAlloc::make("linearalloc",
+#ifdef REDLINE_MEMORY
+                                              tc.redline_z_,
+#endif
+                                              tc.arena_z_, c_debug_flag);
 
                 REQUIRE(alloc.get());
                 REQUIRE(alloc->name() == "linearalloc");

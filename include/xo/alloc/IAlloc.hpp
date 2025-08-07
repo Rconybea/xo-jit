@@ -76,8 +76,10 @@ namespace xo {
              *  Only used in @ref GC.  Default implementation asserts and returns nullptr
              **/
             virtual std::byte * alloc_gc_copy(std::size_t z, const void * src);
+#ifdef REDLINE_MEMORY
             /** release last-resort reserved memory **/
             virtual void release_redline_memory() = 0;
+#endif
         };
     } /*namespace gc*/
 

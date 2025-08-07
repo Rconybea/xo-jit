@@ -255,13 +255,17 @@ namespace xo {
             std::byte * x = nursery_[role2int(role::to_space)]->alloc(z);
 
             if (!x) {
+                /* ListAlloc won't fail -- instead will increase heap size */
+
                 this->request_gc(generation::nursery);
 
+#ifdef REDLINE_MEMORY
                 if (incr_gc_pending_ || full_gc_pending_)
                     nursery_[role2int(role::to_space)]->release_redline_memory();
 
                 /* try (just once) more, maybe request fits in redline space */
                 x = nursery_[role2int(role::to_space)]->alloc(z);
+#endif
 
                 assert(x);
             }
@@ -310,7 +314,9 @@ namespace xo {
 
                             this->request_gc(generation::nursery);
 
+#ifdef REDLINE_MEMORY
                             nursery_[role2int(role::to_space)]->release_redline_memory();
+#endif
 
                             retval = nursery_[role2int(role::to_space)]->alloc(z);
                         }
@@ -387,11 +393,13 @@ namespace xo {
             }
         }
 
+#ifdef REDLINE_MEMORY
         void
         GC::release_redline_memory()
         {
             // not supported feature for GC
         }
+#endif
 
         void
         GC::swap_nursery()

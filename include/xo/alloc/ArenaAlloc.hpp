@@ -42,7 +42,9 @@ namespace xo {
              *  with reserved capacity @p redline_z.
              **/
             static up<ArenaAlloc> make(const std::string & name,
+#ifdef REDLINE_MEMORY
                                         std::size_t redline_z,
+#endif
                                         std::size_t z,
                                         bool debug_flag);
 
@@ -66,10 +68,16 @@ namespace xo {
             virtual void clear() final override;
             virtual void checkpoint() final override;
             virtual std::byte * alloc(std::size_t z) final override;
+#ifdef REDLINE_MEMORY
             virtual void release_redline_memory() final override;
+#endif
 
         private:
-            ArenaAlloc(const std::string & name, std::size_t rz, std::size_t z, bool debug_flag);
+            ArenaAlloc(const std::string & name,
+#ifdef REDLINE_MEMORY
+                       std::size_t rz,
+#endif
+                       std::size_t z, bool debug_flag);
 
         private:
             /**
@@ -91,8 +99,10 @@ namespace xo {
             std::byte * free_ptr_ = nullptr;
             /** soft limit: end of released memory **/
             std::byte * limit_ = nullptr;
+#ifdef REDLINE_MEMORY
             /** amount of last-resort memory to reserve **/
             std::size_t redline_z_ = 0;
+#endif
             /** hard limit: end of allocated memory **/
             std::byte * hi_ = nullptr;
             /** true to enable detailed debug logging **/

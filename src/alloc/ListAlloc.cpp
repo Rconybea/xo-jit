@@ -13,7 +13,9 @@ namespace xo {
         ListAlloc::ListAlloc(std::unique_ptr<ArenaAlloc> hd,
                              ArenaAlloc * marked,
                              std::size_t cz, std::size_t nz, std::size_t tz,
+#ifdef REDLINE_MEMORY
                              bool use_redline,
+#endif
                              bool debug_flag)
             : start_z_{cz},
               hd_{std::move(hd)},
@@ -22,7 +24,9 @@ namespace xo {
               current_z_{cz},
               next_z_{nz},
               total_z_{tz},
+#ifdef REDLINE_MEMOORY
               use_redline_{use_redline},
+#endif
               debug_flag_{debug_flag}
         {}
 
@@ -34,7 +38,11 @@ namespace xo {
         up<ListAlloc>
         ListAlloc::make(const std::string & name, std::size_t cz, std::size_t nz, bool debug_flag)
         {
-            std::unique_ptr<ArenaAlloc> hd{ArenaAlloc::make(name, 0, cz, debug_flag)};
+            std::unique_ptr<ArenaAlloc> hd{ArenaAlloc::make(name,
+#ifdef REDLINE_MEMORY
+                                                            0,
+#endif
+                                                            cz, debug_flag)};
 
             if (!hd)
                 return nullptr;
@@ -44,7 +52,9 @@ namespace xo {
             up<ListAlloc> retval{new ListAlloc(std::move(hd),
                                                marked,
                                                cz, nz, cz,
+#ifdef REDLINE_MEMORY
                                                false /*!use_redline*/,
+#endif
                                                debug_flag)};
 
             return retval;
@@ -248,20 +258,26 @@ namespace xo {
             current_z_ = 0;
             next_z_ = 0;
             total_z_ = 0;
+#ifdef REDLINE_MEMORY
             use_redline_ = false;
+#endif
         }
 
         bool
         ListAlloc::reset(std::size_t z)
         {
+#ifdef REDLINE_MEMORY
             // warning: hd_->size() does not include redline memory
             hd_->release_redline_memory();
+#endif
 
             bool recycle_head_bucket = hd_ && (z <= hd_->size());
 
             this->full_l_.clear();
             this->marked_ = nullptr;
+#ifdef REDLINE_MEMORY
             this->redlined_flag_ = false;
+#endif
 
             if (recycle_head_bucket) {
                 this->hd_->clear();
@@ -291,7 +307,11 @@ namespace xo {
 
             std::string name = hd_->name() + "+exp";
 
-            std::unique_ptr<ArenaAlloc> new_alloc = ArenaAlloc::make(name, 0, cz, debug_flag_);
+            std::unique_ptr<ArenaAlloc> new_alloc = ArenaAlloc::make(name,
+#ifdef REDLINE_MEMORY
+                                                                     0,
+#endif
+                                                                     cz, debug_flag_);
 
             if (!new_alloc)
                 return false;
@@ -325,6 +345,7 @@ namespace xo {
             return nullptr;
         }
 
+#ifdef REDLINE_MEMORY
         void
         ListAlloc::release_redline_memory()
         {
@@ -333,6 +354,7 @@ namespace xo {
 
             this->hd_->release_redline_memory();
         }
+#endif
     } /*namespace gc*/
 } /*namespace xo*/
 

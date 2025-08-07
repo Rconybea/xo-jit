@@ -12,20 +12,37 @@
 
 namespace xo {
     namespace gc {
-        ArenaAlloc::ArenaAlloc(const std::string & name, std::size_t rz, std::size_t z, bool debug_flag)
+        ArenaAlloc::ArenaAlloc(const std::string & name,
+#ifdef REDLINE_MEMORY
+                               std::size_t rz,
+#endif
+                               std::size_t z, bool debug_flag)
         {
             this->name_       = name;
+#ifdef REDLINE_MEMORY
             this->lo_         = (new std::byte [rz + z]);
+#else
+            this->lo_         = (new std::byte [z]);
+#endif
             this->checkpoint_ = lo_;
             this->free_ptr_   = lo_;
             this->limit_      = lo_ + z;
+#ifdef REDLINE_MEMORY
             this->redline_z_  = rz;
             this->hi_         = limit_ + rz;
+#else
+            this->hi_         = limit_;
+#endif
             this->debug_flag_ = debug_flag;
 
             if (!lo_) {
+#ifdef REDLINE_MEMORY
                 throw std::runtime_error(tostr("ArenaAlloc: allocation failed",
                                                xtag("size", rz + z)));
+#else
+                throw std::runtime_error(tostr("ArenaAlloc: allocation failed",
+                                               xtag("size", z)));
+#endif
             }
         }
 
@@ -39,15 +56,25 @@ namespace xo {
             this->checkpoint_ = nullptr;
             this->free_ptr_ = nullptr;
             this->limit_ = nullptr;
+#ifdef REDLINE_MEMORY
             this->redline_z_ = 0;
+#endif
             this->hi_ = nullptr;
             this->debug_flag_ = false;
         }
 
         up<ArenaAlloc>
-        ArenaAlloc::make(const std::string & name, std::size_t rz, std::size_t z, bool debug_flag)
+        ArenaAlloc::make(const std::string & name,
+#ifdef REDLINE_MEMORY
+                         std::size_t rz,
+#endif
+                         std::size_t z, bool debug_flag)
         {
-            return up<ArenaAlloc>(new ArenaAlloc(name, rz, z, debug_flag));
+            return up<ArenaAlloc>(new ArenaAlloc(name,
+#ifdef REDLINE_MEMORY
+                                                 rz,
+#endif
+                                                 z, debug_flag));
         }
 
         void
@@ -144,7 +171,11 @@ namespace xo {
         ArenaAlloc::clear()
         {
             this->set_free_ptr(lo_);
+#ifdef REDLINE_MEMORY
             this->limit_ = hi_ - redline_z_;
+#else
+            this->limit_ = hi_;
+#endif
         }
 
         void
@@ -184,10 +215,12 @@ namespace xo {
             return retval;
         }
 
+#ifdef REDLINE_MEMORY
         void
         ArenaAlloc::release_redline_memory() {
             this->limit_ = this->hi_;
         }
+#endif
 
     } /*namespace gc*/
 } /*namespace xo*/

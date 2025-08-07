@@ -29,7 +29,9 @@ namespace xo {
             ListAlloc(std::unique_ptr<ArenaAlloc> hd,
                       ArenaAlloc * marked,
                       std::size_t cz, std::size_t nz, std::size_t tz,
+#ifdef REDLINE_MEMORY
                       bool use_redline,
+#endif
                       bool debug_flag);
             ~ListAlloc();
 
@@ -66,7 +68,9 @@ namespace xo {
             virtual void clear() final override;
             virtual void checkpoint() final override;
             virtual std::byte * alloc(std::size_t z) final override;
+#ifdef REDLINE_MEMORY
             virtual void release_redline_memory() final override;
+#endif
 
         private:
             /** **/
@@ -79,11 +83,16 @@ namespace xo {
              *  from trying to converge on app working set size
              **/
             std::list<std::unique_ptr<ArenaAlloc>> full_l_;
-            std::size_t current_z_ = 0;;
-            std::size_t next_z_ = 0;;
+            /** size of current arena @ref hd_ **/
+            std::size_t current_z_ = 0;
+            /** if @ref hd_ fills, size of next arena to allocate **/
+            std::size_t next_z_ = 0;
+            /** total size of @ref hd_ + contents of @ref full_l_ **/
             std::size_t total_z_ = 0;
+#ifdef REDLINE_MEMORY
             bool use_redline_ = false;
             bool redlined_flag_ = false;
+#endif
 
             /** true to enable debug logging **/
             bool debug_flag_ = false;
