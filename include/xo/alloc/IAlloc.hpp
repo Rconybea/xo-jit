@@ -31,10 +31,12 @@ namespace xo {
 
             /** optional name for this allocator; labelling for diagnostics **/
             virtual const std::string & name() const = 0;
-            /** allocator size in bytes (up to soft limit).
+            /** allocator size in bytes (up to reserved limit)
              *  Includes unallocated mmeory
              **/
             virtual std::size_t size() const = 0;
+            /** committed size in bytes **/
+            virtual std::size_t committed() const = 0;
             /** number of unallocated bytes available (up to soft limit)
              *  from this allocator
              **/

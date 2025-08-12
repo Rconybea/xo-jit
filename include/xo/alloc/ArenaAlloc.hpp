@@ -24,6 +24,8 @@ namespace xo {
          **/
         class ArenaAlloc : public IAlloc {
         public:
+            ArenaAlloc(const ArenaAlloc &) = delete;
+            ArenaAlloc(ArenaAlloc &&) = delete;
             ~ArenaAlloc();
 
             /** create allocator with capacity @p z,
@@ -38,10 +40,14 @@ namespace xo {
             void capture_object_statistics(capture_phase phase,
                                            ObjectStatistics * p_dest) const;
 
+            /** expand available (i.e. committed) space to size @p z **/
+            bool expand(std::size_t z);
+
             // inherited from IAlloc...
 
             virtual const std::string & name() const final override;
             virtual std::size_t size() const final override;
+            virtual std::size_t committed() const final override;
             virtual std::size_t available() const final override;
             virtual std::size_t allocated() const final override;
             virtual bool contains(const void * x) const final override;
@@ -53,6 +59,9 @@ namespace xo {
             virtual void clear() final override;
             virtual void checkpoint() final override;
             virtual std::byte * alloc(std::size_t z) final override;
+
+            ArenaAlloc & operator=(const ArenaAlloc &) = delete;
+            ArenaAlloc & operator=(ArenaAlloc &&) = delete;
 
         private:
             ArenaAlloc(const std::string & name,
@@ -67,8 +76,15 @@ namespace xo {
             /** optional instance name, for diagnostics **/
             std::string name_;
 
+            /** size of a VM page **/
+            std::size_t page_z_;
+
             /** allocator owns memory in range [@ref lo_, @ref hi_) **/
             std::byte * lo_ = nullptr;
+            /** prefix of this size is actually committed.
+             *  Remainder uses uncommitted virtual address space
+             **/
+            std::size_t committed_z_ = 0;
             /** checkpoint (for GC support); divides objects into
              *  older (addresses below checkpoint)
              *  and younger (addresses above checkpoint)
@@ -76,9 +92,9 @@ namespace xo {
             std::byte * checkpoint_;
             /** free pointer. memory in range [@ref free_, @ref limit_) available **/
             std::byte * free_ptr_ = nullptr;
-            /** soft limit: end of released memory **/
+            /** soft limit: end of committed virtual memory **/
             std::byte * limit_ = nullptr;
-            /** hard limit: end of allocated memory **/
+            /** hard limit: end of reserved virtual memory **/
             std::byte * hi_ = nullptr;
             /** true to enable detailed debug logging **/
             bool debug_flag_ = false;

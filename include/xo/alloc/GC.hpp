@@ -164,7 +164,8 @@ namespace xo {
              *  since one role is always held empty between collections.
              **/
             virtual std::size_t size() const final override;
-
+            /** for committed count both to-space and from-space **/
+            virtual std::size_t committed() const final override;
             virtual std::size_t allocated() const final override;
             virtual std::size_t available() const final override;
             /** only tests to-space **/
@@ -194,10 +195,6 @@ namespace xo {
             virtual std::byte * alloc(std::size_t z) final override;
             virtual std::byte * alloc_gc_copy(std::size_t z, const void * src) final override;
 
-#ifdef REDLINE_MEMORY
-            virtual void release_redline_memory() final override;
-#endif
-
         private:
             ListAlloc * nursery_to() const { return nursery(role::to_space); }
             ListAlloc * nursery_from() const { return nursery(role::from_space); }
@@ -207,6 +204,8 @@ namespace xo {
 
             ListAlloc * nursery(role r) const { return nursery_[role2int(r)].get(); }
             ListAlloc * tenured(role r) const { return tenured_[role2int(r)].get(); }
+
+            MutationLog * mutation_log(role r) const { return mutation_log_[role2int(r)].get(); }
 
             /** begin GC now **/
             void execute_gc(generation g);

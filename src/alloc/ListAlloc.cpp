@@ -75,6 +75,17 @@ namespace xo {
             return total_z_;
         }
 
+        std::size_t
+        ListAlloc::committed() const {
+            std::size_t z = 0;
+            if (hd_)
+                z += hd_->committed();
+            for (const auto & a : full_l_)
+                z += a->committed();
+
+            return z;
+        }
+
         std::byte *
         ListAlloc::free_ptr() const {
             return hd_->free_ptr();

@@ -115,7 +115,16 @@ namespace xo {
         std::size_t
         GC::size() const
         {
-            return nursery_[role2int(role::to_space)]->size() + tenured_[role2int(role::to_space)]->size();
+            return nursery_to()->size() + tenured_to()->size();
+        }
+
+        std::size_t
+        GC::committed() const
+        {
+            return (nursery_to()->committed()
+                    + nursery_from()->committed()
+                    + tenured_to()->committed()
+                    + tenured_from()->committed());
         }
 
         std::size_t
@@ -180,6 +189,12 @@ namespace xo {
             retval.tenured_z_ = tenured_[role2int(role::to_space)]->size();
 
             return retval;
+        }
+
+        std::size_t
+        GC::nursery_to_committed() const
+        {
+            return nursery_to()->committed();
         }
 
         generation_result

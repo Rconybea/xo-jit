@@ -55,6 +55,7 @@ namespace xo {
 
             virtual const std::string & name() const final override;
             virtual std::size_t size() const final override;
+            virtual std::size_t committed() const final override;
             virtual std::size_t available() const final override;
             virtual std::size_t allocated() const final override;
             virtual bool contains(const void * x) const final override;
