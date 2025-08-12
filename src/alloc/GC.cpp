@@ -289,6 +289,12 @@ namespace xo {
             gc_root_v_.push_back(addr);
         }
 
+        auto
+        GC::add_gc_copy_callback(up<GcCopyCallback> fn) -> CallbackId
+        {
+            return gc_copy_cbset_.add_callback(std::move(fn));
+        }
+
         void
         GC::checkpoint()
         {
@@ -322,16 +328,19 @@ namespace xo {
         {
             scope log(XO_DEBUG(config_.debug_flag_), xtag("z", z), xtag("+pad", IAlloc::alloc_padding(z)));
 
-            generation_result gr = this->fromspace_generation_of(src);
+            generation_result src_gr = this->fromspace_generation_of(src);
 
             std::byte * retval = nullptr;
 
-            switch (gr) {
+            switch (src_gr) {
             case generation_result::tenured:
                 {
                     log && log("tenured");
 
                     retval = this->tenured_to()->alloc(z);
+
+                    gc_copy_cbset_.invoke(&GcCopyCallback::notify_gc_copy,
+                                          z, src, retval, generation::tenured, generation::tenured);
                 }
                 break;
             case generation_result::nursery:
@@ -347,11 +356,18 @@ namespace xo {
 
                         assert(this->tospace_generation_of(retval) == generation_result::tenured);
 
+                        gc_copy_cbset_.invoke(&GcCopyCallback::notify_gc_copy,
+                                              z, src, retval, generation::nursery, generation::tenured);
+
                         this->gc_statistics_.total_promoted_ += IAlloc::with_padding(z);
+
                     } else {
                         log && log("nursery");
 
                         retval = this->nursery_to()->alloc(z);
+
+                        gc_copy_cbset_.invoke(&GcCopyCallback::notify_gc_copy,
+                                              z, src, retval, generation::nursery, generation::nursery);
                     }
                 }
                 break;

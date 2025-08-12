@@ -7,6 +7,7 @@
 
 #include "ListAlloc.hpp"
 #include "GcStatistics.hpp"
+#include "xo/callback/UpCallbackSet.hpp"
 #include "xo/indentlog/print/array.hpp"
 #include <vector>
 #include <array>
@@ -105,12 +106,31 @@ namespace xo {
 
         using MutationLog = std::vector<MutationLogEntry>;
 
+        /** @class GcCopyCallback
+         *  @brief optional callback to observe individual copy operations during GC
+         *
+         *  For viz
+         **/
+        class GcCopyCallback {
+        public:
+            virtual void notify_gc_copy(std::size_t z, const void * src_addr, const void * dest_addr,
+                                        generation src_gen, generation dest_gen) = 0;
+            /** invoked when added to callback set (i.e. @ref GC::GcCopyCallbackSet) **/
+            void notify_add_callback() {}
+            /** invoked when removed from callback set **/
+            void notify_remove_callback() {}
+        };
+
         /** @class GC
          *  @brief generational garbage collector
          *
          *  Works with objects of type @ref xo::Object
          **/
         class GC : public IAlloc {
+        public:
+            using CallbackId = xo::fn::CallbackId;
+            using GcCopyCallbackSet = xo::fn::UpCallbackSet<GcCopyCallback>;
+
         public:
             /** create new GC instance with configuration @p config **/
             explicit GC(const Config & config);
@@ -160,6 +180,11 @@ namespace xo {
              *  from @c *addr
              **/
             void add_gc_root(Object ** addr);
+            /** may optionally use this to observe GC copy phase.
+             *  Will be invoked once _per surviving object_, so not cheap.
+             *  Intended for GC visualization.
+             **/
+            CallbackId add_gc_copy_callback(up<GcCopyCallback> fn);
             /** request garbage collection. **/
             void request_gc(generation g);
             /** disable garbage collection until matching call to @ref enable_gc.
@@ -335,6 +360,9 @@ namespace xo {
 
             /** enabled when 0.  disabled when <0 **/
             int gc_enabled_ = 0;
+
+            /** for (optional) viz: invoke when copying individual objects **/
+            GcCopyCallbackSet gc_copy_cbset_;
         };
     } /*namespace gc*/
 
