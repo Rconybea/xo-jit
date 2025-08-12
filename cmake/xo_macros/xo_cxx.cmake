@@ -69,6 +69,7 @@ macro(xo_cxx_toplevel_options3)
     xo_toplevel_config2()
 endmacro()
 
+# deprecated, I think?
 macro(xo_toplevel_testing_options)
     enable_testing()
     add_code_coverage()
@@ -1358,6 +1359,7 @@ endmacro()
 #
 macro(xo_external_target_dependency target pkg pkgtarget)
     message("-- [${target}] find_package(${pkg}) (xo_external_target_dependency)")
+    # CONFIG: insist on a ${target}Config.cmake or ${pkgtarget}-config.cmake file
     find_package(${pkg} CONFIG REQUIRED)
     target_link_libraries(${target} PUBLIC ${pkgtarget})
     #target_link_libraries(${target} ${pkgtarget})
@@ -1367,6 +1369,21 @@ endmacro()
 #
 macro(xo_external_dependency target pkg)
     xo_external_target_dependency(${target} ${pkg} ${target})
+endmacro()
+
+# Dependency on external (non-XO) target that provides pkgconfig support.
+# Can use this when external package doesn't provide cmake integration.
+#
+# For example:
+#    xo_external_pkgconfig_dependency(${MYAPP} IMGUI imgui)
+#
+macro(xo_external_pkgconfig_dependency target prefix pkg)
+    message("-- [${target}] invoke pkgconfig for [${pkg}] config (xo_external_pkgconfig_dependency)")
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(${prefix} REQUIRED ${pkg})
+    target_link_libraries(${target} PUBLIC ${${prefix}_LIBRARIES})
+    target_include_directories(${target} PUBLIC ${${prefix}_INCLUDE_DIRS})
+    target_compile_options(${target} PUBLIC ${${prefix}_CFLAGS_OTHER})
 endmacro()
 
 # dependency on target provided from this codebase.
