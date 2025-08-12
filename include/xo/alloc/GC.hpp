@@ -40,6 +40,11 @@ namespace xo {
              *  Will allocate more space as needed
              **/
             std::size_t initial_tenured_z_ = 0;
+            /** trigger incremental GC after this many bytes allocated in nursery **/
+            std::size_t incr_gc_threshold_ = 64*1024;
+            /** trigger full GC after this many bytes promoted to tenured **/
+            std::size_t full_gc_threshold_ = 512*1024;
+
             /** true to permit incremental garbage collection **/
             bool allow_incremental_gc_ = true;
             /** true to report statistics **/
@@ -118,6 +123,7 @@ namespace xo {
              **/
             static up<GC> make(const Config & config);
 
+            const Config & config() const { return config_; }
             const GCRunstate & runstate() const { return runstate_; }
             const GcStatistics & native_gc_statistics() const { return gc_statistics_; }
             GcStatisticsExt get_gc_statistics() const;
@@ -126,6 +132,19 @@ namespace xo {
             bool is_gc_enabled() const { return gc_enabled_ == 0; }
             /** true during (and only during) a GC cycle **/
             bool gc_in_progress() const { return runstate_.in_progress(); }
+            /** @return committed size of Nursery to-space **/
+            std::size_t nursery_to_committed() const;
+            /** @return nursery bytes used before checkpoint **/
+            std::size_t nursery_before_checkpoint() const;
+            /** @return nursery bytes used after checkpoint **/
+            std::size_t nursery_after_checkpoint() const;
+            /** @return committed size of Tenured to-space **/
+            std::size_t tenured_to_committed() const;
+            /** @return tenured bytes used before checkpoint **/
+            std::size_t tenured_before_checkpoint() const;
+            /** @return tenured bytes used after checkpoint = promoted since last GC **/
+            std::size_t tenured_after_checkpoint() const;
+
             /** @return generation to which object at @p x belongs **/
             generation_result tospace_generation_of(const void * x) const;
             /** @return generation that contains @p x, given it's in from-space **/
@@ -232,7 +251,6 @@ namespace xo {
              *  (T->N, aka xgen) and (N1->N0, aka xckp) pointers
              **/
             void incremental_gc_forward_mlog(ObjectStatistics * per_type_stats);
-
             /**
              *  Aux function for @ref incremental_gc_forward_mlog.  Calls this function until
              *  fixpoint.
@@ -246,6 +264,23 @@ namespace xo {
                                                    MutationLog * to_mlog,
                                                    MutationLog * defer_mlog,
                                                    ObjectStatistics * per_type_stats);
+            /** Aux function for @ref execute_gc.  Updates bookkeeping for cross-generational
+             *  (T->N, aka xgen) and (N1->N0, aka xckcp) pointers on full gc
+             **/
+            void full_gc_forward_mlog(ObjectStatistics * per_type_stats);
+            /**
+             *  Aux function for @ref full_gc_forward_mlog.  Calls this function until fixpoint.
+             *
+             *  @param from_mlog incoming mutation log. Contains {xgen,xckp} pointers before GC.
+             *  Contents of this log is consumed (+discarded) before method returns.
+             *  @param to_mlog    outgoing mutation log. Will contain {xgen,xckp} pointers after GC.
+             *  @param defer_mlog contains log entries associated with possible garbage.
+             *
+             **/
+            void full_gc_forward_mlog_phase(MutationLog * from_mlog,
+                                            MutationLog * to_mlog,
+                                            MutationLog * defer_mlog,
+                                            ObjectStatistics * per_type_stats);
 
         private:
             /** garbage collector configuration **/
@@ -291,11 +326,6 @@ namespace xo {
             std::array<ObjectStatistics, gen2int(generation::N)> object_statistics_sab_;
             /** optional per-object-type counters. snapshot at end of collection cycle **/
             std::array<ObjectStatistics, gen2int(generation::N)> object_statistics_sae_;
-
-            /** trigger full GC whenever this much data arrives in tenured generation **/
-            std::size_t full_gc_threshold_ = 0;
-            /** trigger incr GC whenever this much data arrives in nuresery generation **/
-            std::size_t incr_gc_threshold_ = 0;
 
             /** true when GC requested,
              *  remains true until GC.. completes? begins?
