@@ -28,14 +28,19 @@ namespace xo {
             ArenaAlloc(ArenaAlloc &&) = delete;
             ~ArenaAlloc();
 
-            /** create allocator with capacity @p z,
+            /** Create allocator with capacity @p z,
+             *  Reserve memory addresses for @p z bytes,
+             *  but don't commit them until needed
              **/
             static up<ArenaAlloc> make(const std::string & name,
-                                        std::size_t z,
-                                        bool debug_flag);
+                                       std::size_t z,
+                                       bool debug_flag);
 
             std::byte * free_ptr() const { return free_ptr_; }
             void       set_free_ptr(std::byte * x);
+
+            /** Reset to empty state **/
+            void reset(std::size_t /*z_ignored*/) { this->clear(); }
 
             void capture_object_statistics(capture_phase phase,
                                            ObjectStatistics * p_dest) const;

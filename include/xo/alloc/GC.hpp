@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ListAlloc.hpp"
+#include "ArenaAlloc.hpp"
 #include "GcStatistics.hpp"
 #include "xo/callback/UpCallbackSet.hpp"
 #include "xo/indentlog/print/array.hpp"
@@ -240,14 +240,14 @@ namespace xo {
             virtual std::byte * alloc_gc_copy(std::size_t z, const void * src) final override;
 
         private:
-            ListAlloc * nursery_to() const { return nursery(role::to_space); }
-            ListAlloc * nursery_from() const { return nursery(role::from_space); }
+            ArenaAlloc * nursery_to() const { return nursery(role::to_space); }
+            ArenaAlloc * nursery_from() const { return nursery(role::from_space); }
 
-            ListAlloc * tenured_to() const { return tenured(role::to_space); }
-            ListAlloc * tenured_from() const { return tenured(role::from_space); }
+            ArenaAlloc * tenured_to() const { return tenured(role::to_space); }
+            ArenaAlloc * tenured_from() const { return tenured(role::from_space); }
 
-            ListAlloc * nursery(role r) const { return nursery_[role2int(r)].get(); }
-            ListAlloc * tenured(role r) const { return tenured_[role2int(r)].get(); }
+            ArenaAlloc * nursery(role r) const { return nursery_[role2int(r)].get(); }
+            ArenaAlloc * tenured(role r) const { return tenured_[role2int(r)].get(); }
 
             MutationLog * mutation_log(role r) const { return mutation_log_[role2int(r)].get(); }
 
@@ -314,11 +314,11 @@ namespace xo {
             /** contains allocated objects, along with unreachable garbage to be collected.
              *  roles reverse after each incremental, or full, collection.
              **/
-            std::array<up<ListAlloc>, role2int(role::N)> nursery_;
+            std::array<up<ArenaAlloc>, role2int(role::N)> nursery_;
             /** empty space, destination for objects that survive collection.
              *  roles reverse after each full collection.
              **/
-            std::array<up<ListAlloc>, role2int(role::N)> tenured_;
+            std::array<up<ArenaAlloc>, role2int(role::N)> tenured_;
 
             /** current state of GC activity.
              *  @text

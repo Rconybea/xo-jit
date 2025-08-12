@@ -66,14 +66,14 @@ namespace xo {
             std::size_t tenured_size = config.initial_tenured_z_;
 
             nursery_[role2int(role::from_space)]
-                = ListAlloc::make("NA", nursery_size, 2 * nursery_size, config.debug_flag_);
+                = ArenaAlloc::make("NA", nursery_size, config.debug_flag_);
             nursery_[role2int(role::to_space)  ]
-                = ListAlloc::make("NB", nursery_size, 2 * nursery_size, config.debug_flag_);
+                = ArenaAlloc::make("NB", nursery_size, config.debug_flag_);
 
             tenured_[role2int(role::from_space)]
-                = ListAlloc::make("TA", tenured_size, 2 * tenured_size, config.debug_flag_);
+                = ArenaAlloc::make("TA", tenured_size, config.debug_flag_);
             tenured_[role2int(role::to_space)  ]
-                = ListAlloc::make("TB", tenured_size, 2 * tenured_size, config.debug_flag_);
+                = ArenaAlloc::make("TB", tenured_size, config.debug_flag_);
 
             mutation_log_[role2int(role::from_space)] = std::make_unique<MutationLog>();
             mutation_log_[role2int(role::to_space)] = std::make_unique<MutationLog>();
@@ -444,7 +444,7 @@ namespace xo {
         void
         GC::swap_nursery()
         {
-            up<ListAlloc> tmp = std::move(nursery_[role2int(role::to_space)]);
+            up<ArenaAlloc> tmp = std::move(nursery_[role2int(role::to_space)]);
             nursery_[role2int(role::to_space)] = std::move(nursery_[role2int(role::from_space)]);
             nursery_[role2int(role::from_space)] = std::move(tmp);
         }
@@ -452,7 +452,7 @@ namespace xo {
         void
         GC::swap_tenured()
         {
-            up<ListAlloc> tmp = std::move(tenured_[role2int(role::to_space)]);
+            up<ArenaAlloc> tmp = std::move(tenured_[role2int(role::to_space)]);
             tenured_[role2int(role::to_space)] = std::move(tenured_[role2int(role::from_space)]);
             tenured_[role2int(role::from_space)] = std::move(tmp);
         }
@@ -496,9 +496,9 @@ namespace xo {
                 log && log(xtag("avail_tenured_z", avail_tenured_z));
 
                 if (avail_tenured_z < max_promote_z) {
-                    ListAlloc * tenured_to = this->tenured_to();
+                    ArenaAlloc * tenured_to = this->tenured_to();
 
-                    tenured_to->expand(max_promote_z, tenured_to->name() + "+");
+                    tenured_to->expand(max_promote_z);
                 }
             }
 
@@ -516,13 +516,13 @@ namespace xo {
 
             this->swap_mutation_log();
 
-            ListAlloc * N_from = nursery(role::from_space);
+            ArenaAlloc * N_from = nursery(role::from_space);
             log && log(xtag("nursery.from", N_from->name()), xtag("size", N_from->size()));
-            ListAlloc * N_to = nursery(role::to_space);
+            ArenaAlloc * N_to = nursery(role::to_space);
             log && log(xtag("nursery.to",   N_to->name()), xtag("size", N_to->size()));
-            ListAlloc * T_from = tenured(role::from_space);
+            ArenaAlloc * T_from = tenured(role::from_space);
             log && log(xtag("tenured.from", T_from->name()), xtag("size", T_from->size()));
-            ListAlloc * T_to = tenured(role::to_space);
+            ArenaAlloc * T_to = tenured(role::to_space);
             log && log(xtag("tenured.to", T_to->name()), xtag("size", T_to->size()));
 
         } /*swap_spaces*/
