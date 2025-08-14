@@ -76,7 +76,7 @@ namespace xo {
 
             tag_config::tag_color_enabled = false;
 
-            GcStatisticsExt stats({});
+            GcStatisticsExt stats;
 
             std::string s = tostr(stats);
 
@@ -154,7 +154,7 @@ namespace xo {
 
             std::stringstream ss;
             ppconfig ppc;
-            GcStatisticsExt stats({});
+            GcStatisticsExt stats;
 
             std::string actual = toppstr2(ppc, stats);
             std::string expected

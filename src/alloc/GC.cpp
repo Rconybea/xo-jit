@@ -79,6 +79,8 @@ namespace xo {
             mutation_log_[role2int(role::to_space)] = std::make_unique<MutationLog>();
             defer_mutation_log_ = std::make_unique<MutationLog>();
 
+            this->gc_history_ = CircularBuffer<GcStatisticsHistoryItem>(config.stats_history_z_);
+
             this->checkpoint();
         }
 
@@ -192,6 +194,12 @@ namespace xo {
         }
 
         std::size_t
+        GC::nursery_to_reserved() const
+        {
+            return nursery_to()->reserved();
+        }
+
+        std::size_t
         GC::nursery_to_committed() const
         {
             return nursery_to()->committed();
@@ -207,6 +215,17 @@ namespace xo {
         GC::nursery_after_checkpoint() const
         {
             return nursery_to()->after_checkpoint();
+        }
+
+        std::pair<const std::byte *, const std::byte *>
+        GC::nursery_span(role role) const {
+            return nursery(role)->allocated_span();
+        }
+
+        std::size_t
+        GC::tenured_to_reserved() const
+        {
+            return tenured_to()->reserved();
         }
 
         std::size_t
@@ -237,6 +256,40 @@ namespace xo {
                 return generation_result::nursery;
 
             return generation_result::not_found;
+        }
+
+        std::tuple<generation_result, std::size_t, std::size_t>
+        GC::location_of(role role, const void *x) const
+        {
+            {
+                auto space = this->tenured(role);
+                auto [is_tenured, offset] = space->location_of(x);
+
+                if (is_tenured)
+                    return std::make_tuple(generation_result::tenured, offset, space->allocated());
+            }
+
+            {
+                auto space = this->nursery(role);
+                auto [is_nursery, offset] = nursery(role)->location_of(x);
+
+                if (is_nursery)
+                    return std::make_tuple(generation_result::nursery, offset, space->allocated());
+            }
+
+            return std::make_tuple(generation_result::not_found, 0, 0);
+        }
+
+        std::tuple<generation_result, std::size_t, std::size_t>
+        GC::tospace_location_of(const void * x) const
+        {
+            return location_of(role::to_space, x);
+        }
+
+        std::tuple<generation_result, std::size_t, std::size_t>
+        GC::fromspace_location_of(const void * x) const
+        {
+            return location_of(role::from_space, x);
         }
 
         generation_result
@@ -988,8 +1041,11 @@ namespace xo {
         {
             scope log(XO_DEBUG(config_.debug_flag_));
 
-            std::size_t N_allocated = nursery_from()->after_checkpoint();
-            std::size_t T_allocated = tenured_from()->after_checkpoint();
+            std::size_t N0_before_gc = nursery_from()->after_checkpoint();
+            std::size_t N1_before_gc = nursery_from()->before_checkpoint();
+
+            std::size_t T0_before_gc = tenured_from()->after_checkpoint();
+            std::size_t T1_before_gc = tenured_from()->before_checkpoint();
 
             std::size_t N_before_gc = nursery_from()->allocated();
             std::size_t T_before_gc = tenured_from()->allocated();
@@ -998,8 +1054,36 @@ namespace xo {
             std::size_t T_after_gc = tenured_to()->allocated();
             //std::byte * N_free_ptr = nursery_[role2int(role::to_space)]->free_ptr();
 
+            std::size_t new_alloc_z = N0_before_gc;
+            /* survive_z: bytes surviving first collection */
+            std::size_t survive_z = N_after_gc;
+            /* promote_z: bytes surviving 2nd collection */
             std::size_t promote_z = (gc_statistics_.total_promoted_
                                      - gc_statistics_.total_promoted_sab_);
+
+            /* #of bytes copied by this collection cycle */
+            std::size_t effort_z = 0;
+            if (upto == generation::nursery) {
+                effort_z = N_after_gc + promote_z;
+            } else {
+                effort_z += N_after_gc + T_after_gc;
+            }
+
+            /* persist_z: bytes surviving 3rd or later collection */
+            std::size_t persist_z = 0;
+            if (upto == generation::tenured)
+                persist_z = T_after_gc - promote_z;
+            /* #of bytes found to be garbage on first collection
+             * (reminder: N_after_gc consists *entirely* of survives from N0_before_gc;
+             *            + all such survivors are in N_after_gc)
+             */
+            std::size_t garbage0_z = (N0_before_gc - N_after_gc);
+            /* #of bytes found to be garbage on 2nd collection */
+            std::size_t garbage1_z = (N1_before_gc - promote_z);
+            /* #of bytes found to be garbage on 3rd or later collection */
+            std::size_t garbageN_z = 0;
+            if (upto == generation::tenured)
+                garbageN_z = (T_before_gc - T_after_gc + promote_z);
 
             /* Don't reset from-space here, it's unnecessary.
              * Would be permissible, but interferes with GC object modelling in
@@ -1014,25 +1098,38 @@ namespace xo {
                 this->tenured_to()->checkpoint();
 
             if (log) {
-                log(xtag("N_allocated", N_allocated));
-                log(xtag("N_before_gc", N_before_gc));
+                log(xtag("N0_before_gc", N0_before_gc));
+                log(xtag("N1_before_gc", N1_before_gc));
                 log(xtag("N_after_gc", N_after_gc));
-                log(xtag("T_allocated", T_allocated));
-                log(xtag("T_before_gc", T_before_gc));
+
+                log(xtag("T0_before_gc", T0_before_gc));
+                log(xtag("T1_before_gc", T1_before_gc));
                 log(xtag("T_after_gc", T_after_gc));
             }
 
+            GcStatisticsHistoryItem item(upto,
+                                         new_alloc_z,
+                                         survive_z,
+                                         promote_z,
+                                         persist_z,
+                                         effort_z,
+                                         garbage0_z,
+                                         garbage1_z,
+                                         garbageN_z);
+
+            this->gc_history_.push_back(item);
+
             this->incr_gc_pending_ = false;
-            this->gc_statistics_.include_gc(generation::nursery, N_allocated, N_before_gc, N_after_gc, promote_z);
+            this->gc_statistics_.include_gc(generation::nursery, N0_before_gc, N_before_gc, N_after_gc, promote_z);
 
             if (upto == generation::tenured) {
                 this->full_gc_pending_ = false;
-                this->gc_statistics_.include_gc(generation::tenured, T_allocated, T_before_gc, T_after_gc, 0);
+                this->gc_statistics_.include_gc(generation::tenured, T0_before_gc, T_before_gc, T_after_gc, 0);
             } else {
                 // still want to update tenured stats for current alloc size
                 this->gc_statistics_.update_snapshot(generation::tenured, T_after_gc);
             }
-        }
+        } /*cleanup_phase*/
 
         void
         GC::execute_gc(generation upto)
@@ -1089,6 +1186,9 @@ namespace xo {
             log && log(refrtag("stats", object_statistics_sab_[gen2int(generation::tenured)]));
 
             this->runstate_ = GCRunstate();
+
+            // not this way.. reports cumulative stats
+            //   this->gc_history_.push_back(this->get_gc_statistics());
 
             log && log("statistics:");
             log && log(gc_statistics_);

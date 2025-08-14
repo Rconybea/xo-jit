@@ -34,6 +34,9 @@ namespace xo {
 
             static up<ListAlloc> make(const std::string & name, std::size_t cz, std::size_t nz, bool debug_flag);
 
+            /** page size used by underlying ArenaAlloc **/
+            std::size_t page_size() const;
+
             /** reset to have at least @p z bytes of storage **/
             bool reset(std::size_t z);
 

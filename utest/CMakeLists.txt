@@ -12,6 +12,7 @@ set(UTEST_SRCS
     GcStatistics.test.cpp
     ObjectStatistics.test.cpp
     Forwarding1.test.cpp
+    CircularBuffer.test.cpp
     generation.test.cpp
 )
 

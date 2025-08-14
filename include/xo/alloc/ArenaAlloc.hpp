@@ -36,8 +36,23 @@ namespace xo {
                                        std::size_t z,
                                        bool debug_flag);
 
+            /** size of virtual address range reserved for this allocator **/
+            std::size_t reserved() const { return this->size(); }
+
+            std::size_t page_size() const { return page_z_; }
             std::byte * free_ptr() const { return free_ptr_; }
             void       set_free_ptr(std::byte * x);
+
+            /** if address @p x is allocated from this arena,
+             *  return true along with offset relative to base address @ref lo_
+             *  otherwise return false with 0
+             **/
+            std::pair<bool, std::size_t> location_of(const void * x) const;
+
+            /** allocated span **/
+            std::pair<const std::byte *, const std::byte *> allocated_span() const {
+                return std::make_pair(lo_, free_ptr_);
+            }
 
             /** Reset to empty state **/
             void reset(std::size_t /*z_ignored*/) { this->clear(); }

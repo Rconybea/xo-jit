@@ -30,6 +30,7 @@ namespace xo {
             tenured,
             not_found
         };
+
     } /*namespace gc*/
 } /*namespace xo*/
 

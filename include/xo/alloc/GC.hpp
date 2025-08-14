@@ -50,6 +50,8 @@ namespace xo {
             bool allow_incremental_gc_ = true;
             /** true to report statistics **/
             bool stats_flag_ = false;
+            /** remember basic gc statistics for this many GC's; separately for incremental + full GCs **/
+            std::size_t stats_history_z_ = 256;
             /** true to enable debug logging **/
             bool debug_flag_ = false;
         };
@@ -147,17 +149,24 @@ namespace xo {
             const GCRunstate & runstate() const { return runstate_; }
             const GcStatistics & native_gc_statistics() const { return gc_statistics_; }
             GcStatisticsExt get_gc_statistics() const;
+            const GcStatisticsHistory & gc_history() const { return gc_history_; }
 
             /** true iff GC permitted in current state **/
             bool is_gc_enabled() const { return gc_enabled_ == 0; }
             /** true during (and only during) a GC cycle **/
             bool gc_in_progress() const { return runstate_.in_progress(); }
+            /** @return reserved size of Nursery to-space **/
+            std::size_t nursery_to_reserved() const;
             /** @return committed size of Nursery to-space **/
             std::size_t nursery_to_committed() const;
             /** @return nursery bytes used before checkpoint **/
             std::size_t nursery_before_checkpoint() const;
             /** @return nursery bytes used after checkpoint **/
             std::size_t nursery_after_checkpoint() const;
+            /** @return allocated memory range for nursery **/
+            std::pair<const std::byte *, const std::byte *> nursery_span(role role) const;
+            /** @return reserved size of Tenured to-space **/
+            std::size_t tenured_to_reserved() const;
             /** @return committed size of Tenured to-space **/
             std::size_t tenured_to_committed() const;
             /** @return tenured bytes used before checkpoint **/
@@ -167,8 +176,24 @@ namespace xo {
 
             /** @return generation to which object at @p x belongs **/
             generation_result tospace_generation_of(const void * x) const;
+            /** @return generation to which object at @p x belongs,
+             *          location relative to base address for that generation,
+             *          and allocated size of that generation
+             *          @p role chooses between to-space and from-space
+             **/
+            std::tuple<generation_result, std::size_t, std::size_t> location_of(role role, const void * x) const;
+            /** @return generation to which object at @p x belongs,
+             *          location relative to base address for @p x,
+             *          and allocated size of generation
+             **/
+            std::tuple<generation_result,std::size_t,std::size_t> tospace_location_of(const void * x) const;
             /** @return generation that contains @p x, given it's in from-space **/
             generation_result fromspace_generation_of(const void * x) const;
+            /** @return generation to which object at @p x belongs,
+             *          location relative to base address for @p x,
+             *          and allocated size of generation
+             **/
+            std::tuple<generation_result,std::size_t,std::size_t> fromspace_location_of(const void * x) const;
             /** true iff from-space contains @p x **/
             bool fromspace_contains(const void * x) const;
             /** @return free pointer for generation @p gen, i.e. nursery or tenured space **/
@@ -360,6 +385,9 @@ namespace xo {
 
             /** enabled when 0.  disabled when <0 **/
             int gc_enabled_ = 0;
+
+            /** rotating per-gc statistics history **/
+            GcStatisticsHistory gc_history_;
 
             /** for (optional) viz: invoke when copying individual objects **/
             GcCopyCallbackSet gc_copy_cbset_;

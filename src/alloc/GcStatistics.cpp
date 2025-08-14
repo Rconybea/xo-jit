@@ -92,6 +92,22 @@ namespace xo {
                 // << xtag("per_type_stats", per_type_stats_)
                << ">";
         }
+
+        void
+        GcStatisticsHistoryItem::display(std::ostream & os) const
+        {
+            os << "<GcStatisticsHistoryItem"
+               << xrtag("upto", upto_)
+               << xrtag("survive_z", survive_z_)
+               << xrtag("promote_z", promote_z_)
+               << xrtag("persist_z", persist_z_)
+               << xrtag("effort_z", effort_z_)
+               << xrtag("garbage0_z", garbage0_z_)
+               << xrtag("garbage1_z", garbage1_z_)
+               << xrtag("garbageN_z", garbageN_z_)
+               << ">";
+        }
+
     } /*namespace gc*/
 
     namespace print {
@@ -148,7 +164,21 @@ namespace xo {
                                              refrtag("tenured_z", x.tenured_z_));
         }
 
-
+        bool
+        ppdetail<xo::gc::GcStatisticsHistoryItem>::print_pretty(const ppindentinfo & ppii,
+                                                                const xo::gc::GcStatisticsHistoryItem & x)
+        {
+            return ppii.pps()->pretty_struct(ppii,
+                                             "GcStatisticsHistoryItem",
+                                             refrtag("upto", gen2str(x.upto_)),
+                                             refrtag("survive_z", x.survive_z_),
+                                             refrtag("promote_z", x.promote_z_),
+                                             refrtag("persist_z", x.persist_z_),
+                                             refrtag("effort_z", x.effort_z_),
+                                             refrtag("garbage0_z", x.garbage0_z_),
+                                             refrtag("garbage1_z", x.garbage1_z_),
+                                             refrtag("garbageN_z", x.garbageN_z_));
+        }
     } /*namespace print*/
 } /*namespace xo*/
 

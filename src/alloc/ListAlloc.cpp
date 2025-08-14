@@ -71,6 +71,11 @@ namespace xo {
         }
 
         std::size_t
+        ListAlloc::page_size() const {
+            return hd_->page_size();
+        }
+
+        std::size_t
         ListAlloc::size() const {
             return total_z_;
         }
@@ -109,8 +114,9 @@ namespace xo {
         ListAlloc::allocated() const {
             std::size_t total = 0;
 
-            if (hd_)
+            if (hd_) {
                 total += hd_->allocated();
+            }
 
             for (const auto & alloc : full_l_)
                 total += alloc->allocated();
@@ -363,10 +369,17 @@ namespace xo {
         ListAlloc::alloc(std::size_t z) {
             scope log(XO_DEBUG(debug_flag_));
 
+            /* ArenaAlloc::alloc() may modify its own size */
+
+            std::size_t z_pre = hd_->size();
             std::byte * retval = hd_->alloc(z);
 
-            if (retval)
+            if (retval) {
+                std::size_t z_post = hd_->size();
+                this->total_z_ += (z_post - z_pre);
+
                 return retval;
+            }
 
             log && log("space exhausted -> expand");
 

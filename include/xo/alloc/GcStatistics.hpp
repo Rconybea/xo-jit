@@ -6,6 +6,7 @@
 #pragma once
 
 #include "generation.hpp"
+#include "CircularBuffer.hpp"
 #include "xo/reflect/TypeDescr.hpp"
 #include "xo/indentlog/print/pretty.hpp"
 #include <ostream>
@@ -57,6 +58,8 @@ namespace xo {
          **/
         class GcStatistics {
         public:
+            GcStatistics() = default;
+
             /** update statistics after a GC cycle
              *  @param upto.      nursery -> incremental collection; tenured -> full collection
              *  @param alloc_z.   new allocations (since preceding GC)
@@ -108,6 +111,7 @@ namespace xo {
          **/
         class GcStatisticsExt : public GcStatistics {
         public:
+            GcStatisticsExt() = default;
             explicit GcStatisticsExt(const GcStatistics & x) : GcStatistics{x} {}
 
             /** @param os. write stats on this output stream **/
@@ -128,6 +132,63 @@ namespace xo {
             return os;
         }
 
+        /** @class GcStatisticsHistoryItem
+         *  @brief info we want to record over time (won't have cumulative things in it)
+         **/
+        class GcStatisticsHistoryItem {
+        public:
+            GcStatisticsHistoryItem() = default;
+            GcStatisticsHistoryItem(generation upto,
+                                    std::size_t new_alloc_z,
+                                    std::size_t survive_z,
+                                    std::size_t promote_z,
+                                    std::size_t persist_z,
+                                    std::size_t effort_z,
+                                    std::size_t garbage0_z,
+                                    std::size_t garbage1_z,
+                                    std::size_t garbageN_z)
+                : upto_{upto},
+                  new_alloc_z_{new_alloc_z},
+                  survive_z_{survive_z},
+                  promote_z_{promote_z},
+                  persist_z_{persist_z},
+                  effort_z_{effort_z},
+                  garbage0_z_{garbage0_z},
+                  garbage1_z_{garbage1_z},
+                  garbageN_z_{garbageN_z}
+                {}
+
+            /** @param os. write stats on this output stream **/
+            void display(std::ostream & os) const;
+
+            /** type of GC that generated this record **/
+            generation upto_;
+            /** #of bytes new allocation **/
+            std::size_t new_alloc_z_ = 0;
+            /** #of bytes surviving their first collection (i.e. N0->N1) **/
+            std::size_t survive_z_ = 0;
+            /** #of bytes promoted to tenured.
+             *  Comprises all objects surviving their 2nd collection (i.e. N1->T)
+             **/
+            std::size_t promote_z_ = 0;
+            /** #of bytes surviving 3rd of later collection **/
+            std::size_t persist_z_ = 0;
+            /** #of bytes copied **/
+            std::size_t effort_z_ = 0;
+            /** #of bytes garbage from N0 (i.e. survived 0 GCs) **/
+            std::size_t garbage0_z_ = 0;
+            /** #of bytes garbage from N1 (i.e. survived 1 GCs) **/
+            std::size_t garbage1_z_ = 0;
+            /** #of bytes garbage from T (i.e. survived 2+ GCs) **/
+            std::size_t garbageN_z_ = 0;
+        };
+
+        inline std::ostream & operator<< (std::ostream & os, const GcStatisticsHistoryItem & x) {
+            x.display(os);
+            return os;
+        }
+
+        using GcStatisticsHistory = CircularBuffer<GcStatisticsHistoryItem>;
     } /*namespace gc*/
 
     namespace print {
@@ -144,6 +205,11 @@ namespace xo {
         template<>
         struct ppdetail<xo::gc::GcStatisticsExt> {
             static bool print_pretty(const ppindentinfo &, const xo::gc::GcStatisticsExt &);
+        };
+
+        template<>
+        struct ppdetail<xo::gc::GcStatisticsHistoryItem> {
+            static bool print_pretty(const ppindentinfo &, const xo::gc::GcStatisticsHistoryItem &);
         };
     } /*namespace print*/
 } /*namespace xo*/

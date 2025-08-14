@@ -12,7 +12,10 @@ namespace xo {
     namespace ut {
         TEST_CASE("ListAlloc", "[alloc][gc]")
         {
-            /** teeny weeny allocator **/
+            /** teeny weeny allocator.
+             *  but underlying ArenaAlloc works in multiples of VM page size
+             *  (most likely 4k)
+             **/
             up<ListAlloc> alloc = ListAlloc::make("test", 16, 32, false);
 
             REQUIRE(alloc->name() == "test");
@@ -24,7 +27,7 @@ namespace xo {
             std::byte * mem1 = alloc->alloc(20);
 
             REQUIRE(mem1);
-            REQUIRE(alloc->size() == 16 + 32);
+            REQUIRE(alloc->size() == alloc->page_size());
             /* round up to multiple of 8 */
             REQUIRE(alloc->before_checkpoint() == 24);
             REQUIRE(alloc->after_checkpoint() == 0);
@@ -34,7 +37,7 @@ namespace xo {
             std::byte * mem2 = alloc->alloc(30);
 
             REQUIRE(mem2);
-            REQUIRE(alloc->size() == 16 + 32 + 48);
+            REQUIRE(alloc->size() == alloc->page_size());
             REQUIRE(alloc->before_checkpoint() == 24);
             /* round up to multiple of 8 */
             REQUIRE(alloc->after_checkpoint() == 32);
@@ -42,7 +45,7 @@ namespace xo {
             std::byte * mem3 = alloc->alloc(40);
 
             REQUIRE(mem3);
-            REQUIRE(alloc->size() == 16 + 32 + 48 + 80);
+            REQUIRE(alloc->size() == alloc->page_size());
             REQUIRE(alloc->before_checkpoint() == 24);
             /* already multiple of 8 */
             REQUIRE(alloc->after_checkpoint() == 32 + 40);

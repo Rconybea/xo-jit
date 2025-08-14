@@ -113,6 +113,7 @@ namespace xo {
             }
 
             this->committed_z_ = align_offset_z;
+            this->limit_ = this->lo_ + committed_z_;
 
             return true;
         }
@@ -130,6 +131,16 @@ namespace xo {
             } else {
                 throw std::runtime_error(tostr("LinearAllog::set_free_ptr(x): expected lo <= x < limit",
                                                xtag("lo", lo_), xtag("x", x), xtag("limit", limit_)));
+            }
+        }
+
+        std::pair<bool, std::size_t>
+        ArenaAlloc::location_of(const void * x) const
+        {
+            if ((lo_ <= x) && (x < hi_)) {
+                return std::make_pair(true, reinterpret_cast<const std::byte *>(x) - lo_);
+            } else {
+                return std::make_pair(false, 0);
             }
         }
 
@@ -276,6 +287,7 @@ namespace xo {
                        xtag("z0", z0),
                        xtag("+pad", dz),
                        xtag("z1", z1),
+                       xtag("size", this->size()),
                        xtag("avail", this->available()));
 
             this->free_ptr_ += z1;
