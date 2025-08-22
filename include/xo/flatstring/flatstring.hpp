@@ -246,6 +246,10 @@ namespace xo {
 
         /** @defgroup flatstring-access access methods **/
         ///@{
+        /** @brief get writeable access to string representation
+         *  Caller responsible for ensuring trailing null char
+         **/
+        constexpr char * data() noexcept { return value_; }
         /** @brief return char at position @p pos in this string (counting from zero).
          *
          *  Throws @c std::out_of_range exception if @p pos >= @c N
@@ -283,10 +287,20 @@ namespace xo {
 
         /** @defgroup flatstring-assign assignment **/
         ///@{
-        /** @brief put string into empty state.  fills entire char array with nulls **/
+        /** put string into empty state.  fills entire char array with nulls **/
         constexpr void clear() noexcept { std::fill_n(value_, N, '\0'); }
+        /** ensure null-terminated representation.
+         *
+         *  Example:
+         *  @code
+         *    flatstring<N> x;
+         *    snprintf(x.data(), x.capacity(), ...);
+         *    return x.ensure_final_null();
+         *  @endcode
+         **/
+        constexpr flatstring & ensure_final_null() noexcept { value_[N-1] = '\0'; return *this; }
 
-        /** @brief replace contents with min(count,N-1) copies of character ch **/
+        /**  replace contents with min(count,N-1) copies of character ch **/
         constexpr flatstring & assign(size_type count, value_type ch) {
             std::size_t pos = 0;
             for (; pos < std::min(count, N-1); ++pos)
