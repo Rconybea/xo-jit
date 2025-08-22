@@ -132,6 +132,7 @@ namespace xo {
         public:
             using CallbackId = xo::fn::CallbackId;
             using GcCopyCallbackSet = xo::fn::UpCallbackSet<GcCopyCallback>;
+            using nanos = decltype(xo::qty::qty::nanosecond);
 
         public:
             /** create new GC instance with configuration @p config **/
@@ -224,6 +225,8 @@ namespace xo {
              *  as number of calls to @ref disable_gc.
              **/
             void enable_gc();
+            /** same as @c this->enable_gc() followed by @c this->disable_gc() **/
+            void enable_gc_once();
 
             // inherited from IAlloc..
 
@@ -279,7 +282,7 @@ namespace xo {
             /** begin GC now **/
             void execute_gc(generation g);
             /** cleanup phase.  aux function for @ref execute_gc **/
-            void cleanup_phase(generation g);
+            void cleanup_phase(generation g, nanos dt);
             /** swap roles of From/To spaces for nursery generation **/
             void swap_nursery();
             /** swap roles of From/To spaces for tenured generation **/

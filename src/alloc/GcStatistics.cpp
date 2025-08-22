@@ -16,6 +16,7 @@ namespace xo {
         {
             this->update_snapshot(after_z);
 
+            //++n_gc_;
             new_alloc_z_ += alloc_z;
             scanned_z_   += before_z;
             survive_z_   += after_z;
@@ -39,6 +40,15 @@ namespace xo {
                << xrtag("survive_z", survive_z_)
                << xrtag("promote_z", promote_z_)
                << ">";
+        }
+
+        void
+        GcStatistics::begin_gc(generation upto,
+                               std::size_t new_alloc)
+        {
+            ++(this->gen_v_[static_cast<std::size_t>(upto)].n_gc_);
+            this->total_allocated_ += new_alloc;
+            this->total_promoted_sab_ = total_promoted_;
         }
 
         void
@@ -105,6 +115,7 @@ namespace xo {
                << xrtag("garbage0_z", garbage0_z_)
                << xrtag("garbage1_z", garbage1_z_)
                << xrtag("garbageN_z", garbageN_z_)
+               << xrtag("dt", dt_)
                << ">";
         }
 
@@ -177,7 +188,8 @@ namespace xo {
                                              refrtag("effort_z", x.effort_z_),
                                              refrtag("garbage0_z", x.garbage0_z_),
                                              refrtag("garbage1_z", x.garbage1_z_),
-                                             refrtag("garbageN_z", x.garbageN_z_));
+                                             refrtag("garbageN_z", x.garbageN_z_),
+                                             refrtag("dt", x.dt_));
         }
     } /*namespace print*/
 } /*namespace xo*/

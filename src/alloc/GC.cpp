@@ -7,6 +7,7 @@
 #include "GC.hpp"
 #include "Object.hpp"
 #include "xo/indentlog/scope.hpp"
+#include <chrono>
 #include <cassert>
 #include <cstddef>
 
@@ -1037,9 +1038,9 @@ namespace xo {
         }
 
         void
-        GC::cleanup_phase(generation upto)
+        GC::cleanup_phase(generation upto, nanos dt)
         {
-            scope log(XO_DEBUG(config_.debug_flag_));
+            scope log(XO_DEBUG(config_.stats_flag_));
 
             std::size_t N0_before_gc = nursery_from()->after_checkpoint();
             std::size_t N1_before_gc = nursery_from()->before_checkpoint();
@@ -1098,6 +1099,7 @@ namespace xo {
                 this->tenured_to()->checkpoint();
 
             if (log) {
+                log(xtag("gcseq_before_gc", gc_statistics_.n_gc()));
                 log(xtag("N0_before_gc", N0_before_gc));
                 log(xtag("N1_before_gc", N1_before_gc));
                 log(xtag("N_after_gc", N_after_gc));
@@ -1106,18 +1108,6 @@ namespace xo {
                 log(xtag("T1_before_gc", T1_before_gc));
                 log(xtag("T_after_gc", T_after_gc));
             }
-
-            GcStatisticsHistoryItem item(upto,
-                                         new_alloc_z,
-                                         survive_z,
-                                         promote_z,
-                                         persist_z,
-                                         effort_z,
-                                         garbage0_z,
-                                         garbage1_z,
-                                         garbageN_z);
-
-            this->gc_history_.push_back(item);
 
             this->incr_gc_pending_ = false;
             this->gc_statistics_.include_gc(generation::nursery, N0_before_gc, N_before_gc, N_after_gc, promote_z);
@@ -1129,12 +1119,31 @@ namespace xo {
                 // still want to update tenured stats for current alloc size
                 this->gc_statistics_.update_snapshot(generation::tenured, T_after_gc);
             }
+            GcStatisticsHistoryItem item(gc_statistics_.n_gc(),
+                                         upto,
+                                         new_alloc_z,
+                                         survive_z,
+                                         promote_z,
+                                         persist_z,
+                                         effort_z,
+                                         garbage0_z,
+                                         garbage1_z,
+                                         garbageN_z,
+                                         dt);
+
+            log && log(xtag("gcseq_after_gc", gc_statistics_.n_gc()),
+                       xtag("item", item));
+
+            this->gc_history_.push_back(item);
+
         } /*cleanup_phase*/
 
         void
         GC::execute_gc(generation upto)
         {
             scope log(XO_DEBUG(config_.stats_flag_));
+
+            auto t0 = std::chrono::steady_clock::now();
 
             bool full_move = (upto == generation::tenured);
 
@@ -1146,9 +1155,7 @@ namespace xo {
             /* new allocation since last GC */
             std::size_t new_alloc = this->after_checkpoint();
 
-            ++(gc_statistics_.gen_v_[static_cast<std::size_t>(upto)].n_gc_);
-            gc_statistics_.total_allocated_ += new_alloc;
-            gc_statistics_.total_promoted_sab_ = gc_statistics_.total_promoted_;
+            gc_statistics_.begin_gc(upto, new_alloc);
 
             log && log(xtag("new_alloc", new_alloc));
 
@@ -1176,9 +1183,12 @@ namespace xo {
 
             log && log("step 6 : cleanup");
 
-            this->cleanup_phase(upto);
-
             this->capture_object_statistics(upto, capture_phase::sae);
+
+            auto t1 = std::chrono::steady_clock::now();
+            auto dt = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
+
+            this->cleanup_phase(upto, xo::qty::qty::nanoseconds(dt.count()));
 
             log && log("object statistics [nursery]:");
             log && log(refrtag("stats", object_statistics_sab_[gen2int(generation::nursery)]));
@@ -1233,6 +1243,13 @@ namespace xo {
                     this->request_gc(full_gc_pending_ ? generation::tenured : generation::nursery);
             }
         }
+
+        void
+        GC::enable_gc_once() {
+            this->enable_gc();
+            this->disable_gc();
+        }
+
     } /*namespace gc*/
 } /*namespace xo*/
 
