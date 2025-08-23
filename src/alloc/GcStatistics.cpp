@@ -103,6 +103,23 @@ namespace xo {
                << ">";
         }
 
+        float
+        GcStatisticsHistoryItem::collection_rate() const {
+            using namespace xo::qty::qty;
+
+            float gz = this->garbage_z();
+
+            auto dt_nanos = this->dt_.with_repr<float>();
+            auto dt_sec = dt_nanos.rescale_ext<xo::qty::u::second>();
+            auto rate = gz / dt_sec;
+            float retval = rate.scale();
+
+            //scope log(XO_DEBUG(true));
+            //log && log(xtag("gz", gz), xtag("dt_sec", dt_sec), xtag("rate", rate), xtag("rate/sec", retval));
+
+            return retval;
+        }
+
         void
         GcStatisticsHistoryItem::display(std::ostream & os) const
         {

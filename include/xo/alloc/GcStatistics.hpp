@@ -176,6 +176,17 @@ namespace xo {
                                                           dt_{dt} {}
             constexpr GcStatisticsHistoryItem(const GcStatisticsHistoryItem &) = default;
 
+            std::size_t garbage_z() const { return garbage0_z_ + garbage1_z_ + garbageN_z_; }
+
+            float efficiency() const {
+                std::size_t gz = this->garbage_z();
+
+                return gz / static_cast<float>(effort_z_ + gz);
+            }
+
+            /** collection rate, in bytes/sec **/
+            float collection_rate() const;
+
             GcStatisticsHistoryItem & operator=(const GcStatisticsHistoryItem & x) {
                 gc_seq_ = x.gc_seq_;
                 upto_ = x.upto_;
