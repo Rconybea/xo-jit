@@ -7,6 +7,7 @@
 
 #include <ostream>
 #include <cstdint>
+#include <cassert>
 
 namespace xo {
     namespace gc {
@@ -30,6 +31,15 @@ namespace xo {
             tenured,
             not_found
         };
+
+        inline generation valid_genresult2gen(generation_result x) {
+            assert(x != generation_result::not_found);
+
+            if (x == generation_result::nursery)
+                return generation::nursery;
+            else
+                return generation::tenured;
+        }
 
     } /*namespace gc*/
 } /*namespace xo*/

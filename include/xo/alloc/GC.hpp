@@ -154,6 +154,8 @@ namespace xo {
 
             /** true iff GC permitted in current state **/
             bool is_gc_enabled() const { return gc_enabled_ == 0; }
+            /** true iff GC has been requested **/
+            bool is_gc_pending() const { return incr_gc_pending_ || full_gc_pending_; }
             /** true during (and only during) a GC cycle **/
             bool gc_in_progress() const { return runstate_.in_progress(); }
             /** @return reserved size of Nursery to-space **/
@@ -223,10 +225,14 @@ namespace xo {
              *
              *  GC is enabled when number of calls to @ref enable_gc is at least as large
              *  as number of calls to @ref disable_gc.
+             *
+             *  @return true iff GC performed
              **/
-            void enable_gc();
-            /** same as @c this->enable_gc() followed by @c this->disable_gc() **/
-            void enable_gc_once();
+            bool enable_gc();
+            /** same as @c this->enable_gc() followed by @c this->disable_gc()
+             *  @return true iff GC performed
+             **/
+            bool enable_gc_once();
 
             // inherited from IAlloc..
 

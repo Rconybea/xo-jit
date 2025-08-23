@@ -1233,21 +1233,26 @@ namespace xo {
             --gc_enabled_;
         }
 
-        void
+        bool
         GC::enable_gc() {
             ++gc_enabled_;
 
             if (gc_enabled_ == 0) {
                 /* unblock gc */
-                if (incr_gc_pending_)
+                if (incr_gc_pending_) {
                     this->request_gc(full_gc_pending_ ? generation::tenured : generation::nursery);
+                    return true;
+                }
             }
+
+            return false;
         }
 
-        void
+        bool
         GC::enable_gc_once() {
-            this->enable_gc();
+            bool retval = this->enable_gc();
             this->disable_gc();
+            return retval;
         }
 
     } /*namespace gc*/
