@@ -163,17 +163,23 @@ namespace xo {
                                               std::size_t garbage0_z,
                                               std::size_t garbage1_z,
                                               std::size_t garbageN_z,
-                                              nanos dt) : gc_seq_{gc_seq},
-                                                          upto_{upto},
-                                                          new_alloc_z_{new_alloc_z},
-                                                          survive_z_{survive_z},
-                                                          promote_z_{promote_z},
-                                                          persist_z_{persist_z},
-                                                          effort_z_{effort_z},
-                                                          garbage0_z_{garbage0_z},
-                                                          garbage1_z_{garbage1_z},
-                                                          garbageN_z_{garbageN_z},
-                                                          dt_{dt} {}
+                                              nanos dt,
+                                              std::size_t sum_effort_z,
+                                              std::size_t sum_garbage_z)
+            : gc_seq_{gc_seq},
+              upto_{upto},
+              new_alloc_z_{new_alloc_z},
+              survive_z_{survive_z},
+              promote_z_{promote_z},
+              persist_z_{persist_z},
+              effort_z_{effort_z},
+              garbage0_z_{garbage0_z},
+              garbage1_z_{garbage1_z},
+              garbageN_z_{garbageN_z},
+              dt_{dt},
+              sum_effort_z_{sum_effort_z},
+              sum_garbage_z_{sum_garbage_z}
+                {}
             constexpr GcStatisticsHistoryItem(const GcStatisticsHistoryItem &) = default;
 
             std::size_t garbage_z() const { return garbage0_z_ + garbage1_z_ + garbageN_z_; }
@@ -182,6 +188,11 @@ namespace xo {
                 std::size_t gz = this->garbage_z();
 
                 return gz / static_cast<float>(effort_z_ + gz);
+            }
+
+            /** lifetime byte-weighted average collection efficiency.  Always in [0.0, 1.0] **/
+            float average_efficiency() const {
+                return sum_garbage_z_ / static_cast<float>(sum_effort_z_ + sum_garbage_z_);
             }
 
             /** collection rate, in bytes/sec **/
@@ -199,6 +210,10 @@ namespace xo {
                 garbage1_z_ = x.garbage1_z_;
                 garbageN_z_ = x.garbageN_z_;
                 this->dt_.scale_ = x.dt_.scale_;
+
+                sum_effort_z_ = x.sum_effort_z_;
+                sum_garbage_z_ = x.sum_garbage_z_;
+
                 return *this;
             }
 
@@ -229,6 +244,13 @@ namespace xo {
             std::size_t garbageN_z_ = 0;
             /** elapsed time for this GC (see @ref GC::execute_gc) **/
             nanos dt_;
+
+            // ----- cumulative statistics -----
+
+            /** sum (in bytes) copied by collections since inception **/
+            std::size_t sum_effort_z_ = 0;
+            /** sum (in bytes) of garbage collected since inception **/
+            std::size_t sum_garbage_z_ = 0;
         };
 
         inline std::ostream & operator<< (std::ostream & os, const GcStatisticsHistoryItem & x) {

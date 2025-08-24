@@ -1119,6 +1119,15 @@ namespace xo {
                 // still want to update tenured stats for current alloc size
                 this->gc_statistics_.update_snapshot(generation::tenured, T_after_gc);
             }
+
+            std::size_t sum_effort_z = effort_z;
+            std::size_t sum_garbage_z = garbage0_z + garbage1_z + garbageN_z;
+
+            if (gc_history_.size() > 0) {
+                sum_effort_z += gc_history_.back().sum_effort_z_;
+                sum_garbage_z += gc_history_.back().sum_garbage_z_;
+            }
+
             GcStatisticsHistoryItem item(gc_statistics_.n_gc(),
                                          upto,
                                          new_alloc_z,
@@ -1129,7 +1138,9 @@ namespace xo {
                                          garbage0_z,
                                          garbage1_z,
                                          garbageN_z,
-                                         dt);
+                                         dt,
+                                         sum_effort_z,
+                                         sum_garbage_z);
 
             log && log(xtag("gcseq_after_gc", gc_statistics_.n_gc()),
                        xtag("item", item));
