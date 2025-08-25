@@ -147,6 +147,8 @@ namespace xo {
             static up<GC> make(const Config & config);
 
             const Config & config() const { return config_; }
+            std::uint8_t nursery_polarity() const { return nursery_polarity_; }
+            std::uint8_t tenured_polarity() const { return tenured_polarity_; }
             const GCRunstate & runstate() const { return runstate_; }
             const GcStatistics & native_gc_statistics() const { return gc_statistics_; }
             GcStatisticsExt get_gc_statistics() const;
@@ -344,6 +346,13 @@ namespace xo {
         private:
             /** garbage collector configuration **/
             Config config_;
+
+            /** keep track of the identity of from-space and to-space.
+             *  assist for animation (see xo-imgui/example/ex2).
+             *  polarity alternates between 0 and 1 on each GC
+             **/
+            std::uint8_t nursery_polarity_ = 0;
+            std::uint8_t tenured_polarity_ = 0;
 
             /** contains allocated objects, along with unreachable garbage to be collected.
              *  roles reverse after each incremental, or full, collection.

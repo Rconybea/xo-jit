@@ -501,6 +501,7 @@ namespace xo {
             up<ArenaAlloc> tmp = std::move(nursery_[role2int(role::to_space)]);
             nursery_[role2int(role::to_space)] = std::move(nursery_[role2int(role::from_space)]);
             nursery_[role2int(role::from_space)] = std::move(tmp);
+            nursery_polarity_ = 1 - nursery_polarity_;
         }
 
         void
@@ -509,6 +510,7 @@ namespace xo {
             up<ArenaAlloc> tmp = std::move(tenured_[role2int(role::to_space)]);
             tenured_[role2int(role::to_space)] = std::move(tenured_[role2int(role::from_space)]);
             tenured_[role2int(role::from_space)] = std::move(tmp);
+            tenured_polarity_ = 1 - tenured_polarity_;
         }
 
         void
