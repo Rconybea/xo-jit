@@ -68,16 +68,23 @@ namespace xo {
 
             nursery_[role2int(role::from_space)]
                 = ArenaAlloc::make("NA", nursery_size, config.debug_flag_);
+
             nursery_[role2int(role::to_space)  ]
                 = ArenaAlloc::make("NB", nursery_size, config.debug_flag_);
 
             tenured_[role2int(role::from_space)]
                 = ArenaAlloc::make("TA", tenured_size, config.debug_flag_);
+
             tenured_[role2int(role::to_space)  ]
                 = ArenaAlloc::make("TB", tenured_size, config.debug_flag_);
 
+            nursery_[role2int(role::from_space)]->expand(config.incr_gc_threshold_);
+            nursery_[role2int(role::to_space)  ]->expand(config.incr_gc_threshold_);
+            tenured_[role2int(role::from_space)]->expand(config.full_gc_threshold_);
+            tenured_[role2int(role::to_space)  ]->expand(config.full_gc_threshold_);
+
             mutation_log_[role2int(role::from_space)] = std::make_unique<MutationLog>();
-            mutation_log_[role2int(role::to_space)] = std::make_unique<MutationLog>();
+            mutation_log_[role2int(role::to_space  )] = std::make_unique<MutationLog>();
             defer_mutation_log_ = std::make_unique<MutationLog>();
 
             this->gc_history_ = CircularBuffer<GcStatisticsHistoryItem>(config.stats_history_z_);
@@ -195,6 +202,12 @@ namespace xo {
         }
 
         std::size_t
+        GC::nursery_from_allocated() const
+        {
+            return nursery_from()->allocated();
+        }
+
+        std::size_t
         GC::nursery_to_reserved() const
         {
             return nursery_to()->reserved();
@@ -259,7 +272,7 @@ namespace xo {
             return generation_result::not_found;
         }
 
-        std::tuple<generation_result, std::size_t, std::size_t>
+        std::tuple<generation_result, std::size_t, std::size_t, std::size_t>
         GC::location_of(role role, const void *x) const
         {
             {
@@ -267,7 +280,7 @@ namespace xo {
                 auto [is_tenured, offset] = space->location_of(x);
 
                 if (is_tenured)
-                    return std::make_tuple(generation_result::tenured, offset, space->allocated());
+                    return std::make_tuple(generation_result::tenured, offset, space->allocated(), space->committed());
             }
 
             {
@@ -275,19 +288,19 @@ namespace xo {
                 auto [is_nursery, offset] = nursery(role)->location_of(x);
 
                 if (is_nursery)
-                    return std::make_tuple(generation_result::nursery, offset, space->allocated());
+                    return std::make_tuple(generation_result::nursery, offset, space->allocated(), space->committed());
             }
 
-            return std::make_tuple(generation_result::not_found, 0, 0);
+            return std::make_tuple(generation_result::not_found, 0, 0, 0);
         }
 
-        std::tuple<generation_result, std::size_t, std::size_t>
+        std::tuple<generation_result, std::size_t, std::size_t, std::size_t>
         GC::tospace_location_of(const void * x) const
         {
             return location_of(role::to_space, x);
         }
 
-        std::tuple<generation_result, std::size_t, std::size_t>
+        std::tuple<generation_result, std::size_t, std::size_t, std::size_t>
         GC::fromspace_location_of(const void * x) const
         {
             return location_of(role::from_space, x);
@@ -533,29 +546,26 @@ namespace xo {
              */
             std::size_t max_promote_z = nursery_[role2int(role::to_space)]->before_checkpoint();
 
-            log && log(xtag("max_promote_z", max_promote_z));
+            ArenaAlloc * tenured_to = this->tenured_to();
+
+            /* tenured generation may need this much space */
+            std::size_t need_tenured_z = (tenured_to->allocated()
+                                          + max_promote_z
+                                          + config_.full_gc_threshold_);
+
+            log && log(xtag("alloc_tenured_z", tenured_to->allocated()),
+                       xtag("max_promote_z", max_promote_z),
+                       xtag("full_gc_threshold", config_.full_gc_threshold_),
+                       xtag("need_tenured_z", need_tenured_z));
+
+            tenured_to->expand(tenured_to->allocated()
+                               + max_promote_z
+                               + config_.full_gc_threshold_);
 
             if (target == generation::tenured) {
-                /* gc on tenured generation may need this much space */
-                std::size_t need_tenured_z = (tenured_[role2int(role::to_space)]->allocated()
-                                              + max_promote_z
-                                              + config_.full_gc_threshold_);
-
-                log && log("need_tenured_z", need_tenured_z);
-
-                tenured_from()->reset(need_tenured_z);
+                tenured_from()->clear();
 
                 this->swap_tenured();
-            } else {
-                std::size_t avail_tenured_z = tenured_[role2int(role::to_space)]->available();
-
-                log && log(xtag("avail_tenured_z", avail_tenured_z));
-
-                if (avail_tenured_z < max_promote_z) {
-                    ArenaAlloc * tenured_to = this->tenured_to();
-
-                    tenured_to->expand(max_promote_z);
-                }
             }
 
             /* subtracting max_promote_z is correct here, since anything not promoted is garbage */
@@ -1220,24 +1230,22 @@ namespace xo {
         void
         GC::request_gc(generation target)
         {
+            /** full collection when >= @ref full_gc_threshold_ bytes added to tenured
+             *  generation, since last full collection
+             **/
+            bool need_full_gc
+                = ((target == generation::tenured)
+                   || (this->tenured_to()->after_checkpoint() > config_.full_gc_threshold_)
+                   || !config_.allow_incremental_gc_);
+
+            if (need_full_gc)
+                target = generation::tenured;
+
             if (!runstate_.in_progress() && (gc_enabled_ == 0)) {
-                if (!config_.allow_incremental_gc_)
-                    target = generation::tenured;
-
-                if ((target == generation::nursery)
-                    && (this->tenured_to()->after_checkpoint() > config_.full_gc_threshold_))
-                {
-                    /** full collection when >= @ref full_gc_threshold_ bytes added to tenured
-                     *  generation, since last full collection
-                     **/
-                    target = generation::tenured;
-                }
-
                 this->execute_gc(target);
             } else {
                 this->incr_gc_pending_ = true;
-                if (target == generation::tenured)
-                    this->full_gc_pending_ = true;
+                this->full_gc_pending_ |= need_full_gc;
             }
         }
 

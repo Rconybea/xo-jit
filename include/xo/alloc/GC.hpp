@@ -33,12 +33,16 @@ namespace xo {
         struct Config {
             /** initial size in bytes for youngest (Nursery) generation.
              *  GC allocates two nursery spaces of this size.
-             *  Will allocate more space as needed
+             *  This number represents reserved address space.
+             *  pages are committed on demand.
+             *  Initial committment will be up to @ref incr_gc_threshold_
              **/
             std::size_t initial_nursery_z_ = 0;
             /** initial size in bytes for oldest (Tenured) generation.
-             *  GC allocates two tenured spaces of this size
-             *  Will allocate more space as needed
+             *  GC allocates two tenured spaces of this size.
+             *  This number represents reserved address space.
+             *  pages are committed on demand.
+             *  Initial committment will be up to @ref full_gc_threshold_
              **/
             std::size_t initial_tenured_z_ = 0;
             /** trigger incremental GC after this many bytes allocated in nursery **/
@@ -158,6 +162,8 @@ namespace xo {
             bool is_gc_enabled() const { return gc_enabled_ == 0; }
             /** true iff GC has been requested **/
             bool is_gc_pending() const { return incr_gc_pending_ || full_gc_pending_; }
+            /** true iff full GC pending **/
+            bool is_full_gc_pending() const { return full_gc_pending_; }
             /** true during (and only during) a GC cycle **/
             bool gc_in_progress() const { return runstate_.in_progress(); }
             /** @return reserved size of Nursery to-space **/
@@ -170,6 +176,10 @@ namespace xo {
             std::size_t nursery_after_checkpoint() const;
             /** @return allocated memory range for nursery **/
             std::pair<const std::byte *, const std::byte *> nursery_span(role role) const;
+            /** @return nursery bytes used in from-space
+             *  (only interesting during GC copy phase, e.g. during scope of a GcCopyCallback call)
+             **/
+            std::size_t nursery_from_allocated() const;
             /** @return reserved size of Tenured to-space **/
             std::size_t tenured_to_reserved() const;
             /** @return committed size of Tenured to-space **/
@@ -186,19 +196,19 @@ namespace xo {
              *          and allocated size of that generation
              *          @p role chooses between to-space and from-space
              **/
-            std::tuple<generation_result, std::size_t, std::size_t> location_of(role role, const void * x) const;
+            std::tuple<generation_result, std::size_t, std::size_t, std::size_t> location_of(role role, const void * x) const;
             /** @return generation to which object at @p x belongs,
              *          location relative to base address for @p x,
              *          and allocated size of generation
              **/
-            std::tuple<generation_result,std::size_t,std::size_t> tospace_location_of(const void * x) const;
+            std::tuple<generation_result, std::size_t, std::size_t, std::size_t> tospace_location_of(const void * x) const;
             /** @return generation that contains @p x, given it's in from-space **/
             generation_result fromspace_generation_of(const void * x) const;
             /** @return generation to which object at @p x belongs,
              *          location relative to base address for @p x,
              *          and allocated size of generation
              **/
-            std::tuple<generation_result,std::size_t,std::size_t> fromspace_location_of(const void * x) const;
+            std::tuple<generation_result, std::size_t, std::size_t, std::size_t> fromspace_location_of(const void * x) const;
             /** true iff from-space contains @p x **/
             bool fromspace_contains(const void * x) const;
             /** @return free pointer for generation @p gen, i.e. nursery or tenured space **/
@@ -215,7 +225,10 @@ namespace xo {
              *  Intended for GC visualization.
              **/
             CallbackId add_gc_copy_callback(up<GcCopyCallback> fn);
-            /** request garbage collection. **/
+            /** request garbage collection.
+             *  If GC currently disabled, collection will be deferred until the next time GC
+             *  is in an enabled state.  See @ref disable_gc and @ref enable_gc
+             **/
             void request_gc(generation g);
             /** disable garbage collection until matching call to @ref enable_gc.
              *

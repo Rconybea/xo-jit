@@ -145,6 +145,12 @@ namespace xo {
         }
 
         void
+        ArenaAlloc::reset(std::size_t need_z) {
+            this->clear();
+            this->expand(need_z);
+        }
+
+        void
         ArenaAlloc::capture_object_statistics(capture_phase phase,
                                               ObjectStatistics * p_dest) const
         {

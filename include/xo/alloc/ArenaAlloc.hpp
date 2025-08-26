@@ -54,13 +54,15 @@ namespace xo {
                 return std::make_pair(lo_, free_ptr_);
             }
 
-            /** Reset to empty state **/
-            void reset(std::size_t /*z_ignored*/) { this->clear(); }
+            /** Reset to empty state; provision at least @p need_z bytes of (committed) space **/
+            void reset(std::size_t need_z);
 
             void capture_object_statistics(capture_phase phase,
                                            ObjectStatistics * p_dest) const;
 
-            /** expand available (i.e. committed) space to size @p z **/
+            /** expand available (i.e. committed) space to size at least @p z
+             *  In practice will round up to a multiple of @ref page_z_
+             **/
             bool expand(std::size_t z);
 
             // inherited from IAlloc...
