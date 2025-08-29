@@ -9,6 +9,7 @@
 #include "xo/indentlog/scope.hpp"
 #include "xo/indentlog/print/tag.hpp"
 #include <sys/mman.h>
+#include <unistd.h> // for getpagesize() on OSX
 #include <cassert>
 
 namespace xo {

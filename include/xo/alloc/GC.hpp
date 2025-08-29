@@ -119,6 +119,8 @@ namespace xo {
          **/
         class GcCopyCallback {
         public:
+            virtual ~GcCopyCallback() = default;
+
             virtual void notify_gc_copy(std::size_t z, const void * src_addr, const void * dest_addr,
                                         generation src_gen, generation dest_gen) = 0;
             /** invoked when added to callback set (i.e. @ref GC::GcCopyCallbackSet) **/

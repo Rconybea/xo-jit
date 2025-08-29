@@ -56,7 +56,8 @@ namespace xo {
          *
          *  Passed to @ref Object::deep_move for example
          **/
-        struct ObjectStatistics {
+        class ObjectStatistics {
+        public:
             void display(std::ostream & os) const;
 
             /** per-object-type statistics, indexed by TypeId **/
