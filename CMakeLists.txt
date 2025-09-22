@@ -39,6 +39,12 @@ xo_install_library4(${SELF_LIB} ${PROJECT_NAME}Targets)
 xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets)
 
 # ----------------------------------------------------------------
+
+if (XO_ENABLE_EXAMPLES)
+    install(TARGETS flatstring_ex1)
+endif()
+
+# ----------------------------------------------------------------
 # docs targets depend on all the other library/utest targets
 #
 add_subdirectory(docs)
