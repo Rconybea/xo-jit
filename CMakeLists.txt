@@ -20,13 +20,23 @@ add_definitions(${PROJECT_CXX_FLAGS})
 
 # must complete definition of jit lib before configuring examples
 add_subdirectory(src/jit)
-
 xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets)
 
 # ----------------------------------------------------------------
 
 add_subdirectory(example)
 add_subdirectory(utest)
+
+# ----------------------------------------------------------------
+
+if (XO_ENABLE_EXAMPLES)
+    install(TARGETS xo_jit_ex1       DESTINATION bin/xo/example/jit)
+    install(TARGETS xo_jit_ex2       DESTINATION bin/xo/example/jit)
+    install(TARGETS xo_fptr_ex3      DESTINATION bin/xo/example/jit)
+    install(TARGETS xo_kaleidoscope4 DESTINATION bin/xo/example/jit)
+endif()
+
+# ----------------------------------------------------------------
 
 # reminder: must come last: docs targets depend on all the other library/utest targets
 add_subdirectory(docs)
