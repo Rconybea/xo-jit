@@ -1,7 +1,8 @@
+option(XO_ENABLE_DOCS "enable building documentation" OFF)
 option(XO_ENABLE_EXAMPLES "enable building example programs" OFF)
 
 macro(xo_cxx_config_message)
-    message(STATUS "GUESSED_CMAKE_CMD=cmake -DXO_CMAKE_CONFIG_EXECUTABLE=${XO_CMAKE_CONFIG_EXECUTABLE} -DENABLE_TESTING=${ENABLE_TESTING} -DXO_ENABLE_EXAMPLES=${XO_ENABLE_EXAMPLES} -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH} -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_DOCDIR=${CMAKE_INSTALL_DOCDIR} -B ${CMAKE_BINARY_DIR}")
+    message(STATUS "GUESSED_CMAKE_CMD=cmake -DXO_CMAKE_CONFIG_EXECUTABLE=${XO_CMAKE_CONFIG_EXECUTABLE} -DENABLE_TESTING=${ENABLE_TESTING} -DXO_ENABLE_DOCS=${XO_ENABLE_DCS} -DXO_ENABLE_EXAMPLES=${XO_ENABLE_EXAMPLES} -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH} -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_DOCDIR=${CMAKE_INSTALL_DOCDIR} -B ${CMAKE_BINARY_DIR}")
     message(STATUS "XO_CMAKE_CONFIG_EXECUTABLE=${XO_CMAKE_CONFIG_EXECUTABLE}")
     message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 endmacro()
@@ -348,9 +349,65 @@ endmacro()
 # caller must set DOX_DEPS before invoking xo_toplevel_doxygen_config()
 #
 macro(xo_docdir_doxygen_config)
-    if (XO_SUBMODULE_BUILD)
-        # in submodule build, rely on toplevel docs/CMakeLists.txt file instead
+    if (XO_ENABLE_DOCS)
+        if (XO_SUBMODULE_BUILD)
+            # in submodule build, rely on toplevel docs/CMakeLists.txt file instead
+        else()
+            # look for doxygen executable
+            find_program(DOXYGEN_EXECUTABLE NAMES doxygen REQUIRED)
+            message(STATUS "DOXYGEN_EXECUTABLE=${DOXYGEN_EXECUTABLE}")
+
+            message(STATUS "XO_CMAKE_CONFIG_EXECUTABLE=${XO_CMAKE_CONFIG_EXECUTABLE}")
+
+            execute_process(COMMAND ${XO_CMAKE_CONFIG_EXECUTABLE} --doxygen-template OUTPUT_VARIABLE DOXYGEN_CONFIG_TEMPLATE)
+            message(STATUS "DOXYGEN_CONFIG_TEMPLATE=${DOXYGEN_CONFIG_TEMPLATE}")
+            message(STATUS "DOX_EXCLUDE=${DOX_EXCLUDE}")
+            message(STATUS "DOX_EXCLUDE_PATTERNS=${DOX_EXCLUDE_PATTERNS}")
+
+            set(DOX_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+            set(DOX_INPUT_DIR ${PROJECT_SOURCE_DIR})
+            set(DOX_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/dox)
+
+            set(DOX_INDEX_FILE ${DOX_OUTPUT_DIR}/html/index.html)
+
+            # note: expansion variables in Doxyfile.in:
+            #   @PROJECT_NAME@ @DOX_INPUT_DIR@ @DOX_OUTPUT_DIR@ @DOX_EXCLUDE@ @DOX_EXCLUDE_PATTERNS@
+            #
+            configure_file(
+                ${DOXYGEN_CONFIG_TEMPLATE} ${DOX_CONFIG_FILE}
+                FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+                @ONLY)
+
+            file(MAKE_DIRECTORY ${DOX_OUTPUT_DIR})
+            add_custom_command(
+                OUTPUT ${DOX_INDEX_FILE}
+                DEPENDS "${DOX_DEPS}" ${DOX_CONFIG_FILE}
+                COMMAND "${DOXYGEN_EXECUTABLE}" ${DOX_CONFIG_FILE}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                MAIN_DEPENDENCY ${DOX_CONFIG_FILE}
+                COMMENT "Generating docs (doxygen)")
+
+            # To build this target
+            #   $ cmake --build .build -j -- doxygen
+            # or
+            #   $ cd .build
+            #   $ make doxygen
+            #
+            add_custom_target(
+                doxygen_${PROJECT_NAME}
+                DEPENDS ${DOX_INDEX_FILE} ${DOX_DEPS}
+            )
+
+        endif()
     else()
+        message(STATUS, "Docs disabled (cmake -DXO_ENABLE_DOCS=on to enable)")
+    endif()
+endmacro()
+
+# config for an umbrella project that composes standalone subprojects
+macro(xo_umbrella_doxygen_config)
+    if (XO_ENABLE_DOCS)
         # look for doxygen executable
         find_program(DOXYGEN_EXECUTABLE NAMES doxygen REQUIRED)
         message(STATUS "DOXYGEN_EXECUTABLE=${DOXYGEN_EXECUTABLE}")
@@ -380,7 +437,7 @@ macro(xo_docdir_doxygen_config)
         file(MAKE_DIRECTORY ${DOX_OUTPUT_DIR})
         add_custom_command(
             OUTPUT ${DOX_INDEX_FILE}
-            DEPENDS "${DOX_DEPS}" ${DOX_CONFIG_FILE}
+            DEPENDS "${DOX_DEPS}"
             COMMAND "${DOXYGEN_EXECUTABLE}" ${DOX_CONFIG_FILE}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             MAIN_DEPENDENCY ${DOX_CONFIG_FILE}
@@ -396,57 +453,9 @@ macro(xo_docdir_doxygen_config)
             doxygen_${PROJECT_NAME}
             DEPENDS ${DOX_INDEX_FILE} ${DOX_DEPS}
         )
-
+    else()
+        message(STATUS, "Docs disabled (cmake -DXO_ENABLE_DOCS=on to enable)")
     endif()
-endmacro()
-
-# config for an umbrella project that composes standalone subprojects
-macro(xo_umbrella_doxygen_config)
-    # look for doxygen executable
-    find_program(DOXYGEN_EXECUTABLE NAMES doxygen REQUIRED)
-    message(STATUS "DOXYGEN_EXECUTABLE=${DOXYGEN_EXECUTABLE}")
-
-    message(STATUS "XO_CMAKE_CONFIG_EXECUTABLE=${XO_CMAKE_CONFIG_EXECUTABLE}")
-
-    execute_process(COMMAND ${XO_CMAKE_CONFIG_EXECUTABLE} --doxygen-template OUTPUT_VARIABLE DOXYGEN_CONFIG_TEMPLATE)
-    message(STATUS "DOXYGEN_CONFIG_TEMPLATE=${DOXYGEN_CONFIG_TEMPLATE}")
-    message(STATUS "DOX_EXCLUDE=${DOX_EXCLUDE}")
-    message(STATUS "DOX_EXCLUDE_PATTERNS=${DOX_EXCLUDE_PATTERNS}")
-
-    set(DOX_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-
-    set(DOX_INPUT_DIR ${PROJECT_SOURCE_DIR})
-    set(DOX_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/dox)
-
-    set(DOX_INDEX_FILE ${DOX_OUTPUT_DIR}/html/index.html)
-
-        # note: expansion variables in Doxyfile.in:
-        #   @PROJECT_NAME@ @DOX_INPUT_DIR@ @DOX_OUTPUT_DIR@ @DOX_EXCLUDE@ @DOX_EXCLUDE_PATTERNS@
-        #
-    configure_file(
-        ${DOXYGEN_CONFIG_TEMPLATE} ${DOX_CONFIG_FILE}
-        FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-        @ONLY)
-
-    file(MAKE_DIRECTORY ${DOX_OUTPUT_DIR})
-    add_custom_command(
-        OUTPUT ${DOX_INDEX_FILE}
-        DEPENDS "${DOX_DEPS}"
-        COMMAND "${DOXYGEN_EXECUTABLE}" ${DOX_CONFIG_FILE}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        MAIN_DEPENDENCY ${DOX_CONFIG_FILE}
-        COMMENT "Generating docs (doxygen)")
-
-    # To build this target
-    #   $ cmake --build .build -j -- doxygen
-    # or
-    #   $ cd .build
-    #   $ make doxygen
-    #
-    add_custom_target(
-        doxygen_${PROJECT_NAME}
-        DEPENDS ${DOX_INDEX_FILE} ${DOX_DEPS}
-    )
 endmacro()
 
 
@@ -458,12 +467,72 @@ macro(xo_docdir_sphinx_config rst_files)
 
     message(STATUS "SPHINX_RST_FILES=${SPHINX_RST_FILES}")
 
-    if (XO_SUBMODULE_BUILD)
-        # in submodule build, rely on toplevel docs/CMakeLists.txt file instead
-    else()
-        # build docs starting from here only in standalone build.
-        # otherwise use top-level doxygen setup.
+    if (XO_ENABLE_DOCS)
+        if (XO_SUBMODULE_BUILD)
+            # in submodule build, rely on toplevel docs/CMakeLists.txt file instead
+        else()
+            # build docs starting from here only in standalone build.
+            # otherwise use top-level doxygen setup.
 
+            # look for sphinx-build executable
+            find_program(SPHINX_EXECUTABLE NAMES sphinx-build REQUIRED)
+            message(STATUS "SPHINX_EXECUTABLE=${SPHINX_EXECUTABLE}")
+
+            set(SPHINX_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/sphinx/html)
+            set(SPHINX_INDEX_FILE ${SPHINX_OUTPUT_DIR}/index.html)
+
+            # root of sphinx doc tree
+            set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
+            set(SPHINX_DEPS doxygen_${PROJECT_NAME} conf.py ${SPHINX_RST_FILES} ${SPHINX_RST_FILES_GLOB} ${DOX_DEPS})
+            #set(SPHINX_DEPS conf.py ${SPHINX_RST_FILES} ${SPHINX_RST_FILES_GLOB} ${DOX_DEPS})
+
+            add_custom_command(
+                OUTPUT ${SPHINX_INDEX_FILE}
+                DEPENDS ${SPHINX_DEPS}
+                COMMAND ${SPHINX_EXECUTABLE}
+                -b html -Dbreathe_projects.xodoxxml=${CMAKE_CURRENT_BINARY_DIR}/dox/xml
+                ${SPHINX_SOURCE} ${SPHINX_OUTPUT_DIR}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                COMMENT "Generating docs (sphinx) -> [${SPHINX_OUTPUT_DIR}]")
+
+            # make sphinx --> generate sphinx documentation
+            #
+            add_custom_target(
+                sphinx_${PROJECT_NAME}
+                DEPENDS ${SPHINX_INDEX_FILE})
+
+            # - html docs generated in build/docs/sphinx
+            # - copy the doc tree to share/doc/xo_unit/html
+            #
+            #  DESTINATION: CMAKE_INSTALL_DOCDIR
+            #                => DATAROOTDIR/doc/PROJECT_NAME
+            #                => CMAKE_INSTALL_PREFIX/share/doc/xo_flatstring
+            #  OPTIONAL:    install directory tree if it exists,
+            #               but don't complain if it's missing
+            install(
+                DIRECTORY ${SPHINX_OUTPUT_DIR}
+                FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+                DESTINATION ${CMAKE_INSTALL_DOCDIR}
+                COMPONENT Documentation
+                OPTIONAL)
+
+            # make docs --> generate sphinx documentation
+            add_custom_target(
+                docs
+                DEPENDS sphinx_${PROJECT_NAME})
+        endif()
+    endif()
+endmacro()
+
+# config for an umbrella project that composes standalone subprojects
+#
+macro(xo_umbrella_sphinx_config rst_files)
+    list(APPEND SPHINX_RST_FILES ${rst_files})
+    foreach(arg IN ITEMS ${ARGN})
+        list(APPEND SPHINX_RST_FILES ${arg})
+    endforeach()
+
+    if (XO_ENABLE_DOCS)
         # look for sphinx-build executable
         find_program(SPHINX_EXECUTABLE NAMES sphinx-build REQUIRED)
         message(STATUS "SPHINX_EXECUTABLE=${SPHINX_EXECUTABLE}")
@@ -474,7 +543,6 @@ macro(xo_docdir_sphinx_config rst_files)
         # root of sphinx doc tree
         set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
         set(SPHINX_DEPS doxygen_${PROJECT_NAME} conf.py ${SPHINX_RST_FILES} ${SPHINX_RST_FILES_GLOB} ${DOX_DEPS})
-        #set(SPHINX_DEPS conf.py ${SPHINX_RST_FILES} ${SPHINX_RST_FILES_GLOB} ${DOX_DEPS})
 
         add_custom_command(
             OUTPUT ${SPHINX_INDEX_FILE}
@@ -511,62 +579,6 @@ macro(xo_docdir_sphinx_config rst_files)
             docs
             DEPENDS sphinx_${PROJECT_NAME})
     endif()
-endmacro()
-
-# config for an umbrella project that composes standalone subprojects
-#
-macro(xo_umbrella_sphinx_config rst_files)
-    list(APPEND SPHINX_RST_FILES ${rst_files})
-    foreach(arg IN ITEMS ${ARGN})
-        list(APPEND SPHINX_RST_FILES ${arg})
-    endforeach()
-
-    # look for sphinx-build executable
-    find_program(SPHINX_EXECUTABLE NAMES sphinx-build REQUIRED)
-    message(STATUS "SPHINX_EXECUTABLE=${SPHINX_EXECUTABLE}")
-
-    set(SPHINX_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/sphinx/html)
-    set(SPHINX_INDEX_FILE ${SPHINX_OUTPUT_DIR}/index.html)
-
-    # root of sphinx doc tree
-    set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
-    set(SPHINX_DEPS doxygen_${PROJECT_NAME} conf.py ${SPHINX_RST_FILES} ${SPHINX_RST_FILES_GLOB} ${DOX_DEPS})
-
-    add_custom_command(
-        OUTPUT ${SPHINX_INDEX_FILE}
-        DEPENDS ${SPHINX_DEPS}
-        COMMAND ${SPHINX_EXECUTABLE}
-        -b html -Dbreathe_projects.xodoxxml=${CMAKE_CURRENT_BINARY_DIR}/dox/xml
-        ${SPHINX_SOURCE} ${SPHINX_OUTPUT_DIR}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "Generating docs (sphinx) -> [${SPHINX_OUTPUT_DIR}]")
-
-    # make sphinx --> generate sphinx documentation
-    #
-    add_custom_target(
-        sphinx_${PROJECT_NAME}
-        DEPENDS ${SPHINX_INDEX_FILE})
-
-    # - html docs generated in build/docs/sphinx
-    # - copy the doc tree to share/doc/xo_unit/html
-    #
-    #  DESTINATION: CMAKE_INSTALL_DOCDIR
-    #                => DATAROOTDIR/doc/PROJECT_NAME
-    #                => CMAKE_INSTALL_PREFIX/share/doc/xo_flatstring
-    #  OPTIONAL:    install directory tree if it exists,
-    #               but don't complain if it's missing
-    install(
-        DIRECTORY ${SPHINX_OUTPUT_DIR}
-        FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-        DESTINATION ${CMAKE_INSTALL_DOCDIR}
-        COMPONENT Documentation
-        OPTIONAL)
-
-    # make docs --> generate sphinx documentation
-    add_custom_target(
-        docs
-        DEPENDS sphinx_${PROJECT_NAME})
-
 endmacro()
 
 macro(xo_toplevel_compile_options)
