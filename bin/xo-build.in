@@ -8,6 +8,7 @@ $0 [-u|--usage|-h|--help]
     [--list] [-n|--dry-run] [--xoname=NAME]
     [--repo|--clone|--configure|--build|--install]
     [--with-examples] [--with-utests] [--debug-build]
+    [--with-opengl=GLFLAG] [--with-vulkan=VKFLAG]
     [-S=SOURCEDIR] [-B=BUILDDIR]
 EOF
 }
@@ -20,19 +21,19 @@ help() {
 fetch and/or build xo component libraries
 
 Options:
-  -u | --usage      brief help message
-  -h | --help       this help message
-  --list            list known xo libraries
-  -n | --dry-run    dry-run: don't actually invoke state-changing commands
-  --xoname=NAME     operate on xo subsystem NAME
-  --repo            report github repo for NAME
-  --clone           git clone xo library NAME in current directory
-  --configure       run cmake for xo library NAME in immediate subdir
-                    Will use NAME/.build as build directory
-  --build           run cmake build for xo library NAME in immediate subdir
-  --build-docs      build documentation for xo library NAME in immediate subdir
-  --install         run cmake install for xo library NAME in immediate subdir
-  --realclean       nuke build directory
+  -u | --usage         brief help message
+  -h | --help          this help message
+  --list               list known xo libraries
+  -n | --dry-run       dry-run: don't actually invoke state-changing commands
+  --xoname=NAME        operate on xo subsystem NAME
+  --repo               report github repo for NAME
+  --clone              git clone xo library NAME in current directory
+  --configure          run cmake for xo library NAME in immediate subdir
+                       Will use NAME/.build as build directory
+  --build              run cmake build for xo library NAME in immediate subdir
+  --build-docs         build documentation for xo library NAME in immediate subdir
+  --install            run cmake install for xo library NAME in immediate subdir
+  --realclean          nuke build directory
 
   -S=SOURCEDIR         override path/to/source
   -B=BUILDDIR          override path/to/build
@@ -40,7 +41,8 @@ Options:
   --with-examples      in configure step, set -DXO_ENABLE_EXAMPLES=1
   --with-utests        in configure step, set -DENABLE_TESTING=1
   --debug-build        in configure step, set -DCMAKE_BUILD_TYPE=Debug
-  --with-opengl=FLAG   in configure step, set -DXO_ENABLE_OPENGL=FLAG [ON]
+  --with-opengl=GLFLAG in configure step, set -DXO_ENABLE_OPENGL=GLFLAG [ON]
+  --with-vulkan=VKFLAG in configure step, set -DXO_ENABLE_VULKAN=VKFLAG [OFF]
 
 EOF
 }
@@ -61,6 +63,7 @@ with_examples=0
 with_utests=0
 debug_build=0
 with_opengl=
+with_vulkan=
 
 while [[ $# > 0 ]]; do
     case "$1" in
@@ -125,6 +128,9 @@ while [[ $# > 0 ]]; do
             ;;
         --with-opengl=*)
             with_opengl="${1#*=}"
+            ;;
+        --with-vulkan=*)
+            with_vulkan="${1#*=}"
             ;;
         xo-*)
             xoname="$1"
@@ -243,15 +249,34 @@ if [[ $configure_flag -eq 1 ]]; then
         fi
 
         openglarg=
-        if [[ -n $with_opengl ]]; then
+        if [[ -n ${with_opengl} ]]; then
             openglarg="-DXO_ENABLE_OPENGL=${with_opengl}"
         fi
 
-        cmd="cmake -DCMAKE_INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@ -DCMAKE_MODULE_PATH=@CMAKE_INSTALL_PREFIX@/share/cmake -S $pathtosource -B $pathtobuild ${testingarg} ${examplearg} ${openglarg} ${cmakebuildtype}"
+        vulkanarg=
+        if [[ -n ${with_vulkan} ]]; then
+            vulkanarg="-DXO_ENABLE_VULKAN=${with_vulkan}"
+        fi
+
+        cmd="cmake -DCMAKE_INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@ -DCMAKE_MODULE_PATH=@CMAKE_INSTALL_PREFIX@/share/cmake -S $pathtosource -B $pathtobuild ${testingarg} ${examplearg} ${openglarg} ${vulkanarg} ${cmakebuildtype}"
 
         if [[ $noop_flag -eq 1 ]]; then
             echo $cmd
         else
+            cwd=$(pwd)
+            # write script to re-run cmake later
+            rebootcmake=$pathtobuild/rebootcmake
+
+            mkdir -p $(dirname ${rebootcmake})
+
+            cat > ${rebootcmake} <<EOF
+#!/usr/bin/env bash
+
+cd ${cwd} && ${cmd}
+
+EOF
+            chmod +rx ${rebootcmake}
+
             $cmd
         fi
     fi
