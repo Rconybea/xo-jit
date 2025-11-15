@@ -202,9 +202,21 @@ namespace xo {
         }
 
         std::size_t
+        GC::pagesize() const
+        {
+            return nursery_to()->page_size();
+        }
+
+        std::size_t
         GC::nursery_from_allocated() const
         {
             return nursery_from()->allocated();
+        }
+
+        std::size_t
+        GC::nursery_to_allocated() const
+        {
+            return nursery_to()->allocated();
         }
 
         std::size_t

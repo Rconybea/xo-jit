@@ -1,4 +1,4 @@
-# build unittest alloc/utest
+# xo-alloc/utest/CMakeLists.txt
 #
 # NOTE: more GC tests in xo-object/utest
 
@@ -16,6 +16,11 @@ set(UTEST_SRCS
     generation.test.cpp
 )
 
-xo_add_utest_executable(${UTEST_EXE} ${UTEST_SRCS})
-xo_self_dependency(${UTEST_EXE} xo_alloc)
-xo_external_target_dependency(${UTEST_EXE} Catch2 Catch2::Catch2)
+if (ENABLE_TESTING)
+    xo_add_utest_executable(${UTEST_EXE} ${UTEST_SRCS})
+    xo_self_dependency(${UTEST_EXE} xo_alloc)
+    xo_dependency(${UTEST_EXE} reflect)
+    xo_external_target_dependency(${UTEST_EXE} Catch2 Catch2::Catch2)
+endif()
+
+# end CmakeLists.txt

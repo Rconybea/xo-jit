@@ -168,6 +168,12 @@ namespace xo {
             bool is_full_gc_pending() const { return full_gc_pending_; }
             /** true during (and only during) a GC cycle **/
             bool gc_in_progress() const { return runstate_.in_progress(); }
+
+            /** @return pagesize (will be the same for {nursery, tenured} spaces) **/
+            std::size_t pagesize() const;
+
+            /** @return allocation portion of Nursery to-space **/
+            std::size_t nursery_to_allocated() const;
             /** @return reserved size of Nursery to-space **/
             std::size_t nursery_to_reserved() const;
             /** @return committed size of Nursery to-space **/
