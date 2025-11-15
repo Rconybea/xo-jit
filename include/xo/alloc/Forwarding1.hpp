@@ -7,6 +7,16 @@
 
 namespace xo {
     namespace obj {
+        /** @class Forwarding1
+         *  @brief forwarding pointer for garbage collector.
+         *
+         *  Used internally by garbage collector (see @ref GC).
+         *  During evacuate phase overwrite from-space objects in-place
+         *  with an instance of this class.
+         *
+         *  This class suitable only for singly-inheriting objects,
+         *  i.e. those that have exactly one vtable.
+         **/
         class Forwarding1 : public Object {
         public:
             explicit Forwarding1(gp<Object> dest);
@@ -17,11 +27,11 @@ namespace xo {
             virtual bool        _is_forwarded() const final override { return true; }
             virtual Object *    _offset_destination(Object * src) const final override;
             virtual Object *    _destination() final override;
-            /** never called on Forwarding1 **/
+            /** required by Object i/face, but never called on Forwarding1 **/
             virtual std::size_t _shallow_size() const final override;
-            /** never called on Forwarding1 **/
+            /** required by Object i/face, but never called on Forwarding1 **/
             virtual Object *    _shallow_copy() const final override;
-            /** never called on Forwarding1 **/
+            /** required by Object i/face, but never called on Forwarding1 **/
             virtual std::size_t _forward_children() final override;
 
         private:

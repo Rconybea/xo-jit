@@ -75,8 +75,8 @@ namespace xo {
      *  for a type appear directly in that type's vtable, and at specific locations.
      *  This implies one level of indirection when GC traverses an instance.
      *
-     *  Would be feasible to relax the must-inherit-from-Object constraint,
-     *  but cost would be an extra layer of indirection
+     *  Would be feasible to relax the must-inherit-from-Object constraint
+     *  by having GC use its own wrapper, at cost of an extra layer of indirection
      **/
     class Object {
     public:

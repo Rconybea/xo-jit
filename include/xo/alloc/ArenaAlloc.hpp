@@ -11,16 +11,41 @@
 namespace xo {
     namespace gc {
         /** @class ArenaAlloc
-         *  @brief Bump allocator with fixed capacity
+         *  @brief Bump allocator with fixed capacity with dynamic virtual memory commitment.
          *
          *  @text
          *
-         *    <-----allocated----> <--------free------->
-         *    XXXXXXXXXXXXXXXXXXXX______________________
-         *    ^                   ^                     ^
-         *    lo                  free                  hi
-         *                                              limit
+         *    allocation order:
+         *    ----------------------->
+         *
+         *    <----------------- .size() ------------------>
+         *    <----------------- .committed() --------------->
+         *
+         *    <-------allocated------><--------free-------->  <---uncommitted---->
+         *    XXXXXXXXXXXXXXXXXXXXXXXX______________________  ....................
+         *    ^       ^               ^                     ^                     ^
+         *    lo      checkpoint   free                 limit                    hi
+         *
+         *                            +- .alloc() ->
+         *                                                  +-- .expand() -->
+         *   >        < .before_checkpoint()
+         *           >                < .after_checkpoint()
+         *
          *  @endtext
+         *
+         *  Design Notes:
+         *  - non-copyable, non-moveable
+         *  - always heap-allocated
+         *  - @ref lo_ <= @ref checkpoint_ <= @ref free_ <= @ref limit_ <= @ref hi_
+         *  - memory obtained from mmap(), not heap
+         *  - memory addresses are stable. Expand storage by committing VM pages.
+         *  - @ref lo_ is aligned on VM page size (guaranteed by mmap())
+         *  - @ref lo_ + @ref committed_z_ <= @ref hi_
+         *  - @ref limit_ <= @ref lO_ + @ref committed_z_
+         *  - @ref committed_z_ is always a multiple of VM page size
+         *  - @ref limit_ is not guaranteed to be aligned with VM page size.
+         *  - @ref expand increases @ref limit_ and @ref committed_z_ as needed.
+         *
          **/
         class ArenaAlloc : public IAlloc {
         public:
@@ -57,11 +82,14 @@ namespace xo {
             /** Reset to empty state; provision at least @p need_z bytes of (committed) space **/
             void reset(std::size_t need_z);
 
+            /** gc support: If used for storing xo::Object instances, scan allocated memory
+             *  to populate @p *p_dest.
+             **/
             void capture_object_statistics(capture_phase phase,
                                            ObjectStatistics * p_dest) const;
 
             /** expand available (i.e. committed) space to size at least @p z
-             *  In practice will round up to a multiple of @ref page_z_
+             *  In practice will round up to a multiple of @ref page_z_.
              **/
             bool expand(std::size_t z);
 
@@ -98,7 +126,7 @@ namespace xo {
             /** optional instance name, for diagnostics **/
             std::string name_;
 
-            /** size of a VM page **/
+            /** size of a VM page (from getpagesize()) **/
             std::size_t page_z_;
 
             /** allocator owns memory in range [@ref lo_, @ref hi_) **/

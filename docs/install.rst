@@ -24,7 +24,7 @@ Install
 One-step Install
 ----------------
 
-Install along with the reset of *XO* from `xo-umbrella2 source`_
+Install along with the rest of *XO* from `xo-umbrella2 source`_
 
 .. _xo-umbrella2 source: https://github.com/rconybea/xo-umbrella2
 
