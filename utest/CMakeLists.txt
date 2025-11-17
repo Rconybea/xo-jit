@@ -10,7 +10,7 @@ if (ENABLE_TESTING)
     xo_add_utest_executable(${SELF_EXE} ${SELF_SRCS})
     xo_self_dependency(${SELF_EXE} xo_jit)
     xo_dependency(${SELF_EXE} xo_ratio)
-    xo_dependency(${SELF_EXE} xo_reflectutil)
+    xo_headeronly_dependency(${SELF_EXE} xo_reflectutil)
     xo_external_target_dependency(${SELF_EXE} Catch2 Catch2::Catch2)
 endif()
 
