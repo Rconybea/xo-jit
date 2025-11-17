@@ -61,7 +61,9 @@ namespace xo {
         void assign_ptr(T * x) { ptr_ = x; }
 
         gc_ptr & operator=(const gc_ptr & x) { ptr_ = x.ptr(); return *this; }
+
         T * operator->() const { return ptr_; }
+        T & operator*() const { return *ptr_; }
 
     private:
         T * ptr_ = nullptr;
