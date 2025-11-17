@@ -258,8 +258,9 @@ namespace xo {
      **/
     class Cpof {
     public:
-        explicit Cpof(const Object * src) : src_{src} {}
+        explicit Cpof(gc::IAlloc * mm, const Object * src) : mm_{mm}, src_{src} {}
 
+        gc::IAlloc * mm_ = nullptr;
         const void * src_ = nullptr;
     };
 } /*namespace xo*/

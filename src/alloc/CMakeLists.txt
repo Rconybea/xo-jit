@@ -15,9 +15,9 @@ set(SELF_SRCS
 
 xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 ${SELF_SRCS})
 # xo-unit used for time measurement
-xo_dependency(${SELF_LIB} xo_unit)
+xo_headeronly_dependency(${SELF_LIB} xo_unit)
 xo_dependency(${SELF_LIB} indentlog)
 xo_dependency(${SELF_LIB} reflect)
-xo_dependency(${SELF_LIB} callback)
+xo_headeronly_dependency(${SELF_LIB} callback)
 
 #end CMakeLists.txt

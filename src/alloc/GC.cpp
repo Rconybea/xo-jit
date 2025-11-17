@@ -66,16 +66,36 @@ namespace xo {
             std::size_t nursery_size = config.initial_nursery_z_;
             std::size_t tenured_size = config.initial_tenured_z_;
 
-            nursery_[role2int(role::from_space)]
+            if (config_.incr_gc_threshold_ > nursery_size) {
+                throw std::runtime_error(tostr("GC::ctor: expected nursery gc threshold < nursery size",
+                                               xtag("nursery-gc-threshold", config_.incr_gc_threshold_),
+                                               xtag("nursery-size", nursery_size)));
+            }
+
+            if (nursery_size + config_.full_gc_threshold_ > tenured_size) {
+                throw std::runtime_error(tostr("GC::ctor: expected nursery size + tennured gc threshold < tenured size",
+                                               xtag("nursery-size", nursery_size),
+                                               xtag("tenured-size", tenured_size),
+                                               xtag("full-gc-threshold", config_.full_gc_threshold_)
+                                             ));
+            }
+
+            if (config_.incr_gc_threshold_ > nursery_size)
+                this->config_.incr_gc_threshold_ = nursery_size;
+
+            if (config_.full_gc_threshold_ > tenured_size)
+                this->config_.full_gc_threshold_ = tenured_size;
+
+            this->nursery_[role2int(role::from_space)]
                 = ArenaAlloc::make("NA", nursery_size, config.debug_flag_);
 
-            nursery_[role2int(role::to_space)  ]
+            this->nursery_[role2int(role::to_space)  ]
                 = ArenaAlloc::make("NB", nursery_size, config.debug_flag_);
 
-            tenured_[role2int(role::from_space)]
+            this->tenured_[role2int(role::from_space)]
                 = ArenaAlloc::make("TA", tenured_size, config.debug_flag_);
 
-            tenured_[role2int(role::to_space)  ]
+            this->tenured_[role2int(role::to_space)  ]
                 = ArenaAlloc::make("TB", tenured_size, config.debug_flag_);
 
             nursery_[role2int(role::from_space)]->expand(config.incr_gc_threshold_);
@@ -83,9 +103,9 @@ namespace xo {
             tenured_[role2int(role::from_space)]->expand(config.full_gc_threshold_);
             tenured_[role2int(role::to_space)  ]->expand(config.full_gc_threshold_);
 
-            mutation_log_[role2int(role::from_space)] = std::make_unique<MutationLog>();
-            mutation_log_[role2int(role::to_space  )] = std::make_unique<MutationLog>();
-            defer_mutation_log_ = std::make_unique<MutationLog>();
+            this->mutation_log_[role2int(role::from_space)] = std::make_unique<MutationLog>();
+            this->mutation_log_[role2int(role::to_space  )] = std::make_unique<MutationLog>();
+            this->defer_mutation_log_ = std::make_unique<MutationLog>();
 
             this->gc_history_ = CircularBuffer<GcStatisticsHistoryItem>(config.stats_history_z_);
 
@@ -96,23 +116,25 @@ namespace xo {
             /* hygiene */
             this->clear();
 
-            nursery_[role2int(role::from_space)].reset();
-            nursery_[role2int(role::to_space)  ].reset();
+            this->nursery_[role2int(role::from_space)].reset();
+            this->nursery_[role2int(role::to_space)  ].reset();
 
-            tenured_[role2int(role::from_space)].reset();
-            tenured_[role2int(role::to_space)  ].reset();
+            this->tenured_[role2int(role::from_space)].reset();
+            this->tenured_[role2int(role::to_space)  ].reset();
 
-            mutation_log_[role2int(role::from_space)].reset();
-            mutation_log_[role2int(role::to_space)  ].reset();
-            defer_mutation_log_.reset();
+            this->gc_root_v_.clear();
+
+            this->mutation_log_[role2int(role::from_space)].reset();
+            this->mutation_log_[role2int(role::to_space)  ].reset();
+            this->defer_mutation_log_.reset();
         }
 
         up<GC>
         GC::make(const Config & config)
         {
-            GC * gc = new GC(config);
+            //GC * gc = new GC(config);
 
-            return up<GC>{gc};
+            return std::make_unique<GC>(config);
         }
 
         const std::string &
@@ -608,16 +630,18 @@ namespace xo {
         void
         GC::capture_object_statistics(generation upto, capture_phase phase)
         {
-            /* scan nursery */
-            this->nursery_[role2int(role::to_space)]->capture_object_statistics
-                (phase,
-                 &object_statistics_sab_[gen2int(generation::nursery)]);
-
-            if (upto == generation::tenured) {
-                /* scan tenured */
-                this->tenured_[role2int(role::to_space)]->capture_object_statistics
+            if (config_.object_stats_flag_) {
+                /* scan nursery */
+                this->nursery_[role2int(role::to_space)]->capture_object_statistics
                     (phase,
-                     &object_statistics_sab_[gen2int(generation::tenured)]);
+                     &object_statistics_sab_[gen2int(generation::nursery)]);
+
+                if (upto == generation::tenured) {
+                    /* scan tenured */
+                    this->tenured_[role2int(role::to_space)]->capture_object_statistics
+                        (phase,
+                         &object_statistics_sab_[gen2int(generation::tenured)]);
+                }
             }
         }
 

@@ -14,7 +14,7 @@ operator new (std::size_t z, const xo::Cpof & cpof)
 {
     using xo::gc::GC;
 
-    GC * gc = reinterpret_cast<GC *>(xo::Object::mm);
+    GC * gc = reinterpret_cast<GC *>(cpof.mm_);
 
     return gc->alloc_gc_copy(z, cpof.src_);
 }

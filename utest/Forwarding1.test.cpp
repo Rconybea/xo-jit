@@ -33,7 +33,7 @@ namespace xo {
                 void display(std::ostream & os) const final override { os << data_; }
 
                 virtual std::size_t _shallow_size() const final override { return sizeof(*this); }
-                virtual Object * _shallow_copy() const final override { return new (Cpof(this)) DummyObject(*this); }
+                virtual Object * _shallow_copy() const final override { return new (Cpof(Object::mm, this)) DummyObject(*this); }
                 virtual std::size_t _forward_children() final override { return _shallow_size(); }
 
             private:

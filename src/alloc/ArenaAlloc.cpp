@@ -26,6 +26,11 @@ namespace xo {
 
             void * base = mmap(nullptr, z, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
+            log && log("acquired memory [lo,hi) using mmap",
+                       xtag("lo", base),
+                       xtag("z", z),
+                       xtag("hi", reinterpret_cast<std::byte *>(base) + z));
+
             // could use this as fallback..
             //base         = (new std::byte [z]);
 
@@ -39,7 +44,7 @@ namespace xo {
             this->checkpoint_  = lo_;
             this->free_ptr_    = lo_;
             this->limit_       = lo_ + z;
-            this->hi_          = limit_;
+            this->hi_          = lo_ + z;
             this->debug_flag_  = debug_flag;
 
             if (!lo_) {
@@ -52,22 +57,25 @@ namespace xo {
 
         ArenaAlloc::~ArenaAlloc()
         {
+            scope log(XO_DEBUG(debug_flag_));
 
             // hygiene..
 
             if (lo_) {
+                log && log("unmap [lo,hi)", xtag("lo", lo_), xtag("z", hi_ - lo_), xtag("hi", hi_));
+
                 munmap(lo_, hi_ - lo_);
             }
-            // could use this as fallback if not using uncommitted technique
+            // could use this as fallback if we dropped the uncommitted technique
             //delete [] this->lo_;
 
-            this->lo_ = nullptr;
+            this->lo_          = nullptr;
             this->committed_z_ = 0;
-            this->checkpoint_ = nullptr;
-            this->free_ptr_ = nullptr;
-            this->limit_ = nullptr;
-            this->hi_ = nullptr;
-            this->debug_flag_ = false;
+            this->checkpoint_  = nullptr;
+            this->free_ptr_    = nullptr;
+            this->limit_       = nullptr;
+            this->hi_          = nullptr;
+            this->debug_flag_  = false;
         }
 
         up<ArenaAlloc>
@@ -94,26 +102,41 @@ namespace xo {
         }
 
         bool
-        ArenaAlloc::expand(size_t offset_z) {
+        ArenaAlloc::expand(size_t offset_z)
+        {
             scope log(XO_DEBUG(debug_flag_), xtag("offset_z", offset_z), xtag("committed_z", committed_z_));
 
-            if (offset_z <= committed_z_)
+            if (offset_z <= committed_z_) {
+                log && log("trivial success, offset within committed range",
+                           xtag("offset_z", offset_z),
+                           xtag("committed_z", committed_z_));
                 return true;
-
-            std::size_t align_offset_z = align_lub(offset_z, page_z_);
-            std::byte * commit_start = lo_ + committed_z_;
-            std::size_t new_commit_z = align_offset_z - committed_z_;
-
-            log && log(xtag("align_offset_z", align_offset_z),
-                       xtag("new_commit_z", new_commit_z));
-
-            if (mprotect(commit_start, new_commit_z, PROT_READ | PROT_WRITE) != 0) {
-                throw std::runtime_error(tostr("ArenaAlloc::expand: commit failure",
-                                               xtag("committed_z", committed_z_),
-                                               xtag("new_commit_z", new_commit_z)));
             }
 
-            this->committed_z_ = align_offset_z;
+            if (lo_ + offset_z > limit_) {
+                throw std::runtime_error(tostr("ArenaAlloc::expand: requested size exceeds reserved size",
+                                               xtag("requested", offset_z), xtag("reserved", reserved())));
+            }
+
+            std::size_t aligned_offset_z = align_lub(offset_z, page_z_);
+            std::byte * commit_start = lo_ + committed_z_;
+            std::size_t add_commit_z = aligned_offset_z - committed_z_;
+
+            log && log(xtag("aligned_offset_z", aligned_offset_z),
+                       xtag("add_commit_z", add_commit_z));
+
+            log && log("expand committed range",
+                       xtag("commit_start", commit_start),
+                       xtag("add_commit_z", add_commit_z),
+                       xtag("commit_end", commit_start + add_commit_z));
+
+            if (mprotect(commit_start, add_commit_z, PROT_READ | PROT_WRITE) != 0) {
+                throw std::runtime_error(tostr("ArenaAlloc::expand: commit failure",
+                                               xtag("committed_z", committed_z_),
+                                               xtag("add_commit_z", add_commit_z)));
+            }
+
+            this->committed_z_ = aligned_offset_z;
             this->limit_ = this->lo_ + committed_z_;
 
             return true;
@@ -167,6 +190,8 @@ namespace xo {
             std::byte * p = lo_;
 
             while (p < free_ptr_) {
+                log && log(xtag("p", (void *)p));
+
                 Object *     obj = reinterpret_cast<Object *>(p);
                 TaggedPtr     tp = obj->self_tp();
                 std::size_t    z = obj->_shallow_size();

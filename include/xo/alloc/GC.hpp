@@ -54,6 +54,8 @@ namespace xo {
             bool allow_incremental_gc_ = true;
             /** true to report statistics **/
             bool stats_flag_ = false;
+            /** true to capture per-type object statistics **/
+            bool object_stats_flag_ = false;
             /** remember basic gc statistics for this many GC's; separately for incremental + full GCs **/
             std::size_t stats_history_z_ = 256;
             /** true to enable debug logging **/
