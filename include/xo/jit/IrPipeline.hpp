@@ -11,7 +11,6 @@
 /* stuff from kaleidoscope.cpp */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 # include "llvm/ADT/APFloat.h"
 # include "llvm/ADT/STLExtras.h"
 # include "llvm/IR/BasicBlock.h"
