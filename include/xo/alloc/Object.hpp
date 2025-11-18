@@ -191,8 +191,6 @@ namespace xo {
          **/
         virtual std::size_t _shallow_size() const = 0;
 
-         // TODO: _shallow_move() also overwrite *this with gc-only forwarding object point to C
-
         /** if subject is allocated by GC:
          *  - create copy C in to-space
          *  - destination C will be nursery|tenured depending on location of this.
