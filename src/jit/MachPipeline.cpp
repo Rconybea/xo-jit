@@ -16,7 +16,7 @@ namespace xo {
     using xo::scm::Variable;
     using xo::scm::Apply;
     using xo::scm::IfExpr;
-    using xo::scm::GlobalEnv;
+    using xo::scm::GlobalSymtab;
     using xo::scm::llvmintrinsic;
     using xo::reflect::Reflect;
     using xo::reflect::StructMember;

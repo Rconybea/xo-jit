@@ -20,7 +20,7 @@
 #include "xo/expression/Lambda.hpp"
 #include "xo/expression/Variable.hpp"
 #include "xo/expression/IfExpr.hpp"
-#include "xo/expression/GlobalEnv.hpp"
+#include "xo/expression/GlobalSymtab.hpp"
 
 /* stuff from kaleidoscope.cpp */
 #include "llvm/ADT/APFloat.h"
@@ -58,7 +58,7 @@ namespace xo {
         public:
             using Expression = xo::scm::Expression;
             using Lambda = xo::scm::Lambda;
-            using GlobalEnv = xo::scm::GlobalEnv;
+            using GlobalEnv = xo::scm::GlobalSymtab;
             using TypeDescr = xo::reflect::TypeDescr;
             using ExecutionSession = llvm::orc::ExecutionSession;
             using DataLayout = llvm::DataLayout;
