@@ -39,6 +39,11 @@ namespace xo {
         template <typename S>
         gc_ptr(const gc_ptr<S> & x) : ptr_{x.ptr()} {}
 
+        /** convenience for static asserts **/
+        static constexpr bool is_gc_ptr = true;
+        /** see also: xo/refcnt/Refcounted.hpp **/
+        static constexpr bool is_rc_ptr = false;
+
         static bool is_eq(gc_ptr x1, gc_ptr x2) {
             std::uintptr_t u1 = reinterpret_cast<std::uintptr_t>(x1.ptr());
             std::uintptr_t u2 = reinterpret_cast<std::uintptr_t>(x2.ptr());
