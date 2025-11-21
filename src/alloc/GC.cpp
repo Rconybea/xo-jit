@@ -73,7 +73,7 @@ namespace xo {
             }
 
             if (nursery_size + config_.full_gc_threshold_ > tenured_size) {
-                throw std::runtime_error(tostr("GC::ctor: expected nursery size + tennured gc threshold < tenured size",
+                throw std::runtime_error(tostr("GC::ctor: expected nursery size + tenured gc threshold < tenured size",
                                                xtag("nursery-size", nursery_size),
                                                xtag("tenured-size", tenured_size),
                                                xtag("full-gc-threshold", config_.full_gc_threshold_)

@@ -37,14 +37,14 @@ namespace xo {
              *  pages are committed on demand.
              *  Initial committment will be up to @ref incr_gc_threshold_
              **/
-            std::size_t initial_nursery_z_ = 0;
+            std::size_t initial_nursery_z_ = 64*1024*1024;
             /** initial size in bytes for oldest (Tenured) generation.
              *  GC allocates two tenured spaces of this size.
              *  This number represents reserved address space.
              *  pages are committed on demand.
              *  Initial committment will be up to @ref full_gc_threshold_
              **/
-            std::size_t initial_tenured_z_ = 0;
+            std::size_t initial_tenured_z_ = 128*1024*1024;
             /** trigger incremental GC after this many bytes allocated in nursery **/
             std::size_t incr_gc_threshold_ = 64*1024;
             /** trigger full GC after this many bytes promoted to tenured **/
