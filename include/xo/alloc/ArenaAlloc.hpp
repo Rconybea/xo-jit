@@ -18,11 +18,11 @@ namespace xo {
          *    allocation order:
          *    ----------------------->
          *
-         *    <----------------- .size() ------------------>
-         *    <----------------- .committed() --------------->
+         *    <----------------- .size(), .reserved() --------------------------->
+         *    <----------------- .committed() ------------->
          *
-         *    <-------allocated------><--------free-------->  <---uncommitted---->
-         *    XXXXXXXXXXXXXXXXXXXXXXXX______________________  ....................
+         *    <-------allocated------><--------free--------><-----uncommitted---->
+         *    XXXXXXXXXXXXXXXXXXXXXXXX______________________......................
          *    ^       ^               ^                     ^                     ^
          *    lo      checkpoint   free                 limit                    hi
          *
@@ -31,12 +31,77 @@ namespace xo {
          *   >        < .before_checkpoint()
          *           >                < .after_checkpoint()
          *
+         *   lifetime:
+         *
+         *   1. initial state after ctor
+         *
+         *   >< committed()=0
+         *    <---------------------------uncommitted---------------------------->
+         *    ....................................................................
+         *    ^                                                                   ^
+         *    lo                                                                 hi
+         *    checkpoint
+         *    free
+         *    limit
+         *
+         *    1a. one call to ::mmap()
+         *    1b. vm address space [lo,hi) is reserved
+         *    1c. address space [lo,hi) is inaccessible. no read|write|execute permission
+         *
+         *   2. after first allocation of n bytes
+         *
+         *    <--committed--->
+         *          <--free--><--------------------uncommitted-------------------->
+         *   >      <- allocated
+         *    XXXXXX__________.....................................................
+         *    ^     ^         ^                                                    ^
+         *    lo    lo+n  limit                                                   hi
+         *    ^     free
+         *    checkpoint
+         *
+         *    2a. committed just enough hugepages (2mb each) to accomodate n,
+         *        i.e. expand-on-demand:
+         *        - one call to ::mprotect()
+         *        - .limit = .lo + (k+1) * .hugepage_z for some integer k>=0
+         *        - k * .page_z <= n < (k+1) * .hugepage_z
+         *    2b. expect immediate cost 1-5us, includes:
+         *        - TLB flush
+         *          invalidate TLB entries for committed range on all cores that this
+         *          process' threads have run on since process inception.
+         *          Also, if a kernel thread has run on one of said cores, it may
+         *          have borrowed our TLB entries
+         *        - page table update
+         *          write to entry for each vm page
+         *        - kernel overhead 100-1000 cycles (< 1us)
+         *    2c. expect deferred cost 1us-2us per hugepage:
+         *        - committed pages aren't backed by physical memory until
+         *          first touched; minor page fault on first access for each page.
+         *        - so about 256-512us for 1MB
+         *   3. after .expand(z)
+         *
+         *    <-------------committed------------>
+         *          <------------free------------><----------uncomitted----------->
+         *   >      <- allocated
+         *    XXXXXX______________________________.................................
+         *    ^     ^                             ^                                ^
+         *    lo    lo+n                      limit                               hi
+         *    ^     free
+         *    checkpoint
+         *
+         *    3a. same as case 2. but without advancing .free pointer.
+         *
+         *   4. after dtor
+         *
+         *    4a. all memory returned to o/s, no longer reserved.
+         *        - one call to ::munmap()
+         *
          *  @endtext
          *
          *  Design Notes:
          *  - non-copyable, non-moveable
-         *  - always heap-allocated
          *  - @ref lo_ <= @ref checkpoint_ <= @ref free_ <= @ref limit_ <= @ref hi_
+         *  - memory for ArenaAlloc itself (not the memory it allocates), ~100 bytes
+         *    always heap allocated.  Use ArenaAlloc::make()
          *  - memory obtained from mmap(), not heap
          *  - memory addresses are stable. Expand storage by committing VM pages.
          *  - @ref lo_ is aligned on VM page size (guaranteed by mmap())
@@ -55,7 +120,7 @@ namespace xo {
 
             /** Create allocator with capacity @p z,
              *  Reserve memory addresses for @p z bytes,
-             *  but don't commit them until needed
+             *  (but don't commit them until needed)
              **/
             static up<ArenaAlloc> make(const std::string & name,
                                        std::size_t z,
@@ -127,7 +192,12 @@ namespace xo {
             std::string name_;
 
             /** size of a VM page (from getpagesize()) **/
-            std::size_t page_z_;
+            std::size_t page_z_ = 0;
+
+            /** size of a huge VM page. hardwiring this in ctor (to 2MB).
+             *  larger pages relieve pressure on TLB, but suboptimal if use << 2MB
+             **/
+            std::size_t hugepage_z_ = 0;
 
             /** allocator owns memory in range [@ref lo_, @ref hi_) **/
             std::byte * lo_ = nullptr;
@@ -139,7 +209,7 @@ namespace xo {
              *  older (addresses below checkpoint)
              *  and younger (addresses above checkpoint)
              **/
-            std::byte * checkpoint_;
+            std::byte * checkpoint_ = nullptr;
             /** free pointer. memory in range [@ref free_, @ref limit_) available **/
             std::byte * free_ptr_ = nullptr;
             /** soft limit: end of committed virtual memory **/

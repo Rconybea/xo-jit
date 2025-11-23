@@ -13,37 +13,101 @@
 #include <cassert>
 
 namespace xo {
+    using std::byte;
+
     namespace gc {
+        namespace {
+            /* alignment better be a power of 2 */
+            std::size_t
+            align_lub(std::size_t x, std::size_t align)
+            {
+                /* e.g:
+                 *   align = 4096, x%align = 100 -> dx = 3996
+                 *   align = 4096, x%align = 0   -> dx = 0
+                 */
+                std::size_t dx = (align - (x % align)) % align;
+
+                return x + dx;
+            }
+        }
+
         ArenaAlloc::ArenaAlloc(const std::string & name,
-                               std::size_t z, bool debug_flag)
+                               std::size_t z,
+                               bool debug_flag)
         {
             scope log(XO_DEBUG(debug_flag), xtag("name", name));
 
+            constexpr size_t c_hugepage_z = 2 * 1024 * 1024;
+
             this->name_       = name;
             this->page_z_     = getpagesize();
+            this->hugepage_z_ = c_hugepage_z;
 
-            // reserve virtual memory
+            // 1. need k pagetable entries where k is lub {k | k * .page_z >= z}
+            // 2. base will be aligned with .page_z but likely not with .hugepage_z
+            // 3. bad to have misalignment, because misaligned {prefix, suffix} of [base, base+z)
+            //    will use 4k pages instead of 2mb pages
+            //
+            // strategy:
+            // 4. round up z to multiple of c_hugepage_z
+            // 5. over-request so reserved range contains an aligned subrange of size z
+            // 6. unmap misaligned prefix
+            // 7. unmap misaligned suffix.
+            // 8. enable huge pages for now-aligned remainder of reserved range
+            //
+            // Z. note: rejecting inferior MAP_HUGETLB|MAP_HUGE_2MB flags on ::mmap here:
+            //    Za. requires previously-reserved memory in /proc/sys/vm/nr_hugepages
+            //    Zb. reserved pages permenently resident in RAM, never swapped
+            //    Zc. memory cost incurred even if no application is using said pages
 
-            void * base = mmap(nullptr, z, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+            z = align_lub(z, c_hugepage_z); // 4.
+
+            // 5.
+            byte * base = reinterpret_cast<byte *>(::mmap(nullptr,
+                                                               z + c_hugepage_z,
+                                                               PROT_NONE,
+                                                               MAP_PRIVATE | MAP_ANONYMOUS,
+                                                               -1, 0));
 
             log && log("acquired memory [lo,hi) using mmap",
                        xtag("lo", base),
                        xtag("z", z),
-                       xtag("hi", reinterpret_cast<std::byte *>(base) + z));
-
-            // could use this as fallback..
-            //base         = (new std::byte [z]);
+                       xtag("hi", reinterpret_cast<byte *>(base) + z));
 
             if (base == MAP_FAILED) {
                 throw std::runtime_error(tostr("ArenaAlloc: uncommitted allocation failed",
                                                xtag("size", z)));
             }
 
-            this->lo_          = reinterpret_cast<std::byte *>(base);
+            byte * aligned_base = reinterpret_cast<byte *>(align_lub(reinterpret_cast<size_t>(base),
+                                                                     c_hugepage_z));
+
+            assert(reinterpret_cast<size_t>(aligned_base) % c_hugepage_z == 0);
+            assert(aligned_base >= base);
+            assert(aligned_base < base + c_hugepage_z);
+
+            if (base < aligned_base) {
+                size_t prefix = aligned_base - base;
+
+                ::munmap(base, prefix); // 6.
+            }
+
+            byte * aligned_hi = aligned_base + z;
+            byte * hi = base + z + c_hugepage_z;
+
+            if (aligned_hi < hi) {
+                size_t suffix = hi - aligned_hi;
+
+                ::munmap(aligned_hi, suffix); // 7.
+            }
+
+            ::madvise(aligned_base, z, MADV_HUGEPAGE); // 8.
+
+            this->lo_          = aligned_base;
             this->committed_z_ = 0;
             this->checkpoint_  = lo_;
             this->free_ptr_    = lo_;
-            this->limit_       = lo_ + z;
+            this->limit_       = lo_;
             this->hi_          = lo_ + z;
             this->debug_flag_  = debug_flag;
 
@@ -52,7 +116,9 @@ namespace xo {
                                                xtag("size", z)));
             }
 
-            log && log(xtag("lo", (void*)lo_), xtag("page_z", page_z_));
+            log && log(xtag("lo", (void*)lo_),
+                       xtag("page_z", page_z_),
+                       xtag("hugepage_z", hugepage_z_));
         }
 
         ArenaAlloc::~ArenaAlloc()
@@ -64,7 +130,7 @@ namespace xo {
             if (lo_) {
                 log && log("unmap [lo,hi)", xtag("lo", lo_), xtag("z", hi_ - lo_), xtag("hi", hi_));
 
-                munmap(lo_, hi_ - lo_);
+                ::munmap(lo_, hi_ - lo_);
             }
             // could use this as fallback if we dropped the uncommitted technique
             //delete [] this->lo_;
@@ -86,21 +152,6 @@ namespace xo {
                                                  z, debug_flag));
         }
 
-        namespace {
-            /* alignment better be a power of 2 */
-            std::size_t
-            align_lub(std::size_t x, std::size_t align)
-            {
-                /* e.g:
-                 *   align = 4096, x%align = 100 -> dx = 3996
-                 *   align = 4096, x%align = 0   -> dx = 0
-                 */
-                std::size_t dx = (align - (x % align)) % align;
-
-                return x + dx;
-            }
-        }
-
         bool
         ArenaAlloc::expand(size_t offset_z)
         {
@@ -118,7 +169,7 @@ namespace xo {
                                                xtag("requested", offset_z), xtag("reserved", reserved())));
             }
 
-            std::size_t aligned_offset_z = align_lub(offset_z, page_z_);
+            std::size_t aligned_offset_z = align_lub(offset_z, hugepage_z_);
             std::byte * commit_start = lo_ + committed_z_;
             std::size_t add_commit_z = aligned_offset_z - committed_z_;
 
@@ -130,7 +181,7 @@ namespace xo {
                        xtag("add_commit_z", add_commit_z),
                        xtag("commit_end", commit_start + add_commit_z));
 
-            if (mprotect(commit_start, add_commit_z, PROT_READ | PROT_WRITE) != 0) {
+            if (::mprotect(commit_start, add_commit_z, PROT_READ | PROT_WRITE) != 0) {
                 throw std::runtime_error(tostr("ArenaAlloc::expand: commit failure",
                                                xtag("committed_z", committed_z_),
                                                xtag("add_commit_z", add_commit_z)));
