@@ -127,7 +127,7 @@ namespace xo {
                                        bool debug_flag);
 
             /** size of virtual address range reserved for this allocator **/
-            std::size_t reserved() const { return this->size(); }
+            std::size_t reserved() const { return hi_ - lo_; };
 
             std::size_t page_size() const { return page_z_; }
             std::byte * free_ptr() const { return free_ptr_; }
@@ -212,7 +212,9 @@ namespace xo {
             std::byte * checkpoint_ = nullptr;
             /** free pointer. memory in range [@ref free_, @ref limit_) available **/
             std::byte * free_ptr_ = nullptr;
-            /** soft limit: end of committed virtual memory **/
+            /** soft limit: end of committed virtual memory
+             *  invariant: @ref limit_ = @ref lo_ + @ref committed_z_
+             **/
             std::byte * limit_ = nullptr;
             /** hard limit: end of reserved virtual memory **/
             std::byte * hi_ = nullptr;

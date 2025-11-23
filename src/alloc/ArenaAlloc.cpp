@@ -170,14 +170,36 @@ namespace xo {
                 return true;
             }
 
-            if (lo_ + offset_z > limit_) {
+            if (lo_ + offset_z > hi_) {
                 throw std::runtime_error(tostr("ArenaAlloc::expand: requested size exceeds reserved size",
                                                xtag("requested", offset_z), xtag("reserved", reserved())));
             }
 
+            /*
+             * pre:
+             *
+             *   _______________...................................
+             *   ^              ^                                  ^
+             *   lo         limit                                 hi
+             *
+             *   < committed_z >
+             *   <----------offset_z----------->
+             *                                 >     <- z: 0 <= z < hugepage_z
+             *   <---------aligned_offset_z--------->
+             *                  <--- add_commit_z -->
+             *
+             * post:
+             *   ____________________________________..............
+             *   ^                                   ^             ^
+             *   lo                              limit            hi
+             *
+             */
+
             std::size_t aligned_offset_z = align_lub(offset_z, hugepage_z_);
             std::byte * commit_start = lo_ + committed_z_;
             std::size_t add_commit_z = aligned_offset_z - committed_z_;
+
+            assert(limit_ == lo_ + committed_z_);
 
             log && log(xtag("aligned_offset_z", aligned_offset_z),
                        xtag("add_commit_z", add_commit_z));
@@ -195,6 +217,9 @@ namespace xo {
 
             this->committed_z_ = aligned_offset_z;
             this->limit_ = this->lo_ + committed_z_;
+
+            assert(committed_z_ % hugepage_z_ == 0);
+            assert(reinterpret_cast<size_t>(limit_) % hugepage_z_ == 0);
 
             return true;
         }
