@@ -64,10 +64,10 @@ namespace xo {
 
             // 5.
             byte * base = reinterpret_cast<byte *>(::mmap(nullptr,
-                                                               z + c_hugepage_z,
-                                                               PROT_NONE,
-                                                               MAP_PRIVATE | MAP_ANONYMOUS,
-                                                               -1, 0));
+                                                          z + c_hugepage_z,
+                                                          PROT_NONE,
+                                                          MAP_PRIVATE | MAP_ANONYMOUS,
+                                                          -1, 0));
 
             log && log("acquired memory [lo,hi) using mmap",
                        xtag("lo", base),
@@ -101,7 +101,13 @@ namespace xo {
                 ::munmap(aligned_hi, suffix); // 7.
             }
 
+#ifdef __linux__
             ::madvise(aligned_base, z, MADV_HUGEPAGE); // 8.
+#endif
+            // TODO: for OSX -> need something else here.
+            //       MAP_ALIGNED_SUPER with mmap() and/or
+            //       use mach_vm_allocate()
+            //
 
             this->lo_          = aligned_base;
             this->committed_z_ = 0;
