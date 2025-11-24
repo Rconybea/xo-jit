@@ -7,6 +7,7 @@
 
 #include "ArenaAlloc.hpp"
 #include "GcStatistics.hpp"
+#include "Object.hpp"
 #include "xo/callback/UpCallbackSet.hpp"
 #include "xo/indentlog/print/array.hpp"
 #include <vector>
@@ -154,6 +155,9 @@ namespace xo {
              **/
             static up<GC> make(const Config & config);
 
+            /** runtime downcast **/
+            static GC * from(IAlloc * mm);
+
             const Config & config() const { return config_; }
             std::uint8_t nursery_polarity() const { return nursery_polarity_; }
             std::uint8_t tenured_polarity() const { return tenured_polarity_; }
@@ -230,6 +234,15 @@ namespace xo {
              *  from @c *addr
              **/
             void add_gc_root(Object ** addr);
+            /** reverse the effect of previous call to @ref add_gc_root **/
+            void remove_gc_root(Object ** addr);
+
+            /** convenience wrapper **/
+            template <typename T>
+            void add_gc_root_dwim(gp<T> * p) { this->add_gc_root(reinterpret_cast<Object**>(p->ptr_address())); }
+            template <typename T>
+            void remove_gc_root_dwim(gp<T> * p) { this->remove_gc_root(reinterpret_cast<Object**>(p->ptr_address())); }
+
             /** may optionally use this to observe GC copy phase.
              *  Will be invoked once _per surviving object_, so not cheap.
              *  Intended for GC visualization.

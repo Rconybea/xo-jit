@@ -132,9 +132,13 @@ namespace xo {
         up<GC>
         GC::make(const Config & config)
         {
-            //GC * gc = new GC(config);
-
             return std::make_unique<GC>(config);
+        }
+
+        GC *
+        GC::from(IAlloc * mm)
+        {
+            return dynamic_cast<GC *>(mm);
         }
 
         const std::string &
@@ -388,6 +392,19 @@ namespace xo {
         GC::add_gc_root(Object ** addr)
         {
             gc_root_v_.push_back(addr);
+        }
+
+        void
+        GC::remove_gc_root(Object ** addr)
+        {
+            /* Multithreaded GC not supported */
+
+            assert(!this->gc_in_progress());
+
+            auto new_end_ix = std::remove(gc_root_v_.begin(), gc_root_v_.end(), addr);
+
+            /* erase now-unused slots */
+            gc_root_v_.erase(new_end_ix, gc_root_v_.end());
         }
 
         auto
