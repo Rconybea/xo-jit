@@ -57,6 +57,9 @@ namespace xo {
                 return (u2 <= u1 + sizeof(std::uintptr_t));
         }
 
+        /** (for consistency's sake) **/
+        T * get() const { return ptr_; }
+
         T * ptr() const { return ptr_; }
         T ** ptr_address() { return &ptr_; }
 
@@ -204,7 +207,7 @@ namespace xo {
          *
          *  Require: @ref mm is an instance of @ref gc::GC
          **/
-        virtual Object * _shallow_copy() const = 0;
+        virtual Object * _shallow_copy(gc::IAlloc * mm) const = 0;
 
         /** update child pointers that refer to forwarding pointers,
          *  replacing them with the correct destination.

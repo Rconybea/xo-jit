@@ -170,7 +170,7 @@ namespace xo {
          */
         if (gc->fromspace_contains(src))
         {
-            Object * dest = src->_shallow_copy();
+            Object * dest = src->_shallow_copy(gc);
 
             if (dest != src)
                 src->_forward_to(dest);

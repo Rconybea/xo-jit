@@ -52,7 +52,7 @@ namespace xo {
 
         // LCOV_EXCL_START
         Object *
-        Forwarding1::_shallow_copy() const {
+        Forwarding1::_shallow_copy(gc::IAlloc *) const {
             assert(false);
             return nullptr;
         }
