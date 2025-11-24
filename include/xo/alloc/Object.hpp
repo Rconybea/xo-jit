@@ -97,6 +97,8 @@ namespace xo {
 
         /** memory allocator for objects.  Likely this will be a GC instance,
          *  but simple arena also supported.
+         *
+         *  Load-bearing for .assign_member()
          **/
         static gc::IAlloc * mm;
 
