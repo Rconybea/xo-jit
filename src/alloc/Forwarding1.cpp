@@ -60,7 +60,7 @@ namespace xo {
 
         // LCOV_EXCL_START
         std::size_t
-        Forwarding1::_forward_children(gc::GC *) {
+        Forwarding1::_forward_children(gc::IAlloc *) {
             assert(false);
             return 0;
         }

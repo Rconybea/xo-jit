@@ -119,17 +119,17 @@ namespace xo {
          *  @p src.        source object to be forwarded
          *  @p gc.         garbage collector
          */
-        static Object * _forward(Object * src, gc::GC * gc);
+        static Object * _forward(Object * src, gc::IAlloc * gc);
 
         template <typename T>
-        static void _forward_inplace(T ** src_addr, gc::GC * gc) {
+        static void _forward_inplace(T ** src_addr, gc::IAlloc * gc) {
             Object * fwd = _forward(*src_addr, gc);
 
             *src_addr = reinterpret_cast<T *>(fwd);
         }
 
         template <typename T>
-        static void _forward_inplace(gp<T> & src, gc::GC * gc) {
+        static void _forward_inplace(gp<T> & src, gc::IAlloc * gc) {
             _forward_inplace<T>(src.ptr_address(), gc);
         }
 
@@ -243,7 +243,7 @@ namespace xo {
          *  allocated by @ref _shallow_move
          *
          **/
-        virtual std::size_t _forward_children(gc::GC * gc) = 0;
+        virtual std::size_t _forward_children(gc::IAlloc * gc) = 0;
     };
 
     template <typename T>

@@ -34,7 +34,7 @@ namespace xo {
 
                 virtual std::size_t _shallow_size() const final override { return sizeof(*this); }
                 virtual Object * _shallow_copy(gc::IAlloc * mm) const final override { return new (Cpof(mm, this)) DummyObject(*this); }
-                virtual std::size_t _forward_children(gc::GC * gc) final override { return _shallow_size(); }
+                virtual std::size_t _forward_children(gc::IAlloc * gc) final override { return _shallow_size(); }
 
             private:
                 std::array<char, 128> data_;
