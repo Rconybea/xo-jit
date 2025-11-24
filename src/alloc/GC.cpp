@@ -559,6 +559,19 @@ namespace xo {
             }
         }
 
+        bool
+        GC::check_owned(Object * src) const
+        {
+            return this->fromspace_contains(src);
+        }
+
+        bool
+        GC::check_move(Object * src) const
+        {
+            return (this->runstate().full_move()
+                    || (this->tospace_generation_of(src) != gc::generation_result::tenured));
+        }
+
         void
         GC::swap_nursery()
         {

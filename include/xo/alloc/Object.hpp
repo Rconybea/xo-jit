@@ -122,15 +122,15 @@ namespace xo {
         static Object * _forward(Object * src, gc::GC * gc);
 
         template <typename T>
-        static void _forward_inplace(T ** src_addr) {
-            Object * fwd = _forward(*src_addr, _gc());
+        static void _forward_inplace(T ** src_addr, gc::GC * gc) {
+            Object * fwd = _forward(*src_addr, gc);
 
             *src_addr = reinterpret_cast<T *>(fwd);
         }
 
         template <typename T>
-        static void _forward_inplace(gp<T> & src) {
-            _forward_inplace<T>(src.ptr_address());
+        static void _forward_inplace(gp<T> & src, gc::GC * gc) {
+            _forward_inplace<T>(src.ptr_address(), gc);
         }
 
         /** primary workhorse for garbage collection.
@@ -156,10 +156,10 @@ namespace xo {
          **/
         static Object * _deep_move(Object * src, gc::GC * gc, gc::ObjectStatistics * stats);
 
-        /** copy @p src to to-space, and replace original with forwarding pointer to new location.
+        /** copy @p src to to-space. Overwrite original with forwarding pointer to new location.
          *  return the new location
          **/
-        static Object * _shallow_move(Object * src, gc::GC * gc);
+        static Object * _shallow_move(Object * src, gc::IAlloc * gc);
 
         // Reflection support
 
@@ -207,7 +207,7 @@ namespace xo {
          *
          *  Require: @ref mm is an instance of @ref gc::GC
          **/
-        virtual Object * _shallow_copy(gc::IAlloc * mm) const = 0;
+        virtual Object * _shallow_copy(gc::IAlloc * gc) const = 0;
 
         /** update child pointers that refer to forwarding pointers,
          *  replacing them with the correct destination.
@@ -243,7 +243,7 @@ namespace xo {
          *  allocated by @ref _shallow_move
          *
          **/
-        virtual std::size_t _forward_children() = 0;
+        virtual std::size_t _forward_children(gc::GC * gc) = 0;
     };
 
     template <typename T>

@@ -32,7 +32,7 @@ namespace xo {
             /** required by Object i/face, but never called on Forwarding1 **/
             virtual Object *    _shallow_copy(gc::IAlloc * mm) const final override;
             /** required by Object i/face, but never called on Forwarding1 **/
-            virtual std::size_t _forward_children() final override;
+            virtual std::size_t _forward_children(gc::GC * mm) final override;
 
         private:
             /** the object that used to be located at this address (i.e. @c this)

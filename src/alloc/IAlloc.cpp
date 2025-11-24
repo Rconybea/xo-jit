@@ -47,6 +47,18 @@ namespace xo {
             *lhs = rhs;
         }
 
+        bool
+        IAlloc::check_owned(Object * /*obj*/) const
+        {
+            return false;
+        }
+
+        bool
+        IAlloc::check_move(Object * /*obj*/) const
+        {
+            return false;
+        }
+
         // LCOV_EXCL_START
         std::byte *
         IAlloc::alloc_gc_copy(std::size_t /*z*/, const void * /*src*/)

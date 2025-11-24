@@ -16,7 +16,12 @@ namespace xo {
 
     namespace gc {
         /** @class IAllocator
-         *  @brief memory allocation interface with limited garbaga collector support
+         *  @brief memory allocation interface with limited garbage collector support
+         *
+         *  Garbage collector support methods:
+         *  - checkpoint()
+         *  - assign_member()
+         *  - alloc_gc_copy()
          **/
         class IAlloc {
         public:
@@ -56,14 +61,28 @@ namespace xo {
             /** @return true iff debug logging enabled **/
             virtual bool debug_flag() const = 0;
 
-            /** reset allocator to empty state. **/
-            virtual void clear() = 0;
             /** remember allocator state.  All currently-allocated addresses xo
              *  will satisfy is_before_checkpoint(x).  Subsequent allocations x
              *  will fail is_before_checkpoint(x), until checkpoint superseded
              *  by @ref clear or another call to @ref checkpoint
              **/
             virtual void checkpoint() = 0;
+
+            /** allocate @p z bytes of memory. returns pointer to first address **/
+            virtual std::byte * alloc(std::size_t z) = 0;
+            /** reset allocator to empty state. **/
+            virtual void clear() = 0;
+
+            // ----- GC-specific methods -----
+
+            /** true iff this allocator owns object at address @p src.
+             *  Use to assist Object::_shallow_move
+             **/
+            virtual bool check_owned(Object * src) const;
+            /** true iff object at address @p src must move as part of
+             *  in-progress collection phase
+             **/
+            virtual bool check_move(Object * src) const;
             /** perform assignment
              *    @code
              *    *lhs = rhs
@@ -72,8 +91,6 @@ namespace xo {
              *  Default implementation just does the assignment.
              **/
             virtual void assign_member(Object * parent, Object ** lhs, Object * rhs);
-            /** allocate @p z bytes of memory. returns pointer to first address **/
-            virtual std::byte * alloc(std::size_t z) = 0;
             /** allocate @p z bytes for copy of object at @p src.
              *  Only used in @ref GC.  Default implementation asserts and returns nullptr
              **/

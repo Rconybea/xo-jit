@@ -308,6 +308,15 @@ namespace xo {
              **/
             virtual void assign_member(Object * parent, Object ** lhs, Object* rhs) final override;
 
+            /** during GC check for source objects owned by GC.
+             *  See Object::_shallow_move.
+             **/
+            virtual bool check_owned(Object * src) const final override;
+            /** queries during GC to determine if object at address @p src should move:
+             *  - full GC -> always
+             *  - incr GC -> if not tenured
+             **/
+            virtual bool check_move(Object * src) const final override;
             virtual std::byte * alloc(std::size_t z) final override;
             virtual std::byte * alloc_gc_copy(std::size_t z, const void * src) final override;
 

@@ -14,9 +14,9 @@ operator new (std::size_t z, const xo::Cpof & cpof)
 {
     using xo::gc::GC;
 
-    GC * gc = reinterpret_cast<GC *>(cpof.mm_);
+    //GC * gc = reinterpret_cast<GC *>(cpof.mm_);
 
-    return gc->alloc_gc_copy(z, cpof.src_);
+    return cpof.mm_->alloc_gc_copy(z, cpof.src_);
 }
 
 namespace xo {
@@ -32,18 +32,15 @@ namespace xo {
         if (src->_is_forwarded())
             return src->_offset_destination(src);
 
-        bool full_move = gc->runstate().full_move();
+        if (gc->check_move(src)) {
+            Object::_shallow_move(src, gc);
 
-        if (!full_move && (gc->tospace_generation_of(src) == gc::generation_result::tenured)) {
+            /* *src is now a forwarding pointer to a copy in to-space */
+            return src->_offset_destination(src);
+        } else {
             /* don't move tenured objects during incremental collection */
             return src;
         }
-
-        Object::_shallow_move(src, gc);
-
-        /* *src is now a forwarding pointer to copy in to-space */
-
-        return src->_offset_destination(src);
     }
 
     Object *
@@ -59,9 +56,7 @@ namespace xo {
         if (retval)
             return retval;
 
-        bool full_move = gc->runstate().full_move();
-
-        if (!full_move && gc->tospace_generation_of(from_src) == gc::generation_result::tenured) {
+        if (!gc->check_move(from_src)) {
             /** incremental collection does not move already-tenured objects **/
             return from_src;
         }
@@ -70,7 +65,8 @@ namespace xo {
          *  To-space:
          *
          *     to_lo = start of to-space
-         *     w,W   = white objects. An object x is white if x + all immediate children of x are in to-space
+         *     w,W   = white objects. An object x is white if x
+         *             + all immediate children of x are in to-space
          *             (also implies this GC cycle put it there)
          *     g,G   = grey  objects. An object x is gray if it's in to-space,
          *             but possibly has >0 black children
@@ -141,7 +137,7 @@ namespace xo {
 
                     // update per-class stats here
 
-                    std::size_t xz = x->_forward_children();
+                    std::size_t xz = x->_forward_children(gc);
 
                     // must pad xz to multiple of word size,
                     // to match behavior of LinearAlloc::alloc()
@@ -163,12 +159,12 @@ namespace xo {
     } /*deep_move*/
 
     Object *
-    Object::_shallow_move(Object * src, gc::GC * gc)
+    Object::_shallow_move(Object * src, gc::IAlloc * gc)
     {
         /* filter for source objects that are owned by GC.
          * Care required though -- during GC from/to spaces have been swapped already
          */
-        if (gc->fromspace_contains(src))
+        if (gc->check_owned(src))
         {
             Object * dest = src->_shallow_copy(gc);
 

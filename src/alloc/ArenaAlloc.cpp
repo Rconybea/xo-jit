@@ -357,6 +357,14 @@ namespace xo {
         }
 
         bool
+        ArenaAlloc::check_owned(Object * src) const
+        {
+            byte * addr = reinterpret_cast<byte *>(src);
+
+            return (lo_ <= addr) && (addr < hi_);
+        }
+
+        bool
         ArenaAlloc::debug_flag() const
         {
             return debug_flag_;
