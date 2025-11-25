@@ -39,6 +39,10 @@ namespace xo {
         template <typename S>
         gc_ptr(const gc_ptr<S> & x) : ptr_{x.ptr()} {}
 
+        /** runtime downcast. shorthand for dynamic_cast<T*> **/
+        template <typename S>
+        static gc_ptr<T> from(const gc_ptr<S> & x) { return gc_ptr<T>{dynamic_cast<T*>(x.ptr())}; }
+
         /** convenience for static asserts **/
         static constexpr bool is_gc_ptr = true;
         /** see also: xo/refcnt/Refcounted.hpp **/
