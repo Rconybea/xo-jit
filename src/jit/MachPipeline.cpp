@@ -11,7 +11,7 @@ namespace xo {
     using xo::scm::Expression;
     using xo::scm::ConstantInterface;
     //using xo::scm::FunctionInterface;
-    using xo::scm::PrimitiveInterface;
+    using xo::scm::PrimitiveExprInterface;
     using xo::scm::Lambda;
     using xo::scm::Variable;
     using xo::scm::Apply;
@@ -166,7 +166,7 @@ namespace xo {
         }
 
         llvm::Function *
-        MachPipeline::codegen_primitive(bp<PrimitiveInterface> expr)
+        MachPipeline::codegen_primitive(bp<PrimitiveExprInterface> expr)
         {
             constexpr bool c_debug_flag = true;
 
@@ -251,7 +251,7 @@ namespace xo {
         } /*codegen_primitive*/
 
         llvm::Function *
-        MachPipeline::codegen_primitive_wrapper(bp<PrimitiveInterface> expr,
+        MachPipeline::codegen_primitive_wrapper(bp<PrimitiveExprInterface> expr,
                                                 llvm::IRBuilder<> & /*ir_builder*/)
         {
             constexpr bool c_debug_flag = true;
@@ -369,7 +369,7 @@ namespace xo {
         } /*codegen_primitive_wrapper*/
 
         llvm::Value *
-        MachPipeline::codegen_primitive_closure(bp<xo::scm::PrimitiveInterface> expr,
+        MachPipeline::codegen_primitive_closure(bp<xo::scm::PrimitiveExprInterface> expr,
                                                 llvm::IRBuilder<> & ir_builder)
         {
             constexpr bool c_debug_flag = true;
@@ -422,7 +422,7 @@ namespace xo {
                  * allows substituting LLVM intrinsic
                  */
                 if (apply->fn()->extype() == exprtype::primitive) {
-                    auto pm = PrimitiveInterface::from(apply->fn());
+                    auto pm = PrimitiveExprInterface::from(apply->fn());
 
                     if (pm) {
                         llvm_closure = this->codegen_primitive_closure(pm, ir_builder);
@@ -979,7 +979,7 @@ namespace xo {
             case exprtype::constant:
                 return this->codegen_constant(ConstantInterface::from(expr));
             case exprtype::primitive:
-                return this->codegen_primitive_closure(PrimitiveInterface::from(expr), ir_builder);
+                return this->codegen_primitive_closure(PrimitiveExprInterface::from(expr), ir_builder);
             case exprtype::apply:
                 return this->codegen_apply(Apply::from(expr), envptr, ir_builder);
             case exprtype::lambda:

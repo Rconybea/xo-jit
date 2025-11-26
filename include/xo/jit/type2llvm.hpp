@@ -20,7 +20,7 @@ namespace xo {
          **/
         struct type2llvm {
         public:
-            using FunctionInterface = xo::scm::FunctionInterface;
+            using FunctionInterface = xo::scm::FunctionExprInterface;
             using Lambda = xo::scm::Lambda;
             using TypeDescr = xo::reflect::TypeDescr;
 

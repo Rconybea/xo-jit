@@ -15,7 +15,7 @@
 
 #include "xo/expression/Expression.hpp"
 #include "xo/expression/ConstantInterface.hpp"
-#include "xo/expression/PrimitiveInterface.hpp"
+#include "xo/expression/PrimitiveExprInterface.hpp"
 #include "xo/expression/Apply.hpp"
 #include "xo/expression/Lambda.hpp"
 #include "xo/expression/Variable.hpp"
@@ -110,7 +110,7 @@ namespace xo {
              **/
             llvm::Type * codegen_type(TypeDescr td);
             llvm::Value * codegen_constant(bp<xo::scm::ConstantInterface> expr);
-            llvm::Function * codegen_primitive(bp<xo::scm::PrimitiveInterface> expr);
+            llvm::Function * codegen_primitive(bp<xo::scm::PrimitiveExprInterface> expr);
 
             /** like @ref codegen_primitive , but create wrapper function that accepts (and discards)
              *  environment pointer as first argument.
@@ -118,7 +118,7 @@ namespace xo {
              *  Implementation consists of tail call to natural primitive, that skips the unused
              *  environment pointer
              **/
-            llvm::Function * codegen_primitive_wrapper(bp<xo::scm::PrimitiveInterface> expr,
+            llvm::Function * codegen_primitive_wrapper(bp<xo::scm::PrimitiveExprInterface> expr,
                                                        llvm::IRBuilder<> & ir_builder);
 
             /** Generate closure for invoking a primitive function.
@@ -126,7 +126,7 @@ namespace xo {
              *  to support function-pointer-like behavior for a target function
              *  that may resolve to primitive-or-lambda at runtime
              **/
-            llvm::Value * codegen_primitive_closure(bp<xo::scm::PrimitiveInterface> expr,
+            llvm::Value * codegen_primitive_closure(bp<xo::scm::PrimitiveExprInterface> expr,
                                                     llvm::IRBuilder<> & ir_builder);
 
             llvm::Value * codegen_apply(bp<xo::scm::Apply> expr,
