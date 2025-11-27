@@ -1,7 +1,7 @@
 /* @file MachPipeline.test.cpp */
 
 #include "xo/jit/MachPipeline.hpp"
-#include "xo/expression/Primitive.hpp"
+#include "xo/expression/PrimitiveExpr.hpp"
 #include "xo/ratio/ratio.hpp"
 #include "xo/ratio/ratio_reflect.hpp"
 #include "xo/reflect/reflect_struct.hpp"
