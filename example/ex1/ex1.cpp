@@ -2,7 +2,7 @@
 
 #include "xo/jit/MachPipeline.hpp"
 #include "xo/expression/Constant.hpp"
-#include "xo/expression/Primitive.hpp"
+#include "xo/expression/PrimitiveExpr.hpp"
 #include "xo/expression/Apply.hpp"
 #include "xo/expression/Lambda.hpp"
 #include "xo/expression/Variable.hpp"
