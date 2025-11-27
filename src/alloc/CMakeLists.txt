@@ -9,6 +9,7 @@ set(SELF_SRCS
     GcStatistics.cpp
     ObjectStatistics.cpp
     Object.cpp
+    Blob.cpp
     Forwarding1.cpp
     generation.cpp
 )
