@@ -16,12 +16,15 @@ namespace xo {
 
     namespace gc {
         /** @class IAllocator
-         *  @brief memory allocation interface with limited garbage collector support
+         *  @brief arena allocation interface with limited garbage collector support
          *
          *  Garbage collector support methods:
          *  - checkpoint()
          *  - assign_member()
          *  - alloc_gc_copy()
+         *
+         *  See class GC for copying incremental collector.
+         *  See class ArenaAlloc for arena allocator
          **/
         class IAlloc {
         public:

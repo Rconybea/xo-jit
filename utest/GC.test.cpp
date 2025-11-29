@@ -26,8 +26,11 @@ namespace xo {
 
             std::vector<testcase_gc>
             s_testcase_v = {
+                // n_gct: nursery gc threshold
+                // t_gct: tenured gc threshold
+                //
                 //            nz    tz  n_gct  t_gct
-                testcase_gc(1024, 4096,  1024,  4096)
+                testcase_gc(1024, 4096,  1024,  1024)
             };
         }
 
@@ -49,9 +52,9 @@ namespace xo {
                     REQUIRE(gc->nursery_to_allocated() == 0);
                     REQUIRE(gc->nursery_to_committed() >= tc.nursery_z_);
                     REQUIRE(gc->nursery_to_reserved() >= tc.nursery_z_);
-                    REQUIRE(gc->nursery_to_reserved() < tc.nursery_z_ + gc->pagesize());
+                    REQUIRE(gc->nursery_to_reserved() < tc.nursery_z_ + gc->hugepage_z());
                     REQUIRE(gc->size() >= tc.nursery_z_ + tc.tenured_z_);
-                    REQUIRE(gc->size() < tc.nursery_z_ + gc->pagesize() + tc.tenured_z_ + gc->pagesize());
+                    REQUIRE(gc->size() < tc.nursery_z_ + gc->hugepage_z() + tc.tenured_z_ + gc->hugepage_z());
                     REQUIRE(gc->allocated() == 0);
                     REQUIRE(gc->available() == gc->nursery_to_reserved());
                     REQUIRE(gc->before_checkpoint() == 0);

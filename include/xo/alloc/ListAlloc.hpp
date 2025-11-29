@@ -37,6 +37,9 @@ namespace xo {
             /** page size used by underlying ArenaAlloc **/
             std::size_t page_size() const;
 
+            /** hugepage size used by underlying ArenaAlloc **/
+            std::size_t hugepage_z() const;
+
             /** reset to have at least @p z bytes of storage **/
             bool reset(std::size_t z);
 

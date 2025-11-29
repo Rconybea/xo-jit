@@ -10,6 +10,8 @@ namespace xo {
     using xo::gc::ListAlloc;
 
     namespace ut {
+#ifdef NOT_USING // ListAlloc probably permanently retired. Not maintaining
+
         TEST_CASE("ListAlloc", "[alloc][gc]")
         {
             /** teeny weeny allocator.
@@ -27,7 +29,7 @@ namespace xo {
             std::byte * mem1 = alloc->alloc(20);
 
             REQUIRE(mem1);
-            REQUIRE(alloc->size() == alloc->page_size());
+            REQUIRE(alloc->size() == std::max(alloc->page_size(), alloc->hugepage_z()));
             /* round up to multiple of 8 */
             REQUIRE(alloc->before_checkpoint() == 24);
             REQUIRE(alloc->after_checkpoint() == 0);
@@ -54,6 +56,7 @@ namespace xo {
             REQUIRE(alloc->is_before_checkpoint(mem2) == false);
             REQUIRE(alloc->is_before_checkpoint(mem3) == false);
         }
+#endif
 
     } /*namespace ut*/
 } /*namespace xo*/

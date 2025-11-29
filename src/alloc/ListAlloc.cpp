@@ -76,6 +76,11 @@ namespace xo {
         }
 
         std::size_t
+        ListAlloc::hugepage_z() const {
+            return hd_->hugepage_z();
+        }
+
+        std::size_t
         ListAlloc::size() const {
             return total_z_;
         }
@@ -336,6 +341,7 @@ namespace xo {
 
             std::unique_ptr<ArenaAlloc> new_alloc = ArenaAlloc::make(name,
                                                                      cz, debug_flag_);
+            cz = new_alloc->size();
 
             if (!new_alloc)
                 return false;

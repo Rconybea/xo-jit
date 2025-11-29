@@ -234,6 +234,12 @@ namespace xo {
         }
 
         std::size_t
+        GC::hugepage_z() const
+        {
+            return nursery_to()->hugepage_z();
+        }
+
+        std::size_t
         GC::nursery_from_allocated() const
         {
             return nursery_from()->allocated();

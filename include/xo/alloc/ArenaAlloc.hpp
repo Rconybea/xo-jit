@@ -130,6 +130,7 @@ namespace xo {
             std::size_t reserved() const { return hi_ - lo_; };
 
             std::size_t page_size() const { return page_z_; }
+            std::size_t hugepage_z() const { return hugepage_z_; }
             std::byte * free_ptr() const { return free_ptr_; }
             void       set_free_ptr(std::byte * x);
 

@@ -13,17 +13,16 @@ namespace xo {
 
         namespace {
             struct testcase_alloc {
-                testcase_alloc(std::size_t rz, std::size_t z)
+                explicit testcase_alloc(std::size_t z)
                     :
                     arena_z_{z} {}
 
                 std::size_t arena_z_;
-
             };
 
             std::vector<testcase_alloc>
             s_testcase_v = {
-                testcase_alloc(0, 4096)
+                testcase_alloc(4096)
             };
         }
 
@@ -37,11 +36,12 @@ namespace xo {
 
                 auto alloc = ArenaAlloc::make("linearalloc",
                                               tc.arena_z_, c_debug_flag);
+                alloc->expand(tc.arena_z_);
 
                 REQUIRE(alloc.get());
                 REQUIRE(alloc->name() == "linearalloc");
-                REQUIRE(alloc->size() == tc.arena_z_);
-                REQUIRE(alloc->available() == tc.arena_z_);
+                REQUIRE(alloc->size() == std::max(tc.arena_z_, alloc->hugepage_z()));
+                REQUIRE(alloc->available() == std::max(tc.arena_z_, alloc->hugepage_z()));
                 REQUIRE(alloc->allocated() == 0);
                 REQUIRE(alloc->is_before_checkpoint(alloc->free_ptr()) == false);
                 REQUIRE(alloc->before_checkpoint() == 0);
@@ -49,23 +49,23 @@ namespace xo {
 
                 auto free0 = alloc->free_ptr();
 
-                auto mem = alloc->alloc(tc.arena_z_);
+                auto mem = alloc->alloc(std::max(tc.arena_z_, alloc->hugepage_z()));
 
                 REQUIRE(mem != nullptr);
 
                 REQUIRE(mem == free0);
 
-                REQUIRE(alloc->size() == tc.arena_z_);
+                REQUIRE(alloc->size() == std::max(tc.arena_z_, alloc->hugepage_z()));
                 REQUIRE(alloc->available() == 0);
-                REQUIRE(alloc->allocated() == tc.arena_z_);
+                REQUIRE(alloc->allocated() == std::max(tc.arena_z_, alloc->hugepage_z()));
                 REQUIRE(alloc->is_before_checkpoint(mem) == false);
                 REQUIRE(alloc->before_checkpoint() == 0);
-                REQUIRE(alloc->after_checkpoint() == tc.arena_z_);
+                REQUIRE(alloc->after_checkpoint() == std::max(tc.arena_z_, alloc->hugepage_z()));
 
                 alloc->clear();
 
                 REQUIRE(alloc->free_ptr() == free0);
-                REQUIRE(alloc->available() == tc.arena_z_);
+                REQUIRE(alloc->available() == std::max(tc.arena_z_, alloc->hugepage_z()));
                 REQUIRE(alloc->allocated() == 0);
                 REQUIRE(alloc->is_before_checkpoint(free0) == false);
                 REQUIRE(alloc->before_checkpoint() == 0);
@@ -74,8 +74,8 @@ namespace xo {
                 mem = alloc->alloc(1);
 
                 auto used = sizeof(void*);
-                REQUIRE(alloc->size() == tc.arena_z_);
-                REQUIRE(alloc->available() == tc.arena_z_ - used);
+                REQUIRE(alloc->size() == std::max(tc.arena_z_, alloc->hugepage_z()));
+                REQUIRE(alloc->available() == std::max(tc.arena_z_, alloc->hugepage_z()) - used);
                 REQUIRE(alloc->allocated() == used);
                 REQUIRE(alloc->is_before_checkpoint(free0) == false);
                 REQUIRE(alloc->before_checkpoint() == 0);

@@ -177,6 +177,8 @@ namespace xo {
 
             /** @return pagesize (will be the same for {nursery, tenured} spaces) **/
             std::size_t pagesize() const;
+            /** @return hugepage size (will be the same for {nursery, tenured} spaces) **/
+            std::size_t hugepage_z() const;
 
             /** @return allocation portion of Nursery to-space **/
             std::size_t nursery_to_allocated() const;
