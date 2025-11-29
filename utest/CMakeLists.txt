@@ -7,6 +7,7 @@ set(UTEST_SRCS
     alloc_utest_main.cpp
     IAlloc.test.cpp
     ArenaAlloc.test.cpp
+    ArenaAllocT.test.cpp
     ListAlloc.test.cpp
     GC.test.cpp
     GcStatistics.test.cpp
