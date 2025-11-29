@@ -15,15 +15,16 @@ namespace xo {
 
         namespace {
             struct testcase_ArenaAllocT {
-                testcase_ArenaAllocT(std::size_t z) : arena_z_{z} {}
-
                 std::size_t arena_z_;
                 std::vector<std::pair<std::string, std::string>> kv_pairs_;
             };
 
             std::vector<testcase_ArenaAllocT>
             s_testcase_v = {
-                testcase_ArenaAllocT(4096)
+                { 4096, {} },
+                { 4096, {{"a", "apple"}} },
+                { 4096, {{"a", "apple"}, {"b", "banana"}, {"c", "carrot"}} },
+                { 4096, {{"a", "apple"}, {"b", "banana"}, {"c", "carrot"}, {"e", "eggplant"}} },
             };
         }
 
@@ -32,7 +33,7 @@ namespace xo {
             for (std::size_t i_tc = 0, n_tc = s_testcase_v.size(); i_tc < n_tc; ++i_tc) {
                 const testcase_ArenaAllocT & tc = s_testcase_v[i_tc];
 
-                constexpr bool c_debug_flag = true;
+                constexpr bool c_debug_flag = false;
 
                 auto arena = ArenaAlloc::make("arena", tc.arena_z_, c_debug_flag);
                 auto alloc = ArenaAllocT<std::pair<const std::string, std::string>>(arena.get());
@@ -52,8 +53,9 @@ namespace xo {
                     REQUIRE(test_map.size() == n);
 
                     for (const auto & map_ix : test_map) {
-                        map_ix.first;
-                        map_ix.second;
+                        // verify alloc was used for both Key + Value.
+                        REQUIRE(arena->contains(&map_ix.first));
+                        REQUIRE(arena->contains(&map_ix.second));
                     }
                 }
 
