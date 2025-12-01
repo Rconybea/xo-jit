@@ -23,7 +23,7 @@ namespace xo {
 
                 gp<Object> member() const { return member_; }
                 void assign_member(Object * x) {
-                    Object::mm->assign_member(this, member_.ptr_address(), x);
+                    Object::mm->assign_member(this, reinterpret_cast<IObject**>(member_.ptr_address()), x);
                 }
 
                 TaggedPtr self_tp() const final override {
@@ -33,7 +33,7 @@ namespace xo {
                 void display(std::ostream & os) const final override { os << data_; }
 
                 virtual std::size_t _shallow_size() const final override { return sizeof(*this); }
-                virtual Object * _shallow_copy(gc::IAlloc * mm) const final override { return new (Cpof(mm, this)) DummyObject(*this); }
+                virtual IObject * _shallow_copy(gc::IAlloc * mm) const final override { return new (Cpof(mm, this)) DummyObject(*this); }
                 virtual std::size_t _forward_children(gc::IAlloc * gc) final override { return _shallow_size(); }
 
             private:

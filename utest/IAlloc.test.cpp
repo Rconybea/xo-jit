@@ -3,7 +3,7 @@
  * author: Roland Conybeare, Aug 2025
  */
 
-#include "xo/alloc/IAlloc.hpp"
+#include "xo/allocutil/IAlloc.hpp"
 #include <catch2/catch.hpp>
 
 namespace xo {

@@ -64,7 +64,7 @@ namespace xo {
          *  3. return the location of the copy make in step 1.
          *
          *  @p src.        source object to be forwarded
-         *  @p gc.         garbage collector
+         *  @p gc.         allocator (poassibly garbage collector)
          */
         static IObject * _forward(IObject * src, gc::IAlloc * gc);
 
