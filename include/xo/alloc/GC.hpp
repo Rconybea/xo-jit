@@ -88,29 +88,30 @@ namespace xo {
 
         class MutationLogEntry {
         public:
-            MutationLogEntry(Object * parent, Object ** lhs) : parent_{parent}, lhs_{lhs} {}
+            MutationLogEntry(IObject * parent, IObject ** lhs)
+                : parent_{parent}, lhs_{lhs} {}
 
-            Object * parent() const { return parent_; }
-            Object ** lhs() const { return lhs_; }
+            IObject * parent() const { return parent_; }
+            IObject ** lhs() const { return lhs_; }
 
-            Object * child() const { return *lhs_; }
+            IObject * child() const { return *lhs_; }
 
             bool is_child_forwarded() const;
             bool is_parent_forwarded() const;
 
-            Object * parent_destination() const;
+            IObject * parent_destination() const;
 
             /** Flag obsolete mutation.
              *  Future proofing, never happens for regular objects
              **/
             bool is_dead() const { return false; }
 
-            MutationLogEntry update_parent_moved(Object * parent_to) const;
-            void fixup_parent_child_moved(Object * child_to) { *lhs_ = child_to; }
+            MutationLogEntry update_parent_moved(IObject * parent_to) const;
+            void fixup_parent_child_moved(IObject * child_to) { *lhs_ = child_to; }
 
         private:
-            Object * parent_;
-            Object ** lhs_;
+            IObject * parent_ = nullptr;
+            IObject ** lhs_ = nullptr;
         };
 
         using MutationLog = std::vector<MutationLogEntry>;
@@ -235,15 +236,15 @@ namespace xo {
             /** add gc root at address @p addr .  Gc will keep alive anything reachable
              *  from @c *addr
              **/
-            void add_gc_root(Object ** addr);
+            void add_gc_root(IObject ** addr);
             /** reverse the effect of previous call to @ref add_gc_root **/
-            void remove_gc_root(Object ** addr);
+            void remove_gc_root(IObject ** addr);
 
             /** convenience wrapper **/
             template <typename T>
-            void add_gc_root_dwim(gp<T> * p) { this->add_gc_root(reinterpret_cast<Object**>(p->ptr_address())); }
+            void add_gc_root_dwim(gp<T> * p) { this->add_gc_root(reinterpret_cast<IObject**>(p->ptr_address())); }
             template <typename T>
-            void remove_gc_root_dwim(gp<T> * p) { this->remove_gc_root(reinterpret_cast<Object**>(p->ptr_address())); }
+            void remove_gc_root_dwim(gp<T> * p) { this->remove_gc_root(reinterpret_cast<IObject**>(p->ptr_address())); }
 
             /** may optionally use this to observe GC copy phase.
              *  Will be invoked once _per surviving object_, so not cheap.
@@ -308,17 +309,17 @@ namespace xo {
              *  @param lhs.     address of a member variable within the allocation of @p parent.
              *  @param rhs.     new target for @p *lhs
              **/
-            virtual void assign_member(Object * parent, Object ** lhs, Object* rhs) final override;
+            virtual void assign_member(IObject * parent, IObject ** lhs, IObject* rhs) final override;
 
             /** during GC check for source objects owned by GC.
              *  See Object::_shallow_move.
              **/
-            virtual bool check_owned(Object * src) const final override;
+            virtual bool check_owned(IObject * src) const final override;
             /** queries during GC to determine if object at address @p src should move:
              *  - full GC -> always
              *  - incr GC -> if not tenured
              **/
-            virtual bool check_move(Object * src) const final override;
+            virtual bool check_move(IObject * src) const final override;
             virtual std::byte * alloc(std::size_t z) final override;
             virtual std::byte * alloc_gc_copy(std::size_t z, const void * src) final override;
 
@@ -349,7 +350,7 @@ namespace xo {
             /** scan to-space for object statistics before GC */
             void capture_object_statistics(generation upto, capture_phase phase);
             /** copy object **/
-            void copy_object(Object ** addr, generation upto, ObjectStatistics * object_stats);
+            void copy_object(IObject ** addr, generation upto, ObjectStatistics * object_stats);
             /** copy everything reachable from global gc roots **/
             void copy_globals(generation g);
             /** review mutation log; may discover+rescue reachable objects.
@@ -426,7 +427,7 @@ namespace xo {
              *  Application can introduce new root object pointers at any time provided GC not running,
              *  but cannot withdraw them.
              **/
-            std::vector<Object**> gc_root_v_;
+            std::vector<IObject**> gc_root_v_;
 
             /** log cross-generational and cross-checkpoint mutations.
              *  These need to be adjusted on next incremental collection

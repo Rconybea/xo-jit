@@ -357,7 +357,7 @@ namespace xo {
         }
 
         bool
-        ArenaAlloc::check_owned(Object * src) const
+        ArenaAlloc::check_owned(IObject * src) const
         {
             byte * addr = reinterpret_cast<byte *>(src);
 

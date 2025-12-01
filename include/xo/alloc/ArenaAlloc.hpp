@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "IAlloc.hpp"
+#include "xo/allocutil/IAlloc.hpp"
 #include "ObjectStatistics.hpp"
 
 namespace xo {
@@ -175,8 +175,8 @@ namespace xo {
             virtual void clear() final override;
             virtual void checkpoint() final override;
             virtual std::byte * alloc(std::size_t z) final override;
+            virtual bool check_owned(IObject * src) const final override;
 
-            virtual bool check_owned(Object * src) const final override;
 
             ArenaAlloc & operator=(const ArenaAlloc &) = delete;
             ArenaAlloc & operator=(ArenaAlloc &&) = delete;

@@ -13,7 +13,7 @@ namespace xo {
     using xo::reflect::TaggedPtr;
 
     namespace obj {
-        Forwarding1::Forwarding1(gp<Object> dest)
+        Forwarding1::Forwarding1(gp<IObject> dest)
             : dest_{dest}
         {}
 
@@ -26,18 +26,21 @@ namespace xo {
         void
         Forwarding1::display(std::ostream & os) const
         {
-            os << "<fwd" << xtag("dest-td", dest_->self_tp().td()->short_name()) << ">";
+            os << "<fwd"
+               << xtag("dest", (void*)dest_.ptr())
+//               << xtag("dest-td", dest_->self_tp().td()->short_name())
+               << ">";
         }
 
-        Object *
-        Forwarding1::_offset_destination(Object * src) const
+        IObject *
+        Forwarding1::_offset_destination(IObject * src) const
         {
-            intptr_t offset = src - static_cast<const Object *>(this);
+            intptr_t offset = src - static_cast<const IObject *>(this);
 
             return dest_.ptr() + offset;
         }
 
-        Object *
+        IObject *
         Forwarding1::_destination() {
             return dest_.ptr();
         }
@@ -51,8 +54,10 @@ namespace xo {
         // LCOV_EXCL_STOP
 
         // LCOV_EXCL_START
-        Object *
+        IObject *
         Forwarding1::_shallow_copy(gc::IAlloc *) const {
+            /* forwarding objects are never copied */
+
             assert(false);
             return nullptr;
         }
@@ -61,6 +66,8 @@ namespace xo {
         // LCOV_EXCL_START
         std::size_t
         Forwarding1::_forward_children(gc::IAlloc *) {
+            /* forwarding objects are never traced */
+
             assert(false);
             return 0;
         }

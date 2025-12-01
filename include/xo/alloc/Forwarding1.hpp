@@ -19,18 +19,18 @@ namespace xo {
          **/
         class Forwarding1 : public Object {
         public:
-            explicit Forwarding1(gp<Object> dest);
+            explicit Forwarding1(gp<IObject> dest);
 
             // inherited from Object..
             virtual TaggedPtr   self_tp() const final override;
             virtual void        display(std::ostream & os) const final override;
             virtual bool        _is_forwarded() const final override { return true; }
-            virtual Object *    _offset_destination(Object * src) const final override;
-            virtual Object *    _destination() final override;
+            virtual IObject *   _offset_destination(IObject * src) const final override;
+            virtual IObject *   _destination() final override;
             /** required by Object i/face, but never called on Forwarding1 **/
             virtual std::size_t _shallow_size() const final override;
             /** required by Object i/face, but never called on Forwarding1 **/
-            virtual Object *    _shallow_copy(gc::IAlloc * mm) const final override;
+            virtual IObject *   _shallow_copy(gc::IAlloc * mm) const final override;
             /** required by Object i/face, but never called on Forwarding1 **/
             virtual std::size_t _forward_children(gc::IAlloc * mm) final override;
 
@@ -47,7 +47,7 @@ namespace xo {
              *    UB revealed when GC traverses a pointer that relies on the 2nd
              *    vtable to index virtual methods.
              **/
-            gp<Object> dest_;
+            gp<IObject> dest_;
         };
 
     } /*namespace obj*/

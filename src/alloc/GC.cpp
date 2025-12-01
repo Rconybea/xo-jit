@@ -27,7 +27,7 @@ namespace xo {
             return parent_->_is_forwarded();
         }
 
-        Object *
+        IObject *
         MutationLogEntry::parent_destination() const
         {
             //const bool c_debug_flag = true;
@@ -45,7 +45,7 @@ namespace xo {
         }
 
         MutationLogEntry
-        MutationLogEntry::update_parent_moved(Object * parent_to) const
+        MutationLogEntry::update_parent_moved(IObject * parent_to) const
         {
             std::byte * parent_from = reinterpret_cast<std::byte *>(parent_);
             std::byte * lhs_from = reinterpret_cast<std::byte *>(lhs_);
@@ -55,7 +55,7 @@ namespace xo {
             std::byte * lhs_to = reinterpret_cast<std::byte *>(parent_to) + offset;
 
             return MutationLogEntry(parent_to,
-                                    reinterpret_cast<Object **>(lhs_to));
+                                    reinterpret_cast<IObject **>(lhs_to));
         }
 
         GC::GC(const Config & config)
@@ -395,13 +395,13 @@ namespace xo {
         }
 
         void
-        GC::add_gc_root(Object ** addr)
+        GC::add_gc_root(IObject ** addr)
         {
             gc_root_v_.push_back(addr);
         }
 
         void
-        GC::remove_gc_root(Object ** addr)
+        GC::remove_gc_root(IObject ** addr)
         {
             /* Multithreaded GC not supported */
 
@@ -450,7 +450,9 @@ namespace xo {
         std::byte *
         GC::alloc_gc_copy(std::size_t z, const void * src)
         {
-            scope log(XO_DEBUG(config_.debug_flag_), xtag("z", z), xtag("+pad", IAlloc::alloc_padding(z)));
+            scope log(XO_DEBUG(config_.debug_flag_),
+                      xtag("z", z),
+                      xtag("+pad", IAlloc::alloc_padding(z)));
 
             generation_result src_gr = this->fromspace_generation_of(src);
 
@@ -483,7 +485,8 @@ namespace xo {
                         gc_copy_cbset_.invoke(&GcCopyCallback::notify_gc_copy,
                                               z, src, retval, generation::nursery, generation::tenured);
 
-                        this->gc_statistics_.total_promoted_ += IAlloc::with_padding(z);
+                        this->gc_statistics_.total_promoted_
+                            += IAlloc::with_padding(z);
 
                     } else {
                         log && log("nursery");
@@ -509,7 +512,7 @@ namespace xo {
         }
 
         void
-        GC::assign_member(Object * parent, Object ** lhs, Object * rhs)
+        GC::assign_member(IObject * parent, IObject ** lhs, IObject * rhs)
         {
             ++gc_statistics_.n_mutation_;
 
@@ -566,13 +569,13 @@ namespace xo {
         }
 
         bool
-        GC::check_owned(Object * src) const
+        GC::check_owned(IObject * src) const
         {
             return this->fromspace_contains(src);
         }
 
         bool
-        GC::check_move(Object * src) const
+        GC::check_move(IObject * src) const
         {
             return (this->runstate().full_move()
                     || (this->tospace_generation_of(src) != gc::generation_result::tenured));
@@ -682,7 +685,9 @@ namespace xo {
         }
 
         void
-        GC::copy_object(Object ** pp_object, generation upto, ObjectStatistics * object_stats)
+        GC::copy_object(IObject ** pp_object,
+                        generation upto,
+                        ObjectStatistics * object_stats)
         {
             void * object_address = *pp_object;
 
@@ -707,7 +712,7 @@ namespace xo {
             scope log(XO_DEBUG(config_.debug_flag_),
                       xtag("roots", gc_root_v_.size()));
 
-            for (Object ** pp_root : gc_root_v_) {
+            for (IObject ** pp_root : gc_root_v_) {
                 this->copy_object(pp_root, upto,
                                   &object_statistics_sae_[gen2int(upto)]);
             }
@@ -778,7 +783,7 @@ namespace xo {
                         // obsolete mutation -- no longer belongs to parent, discard
                     } else {
                         // note: child obtained (as it must be) by reading from parent's memory _now_.
-                        Object * child_from = from_entry.child();
+                        IObject * child_from = from_entry.child();
 
                         if (child_from) {
                             if (!child_from->_is_forwarded()) {
@@ -813,7 +818,7 @@ namespace xo {
                                 // P->C, C moved to C'
                                 // Includes cases (a),(c) from above
 
-                                Object * child_to = child_from->_destination();
+                                IObject * child_to = child_from->_destination();
 
                                 from_entry.fixup_parent_child_moved(child_to);
 
@@ -843,7 +848,7 @@ namespace xo {
                     // follows that loc(P') = T
                     // already have P'->C' when parent moved separately
 
-                    Object * parent_to = from_entry.parent_destination();
+                    IObject * parent_to = from_entry.parent_destination();
 
                     log && log(xtag("parent_to", (void*)parent_to));
 
@@ -851,7 +856,7 @@ namespace xo {
 
                     MutationLogEntry to_entry = from_entry.update_parent_moved(parent_to);
 
-                    Object * child_to = to_entry.child(); // after moving
+                    IObject * child_to = to_entry.child(); // after moving
 
                     if (tospace_generation_of(child_to) == generation_result::nursery) {
                         if (to_entry.is_dead()) {
@@ -954,7 +959,7 @@ namespace xo {
                 log && (i_from % 10000 == 0) && log(xtag("i_from", i_from));
 
                 if (from_entry.is_parent_forwarded()) {
-                    Object * parent_to = from_entry.parent_destination();
+                    IObject * parent_to = from_entry.parent_destination();
 
                     log && log(xtag("parent_to", (void*)parent_to));
 
@@ -964,7 +969,7 @@ namespace xo {
 
                     // note: child obtained (as it must be) by reading from prarent's memory _now_.
                     //       Since parent has moved, child has too
-                    Object * child_to = to_entry.child(); // after moveing
+                    IObject * child_to = to_entry.child(); // after moveing
 
                     if (tospace_generation_of(parent_to) == generation_result::tenured)
                     {

@@ -23,8 +23,8 @@ namespace xo {
     gc::IAlloc *
     Object::mm = nullptr;
 
-    Object *
-    Object::_forward(Object * src, gc::IAlloc * gc)
+    IObject *
+    Object::_forward(IObject * src, gc::IAlloc * gc)
     {
         if (!src)
             return src;
@@ -43,15 +43,15 @@ namespace xo {
         }
     }
 
-    Object *
-    Object::_deep_move(Object * from_src, gc::GC * gc, gc::ObjectStatistics * /*stats*/)
+    IObject *
+    Object::_deep_move(IObject * from_src, gc::GC * gc, gc::ObjectStatistics * /*stats*/)
     {
         using gc::generation;
 
         if (!from_src)
             return nullptr;
 
-        Object * retval = from_src->_destination();
+        IObject * retval = from_src->_destination();
 
         if (retval)
             return retval;
@@ -124,7 +124,7 @@ namespace xo {
         std::array<std::byte *, gen2int(generation::N)> gray_lo_v
             = { gc->free_ptr(generation::nursery), gc->free_ptr(generation::tenured) };
 
-        Object * to_src = Object::_shallow_move(from_src, gc);
+        IObject * to_src = Object::_shallow_move(from_src, gc);
 
         std::size_t fixup_work = 0;
         do {
@@ -158,15 +158,15 @@ namespace xo {
         return to_src;
     } /*deep_move*/
 
-    Object *
-    Object::_shallow_move(Object * src, gc::IAlloc * gc)
+    IObject *
+    Object::_shallow_move(IObject * src, gc::IAlloc * gc)
     {
         /* filter for source objects that are owned by GC.
          * Care required though -- during GC from/to spaces have been swapped already
          */
         if (gc->check_owned(src))
         {
-            Object * dest = src->_shallow_copy(gc);
+            IObject * dest = src->_shallow_copy(gc);
 
             if (dest != src)
                 src->_forward_to(dest);
@@ -178,7 +178,7 @@ namespace xo {
     }
 
     void
-    Object::_forward_to(Object * dest)
+    Object::_forward_to(IObject * dest)
     {
         char * mem = reinterpret_cast<char *>(this);
 
