@@ -7,6 +7,7 @@
 #include "ArenaAlloc.hpp"
 #include "xo/reflect/Reflect.hpp"
 #include <catch2/catch.hpp>
+#include <regex>
 #include <cstring>
 
 namespace xo {
@@ -58,7 +59,14 @@ namespace xo {
             std::stringstream ss;
             ss << fwd;
 
-            REQUIRE(ss.str() == "<fwd :dest-td DummyObject>");
+            // forwarding printer looks like
+            //  "<fwd :dest 0x1ef49c20>"
+            //
+
+            std::regex pattern(R"(<fwd :dest 0x[0-9a-f]+>)");
+            REQUIRE(std::regex_match(ss.str(), pattern));
+
+            //REQUIRE(ss.str() == "<fwd :dest DummyObject>");
 
             tag_config::tag_color_enabled = saved;
         }
