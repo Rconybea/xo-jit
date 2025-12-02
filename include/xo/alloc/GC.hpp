@@ -144,9 +144,17 @@ namespace xo {
             using GcCopyCallbackSet = xo::fn::UpCallbackSet<GcCopyCallback>;
             using nanos = decltype(xo::qty::qty::nanosecond);
 
+            /** rebind is for typed allocators. since IAlloc is untyped,
+             *  we want degenerate version
+             **/
+            template <typename U>
+            struct rebind { using other = GC; };
+
         public:
             /** create new GC instance with configuration @p config **/
             explicit GC(const Config & config);
+            /** noncopyable **/
+            GC(const GC & other) = delete;
             virtual ~GC();
 
             /** create GC allocator.

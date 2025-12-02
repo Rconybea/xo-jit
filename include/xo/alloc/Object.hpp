@@ -141,19 +141,6 @@ namespace xo {
     std::ostream &
     operator<< (std::ostream & os, gp<Object> x);
 
-    /** @class Cpof
-     *  @brief argument to operator new used for garbage collector evacuation phase
-     *
-     *  Tag overloaded operator new to activate allocation policy based on location
-     *  in memory of source object.
-     **/
-    class Cpof {
-    public:
-        explicit Cpof(gc::IAlloc * mm, const Object * src) : mm_{mm}, src_{src} {}
-
-        gc::IAlloc * mm_ = nullptr;
-        const void * src_ = nullptr;
-    };
 } /*namespace xo*/
 
 void * operator new (std::size_t z, const xo::Cpof & copy);
