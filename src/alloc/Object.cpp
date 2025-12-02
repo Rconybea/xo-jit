@@ -24,7 +24,8 @@ namespace xo {
     Object::mm = nullptr;
 
     IObject *
-    Object::_forward(IObject * src, gc::IAlloc * gc)
+    Object::_forward(IObject * src,
+                     gc::IAlloc * gc)
     {
         if (!src)
             return src;

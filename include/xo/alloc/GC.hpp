@@ -318,7 +318,8 @@ namespace xo {
              *  @param rhs.     new target for @p *lhs
              **/
             virtual void assign_member(IObject * parent, IObject ** lhs, IObject* rhs) final override;
-
+            /** evacuate @p *lhs and replace with forwarding pointer **/
+            virtual void forward_inplace(IObject ** lhs) final override;
             /** during GC check for source objects owned by GC.
              *  See Object::_shallow_move.
              **/

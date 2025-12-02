@@ -568,6 +568,12 @@ namespace xo {
             }
         }
 
+        void
+        GC::forward_inplace(IObject ** lhs)
+        {
+            Object::_forward_inplace(lhs, this);
+        }
+
         bool
         GC::check_owned(IObject * src) const
         {
