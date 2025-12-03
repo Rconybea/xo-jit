@@ -94,13 +94,13 @@ namespace xo {
         /** gc-enabled allocator **/
         namespace {
             /** Setup test with custom allocator
-             *  
+             *
              **/
             template <typename Nested, typename GcObjectInterface>
             struct TestClass : public GcObjectInterface {
                 TestClass() = default;
                 explicit TestClass(const Nested & member1) : member1_{member1} {}
-                
+
                 // using allocator_type = Allocator;
                 // using allocator_traits = xo::gc::gc_allocator_traits<Allocator>;
 
@@ -182,21 +182,22 @@ namespace xo {
                 Nested member1_;
             };
 
-            template <typename Allocator>
+            //template <typename Allocator>
             struct MemberType {
             public:
-                using allocator_type = Allocator;
-                using vector_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<gp<Object>>;
-                using vector_type = std::vector<gp<Object>, vector_allocator_type>;
+                //using allocator_type = Allocator;
+                //using vector_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<gp<Object>>;
+                using vector_type = std::vector<gp<Object>>;
+                //using vector_type = std::vector<gp<Object>, vector_allocator_type>;
 
             public:
                 MemberType() : ctor_ran_{true} {}
-                explicit MemberType(const Allocator & alloc)
-                : member2_{vector_allocator_type(alloc)}, ctor_ran_{true} {}
+                //explicit MemberType(const Allocator & alloc)
+                //: member2_{vector_allocator_type(alloc)}, ctor_ran_{true} {}
 
                 explicit MemberType(const vector_type & mem2) : member2_{mem2}, ctor_ran_{true} {}
-                MemberType(const vector_type & mem2, const Allocator & alloc)
-                : member2_{mem2, vector_allocator_type(alloc)}, ctor_ran_{true} {}
+                //MemberType(const vector_type & mem2, const Allocator & alloc)
+                //: member2_{mem2, vector_allocator_type(alloc)}, ctor_ran_{true} {}
 
                 vector_type member2_;
                 std::size_t ctor_ran_ = false;
@@ -223,6 +224,7 @@ namespace xo {
                     using MyObjectInterface = gc_allocator_traits<ex_allocator>::template object_interface<ex_allocator>;
                     using NestedElementAllocator = xo::gc::allocator<gp<Object>>;
                     using NestedType = MemberType;
+                    //using NestedType = MemberType<NestedElementAllocator>;
                     using MyType = TestClass<NestedType, MyObjectInterface>;
                     using MyAllocator = xo::gc::allocator<MyType>;
 
@@ -273,7 +275,7 @@ namespace xo {
                     REQUIRE(false);
                 }
             }
-            
+
         }
 
     } /*namespace ut*/
