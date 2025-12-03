@@ -182,11 +182,23 @@ namespace xo {
                 Nested member1_;
             };
 
+            template <typename Allocator>
             struct MemberType {
-                MemberType() : ctor_ran_{true} {}
-                explicit MemberType(const std::vector<gp<Object>> & mem2) : member2_{mem2} {}
+            public:
+                using allocator_type = Allocator;
+                using vector_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<gp<Object>>;
+                using vector_type = std::vector<gp<Object>, vector_allocator_type>;
 
-                std::vector<gp<Object>> member2_;
+            public:
+                MemberType() : ctor_ran_{true} {}
+                explicit MemberType(const Allocator & alloc)
+                : member2_{vector_allocator_type(alloc)}, ctor_ran_{true} {}
+
+                explicit MemberType(const vector_type & mem2) : member2_{mem2}, ctor_ran_{true} {}
+                MemberType(const vector_type & mem2, const Allocator & alloc)
+                : member2_{mem2, vector_allocator_type(alloc)}, ctor_ran_{true} {}
+
+                vector_type member2_;
                 std::size_t ctor_ran_ = false;
             };
         }
