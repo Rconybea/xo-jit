@@ -204,6 +204,94 @@ namespace xo {
             };
         }
 
+        TEST_CASE("vector_custom_allocator", "[alloc][vector]")
+        {
+            for (std::size_t i_tc = 0, n_tc = s_testcase_v.size(); i_tc < n_tc; ++i_tc) {
+                try {
+                    const testcase_gc & tc = s_testcase_v[i_tc];
+
+                    up<GC> gc = GC::make(
+                        {.initial_nursery_z_ = tc.nursery_z_,
+                         .initial_tenured_z_ = tc.tenured_z_,
+                         .incr_gc_threshold_ = tc.incr_gc_threshold_,
+                         .full_gc_threshold_ = tc.full_gc_threshold_,
+                        });
+
+                    REQUIRE(gc.get());
+                    REQUIRE(gc->name() == "GC");
+
+                    using NestedElementAllocator = xo::gc::allocator<gp<Object>>;
+
+                    NestedElementAllocator alloc(gc.get());
+
+                    /** testv will use GC to allocaate element storage
+                     *  Attempt to gc will fail, because memory iteration
+                     *  won't work.
+                     **/
+                    std::vector<gp<Object>,
+                                NestedElementAllocator> testv(alloc);
+
+                    testv.push_back(gp<Object>());
+
+#ifdef NOPE
+                    using ex_allocator = xo::gc::allocator<int>;
+                    using MyObjectInterface = gc_allocator_traits<ex_allocator>::template object_interface<ex_allocator>;
+                    using NestedType = MemberType;
+                    //using NestedType = MemberType<NestedElementAllocator>;
+                    using MyType = TestClass<NestedType, MyObjectInterface>;
+                    using MyAllocator = xo::gc::allocator<MyType>;
+
+                    MyAllocator alloc(gc.get());
+
+                    {
+                        /* verify that MyType is constructible */
+                        MyType obj0;
+
+                        REQUIRE(obj0.member1_.ctor_ran_ == true);
+                    }
+
+                    {
+                        MyType * mem0 = MyType::make_0(alloc);
+
+                        REQUIRE(mem0 != nullptr);
+                        REQUIRE(mem0->member1_.ctor_ran_ == false);
+                    }
+
+                    {
+                        MyType * mem1 = MyType::make_1(alloc);
+
+                        REQUIRE(mem1 != nullptr);
+                        REQUIRE(mem1->member1_.ctor_ran_ == false);
+                    }
+
+                    {
+                        MyType * mem2 = MyType::make_2(alloc);
+
+                        REQUIRE(mem2 != nullptr);
+                        REQUIRE(mem2->member1_.ctor_ran_ == true);
+                    }
+
+                    {
+                        MyType * mem3 = MyType::make_3(alloc);
+
+                        REQUIRE(mem3 != nullptr);
+                        REQUIRE(mem3->member1_.ctor_ran_ == true);
+                    }
+
+                    gp<MyType> ptr;
+                    {
+                        REQUIRE(ptr.is_null());
+                        //ptr = MyType::make_0();
+                    }
+#endif
+                } catch (std::exception & ex) {
+                    std::cerr << "caught exception: " << ex.what() << std::endl;
+                    REQUIRE(false);
+                }
+            }
+
+        }
+
         TEST_CASE("gc_allocator_traits", "[alloc][gc]")
         {
             for (std::size_t i_tc = 0, n_tc = s_testcase_v.size(); i_tc < n_tc; ++i_tc) {
