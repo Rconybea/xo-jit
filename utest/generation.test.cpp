@@ -4,6 +4,7 @@
  */
 
 #include "xo/alloc/generation.hpp"
+#include <sstream>
 #include <catch2/catch.hpp>
 #include <cstring>
 
