@@ -38,7 +38,7 @@ namespace xo {
             return dynamic_cast<Object*>(x.ptr());
         }
 
-        virtual ~Object() = default;
+        virtual ~Object() noexcept = default;
 
         /** memory allocator for objects.  Likely this will be a GC instance,
          *  but simple arena also supported.
@@ -128,6 +128,9 @@ namespace xo {
         virtual IObject * _shallow_copy(gc::IAlloc * gc) const override = 0;
         virtual std::size_t _forward_children(gc::IAlloc * gc) override = 0;
     };
+
+    static_assert(std::is_destructible_v<Object>, "Object must be destructible");
+    static_assert(std::is_nothrow_destructible_v<Object>, "Object must be noexcept destructible");
 
     template <typename T>
     void

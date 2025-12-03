@@ -200,7 +200,7 @@ namespace xo {
                 //: member2_{mem2, vector_allocator_type(alloc)}, ctor_ran_{true} {}
 
                 vector_type member2_;
-                std::size_t ctor_ran_ = false;
+                bool ctor_ran_ = false;
             };
         }
 
