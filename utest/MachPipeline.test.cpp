@@ -7,6 +7,7 @@
 #include "xo/reflect/reflect_struct.hpp"
 #include "xo/indentlog/scope.hpp"
 #include <catch2/catch.hpp>
+#include <cmath>
 
 namespace xo {
     using xo::jit::MachPipeline;
@@ -24,19 +25,20 @@ namespace xo {
     using std::endl;
 
     namespace ut {
+        double (*sqrt_double)(double) = &std::sqrt;
 
         /* abstract syntax tree for a function:
          *   def root4(x :: double) { sqrt(sqrt(x)); }
          */
         rp<Expression>
         root4_ast() {
-            auto sqrt = make_primitive("sqrt",
-                                       ::sqrt,
-                                       false /*!explicit_symbol_def*/,
-                                       llvmintrinsic::fp_sqrt);
+            auto sqrtx = make_primitive("sqrt",
+                                        sqrt_double,
+                                        false /*!explicit_symbol_def*/,
+                                        llvmintrinsic::fp_sqrt);
             auto x_var = make_var("x", Reflect::require<double>());
-            auto call1 = make_apply(sqrt, {x_var});
-            auto call2 = make_apply(sqrt, {call1});
+            auto call1 = make_apply(sqrtx, {x_var});
+            auto call2 = make_apply(sqrtx, {call1});
 
             auto fn_ast = make_lambda("root4",
                                       {x_var},
@@ -52,7 +54,7 @@ namespace xo {
         rp<Expression>
         root_2x_ast() {
             auto root = make_primitive("sqrt",
-                                       ::sqrt,
+                                       sqrt_double,
                                        false /*!explicit_symbol_def*/,
                                        llvmintrinsic::fp_sqrt);
 
@@ -202,7 +204,7 @@ namespace xo {
             auto jit = MachPipeline::make();
 
             auto root = make_primitive("sqrt",
-                                       ::sqrt,
+                                       sqrt_double,
                                        false /*!explicit_symbol_def*/,
                                        llvmintrinsic::fp_sqrt);
 
