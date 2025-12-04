@@ -249,10 +249,18 @@ namespace xo {
             void remove_gc_root(IObject ** addr);
 
             /** convenience wrapper **/
+
             template <typename T>
-            void add_gc_root_dwim(gp<T> * p) { this->add_gc_root(reinterpret_cast<IObject**>(p->ptr_address())); }
+            void add_gc_root_dwim(gp<T> * p) {
+                static_assert(std::is_convertible_v<T*, IObject*>);
+                this->add_gc_root(reinterpret_cast<IObject**>(p->ptr_address()));
+            }
+
             template <typename T>
-            void remove_gc_root_dwim(gp<T> * p) { this->remove_gc_root(reinterpret_cast<IObject**>(p->ptr_address())); }
+            void remove_gc_root_dwim(gp<T> * p) {
+                static_assert(std::is_convertible_v<T*, IObject*>);
+                this->remove_gc_root(reinterpret_cast<IObject**>(p->ptr_address()));
+            }
 
             /** may optionally use this to observe GC copy phase.
              *  Will be invoked once _per surviving object_, so not cheap.
