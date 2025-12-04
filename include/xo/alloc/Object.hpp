@@ -20,14 +20,18 @@ namespace xo {
 
     /** Root class for all xo GC-collectable objects.
      *
-     *  Design note:
-     *
-     *  relying on inheritance means we insist that GC traits
-     *  for a type appear directly in that type's vtable, and at specific locations.
-     *  This implies one level of indirection when GC traverses an instance.
-     *
-     *  Would be feasible to relax the must-inherit-from-Object constraint
-     *  by having GC use its own wrapper, at cost of an extra layer of indirection
+     *  Design notes:
+     *  1. xo::IObject -> xo-allocutil  header-only library
+     *     xo::Object  -> xo-alloc      ordinary library
+     *  2. relying on inheritance means we insist that GC traits
+     *     for a type appear directly in that type's vtable, and at specific locations.
+     *     This implies one level of indirection when GC traverses an instance.
+     *  3. Could adapt a gc-aware XO library (such as xo-ordinaltree)
+     *     to a non-xo garbage collector.
+     *     Would still need to use xo::IObject and xo::gc::gc_allocator_traits,
+     *     but not necessarily xo::Object
+     *  4. Would be feasible to relax the must-inherit-from-Object constraint
+     *     by having GC use its own wrapper, at cost of an extra layer of indirection
      **/
     class Object : public IObject {
     public:
@@ -49,7 +53,9 @@ namespace xo {
 
         /** assign value @p rhs to member @p *lhs of @p parent.
          *  if assignment creates a cross-generational or cross-checkpoint pointer,
-         *  add mutation log entry
+         *  add mutation log entry.
+         *
+         *  DEPRECATED. prefer IObject::_gc_assign_member, for explicit alloc
          **/
         template <typename T>
         static void assign_member(gp<IObject> parent, gp<T> * lhs, gp<IObject> rhs);
