@@ -32,6 +32,12 @@ namespace xo {
         return TaggedPtr::universal_null();
     }
 
+     void
+     Object::display(std::ostream & os) const
+     {
+         os << "<Object>";
+     }
+
     IObject *
     Object::_forward(IObject * src,
                      gc::IAlloc * gc)
