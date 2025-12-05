@@ -121,7 +121,7 @@ namespace xo {
         virtual TaggedPtr self_tp() const;
 
         /** print on stream @p os **/
-        virtual void display(std::ostream & os) const = 0;
+        virtual void display(std::ostream & os) const;
 
         // Inherited from IObject..
 
