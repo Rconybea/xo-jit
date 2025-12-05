@@ -20,8 +20,17 @@ operator new (std::size_t z, const xo::Cpof & cpof)
 }
 
 namespace xo {
+    using xo::reflect::TaggedPtr;
+
     gc::IAlloc *
     Object::mm = nullptr;
+
+    TaggedPtr
+    Object::self_tp() const
+    {
+        assert(false);
+        return TaggedPtr::universal_null();
+    }
 
     IObject *
     Object::_forward(IObject * src,

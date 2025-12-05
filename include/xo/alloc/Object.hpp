@@ -118,7 +118,7 @@ namespace xo {
 
         /** tagged pointer with runtime type information
          **/
-        virtual TaggedPtr self_tp() const = 0;
+        virtual TaggedPtr self_tp() const;
 
         /** print on stream @p os **/
         virtual void display(std::ostream & os) const = 0;
