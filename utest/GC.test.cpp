@@ -202,6 +202,29 @@ namespace xo {
                 vector_type member2_;
                 bool ctor_ran_ = false;
             };
+
+#ifdef NOT_YET
+            struct MemberType2 {
+            public:
+                MemberType2() = default;
+                /** GC hooks rely on copy constructor. But can't write it without allocator state.
+                 *  Therefore: need copy-like constructor that takes allocator argument
+                 **/
+
+                template <typename Allocator>
+                explicit MemberType2(Allocator & alloc, uint64 payload) {
+                    using traits = gc_allocator_traits<Allocator>;
+
+                    uint64_t * ptr = traits::allocate(alloc, 1);
+
+                    this->payload_ = payload;
+                    this->ctor_ran_ = true;
+                }
+
+                uint64_t * payload_ = nullptr;
+                bool ctor_ran_ = false;
+            }
+#endif
         }
 
         TEST_CASE("vector_custom_allocator", "[alloc][vector]")

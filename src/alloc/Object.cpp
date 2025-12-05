@@ -42,18 +42,24 @@ namespace xo {
     Object::_forward(IObject * src,
                      gc::IAlloc * gc)
     {
+        scope log(XO_DEBUG(gc->debug_flag()), xtag("src", src));
+
         if (!src)
             return src;
 
-        if (src->_is_forwarded())
+        if (src->_is_forwarded()) {
+            log && log("already forwarded", xtag("dest", src->_offset_destination(src)));
             return src->_offset_destination(src);
+        }
 
         if (gc->check_move(src)) {
+            log && log("needs forwarding");
             Object::_shallow_move(src, gc);
 
             /* *src is now a forwarding pointer to a copy in to-space */
             return src->_offset_destination(src);
         } else {
+            log && log("already tenured + incr collection");
             /* don't move tenured objects during incremental collection */
             return src;
         }
@@ -62,6 +68,8 @@ namespace xo {
     IObject *
     Object::_deep_move(IObject * from_src, gc::GC * gc, gc::ObjectStatistics * /*stats*/)
     {
+        scope log(XO_DEBUG(gc->config().debug_flag_));
+
         using gc::generation;
 
         if (!from_src)
@@ -146,12 +154,14 @@ namespace xo {
         do {
             fixup_work = 0;
 
-            auto fixup_generation = [gc, &gray_lo_v](generation gen) {
+            auto fixup_generation = [gc, &log, &gray_lo_v](generation gen) {
                 std::size_t work = 0;
                 while(gray_lo_v[gen2int(gen)] < gc->free_ptr(gen)) {
                     Object * x = reinterpret_cast<Object *>(gray_lo_v[gen2int(gen)]);
 
                     // update per-class stats here
+
+                    log && log("fwd children", xtag("x", x));
 
                     std::size_t xz = x->_forward_children(gc);
 

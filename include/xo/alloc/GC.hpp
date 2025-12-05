@@ -107,7 +107,7 @@ namespace xo {
             bool is_dead() const { return false; }
 
             MutationLogEntry update_parent_moved(IObject * parent_to) const;
-            void fixup_parent_child_moved(IObject * child_to) { *lhs_ = child_to; }
+            void fixup_parent_child_moved(IObject * child_to);
 
         private:
             IObject * parent_ = nullptr;
@@ -341,7 +341,7 @@ namespace xo {
              *  is recorded in mutation log,
              *  given an object @p parent  that contains object pointer @p lhs
              **/
-            virtual bool check_write_barrier(IObject * parent, IObject ** lhs, bool may_throw) const final;
+            virtual bool check_write_barrier(const void * parent, const void * const * lhs, bool may_throw) const final;
 
             virtual std::byte * alloc(std::size_t z) final override;
             virtual std::byte * alloc_gc_copy(std::size_t z, const void * src) final override;

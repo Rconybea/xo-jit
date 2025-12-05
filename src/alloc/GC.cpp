@@ -58,6 +58,12 @@ namespace xo {
                                     reinterpret_cast<IObject **>(lhs_to));
         }
 
+        void
+        MutationLogEntry::fixup_parent_child_moved(IObject * child_to)
+        {
+            *(this->lhs_) = child_to;
+        }
+
         GC::GC(const Config & config)
             : config_{config}
         {
@@ -508,12 +514,17 @@ namespace xo {
 
             assert(retval);
 
+            log && log(xtag("retval", retval));
+
             return retval;
         }
 
         void
         GC::assign_member(IObject * parent, IObject ** lhs, IObject * rhs)
         {
+            scope log(XO_DEBUG(config_.debug_flag_),
+                      xtag("parent", parent), xtag("lhs", lhs), xtag("rhs", rhs));
+
             ++gc_statistics_.n_mutation_;
 
             *lhs = rhs;
@@ -532,23 +543,28 @@ namespace xo {
             {
             case generation_result::tenured:
                 /* only need to log mutations that create tenured->nursery pointers */
+                log && log(xtag("act", "any->T no log"));
                 return;
 
             case generation_result::nursery:
                 switch (tospace_generation_of(parent)) {
                 case generation_result::nursery:
                     if (is_before_checkpoint(parent)) {
+                        log && log(xtag("act", "N1->N0 must mlog"));
+                        
                         // N1->N0, so must log
                         this->mutation_log_[role2int(role::to_space)]->push_back(MutationLogEntry(parent, lhs));
                         ++(this->gc_statistics_.n_logged_mutation_);
                         ++(this->gc_statistics_.n_xckp_mutation_);
                     } else {
                         // parent in N0, not an xckp mutation
-                        return;
+                        log && log(xtag("act", "N0->any no long"));
                     }
                     break;
                 case generation_result::tenured:
                     // T->N, so must log
+                    log && log(xtag("act", "T->N must mlog"));
+
                     this->mutation_log_[role2int(role::to_space)]->push_back(MutationLogEntry(parent, lhs));
                     ++(this->gc_statistics_.n_logged_mutation_);
                     ++(this->gc_statistics_.n_xgen_mutation_);
@@ -556,11 +572,13 @@ namespace xo {
                 case generation_result::not_found:
                     // parent is global
                     // This may be ok (provided lhs is a gc root)
+                    log && log(xtag("act", "root->any no log"));
                     break;
                 }
                 break;
 
             case generation_result::not_found:
+                log && log(xtag("act", "any->root no log"));
 
                 // child is global;
                 // logging not required
@@ -571,6 +589,8 @@ namespace xo {
         void
         GC::forward_inplace(IObject ** lhs)
         {
+            scope log(XO_DEBUG(config_.debug_flag_), xtag("lhs", lhs));
+
             Object::_forward_inplace(lhs, this);
         }
 
@@ -588,10 +608,13 @@ namespace xo {
         }
 
         bool
-        GC::check_write_barrier(IObject * parent,
-                                IObject ** lhs,
+        GC::check_write_barrier(const void * parent,
+                                const void * const * lhs,
                                 bool may_throw_flag) const
         {
+            scope log(XO_DEBUG(config_.debug_flag_),
+                      xtag("P", parent), xtag("L", lhs));
+
             if (!this->contains(parent)) {
                 if (may_throw_flag) {
                     throw std::runtime_error(tostr("GC::check_write_barrier",
@@ -601,10 +624,11 @@ namespace xo {
                 return false;
             }
 
+#ifdef NOPE // don't want to assume IObject*
             std::size_t parent_z = parent->_shallow_size();
 
-            std::byte * parent_addr = reinterpret_cast<std::byte *>(parent);
-            std::byte * lhs_addr = reinterpret_cast<std::byte *>(lhs);
+            const std::byte * parent_addr = reinterpret_cast<const std::byte *>(parent);
+            const std::byte * lhs_addr = reinterpret_cast<const std::byte *>(lhs);
 
             if ((lhs_addr < parent_addr) || (parent_addr + parent_z < lhs_addr)) {
                 if (may_throw_flag) {
@@ -617,11 +641,20 @@ namespace xo {
                 }
                 return false;
             }
+#endif
 
-            IObject * rhs = *lhs;
+            const void * rhs = *lhs;
+
+            if (!rhs)
+                return true;
 
             auto parent_gen = tospace_generation_of(parent);
             auto rhs_gen = tospace_generation_of(rhs);
+
+            log && log(xtag("C", rhs),
+                       xtag("gen(P)", parent_gen), xtag("gen(C)", rhs_gen),
+                       xtag("P.before-ckp", is_before_checkpoint(parent)),
+                       xtag("C.before-ckp", is_before_checkpoint(rhs)));
 
             switch(parent_gen) {
             case generation_result::nursery:
@@ -630,21 +663,25 @@ namespace xo {
                     case generation_result::nursery:
                         if (is_before_checkpoint(rhs)) {
                             /* no mlog entry needed */
+                            log && log(xtag("msg", "N1->N1 - trivial"));
                             return true;
                         } else {
                             /* need to check mlog */
-                            ;
+                            log && log(xtag("msg", "N1->N0 - xgen"));
                         }
                         break;
                     case generation_result::tenured:
                         /* no mlog entry needed */
+                        log && log(xtag("msg", "N1->T - trivial"));
                         return true;
                     case generation_result::not_found:
                         /* possible non-gc rhs */
+                        log && log(xtag("msg", "non-gc rhs - trivial"));
                         return true;
                     }
                 } else {
                     /* no mlog entry needed */
+                    log && log(xtag("msg", "N0->any - trivial"));
                     return true;
                 }
                 break;
@@ -652,16 +689,21 @@ namespace xo {
                 switch(rhs_gen) {
                 case generation_result::nursery:
                     /* need to check mlog */
+                    log && log(xtag("msg", "T->N - xgen"));
                     break;
                 case generation_result::tenured:
                     /* no mlog entry needed */
+                    log && log(xtag("msg", "T->T - trivial"));
                     return true;
                 case generation_result::not_found:
                     /* possible non-gc rhs */
+                    log && log(xtag("msg", "non-gc rhs - trivial"));
                     return true;
                 }
+                break;
             case generation_result::not_found:
                 /* already excluded -> impossible */
+                log && log(xtag("msg", "assert"));
                 assert(false && "already verified parent owned by GC");
             }
 
@@ -669,7 +711,7 @@ namespace xo {
              * search mutation log + verify such entry exists
              */
             for (MutationLogEntry & mlog : *(mutation_log_[role2int(role::to_space)])) {
-                if ((mlog.parent() == parent) && (mlog.lhs() == lhs)) {
+                if ((mlog.parent() == parent) && ((const void * const *)mlog.lhs() == lhs)) {
                     return true;
                 }
                 mlog.lhs();
@@ -872,7 +914,7 @@ namespace xo {
             for (MutationLogEntry & from_entry : *from_mlog)
             {
                 if (log) {
-                    if (i_from % 10000 == 0)
+                    if (i_from % 10000 == 0 || true)
                         log(xtag("i_from", i_from));
                 }
 
@@ -905,7 +947,11 @@ namespace xo {
 
                                     ++n_rescue;
 
+                                    log && log(xtag("parent", parent), xtag("act", "move child"), xtag("child.from", child_from));
+
                                     Object::_deep_move(child_from, this, per_type_stats);
+
+                                    log && log(xtag("child.to", child_from->_destination()));
 
                                     // C forwards to C', fall thru to parent fixup below
                                     // (a) T->N1'
@@ -924,12 +970,23 @@ namespace xo {
 
                                 IObject * child_to = child_from->_destination();
 
+                                log && log(xtag("act", "fixup parent"), xtag("parent", parent), xtag("lhs", from_entry.lhs()), xtag("child.from", child_from), xtag("child.to", child_to));
+
                                 from_entry.fixup_parent_child_moved(child_to);
+
+                                {
+                                    // verify fixup was effective
+                                    IObject * child_from2 = from_entry.child();
+                                    assert(child_from2 == child_to);
+                                }
+                                
 
                                 // P->C', loc(C') in {N1', T'}
 
                                 if (tospace_generation_of(child_to) == generation_result::nursery) {
                                     // (b) loc(P)=T, loc(C')=N1';  also case (a)
+
+                                    log && log(xtag("act", "still xgen -> keep mlog entry"));
 
                                     // still have xgen pointer, so need mlog for it
                                     to_mlog->push_back(from_entry);
@@ -972,6 +1029,8 @@ namespace xo {
 
                     }
                 } else {
+                    log && log("defer");
+
                     // loc(P) = N1, loc(C) = N0, P may be garbage
                     // Includes cases:
                     // (e) P->C, C not moved
@@ -1347,7 +1406,7 @@ namespace xo {
         void
         GC::execute_gc(generation upto)
         {
-            scope log(XO_DEBUG(config_.stats_flag_));
+            scope log(XO_DEBUG(config_.stats_flag_ || config_.debug_flag_));
 
             auto t0 = std::chrono::steady_clock::now();
 
