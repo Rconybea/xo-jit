@@ -587,6 +587,104 @@ namespace xo {
                     || (this->tospace_generation_of(src) != gc::generation_result::tenured));
         }
 
+        bool
+        GC::check_write_barrier(IObject * parent,
+                                IObject ** lhs,
+                                bool may_throw_flag) const
+        {
+            if (!this->contains(parent)) {
+                if (may_throw_flag) {
+                    throw std::runtime_error(tostr("GC::check_write_barrier",
+                                                   ": expected parent object P in GC to-space",
+                                                   xtag("P", parent)));
+                }
+                return false;
+            }
+
+            std::size_t parent_z = parent->_shallow_size();
+
+            std::byte * parent_addr = reinterpret_cast<std::byte *>(parent);
+            std::byte * lhs_addr = reinterpret_cast<std::byte *>(lhs);
+
+            if ((lhs_addr < parent_addr) || (parent_addr + parent_z < lhs_addr)) {
+                if (may_throw_flag) {
+                    throw std::runtime_error
+                        (tostr("GC::check_write_barrier",
+                               ": expected lhs address L within address extent z of parent P",
+                               xtag("P", parent), xtag("z", parent_z),
+                               xtag("P+z", parent_addr + parent_z),
+                               xtag("L", lhs)));
+                }
+                return false;
+            }
+
+            IObject * rhs = *lhs;
+
+            auto parent_gen = tospace_generation_of(parent);
+            auto rhs_gen = tospace_generation_of(rhs);
+
+            switch(parent_gen) {
+            case generation_result::nursery:
+                if (is_before_checkpoint(parent)) {
+                    switch(rhs_gen) {
+                    case generation_result::nursery:
+                        if (is_before_checkpoint(rhs)) {
+                            /* no mlog entry needed */
+                            return true;
+                        } else {
+                            /* need to check mlog */
+                            ;
+                        }
+                        break;
+                    case generation_result::tenured:
+                        /* no mlog entry needed */
+                        return true;
+                    case generation_result::not_found:
+                        /* possible non-gc rhs */
+                        return true;
+                    }
+                } else {
+                    /* no mlog entry needed */
+                    return true;
+                }
+                break;
+            case generation_result::tenured:
+                switch(rhs_gen) {
+                case generation_result::nursery:
+                    /* need to check mlog */
+                    break;
+                case generation_result::tenured:
+                    /* no mlog entry needed */
+                    return true;
+                case generation_result::not_found:
+                    /* possible non-gc rhs */
+                    return true;
+                }
+            case generation_result::not_found:
+                /* already excluded -> impossible */
+                assert(false && "already verified parent owned by GC");
+            }
+
+            /* control here -> expect mutation log entry.
+             * search mutation log + verify such entry exists
+             */
+            for (MutationLogEntry & mlog : *(mutation_log_[role2int(role::to_space)])) {
+                if ((mlog.parent() == parent) && (mlog.lhs() == lhs)) {
+                    return true;
+                }
+                mlog.lhs();
+            }
+
+            if (may_throw_flag) {
+                throw std::runtime_error
+                    (tostr("GC::check_write_barrier",
+                           ": expected mlog entry for xgen pointer L->C within parent P",
+                           xtag("P", parent), xtag("L", lhs), xtag("C", rhs),
+                           xtag("gen(P)", parent_gen), xtag("gen(C)", rhs_gen)));
+            }
+            return false;
+        }
+
         void
         GC::swap_nursery()
         {
@@ -1126,9 +1224,11 @@ namespace xo {
             scope log(XO_DEBUG(config_.debug_flag_));
 
             if (upto == generation::tenured) {
-                this->full_gc_forward_mlog(&object_statistics_sae_[gen2int(generation::tenured)]);
+                this->full_gc_forward_mlog
+                    (&object_statistics_sae_[gen2int(generation::tenured)]);
             } else {
-                this->incremental_gc_forward_mlog(&object_statistics_sae_[gen2int(generation::nursery)]);
+                this->incremental_gc_forward_mlog
+                    (&object_statistics_sae_[gen2int(generation::nursery)]);
             }
         }
 

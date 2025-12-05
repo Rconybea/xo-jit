@@ -177,7 +177,6 @@ namespace xo {
             virtual std::byte * alloc(std::size_t z) final override;
             virtual bool check_owned(IObject * src) const final override;
 
-
             ArenaAlloc & operator=(const ArenaAlloc &) = delete;
             ArenaAlloc & operator=(ArenaAlloc &&) = delete;
 

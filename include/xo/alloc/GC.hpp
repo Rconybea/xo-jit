@@ -337,6 +337,12 @@ namespace xo {
              *  - incr GC -> if not tenured
              **/
             virtual bool check_move(IObject * src) const final override;
+            /** if src is cross-generational (or cross-checkpoint), verify that it
+             *  is recorded in mutation log,
+             *  given an object @p parent  that contains object pointer @p lhs
+             **/
+            virtual bool check_write_barrier(IObject * parent, IObject ** lhs, bool may_throw) const final;
+
             virtual std::byte * alloc(std::size_t z) final override;
             virtual std::byte * alloc_gc_copy(std::size_t z, const void * src) final override;
 
@@ -447,7 +453,15 @@ namespace xo {
             std::vector<IObject**> gc_root_v_;
 
             /** log cross-generational and cross-checkpoint mutations.
-             *  These need to be adjusted on next incremental collection
+             *  These need to be adjusted on next incremental collection.
+             *
+             *  mutation_log_[tospace] accumulates {xgen,xckp} pointers until
+             *  the next GC.
+             *
+             *  See GC aux functions
+             *   @ref incremental_gc_forward_mlog
+             *   @ref full_gc_forward_mlog
+             *
              **/
             std::array<up<MutationLog>, role2int(role::N)> mutation_log_;
             /** temporary mutation log (for deferred entries) **/

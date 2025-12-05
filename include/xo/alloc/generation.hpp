@@ -41,6 +41,13 @@ namespace xo {
                 return generation::tenured;
         }
 
+        const char * genresult2str(generation_result x);
+
+        inline std::ostream & operator<<(std::ostream & os, generation_result x) {
+            os << genresult2str(x);
+            return os;
+        }
+
     } /*namespace gc*/
 } /*namespace xo*/
 
