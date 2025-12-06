@@ -5,15 +5,16 @@
 
 #pragma once
 
-#include "xo/reflect/TaggedPtr.hpp"
-#include "IAlloc.hpp"
 #include "xo/allocutil/IObject.hpp"
+#include "xo/reflect/TaggedPtr.hpp"
+#include "xo/allocutil/ObjectVisitor.hpp"
 #include "xo/allocutil/gc_ptr.hpp"
 #include <concepts>
 #include <cstdint>
 
 namespace xo {
     namespace gc {
+        class IAlloc;
         class GC;
         class ObjectStatistics;
     };
@@ -145,6 +146,18 @@ namespace xo {
         Object::mm->assign_member(reinterpret_cast<IObject *>(parent.ptr()),
                                   reinterpret_cast<IObject **>(lhs->ptr_address()),
                                   reinterpret_cast<IObject *>(rhs.ptr()));
+    }
+
+    namespace gc {
+        template <typename T>
+        class ObjectVisitor<gp<T>> {
+        public:
+            void forward_children(gp<T> & target,
+                                  IAlloc * gc)
+            {
+                Object::_forward_inplace(target, gc);
+            }
+        };
     }
 
     std::ostream &
