@@ -8,6 +8,7 @@
 # include <format>
 #endif
 #include <chrono>
+#include <compare>
 #include <cstdint>
 #include <time.h>
 
