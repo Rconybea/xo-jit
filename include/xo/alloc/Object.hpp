@@ -152,8 +152,8 @@ namespace xo {
         template <typename T>
         class ObjectVisitor<gp<T>> {
         public:
-            void forward_children(gp<T> & target,
-                                  IAlloc * gc)
+            static void forward_children(gp<T> & target,
+                                         IAlloc * gc)
             {
                 Object::_forward_inplace(target, gc);
             }
