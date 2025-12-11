@@ -374,7 +374,7 @@ namespace xo {
         ArenaAlloc::clear()
         {
             this->set_free_ptr(lo_);
-            this->limit_ = hi_;
+            //this->limit_ = hi_;
         }
 
         void
