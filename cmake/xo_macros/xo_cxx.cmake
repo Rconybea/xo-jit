@@ -471,7 +471,25 @@ macro(xo_docdir_sphinx_config rst_files)
 
     if (XO_ENABLE_DOCS)
         if (XO_SUBMODULE_BUILD)
-            # in submodule build, rely on toplevel docs/CMakeLists.txt file instead
+            # in submodule build, rely on toplevel docs/CMakeLists.txt file instead.
+            #
+            # translate ${rst_files} to absolute paths
+            #
+            set(SPHINX_ABS_RST_FILES)
+            foreach(rst_file ${SPHINX_RST_FILES})
+                get_filename_component(
+                    abs_path "${rst_file}"
+                    ABSOLUTE
+                    BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+                list(APPEND SPHINX_ABS_RST_FILES "${abs_path}")
+            endforeach()
+
+            # append to global property
+            set_property(GLOBAL APPEND
+                PROPERTY XO_UMBRELLA_SPHINX_RST_FILES
+                ${SPHINX_ABS_RST_FILES})
+
+            message(STATUS "SPHINX_ABS_RST_FILES=${SPHINX_ABS_RST_FILES}")
         else()
             # build docs starting from here only in standalone build.
             # otherwise use top-level doxygen setup.
@@ -529,6 +547,7 @@ endmacro()
 # config for an umbrella project that composes standalone subprojects
 #
 macro(xo_umbrella_sphinx_config rst_files)
+    # here SPHINX_RST_FILES refers to toplevel-only .rst files in umbrella project
     list(APPEND SPHINX_RST_FILES ${rst_files})
     foreach(arg IN ITEMS ${ARGN})
         list(APPEND SPHINX_RST_FILES ${arg})
@@ -539,12 +558,17 @@ macro(xo_umbrella_sphinx_config rst_files)
         find_program(SPHINX_EXECUTABLE NAMES sphinx-build REQUIRED)
         message(STATUS "SPHINX_EXECUTABLE=${SPHINX_EXECUTABLE}")
 
+        get_property(SPHINX_ABS_RST_FILES GLOBAL PROPERTY XO_UMBRELLA_SPHINX_RST_FILES)
+        message(STATUS "SPHINX_ABS_RST_FILES=${SPHINX_ABS_RST_FILES}")
+
         set(SPHINX_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/sphinx/html)
         set(SPHINX_INDEX_FILE ${SPHINX_OUTPUT_DIR}/index.html)
 
         # root of sphinx doc tree
         set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
-        set(SPHINX_DEPS doxygen_${PROJECT_NAME} conf.py ${SPHINX_RST_FILES} ${SPHINX_RST_FILES_GLOB} ${DOX_DEPS})
+        # SPHINX_RST_FILES: top-level .rst files in umbrella project
+        # SPHINX_ABS_RST_FILES: satellite .rst files, collected via XO_SUBMODULE_BUILD, rewritten to absoluate paths
+        set(SPHINX_DEPS doxygen_${PROJECT_NAME} conf.py ${SPHINX_RST_FILES} ${SPHINX_ABS_RST_FILES} ${DOX_DEPS})
 
         add_custom_command(
             OUTPUT ${SPHINX_INDEX_FILE}
