@@ -1619,3 +1619,49 @@ endmacro()
 macro(xo_pybind11_header_dependency target dep)
     xo_dependency_helper(${target} PUBLIC ${dep})
 endmacro()
+
+# ----------------------------------------------------------------
+# use this to streamline generating .hpp / .cpp scaffolding
+# for faceted object model
+#
+
+macro(xo_add_genfacet)
+    # Parse arguments
+    set(options "")
+    set(oneValueArgs
+        TARGET              # Name for this generation target
+        FACET               # facet name
+        INPUT               # Input .json5 file
+        OUTPUT_HPP_DIR      # Directory for .hpp files
+        OUTPUT_IMPL_SUBDIR  # Subdirectory name for impl headers
+        OUTPUT_CPP_DIR      # Directory for .cpp files
+    )
+    set(multiValueArgs "")
+
+    cmake_parse_arguments(GF "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    # Build the genfacet command
+    add_custom_command(
+        OUTPUT ${GF_OUTPUT_HPP_DIR}/${FACET}.hpp
+            ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/A${FACET}.hpp
+            ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/I${FACET}_Any.hpp
+            ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/I${FACET}_Xfer.hpp
+            ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/R${FACET}.hpp
+            ${GF_OUTPUT_CPP_DIR}/I${FACET}_Any.cpp
+        COMMAND ${CMAKE_SOURCE_DIR}/xo-facet/codegen/genfacet
+            --input ${GF_INPUT}
+            --output-hpp ${GF_OUTPUT_HPP_DIR}
+            --output-impl-hpp ${GF_OUTPUT_IMPL_SUBDIR}
+            --output-cpp ${GF_OUTPUT_CPP_DIR}
+            --templates ${CMAKE_SOURCE_DIR}/xo-facet/codegen
+        DEPENDS ${GF_INPUT}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating facet source files from ${GF_INPUT}"
+        VERBATIM
+    )
+
+    # Create a target for this generation
+    add_custom_target(${GF_TARGET}
+        DEPENDS ${GF_GENERATED_FILES}
+    )
+endmacro()
