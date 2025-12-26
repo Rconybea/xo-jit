@@ -1640,6 +1640,12 @@ macro(xo_add_genfacet)
 
     cmake_parse_arguments(GF "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+    find_program(GENFACET_EXECUTABLE NAMES genfacet
+        HINTS ${CMAKE_SOURCE_DIR}/xo-facet/codegen
+        DOC "path to xo genfacet code generator"
+        REQUIRED)
+    message(STATUS "GENFACET_EXECUTABLE=${GENFACET_EXECUTABLE}")
+
     # Build the genfacet command
     add_custom_command(
         OUTPUT ${GF_OUTPUT_HPP_DIR}/${FACET}.hpp
@@ -1648,12 +1654,11 @@ macro(xo_add_genfacet)
             ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/I${FACET}_Xfer.hpp
             ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/R${FACET}.hpp
             ${GF_OUTPUT_CPP_DIR}/I${FACET}_Any.cpp
-        COMMAND ${CMAKE_SOURCE_DIR}/xo-facet/codegen/genfacet
+        COMMAND ${GENFACET_EXECUTABLE}
             --input ${GF_INPUT}
             --output-hpp ${GF_OUTPUT_HPP_DIR}
             --output-impl-hpp ${GF_OUTPUT_IMPL_SUBDIR}
             --output-cpp ${GF_OUTPUT_CPP_DIR}
-            --templates ${CMAKE_SOURCE_DIR}/xo-facet/codegen
         DEPENDS ${GF_INPUT}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating facet source files from ${GF_INPUT}"
