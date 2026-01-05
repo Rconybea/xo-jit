@@ -65,10 +65,10 @@ macro(xo_cxx_toplevel_options2)
             TARGET docs_${PROJECT_NAME}
             PROPERTY targets "")
 
-        add_custom_target(idl_${PROJECT_NAME})
+        add_custom_target(share_${PROJECT_NAME})
         set_property(
-            TARGET idl_${PROJECT_NAME}
-            PROPERTY path ${PROJECT_SOURCE_DIR}/idl)
+            TARGET share_${PROJECT_NAME}
+            PROPERTY path ${PROJECT_SOURCE_DIR})
     endif()
 endmacro()
 
@@ -1677,9 +1677,7 @@ function(xo_add_genfacet)
         ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/R${GF_FACET}.hpp
         ${GF_OUTPUT_CPP_DIR}/I${GF_FACET}_Any.cpp)
 
-    message(STATUS "generatedFiles=${generatedFiles}")
-
-    message(ERROR "epic fail")
+    #message(STATUS "generatedFiles=${generatedFiles}")
 
     # Build the genfacet command
     add_custom_command(
@@ -1704,6 +1702,7 @@ function(xo_add_genfacetimpl)
     set(options "")
     set(oneValueArgs
         TARGET              # Name for this generation target
+        FACET_DIR           # facet directory
         FACET               # facet name
         REPR                # representation name
         INPUT               # Input .json5 file
@@ -1754,6 +1753,7 @@ function(xo_add_genfacetimpl)
         OUTPUT ${generatedFiles}
         COMMAND ${GENFACET_EXECUTABLE}
             --input ${GF_INPUT}
+            --facet-dir ${GF_FACET_DIR}
             --output-hpp ${GF_OUTPUT_HPP_DIR}
             --output-impl-hpp ${GF_OUTPUT_IMPL_SUBDIR}
             --output-cpp ${GF_OUTPUT_CPP_DIR}
