@@ -1702,7 +1702,8 @@ function(xo_add_genfacetimpl)
     set(options "")
     set(oneValueArgs
         TARGET              # Name for this generation target
-        FACET_DIR           # facet directory
+        FACET_PKG           # package providing abstract interface
+        FACET_DIR           # facet directory (instead of FACET_PKG)
         FACET               # facet name
         REPR                # representation name
         INPUT               # Input .json5 file
@@ -1734,6 +1735,15 @@ function(xo_add_genfacetimpl)
     endif()
     if(NOT DEFINED GF_OUTPUT_CPP_DIR)
         message(FATAL_ERROR "xo_add_genfacetimpl: OUTPUT_CPP_DIR is required")
+    endif()
+
+    if(NOT DEFINED GF_FACET_DIR)
+        if (NOT DEFINED GF_FACET_PKG)
+            message(FATAL_ERROR "xo_add_genfacetimpl: FACET_PKG or FACET_DIR required")
+        else()
+            get_target_property(_facet_dir share_${GF_FACET_PKG} path)
+            set(GF_FACET_DIR ${_facet_dir})
+        endif()
     endif()
 
     find_program(GENFACET_EXECUTABLE NAMES genfacet
