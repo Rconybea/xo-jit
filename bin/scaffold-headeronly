@@ -1,0 +1,282 @@
+#!/usr/bin/env bash
+#
+# scaffold-headeronly - Create a new xo library subdirectory
+#
+# Usage: scaffold-headeronly [--mode=headeronly|shared] <name>
+#   where <name> is the short name (e.g., "arena" creates "xo-arena")
+#
+
+set -euo pipefail
+
+usage() {
+    echo "Usage: $0 [--mode=headeronly|shared] <name>"
+    echo "  Creates xo-<name>/ with library scaffolding"
+    echo ""
+    echo "Options:"
+    echo "  --mode=headeronly  Create header-only library (default)"
+    echo "  --mode=shared      Create shared library with src/ directory"
+    echo ""
+    echo "Example: $0 arena"
+    echo "  Creates xo-arena/CMakeLists.txt"
+    echo "          xo-arena/cmake/xo-bootstrap-macros.cmake"
+    echo "          xo-arena/cmake/xo_arenaConfig.cmake.in"
+    echo "          xo-arena/include/xo/arena/"
+    echo ""
+    echo "Example: $0 --mode=shared mylib"
+    echo "  Creates xo-mylib/CMakeLists.txt"
+    echo "          xo-mylib/cmake/xo-bootstrap-macros.cmake"
+    echo "          xo-mylib/cmake/xo_mylibConfig.cmake.in"
+    echo "          xo-mylib/include/xo/mylib/"
+    echo "          xo-mylib/src/CMakeLists.txt"
+    exit 1
+}
+
+# Default mode
+MODE="headeronly"
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --mode=*)
+            MODE="${1#--mode=}"
+            if [[ "$MODE" != "headeronly" && "$MODE" != "shared" ]]; then
+                echo "Error: --mode must be 'headeronly' or 'shared'"
+                exit 1
+            fi
+            shift
+            ;;
+        --help|-h)
+            usage
+            ;;
+        -*)
+            echo "Error: unknown option $1"
+            usage
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+if [[ $# -ne 1 ]]; then
+    usage
+fi
+
+NAME="$1"
+
+# Validate name: alphanumeric and underscores only
+if [[ ! "$NAME" =~ ^[a-zA-Z][a-zA-Z0-9_]*$ ]]; then
+    echo "Error: name must start with letter and contain only alphanumeric/underscores"
+    exit 1
+fi
+
+# Derive names
+DIR_NAME="xo-${NAME}"
+LIB_NAME="xo_${NAME}"
+PROJECT_NAME="xo_${NAME}"
+
+# Get script directory to find umbrella root
+XO_UMBRELLA_ROOT=$(git rev-parse --show-toplevel)
+
+TARGET_DIR="${XO_UMBRELLA_ROOT}/${DIR_NAME}"
+
+if [[ -d "$TARGET_DIR" ]]; then
+    echo "Error: ${TARGET_DIR} already exists"
+    exit 1
+fi
+
+echo "Creating ${DIR_NAME} (${MODE}) in ${XO_UMBRELLA_ROOT}..."
+
+# Create directories
+mkdir -p "${TARGET_DIR}/cmake"
+mkdir -p "${TARGET_DIR}/include/xo/${NAME}"
+
+if [[ "$MODE" == "shared" ]]; then
+    mkdir -p "${TARGET_DIR}/src"
+fi
+
+# Create CMakeLists.txt (different content based on mode)
+if [[ "$MODE" == "headeronly" ]]; then
+    cat > "${TARGET_DIR}/CMakeLists.txt" << EOF
+# ${DIR_NAME}/CMakeLists.txt
+
+cmake_minimum_required(VERSION 3.10)
+
+project(${PROJECT_NAME} VERSION 1.0)
+enable_language(CXX)
+
+include(GNUInstallDirs)
+include(cmake/xo-bootstrap-macros.cmake)
+
+xo_cxx_toplevel_options3()
+
+# ----------------------------------------------------------------
+# c++ settings
+
+# one-time project-specific c++ flags. usually empty
+set(PROJECT_CXX_FLAGS "")
+add_definitions(\${PROJECT_CXX_FLAGS})
+
+# ----------------------------------------------------------------
+# output targets
+
+#add_subdirectory(utest)
+
+# ----------------------------------------------------------------
+# header-only library
+
+set(SELF_LIB ${LIB_NAME})
+xo_add_headeronly_library(\${SELF_LIB})
+xo_install_library4(\${SELF_LIB} \${PROJECT_NAME}Targets)
+xo_export_cmake_config(\${PROJECT_NAME} \${PROJECT_VERSION} \${PROJECT_NAME}Targets)
+
+# ----------------------------------------------------------------
+# input dependencies
+#
+# NOTE: dependency set here must be kept consistent with
+#       ${DIR_NAME}/cmake/${LIB_NAME}Config.cmake.in
+
+#xo_headeronly_dependency(\${SELF_LIB} xo_flatstring)
+
+# end CMakeLists.txt
+EOF
+else
+    # Shared library mode
+    cat > "${TARGET_DIR}/CMakeLists.txt" << EOF
+# ${DIR_NAME}/CMakeLists.txt
+
+cmake_minimum_required(VERSION 3.10)
+
+project(${PROJECT_NAME} VERSION 1.0)
+enable_language(CXX)
+
+include(GNUInstallDirs)
+include(cmake/xo-bootstrap-macros.cmake)
+
+xo_cxx_toplevel_options3()
+
+# ----------------------------------------------------------------
+# c++ settings
+
+# one-time project-specific c++ flags. usually empty
+set(PROJECT_CXX_FLAGS "")
+add_definitions(\${PROJECT_CXX_FLAGS})
+
+# ----------------------------------------------------------------
+# output targets
+
+add_subdirectory(src)
+#add_subdirectory(utest)
+
+# ----------------------------------------------------------------
+# cmake export
+
+xo_export_cmake_config(\${PROJECT_NAME} \${PROJECT_VERSION} \${PROJECT_NAME}Targets)
+
+# end CMakeLists.txt
+EOF
+fi
+
+# Create cmake/xo-bootstrap-macros.cmake
+cat > "${TARGET_DIR}/cmake/xo-bootstrap-macros.cmake" << EOF
+# ----------------------------------------------------------------
+# for example:
+#   $ PREFIX=/usr/local   # for example
+#   $ cmake -DCMAKE_MODULE_PATH=prefix -DCMAKE_INSTALL_PREFIX=\$PREFIX -B .build
+#
+# will get
+#   CMAKE_MODULE_PATH
+# from xo-cmake-config --cmake-module-path
+#
+# and expect .cmake macros in
+#   CMAKE_MODULE_PATH/xo_macros/xo_cxx.cmake
+# ----------------------------------------------------------------
+
+find_program(XO_CMAKE_CONFIG_EXECUTABLE NAMES xo-cmake-config REQUIRED)
+
+if (("\${CMAKE_MODULE_PATH}" STREQUAL "") OR ("\${CMAKE_MODULE_PATH}" STREQUAL "prefix"))
+    message(FATAL "could not find xo-cmake-config executable")
+endif()
+
+if (NOT XO_SUBMODULE_BUILD)
+    if (("\${CMAKE_MODULE_PATH}" STREQUAL "") OR ("\${CMAKE_MODULE_PATH}" STREQUAL prefix))
+        # default to typical install location for xo-project-macros
+        execute_process(COMMAND \${XO_CMAKE_CONFIG_EXECUTABLE} --cmake-module-path OUTPUT_VARIABLE CMAKE_MODULE_PATH)
+        message(STATUS "CMAKE_MODULE_PATH=\${CMAKE_MODULE_PATH}")
+    endif()
+endif()
+
+# needs to have been installed somewhere on CMAKE_MODULE_PATH,
+# (e.g. from xo-cmake with the same value for CMAKE_INSTALL_PREFIX)
+#
+include(xo_macros/xo_cxx)
+
+xo_cxx_bootstrap_message()
+EOF
+
+# Create cmake/xo_${NAME}Config.cmake.in
+cat > "${TARGET_DIR}/cmake/${LIB_NAME}Config.cmake.in" << EOF
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# note: changes to find_dependency() calls here
+#       must coordinate with xo_dependency() calls
+#       in CMakeLists.txt
+#
+#find_dependency(xo_flatstring)
+
+include("\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+check_required_components("@PROJECT_NAME@")
+EOF
+
+# Create src/CMakeLists.txt for shared library mode
+if [[ "$MODE" == "shared" ]]; then
+    cat > "${TARGET_DIR}/src/CMakeLists.txt" << EOF
+# ${DIR_NAME}/src/CMakeLists.txt
+
+set(SELF_LIB ${LIB_NAME})
+set(SELF_SRCS
+    # Add source files here, e.g.:
+    # ${NAME}.cpp
+)
+
+xo_add_shared_library4(\${SELF_LIB} \${PROJECT_NAME}Targets \${PROJECT_VERSION} 1 \${SELF_SRCS})
+xo_install_include_tree3(include/xo/${NAME})
+
+# ----------------------------------------------------------------
+# input dependencies
+#
+# NOTE: dependency set here must be kept consistent with
+#       ${DIR_NAME}/cmake/${LIB_NAME}Config.cmake.in
+
+#xo_dependency(\${SELF_LIB} xo_indentlog)
+
+# end src/CMakeLists.txt
+EOF
+fi
+
+# Create placeholder .gitkeep in include dir
+touch "${TARGET_DIR}/include/xo/${NAME}/.gitkeep"
+
+echo ""
+echo "Created ${DIR_NAME}/ (${MODE}) with:"
+echo "  ${DIR_NAME}/CMakeLists.txt"
+echo "  ${DIR_NAME}/cmake/xo-bootstrap-macros.cmake"
+echo "  ${DIR_NAME}/cmake/${LIB_NAME}Config.cmake.in"
+echo "  ${DIR_NAME}/include/xo/${NAME}/"
+if [[ "$MODE" == "shared" ]]; then
+    echo "  ${DIR_NAME}/src/CMakeLists.txt"
+fi
+echo ""
+echo "Next steps:"
+if [[ "$MODE" == "headeronly" ]]; then
+    echo "  1. Add header files to ${DIR_NAME}/include/xo/${NAME}/"
+    echo "  2. Add ${DIR_NAME} to umbrella CMakeLists.txt"
+    echo "  3. Uncomment dependencies as needed in CMakeLists.txt and Config.cmake.in"
+else
+    echo "  1. Add header files to ${DIR_NAME}/include/xo/${NAME}/"
+    echo "  2. Add source files to ${DIR_NAME}/src/ and update src/CMakeLists.txt SELF_SRCS"
+    echo "  3. Add ${DIR_NAME} to umbrella CMakeLists.txt"
+    echo "  4. Uncomment dependencies as needed in src/CMakeLists.txt and Config.cmake.in"
+fi
