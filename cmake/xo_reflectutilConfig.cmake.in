@@ -6,12 +6,7 @@ include(CMakeFindDependencyMacro)
 #       must coordinate with xo_dependency() calls
 #       in xo-reactor/src/reactor/CMakeLists.txt
 #
-find_dependency(xo_flatstring)
-#find_dependency(subsys)
-#find_dependency(Eigen3)
-#find_dependency(webutil)
-#find_dependency(printjson)
-#find_dependency(callback)
+#find_dependency(xo_flatstring)
 
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 check_required_components("@PROJECT_NAME@")
