@@ -171,9 +171,26 @@ namespace xo {
             return true;
         } /*log*/
 
+        /** re-enable + log (args...).
+         *  No-op if scope already enabled.
+         *  Useful in verify_ok() methods, to conditionally enable
+         *  logging only when a test fails
+         **/
+        template<typename... Tn>
+        void retroactively_enable(Tn&&... args) {
+            if (finalized_) {
+                this->finalized_ = false;
+                this->begin_scope(std::forward<Tn>(args)...);
+            }
+        }
+
         /** Log argument in pack @p args **/
         template<typename... Tn>
         bool operator()(Tn&&... args) { return this->log(std::forward<Tn>(args)...); }
+
+        /** If enabled, writes initial banner **/
+        template<typename... Tn>
+        void begin_scope(Tn&&... args);
 
         /** Optionally, call once to end scope before dtor.
          *  Logs arguments in pack @p args
@@ -231,27 +248,7 @@ namespace xo {
           line_{setup.line_},
           finalized_{!(setup.is_enabled())}
     {
-        if(setup.is_enabled()) {
-            state_impl_type * logstate = basic_scope::require_thread_local_state();
-            std::ostream & os = logstate2stream(logstate);
-
-            logstate->preamble(this->style_, this->name1_, this->name2_);
-
-            tosn(os, " ", std::forward<Tn>(args)...);
-
-            if (log_config::location_enabled) {
-                /* prints on next call to flush2sbuf */
-                logstate->set_location(this->file_, this->line_);
-                //tosn(os, " [", basename(this->file_), ":", this->line_, "]");
-            }
-
-            logstate->flush2sbuf(std::clog.rdbuf());
-
-            ///* next call to scope::log() can reset to beginning of buffer space */
-            //logstate->ss().seekp(0);
-
-            logstate->incr_nesting();
-        }
+        this->begin_scope(std::forward<Tn>(args)...);
     } /*ctor*/
 
     template <typename CharT, typename Traits>
@@ -313,6 +310,34 @@ namespace xo {
     {
         logstate->flush2sbuf(this->dest_sbuf_);
     } /*flush2sbuf*/
+
+    template <typename CharT, typename Traits>
+    template <typename... Tn>
+    void
+    basic_scope<CharT, Traits>::begin_scope(Tn&&... args)
+    {
+        if(this->enabled()) {
+            state_impl_type * logstate = basic_scope::require_thread_local_state();
+            std::ostream & os = logstate2stream(logstate);
+
+            logstate->preamble(this->style_, this->name1_, this->name2_);
+
+            tosn(os, " ", std::forward<Tn>(args)...);
+
+            if (log_config::location_enabled) {
+                /* prints on next call to flush2sbuf */
+                logstate->set_location(this->file_, this->line_);
+                //tosn(os, " [", basename(this->file_), ":", this->line_, "]");
+            }
+
+            logstate->flush2sbuf(std::clog.rdbuf());
+
+            ///* next call to scope::log() can reset to beginning of buffer space */
+            //logstate->ss().seekp(0);
+
+            logstate->incr_nesting();
+        }
+    }
 
     template <typename CharT, typename Traits>
     template <typename... Tn>
