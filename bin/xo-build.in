@@ -7,7 +7,7 @@ usage() {
 $0 [-u|--usage|-h|--help]
     [--list] [-n|--dry-run] [--xoname=NAME]
     [--repo|--clone|--configure|--build|--install]
-    [--with-examples] [--with-utests] [--debug-build]
+    [--with-examples] [--with-utests] [--with-asm] [--debug-build]
     [--with-opengl=GLFLAG] [--with-vulkan=VKFLAG]
     [-S=SOURCEDIR] [-B=BUILDDIR]
 EOF
@@ -40,6 +40,7 @@ Options:
 
   --with-examples      in configure step, set -DXO_ENABLE_EXAMPLES=1
   --with-utests        in configure step, set -DENABLE_TESTING=1
+  --with-asm           in configure step, set -DXO_ENABLE_ASM=1
   --debug-build        in configure step, set -DCMAKE_BUILD_TYPE=Debug
   --with-opengl=GLFLAG in configure step, set -DXO_ENABLE_OPENGL=GLFLAG [ON]
   --with-vulkan=VKFLAG in configure step, set -DXO_ENABLE_VULKAN=VKFLAG [OFF]
@@ -61,6 +62,7 @@ pathtosource=
 pathtobuild=
 with_examples=0
 with_utests=0
+with_asm=0
 debug_build=0
 with_opengl=
 with_vulkan=
@@ -122,6 +124,9 @@ while [[ $# > 0 ]]; do
             ;;
         --with-utests)
             with_utests=1
+            ;;
+        --with-asm)
+            with_asm=1
             ;;
         --debug-build)
             debug_build=1
@@ -238,6 +243,10 @@ if [[ $configure_flag -eq 1 ]]; then
             testingarg="-DENABLE_TESTING=1"
         fi
 
+        if [[ $with_asm -eq 1 ]]; then
+            asmarg="-DENABLE_ASM=1"
+        fi
+
         examplearg=
         if [[ $with_examples -eq 1 ]]; then
             examplearg="-DXO_ENABLE_EXAMPLES=1"
@@ -258,7 +267,7 @@ if [[ $configure_flag -eq 1 ]]; then
             vulkanarg="-DXO_ENABLE_VULKAN=${with_vulkan}"
         fi
 
-        cmd="cmake -DCMAKE_INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@ -DCMAKE_MODULE_PATH=@CMAKE_INSTALL_PREFIX@/share/cmake -S $pathtosource -B $pathtobuild ${testingarg} ${examplearg} ${openglarg} ${vulkanarg} ${cmakebuildtype}"
+        cmd="cmake -DCMAKE_INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@ -DCMAKE_MODULE_PATH=@CMAKE_INSTALL_PREFIX@/share/cmake -S $pathtosource -B $pathtobuild ${testingarg} ${examplearg} ${asmarg} ${openglarg} ${vulkanarg} ${cmakebuildtype}"
 
         if [[ $noop_flag -eq 1 ]]; then
             echo $cmd
