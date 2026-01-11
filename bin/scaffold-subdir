@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# scaffold-headeronly - Create a new xo library subdirectory
+# scaffold-subdir - Create a new xo library subdirectory
 #
 # Usage: scaffold-headeronly [--mode=headeronly|shared] <name>
 #   where <name> is the short name (e.g., "arena" creates "xo-arena")
