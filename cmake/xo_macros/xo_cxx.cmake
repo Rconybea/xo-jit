@@ -292,7 +292,7 @@ function(xo_generate_reconfigure_script)
         return()
     endif()
 
-    set(_reconfigure_script "${CMAKE_BINARY_DIR}/xo-reconfigure")
+    set(_reconfigure_script "${CMAKE_BINARY_DIR}/reconfigure")
     configure_file(${_reconfigure_template} ${_reconfigure_script} @ONLY)
     file(CHMOD ${_reconfigure_script} PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
