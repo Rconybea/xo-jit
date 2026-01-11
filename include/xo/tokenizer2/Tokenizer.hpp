@@ -9,8 +9,9 @@
 #include "TkInputState.hpp"
 #include "span.hpp"
 #include "scan_result.hpp"
-#include "xo/indentlog/scope.hpp"
-#include "xo/indentlog/print/ppdetail_atomic.hpp"
+#include <xo/arena/DCircularBuffer.hpp>
+#include <xo/indentlog/scope.hpp>
+#include <xo/indentlog/print/ppdetail_atomic.hpp>
 #include <cassert>
 
 namespace xo {
@@ -58,15 +59,24 @@ namespace xo {
             using CharT = char;
             using token_type = Token;
             using error_type = TokenizerError;
-            using span_type = span<const CharT>;
-            using input_state_type = TkInputState;
+            using DCircularBuffer = xo::mm::DCircularBuffer;
+            using CircularBufferConfig = xo::mm::CircularBufferConfig;
+            using span_type = xo::mm::span<const CharT>;
+            //using input_state_type = TkInputState;
             using result_type = scan_result;
 
         public:
             /** @defgroup tokenizer-ctors tokenizer constructors **/
             ///@{
 
-            Tokenizer(bool debug_flag = false);
+            /**
+             *  @p config     gives configuration for circular input buffer
+             *  @p debug_flag enables tokenizer debug output
+             **/
+            Tokenizer(const CircularBufferConfig & config = CircularBufferConfig{.name_ = "tkz-input",
+                                                                                 .max_capacity_ = 4*1024,
+                                                                                 .max_captured_span_ = 128},
+                      bool debug_flag = false);
 
             ///@}
 
@@ -119,6 +129,11 @@ namespace xo {
              **/
             bool has_prefix() const { return !prefix_.empty(); }
 
+            /** buffer contents of input_cstr.
+             *  May throw if buffer space exhausted
+             **/
+            std::pair<input_error, span_type> buffer_input_line(const char * input_cstr, bool eof_flag);
+
             /** scan for next input token,  given @p input.
              *  Note:
              *  - tokenizer can consume input (e.g. whitespace)
@@ -130,8 +145,7 @@ namespace xo {
              *
              *  @return {parsed token, consumed span}
              **/
-            scan_result scan(const span_type & input,
-                             bool eof_flag);
+            scan_result scan(const span_type & input);
 
             /** discard current line after error.  Just cleans up error-reporting state **/
             void discard_current_line();
@@ -142,6 +156,8 @@ namespace xo {
             /** @defgroup tokenizer-instance-vars tokenizer instance variables **/
             ///@{
 
+            /** Buffer input here. vm-aware. uses mmap directly **/
+            DCircularBuffer input_buffer_;
             /** track input state (line#,pos,..) for error messages.
              *  There's an ordering problem here:
              *  1. input_state_.skip_leading_whitespace() advances
@@ -150,7 +166,7 @@ namespace xo {
              *  3. but neeed newline to end token
              *  Also recall input_state_type needed for reporting errors.
              **/
-            input_state_type input_state_;
+            TkInputState input_state_;
             /** Accumulate partial token here.
              *  This will happen if input sent to @ref tokenizer::scan
              *  ends without whitespace such that last available token's

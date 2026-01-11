@@ -20,7 +20,7 @@ namespace xo {
         class TokenizerError {
         public:
             using CharT = char;
-            using span_type = span<const CharT>;
+            using span_type = xo::mm::span<const CharT>;
 
         public:
             /** @defgroup tokenizer-error-ctors **/

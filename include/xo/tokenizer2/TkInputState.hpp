@@ -63,7 +63,7 @@ namespace xo {
             using CharT = char;
 
             /** type representing a contiguous span of tokenizer input characters **/
-            using span_type = span<const CharT>;
+            using span_type = xo::mm::span<const CharT>;
 
             ///@}
 
@@ -76,7 +76,7 @@ namespace xo {
             /** Create instance with supplied @p current_line, @p current_pos, @p whitespace.
              *  Introduced for unit tests, not used in tokenizer.
              **/
-            explicit TkInputState(const span<const CharT>& current_line,
+            explicit TkInputState(const span_type & current_line,
                                   size_t current_pos,
                                   size_t whitespace) : current_line_{current_line},
                                                        current_pos_{current_pos},
@@ -191,7 +191,7 @@ namespace xo {
             ///@{
 
             /** remember current input line.  Used only to report errors **/
-            span<const CharT> current_line_ = span<const CharT>();
+            span_type current_line_ = span_type();
             /** start of last token within @ref current_line_ **/
             size_t tk_start_ = 0;
             /** input position within @ref current_line_ **/

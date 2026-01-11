@@ -6,9 +6,13 @@
 #include "Tokenizer.hpp"
 
 namespace xo {
+    using std::byte;
+
     namespace scm {
-        Tokenizer::Tokenizer(bool debug_flag)
-            : input_state_{debug_flag}
+        Tokenizer::Tokenizer(const CircularBufferConfig & config,
+                             bool debug_flag)
+        : input_buffer_{DCircularBuffer::map(config)},
+          input_state_{debug_flag}
         {}
 
         void
@@ -108,7 +112,7 @@ namespace xo {
         auto
         Tokenizer::assemble_token(std::size_t initial_whitespace,
                                   const span_type & token_text,
-                                  input_state_type * p_input_state) -> result_type
+                                  TkInputState * p_input_state) -> result_type
         {
             /* literal|pretty|streamlined */
             log_config::style = function_style::streamlined;
@@ -600,7 +604,7 @@ namespace xo {
 
         auto
         Tokenizer::assemble_final_token(const span_type & token_text,
-                                        input_state_type * p_input_state) -> result_type
+                                        TkInputState * p_input_state) -> result_type
         {
             return assemble_token(0 /*initial_whitespace*/,
                                   token_text,
@@ -608,12 +612,43 @@ namespace xo {
         }
 
         auto
-        Tokenizer::scan(const span_type & input,
-                        bool eof_flag) -> result_type
+        Tokenizer::buffer_input_line(const char * input_cstr,
+                                     bool eof_flag) -> std::pair<input_error, span_type>
         {
             scope log(XO_DEBUG(input_state_.debug_flag()));
 
-            log && log(xtag("input", input));
+            log && log(xtag("input", input_cstr));
+
+            auto buf_input_0 = input_buffer_.input_range().hi();
+
+            auto remainder = input_buffer_.append
+                                 (DCircularBuffer::const_span_type
+                                      ((const byte *)input_cstr,
+                                       (const byte *)input_cstr + strlen(input_cstr)));
+
+            const char * newline_cstr = "\n";
+            auto remainder2 = input_buffer_.append
+                                  (DCircularBuffer::const_span_type
+                                       ((const byte *)newline_cstr,
+                                        (const byte *)newline_cstr + strlen(newline_cstr)));
+
+            if (!remainder.empty() || !remainder2.empty()) {
+                throw std::runtime_error(tostr("Tokenizer::buffer_line: line too long!",
+                                               xtag("remainder.size", remainder.size())));
+            }
+
+            auto buf_input_1 = input_buffer_.input_range().hi();
+
+            span_type input = span_type((const char *)buf_input_0,
+                                        (const char *)buf_input_1);
+
+            return this->input_state_.capture_current_line(input, eof_flag);
+        }
+
+        auto
+        Tokenizer::scan(const span_type & input) -> result_type
+        {
+            scope log(XO_DEBUG(input_state_.debug_flag()));
 
             /* - Always at beginning of token when scan() invoked
              * - scan will not report any portion of line as consumed until it has
@@ -624,9 +659,6 @@ namespace xo {
              * - this means caller will typically call scan()
              *   with the same input span multiple times
              */
-
-            /* automagically no-ops when the same input presented twice */
-            this->input_state_.capture_current_line(input, eof_flag);
 
             const CharT * ix = this->input_state_.skip_leading_whitespace();
 
@@ -789,7 +821,7 @@ namespace xo {
                  * - punctuation
                  */
                 for (; ix != input.hi(); ++ix) {
-                    if (input_state_type::is_whitespace(*ix)
+                    if (TkInputState::is_whitespace(*ix)
                         || is_1char_punctuation(*ix)
                         || is_2char_punctuation(*ix))
                     {
@@ -829,7 +861,7 @@ namespace xo {
             return assemble_token(whitespace_z,
                                   span_type(tk_start, ix) /*token*/,
                                   &(this->input_state_));
-        } /*scan*/
+        } /*_scan_aux*/
     } /*namespace scm*/
 } /*namespace xo*/
 

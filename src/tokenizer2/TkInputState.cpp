@@ -84,7 +84,8 @@ namespace xo {
             //       for example including leading whitespace.
             //       See discussion in tokenizer scan() method
 
-            scope log(XO_DEBUG(debug_flag_));
+            scope log(XO_DEBUG(debug_flag_),
+                      xtag("input", input));
 
             /* look ahead to {end of line, end of input}, whichever comes first */
             const CharT * sol = input.lo();

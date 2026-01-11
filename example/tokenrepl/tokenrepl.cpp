@@ -3,7 +3,7 @@
 #include <xo/tokenizer2/Tokenizer.hpp>
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/tokenizer2/tokentype.hpp>
-#include <xo/tokenizer2/span.hpp>
+#include <xo/arena/span.hpp>
 #include <xo/indentlog/log_config.hpp>
 #include <replxx.hxx>
 #include <iostream>
@@ -14,7 +14,7 @@
 bool replxx_getline(bool interactive,
                     std::size_t parser_stack_size,
                     replxx::Replxx & rx,
-                    std::string& input)
+                    const char ** p_input)
 {
     using namespace std;
 
@@ -34,40 +34,23 @@ bool replxx_getline(bool interactive,
     if (retval) {
         //cerr << "got reval->true" << endl;
 
-        input = input_cstr;
+        *p_input = input_cstr;
 
     } else {
         //cerr << "got retval->false" << endl;
     }
 
-    rx.history_add(input);
-
-    // we want tokenizer to see newline, it's syntax
-    input.push_back('\n');
+    rx.history_add(input_cstr);
 
     return retval;
 }
 
-#ifdef OBSOLETE
-bool repl_getline(bool interactive,
-                  std::istream & in,
-                  std::ostream & out,
-                  std::string & input)
-{
-    if (interactive) {
-        out << "> ";
-        std::flush(out);
-    }
-
-    return static_cast<bool>(std::getline(in, input));
-}
-#endif
-
 int
 main() {
     using xo::scm::Tokenizer;
-    using xo::scm::span;
     using xo::scm::operator<<;
+    using xo::mm::CircularBufferConfig;
+    using xo::mm::span;
     using replxx::Replxx;
 
     using namespace std;
@@ -82,36 +65,39 @@ main() {
     rx.set_max_history_size(1000);
     rx.history_load("repl_history.txt");
 
-    Tokenizer tkz(xo::log_config::min_log_level <= xo::log_level::info);
+    Tokenizer tkz(CircularBufferConfig{.name_ = "tokenrepl-input",
+                                       .max_capacity_ = 4*1024,
+                                       .max_captured_span_ = 128},
+                  true /*debug_flag*/);
 
-    string input_str;
+    const char * input_cstr = nullptr;;
 
     size_t line_no = 1;
 
     constexpr std::size_t c_maxlines = 25;
 
-    while (
-        //repl_getline(interactive, cin, cout, input_str)  // once upon a time
-        replxx_getline(interactive, 0 /*parser_stack_size*/, rx, input_str))
+    while (replxx_getline(interactive, 0 /*parser_stack_size*/, rx, &input_cstr))
     {
-        span_type input = span_type::from_string(input_str);
-
         //cout << "input: " << input << endl;
 
         // reminder: input may contain multiple tokens
-        while (!input.empty()) {
-            auto [tk, consumed, error] = tkz.scan(input, false /*!eof*/);
+        if (input_cstr && *input_cstr) {
+            auto [error, input] = tkz.buffer_input_line(input_cstr, false /*!eof*/);
 
-            if (tk.is_valid()) {
-                cout << tk << endl;
-            } else if (error.is_error()) {
-                cout << "tokenizer error: " << endl;
-                error.report(cout);
+            {
+                auto [tk, consumed, error] = tkz.scan(input);
 
-                break;
+                if (tk.is_valid()) {
+                    cout << tk << endl;
+                } else if (error.is_error()) {
+                    cout << "tokenizer error: " << endl;
+                    error.report(cout);
+
+                    break;
+                }
+
+                input = input.after_prefix(consumed);
             }
-
-            input = input.after_prefix(consumed);
         }
 
         /* here: input.empty() or error encountered */
