@@ -51,6 +51,8 @@ main() {
     using xo::scm::operator<<;
     using xo::mm::CircularBufferConfig;
     using xo::mm::span;
+    using xo::scope;
+    using xo::xtag;
     using replxx::Replxx;
 
     using namespace std;
@@ -65,10 +67,13 @@ main() {
     rx.set_max_history_size(1000);
     rx.history_load("repl_history.txt");
 
+    constexpr bool c_debug_flag = true;
+    scope log(XO_DEBUG(c_debug_flag));
+
     Tokenizer tkz(CircularBufferConfig{.name_ = "tokenrepl-input",
                                        .max_capacity_ = 4*1024,
                                        .max_captured_span_ = 128},
-                  true /*debug_flag*/);
+                  c_debug_flag);
 
     const char * input_cstr = nullptr;;
 
@@ -84,8 +89,16 @@ main() {
         if (input_cstr && *input_cstr) {
             auto [error, input] = tkz.buffer_input_line(input_cstr, false /*!eof*/);
 
+            if (log) {
+                log(xtag("msg", "buffered input line"));
+                log(xtag("input", input));
+            }
+
+            while (!input.empty())
             {
                 auto [tk, consumed, error] = tkz.scan(input);
+
+                log && log(xtag("consumed", consumed), xtag("tk", tk));
 
                 if (tk.is_valid()) {
                     cout << tk << endl;

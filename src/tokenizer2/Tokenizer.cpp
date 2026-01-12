@@ -622,15 +622,9 @@ namespace xo {
             auto buf_input_0 = input_buffer_.input_range().hi();
 
             auto remainder = input_buffer_.append
-                                 (DCircularBuffer::const_span_type
-                                      ((const byte *)input_cstr,
-                                       (const byte *)input_cstr + strlen(input_cstr)));
-
-            const char * newline_cstr = "\n";
+                                 (DCircularBuffer::const_span_type::from_cstr(input_cstr));
             auto remainder2 = input_buffer_.append
-                                  (DCircularBuffer::const_span_type
-                                       ((const byte *)newline_cstr,
-                                        (const byte *)newline_cstr + strlen(newline_cstr)));
+                                  (DCircularBuffer::const_span_type::from_cstr("\n"));
 
             if (!remainder.empty() || !remainder2.empty()) {
                 throw std::runtime_error(tostr("Tokenizer::buffer_line: line too long!",
@@ -639,8 +633,8 @@ namespace xo {
 
             auto buf_input_1 = input_buffer_.input_range().hi();
 
-            span_type input = span_type((const char *)buf_input_0,
-                                        (const char *)buf_input_1);
+            span_type input = span_type(buf_input_0,
+                                        buf_input_1);
 
             return this->input_state_.capture_current_line(input, eof_flag);
         }
