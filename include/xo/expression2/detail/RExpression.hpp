@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
+ *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/Expression.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -31,6 +31,7 @@ public:
     using ObjectType = Object;
     using DataPtr = Object::DataPtr;
     using typeseq = xo::reflect::typeseq;
+    using TypeDescr = AExpression::TypeDescr;
     ///@}
 
     /** @defgroup scm-expression-router-ctors **/
@@ -44,10 +45,13 @@ public:
 
     // const methods
     typeseq _typeseq() const noexcept { return O::iface()->_typeseq(); }
-    TypeRef typeref()  const  noexcept override {
+    exprtype extype()  const  noexcept {
+        return O::iface()->extype(O::data());
+    }
+    TypeRef typeref()  const  noexcept {
         return O::iface()->typeref(O::data());
     }
-    TypeDescr valuetype()  const  noexcept override {
+    TypeDescr valuetype()  const  noexcept {
         return O::iface()->valuetype(O::data());
     }
 

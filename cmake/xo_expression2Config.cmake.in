@@ -8,6 +8,7 @@ include(CMakeFindDependencyMacro)
 #
 find_dependency(xo_gc)
 find_dependency(reflect)
+find_dependency(xo_object2)
 find_dependency(xo_printable2)
 find_dependency(xo_flatstring)
 find_dependency(indentlog)

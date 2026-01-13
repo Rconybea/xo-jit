@@ -1,6 +1,9 @@
 {
     mode: "facet",
-    includes: ["\"TypeRef.hpp\""],
+    includes: [ "\"TypeRef.hpp\"",
+                "\"exprtype.hpp\"",
+                "<xo/reflect/TypeDescr.hpp>"],
+
     namespace1: "xo",
     namespace2: "scm",
     facet: "Expression",
@@ -10,8 +13,24 @@
     doc: [
         "Representation for executable Schematika expressions"
     ],
-    types: [],
+    types: [
+        // using TypeDescr = xo::reflect::TypeDescr;
+        {
+            name: "TypeDescr",
+            doc: ["struct describing a type"],
+            definition: "xo::reflect::TypeDescr"
+        },
+    ],
     const_methods: [
+        {
+            name: "extype",
+            doc: ["expression type (constant | apply | ..)"],
+            return_type: "exprtype",
+            args: [],
+            const: true,
+            noexcept: true,
+            attributes: [],
+        },
         {
             name: "typeref",
             doc: ["placeholder for type giving possible values for this expression"],

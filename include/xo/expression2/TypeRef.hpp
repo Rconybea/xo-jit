@@ -26,6 +26,11 @@ namespace xo {
             TypeRef() = default;
             TypeRef(const type_var & id, TypeDescr td);
 
+            /** trivial typeref, where already resolved.
+             *  Require: @p td non-null
+             **/
+            static TypeRef resolved(TypeDescr td);
+
             /** if @p td is non-null
              *   -> type is already resolved
              *
@@ -43,7 +48,10 @@ namespace xo {
             TypeDescr td() const noexcept { return td_; }
 
             /** true iff type at this location has been resolved **/
-            bool is_concrete() const noexcept;
+            bool is_resolved() const noexcept;
+
+            /** resolve TypeRef by supplying final type-description **/
+            void resolve(TypeDescr td) noexcept { td_ = td; }
 
         private:
             /** unique (probably generated) name for type at this location **/

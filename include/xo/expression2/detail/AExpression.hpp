@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
+ *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/Expression.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -15,6 +15,8 @@
 
 // includes (via {facet_includes})
 #include "TypeRef.hpp"
+#include "exprtype.hpp"
+#include <xo/reflect/TypeDescr.hpp>
 #include <xo/facet/obj.hpp>
 #include <xo/facet/facet_implementation.hpp>
 #include <xo/facet/typeseq.hpp>
@@ -35,6 +37,8 @@ public:
     // types
     /** integer identifying a type **/
     using typeseq = xo::facet::typeseq;
+    /** struct describing a type **/
+    using TypeDescr = xo::reflect::TypeDescr;
     ///@}
 
     /** @defgroup scm-expression-methods **/
@@ -42,6 +46,8 @@ public:
     // const methods
     /** RTTI: unique id# for actual runtime data representation **/
     virtual typeseq _typeseq() const noexcept = 0;
+    /** expression type (constant | apply | ..) **/
+    virtual exprtype extype(Copaque data)  const  noexcept = 0;
     /** placeholder for type giving possible values for this expression **/
     virtual TypeRef typeref(Copaque data)  const  noexcept = 0;
     /** type giving possible values for this expression. Maybe null before typecheck **/

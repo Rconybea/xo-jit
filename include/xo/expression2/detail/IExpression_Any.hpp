@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
+ *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/Expression.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -44,6 +44,7 @@ namespace scm {
 
         /** integer identifying a type **/
         using typeseq = xo::facet::typeseq;
+        using TypeDescr = AExpression::TypeDescr;
 
         ///@}
         /** @defgroup scm-expression-any-methods **/
@@ -55,6 +56,7 @@ namespace scm {
 
         // const methods
         typeseq _typeseq() const noexcept override { return s_typeseq; }
+        [[noreturn]] exprtype extype(Copaque)  const  noexcept override { _fatal(); }
         [[noreturn]] TypeRef typeref(Copaque)  const  noexcept override { _fatal(); }
         [[noreturn]] TypeDescr valuetype(Copaque)  const  noexcept override { _fatal(); }
 

@@ -12,14 +12,22 @@ namespace xo {
         {}
 
         TypeRef
+        TypeRef::resolved(TypeDescr td)
+        {
+            assert(td);
+
+            type_var null;
+            return TypeRef(null, td);
+        }
+
+        TypeRef
         TypeRef::dwim(prefix_type prefix, TypeDescr td)
         {
             if (td) {
                 /* type already resolved
                  *  -> we don't need a type variable name
                  */
-                type_var null;
-                return TypeRef(null, td);
+                return TypeRef::resolved(td);
             } else {
                 /* type is not resolved yet.
                  *  -> give it a unique name,
@@ -49,7 +57,7 @@ namespace xo {
         }
 
         bool
-        TypeRef::is_concrete() const noexcept
+        TypeRef::is_resolved() const noexcept
         {
             return (td_ != nullptr);
         }
