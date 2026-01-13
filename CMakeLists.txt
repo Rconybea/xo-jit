@@ -22,12 +22,21 @@ add_definitions(${PROJECT_CXX_FLAGS})
 
 #add_subdirectory(utest)
 
+# note: manual target; generated code committed to git
+xo_add_genfacet(
+    TARGET xo-expression2-facet-expression
+    FACET Expression
+    INPUT idl/Expression.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/expression2
+    )
+
 # ----------------------------------------------------------------
 # header-only library
 
-set(SELF_LIB xo_expression2)
-xo_add_headeronly_library(${SELF_LIB})
-xo_install_library4(${SELF_LIB} ${PROJECT_NAME}Targets)
+add_subdirectory(src/expression2)
+
 xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets)
 
 # ----------------------------------------------------------------

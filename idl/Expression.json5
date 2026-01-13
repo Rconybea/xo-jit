@@ -1,0 +1,48 @@
+{
+    mode: "facet",
+    includes: ["\"TypeRef.hpp\""],
+    namespace1: "xo",
+    namespace2: "scm",
+    facet: "Expression",
+    detail_subdir: "detail",
+    brief: "a schematika expression",
+    using_doxygen: true,
+    doc: [
+        "Representation for executable Schematika expressions"
+    ],
+    types: [],
+    const_methods: [
+        {
+            name: "typeref",
+            doc: ["placeholder for type giving possible values for this expression"],
+            return_type: "TypeRef",
+            args: [],
+            const: true,
+            noexcept: true,
+            attributes: [],
+        },
+        {
+            name: "valuetype",
+            doc: ["type giving possible values for this expression. Maybe null before typecheck"],
+            return_type: "TypeDescr",
+            args: [],
+            const: true,
+            noexcept: true,
+            attributes: [],
+        },
+    ],
+    nonconst_methods: [
+        {
+            name: "assign_valuetype",
+            doc: ["assing to valuetype member. Useful when scaffolding expressions"],
+            return_type: "void",
+            args: [
+                // void assign_valuetype(TypeDescr td)
+                {type: "TypeDescr", name: "td"},
+            ],
+            const: false,
+            noexcept: true,
+            attributes: [],
+        }
+    ],
+}
