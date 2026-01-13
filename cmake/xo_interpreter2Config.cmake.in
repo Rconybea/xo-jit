@@ -6,7 +6,8 @@ include(CMakeFindDependencyMacro)
 #       must coordinate with xo_dependency() calls
 #       in CMakeLists.txt
 #
-#find_dependency(xo_flatstring)
+find_dependency(xo_expression2)
+find_dependency(xo_gc)
 
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 check_required_components("@PROJECT_NAME@")

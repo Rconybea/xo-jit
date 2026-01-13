@@ -1,0 +1,63 @@
+/** @file VirtualSchematikaMachine.cpp
+ *
+ *  @author Roland Conybeare, Jan 2026
+ **/
+
+#include "VirtualSchematikaMachine.hpp"
+#include <xo/expression2/DConstant.hpp>
+#include <cassert>
+
+namespace xo {
+    namespace scm {
+
+        VirtualSchematikaMachine::VirtualSchematikaMachine()
+        {}
+
+        void
+        VirtualSchematikaMachine::run()
+        {
+            while (this->execute_one())
+                ;
+        }
+
+        bool
+        VirtualSchematikaMachine::execute_one()
+        {
+            switch (pc_.opcode()) {
+            case vsm_opcode::halt:
+            case vsm_opcode::N:
+                return false;
+            case vsm_opcode::eval:
+                _do_eval_op();
+            }
+
+            return true;
+        }
+
+        void
+        VirtualSchematikaMachine::_do_eval_op()
+        {
+            switch(expr_.extype()) {
+            case exprtype::invalid:
+            case exprtype::N:
+                break;
+            case exprtype::constant:
+                _do_eval_constant_op();
+                break;
+            }
+        }
+
+        void
+        VirtualSchematikaMachine::_do_eval_constant_op()
+        {
+            auto expr
+                = obj<AExpression,DConstant>::from(expr_);
+
+            this->value_ = expr.data()->value();
+            this->pc_ = this->cont_;
+        }
+
+    } /*namespace scm*/
+} /*namespace xo*/
+
+/* end VirtualSchematikaMachine.hpp */
