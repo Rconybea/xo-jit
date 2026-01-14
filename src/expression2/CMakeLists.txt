@@ -4,7 +4,8 @@ set(SELF_LIB xo_expression2)
 set(SELF_SRCS
     DConstant.cpp
     TypeRef.cpp
-    #IExpression_Any.cpp
+    IExpression_Any.cpp
+    IExpression_DConstant.cpp
     expression2_register_facets.cpp
     )
 
