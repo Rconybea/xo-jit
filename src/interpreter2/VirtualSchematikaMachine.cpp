@@ -4,6 +4,7 @@
  **/
 
 #include "VirtualSchematikaMachine.hpp"
+#include <xo/expression2/IExpression_DConstant.hpp>
 #include <xo/expression2/DConstant.hpp>
 #include <cassert>
 
