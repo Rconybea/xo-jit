@@ -11,6 +11,7 @@ find_dependency(reflect)
 find_dependency(xo_object2)
 find_dependency(xo_printable2)
 find_dependency(xo_flatstring)
+find_dependency(cmake)
 find_dependency(indentlog)
 
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
