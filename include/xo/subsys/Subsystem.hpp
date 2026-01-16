@@ -130,8 +130,8 @@ namespace xo {
     public:
         SubsystemImpl() = default;
         SubsystemImpl(bool require_flag,
-                  std::string_view subsys_name,
-                  std::function<void ()> init_fn)
+                      std::string_view subsys_name,
+                      std::function<void ()> init_fn)
             : require_flag_{require_flag},
               subsys_name_{subsys_name},
               init_fn_{init_fn} {}
