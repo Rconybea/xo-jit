@@ -28,6 +28,7 @@ namespace xo {
             using AAllocator = xo::mm::AAllocator;
             using ACollector = xo::mm::ACollector;
             using size_type = DString::size_type;
+            using ppindentinfo = xo::print::ppindentinfo;
 
             /* Memory model for a DUniqueString allocated via xo allocator
              *
@@ -73,6 +74,12 @@ namespace xo {
 
             std::size_t hash() const noexcept { return _text()->hash(); }
             operator std::string_view() const noexcept { return std::string_view(*_text()); }
+
+            ///@}
+            /** @defgroup duniquestring-printable-methods printable facet methods **/
+            ///@{
+
+            bool pretty(const ppindentinfo & ppii) const;
 
             ///@}
             /** @defgroup duniquestring-gcobject-methods gcobject facet methods **/

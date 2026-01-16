@@ -33,6 +33,12 @@ namespace xo {
             return (const DString *)(((std::byte *)this) + offset);
         }
 
+        bool
+        DUniqueString::pretty(const ppindentinfo & ppii) const
+        {
+            return _text()->pretty(ppii);
+        }
+
         DUniqueString *
         DUniqueString::from_view(obj<AAllocator> mm,
                                  std::string_view sv)
