@@ -14,6 +14,7 @@
 namespace xo {
     using xo::mm::AGCObject;
     using xo::facet::FacetRegistry;
+    using xo::facet::typeseq;
 
     namespace scm {
         bool
@@ -22,6 +23,8 @@ namespace xo {
             scope log(XO_DEBUG(true));
 
             FacetRegistry::register_impl<AGCObject, DUniqueString>();
+
+            log && log(xtag("DUniqueString.tseq", typeseq::id<DUniqueString>()));
 
             return true;
         }
