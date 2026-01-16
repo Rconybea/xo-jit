@@ -23,7 +23,7 @@ namespace xo {
             (void)debug_flag;
         }
 
-        const DString *
+        const DUniqueString *
         StringTable::lookup(std::string_view key) const
         {
             auto ix = map_.find(key);
@@ -34,7 +34,7 @@ namespace xo {
             return nullptr;
         }
 
-        const DString *
+        const DUniqueString *
         StringTable::intern(std::string_view key)
         {
             // 1a. lookup key in map_.
@@ -49,9 +49,9 @@ namespace xo {
             //
             // 2d. return key2 address
 
-            // 2a. allocate DString copy 'interned' of key in strings_
+            // 2a. allocate DUniqueString copy 'interned' of key in strings_
             auto mm = with_facet<AAllocator>::mkobj(&strings_);
-            DString * interned = DString::from_view(mm, key);
+            DUniqueString * interned = DUniqueString::from_view(mm, key);
 
             assert(interned);
             if (interned) {
@@ -90,7 +90,7 @@ namespace xo {
             /* ST2: for each entry, key points to value's string data */
             for (const auto & kv : map_) {
                 const std::string_view & key = kv.first;
-                const DString * value = kv.second;
+                const DUniqueString * value = kv.second;
 
                 /* ST2.1: value is not null */
                 if (value == nullptr) {

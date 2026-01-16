@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <xo/object2/DString.hpp>
+#include "DUniqueString.hpp"
 #include <xo/arena/DArenaHashMap.hpp>
 #include <xo/arena/DArena.hpp>
 #include <xo/arena/hashmap/verify_policy.hpp>
@@ -22,7 +22,7 @@ namespace xo {
         public:
             using DArena = xo::mm::DArena;
             using StringMap = xo::map::DArenaHashMap<std::string_view,
-                                                     DString*>;
+                                                     DUniqueString*>;
             using size_type = StringMap::size_type;
 
         public:
@@ -30,10 +30,10 @@ namespace xo {
                         bool debug_flag = false);
 
             /** lookup interned string; nullptr if not present **/
-            const DString * lookup(std::string_view key) const;
+            const DUniqueString * lookup(std::string_view key) const;
 
             /** return unique string with contents @p key. Idempotent! **/
-            const DString * intern(std::string_view key);
+            const DUniqueString * intern(std::string_view key);
 
             /** verify StringTable invariants.
              *  Act on failure according to policy @p p

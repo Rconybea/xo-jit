@@ -7,6 +7,7 @@ set(SELF_SRCS
     IExpression_Any.cpp
     IExpression_DConstant.cpp
     StringTable.cpp
+    DUniqueString.cpp
     expression2_register_facets.cpp
     )
 

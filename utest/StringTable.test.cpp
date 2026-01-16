@@ -9,7 +9,8 @@
 
 namespace xo {
     using xo::scm::StringTable;
-    using xo::scm::DString;
+    using xo::scm::DUniqueString;
+    //using xo::scm::DString;
 
     namespace ut {
         TEST_CASE("StringTable-lookup-empty", "[expression2][StringTable]")
@@ -25,7 +26,7 @@ namespace xo {
         {
             StringTable table(1024);
 
-            const DString * s1 = table.intern("hello");
+            const DUniqueString * s1 = table.intern("hello");
 
             REQUIRE(s1 != nullptr);
             REQUIRE(std::strcmp(s1->chars(), "hello") == 0);
@@ -36,8 +37,8 @@ namespace xo {
         {
             StringTable table(1024);
 
-            const DString * s1 = table.intern("hello");
-            const DString * s2 = table.intern("hello");
+            const DUniqueString * s1 = table.intern("hello");
+            const DUniqueString * s2 = table.intern("hello");
 
             // same key returns same pointer
             REQUIRE(s1 != nullptr);
@@ -51,9 +52,9 @@ namespace xo {
 
             REQUIRE(table.lookup("hello") == nullptr);
 
-            const DString * s1 = table.intern("hello");
+            const DUniqueString * s1 = table.intern("hello");
 
-            const DString * s2 = table.lookup("hello");
+            const DUniqueString * s2 = table.lookup("hello");
 
             REQUIRE(s2 != nullptr);
             REQUIRE(s1 == s2);
@@ -63,9 +64,9 @@ namespace xo {
         {
             StringTable table(1024);
 
-            const DString * s1 = table.intern("apple");
-            const DString * s2 = table.intern("banana");
-            const DString * s3 = table.intern("cherry");
+            const DUniqueString * s1 = table.intern("apple");
+            const DUniqueString * s2 = table.intern("banana");
+            const DUniqueString * s3 = table.intern("cherry");
 
             // all different pointers
             REQUIRE(s1 != s2);
@@ -88,14 +89,14 @@ namespace xo {
         {
             StringTable table(1024);
 
-            const DString * s1 = table.intern("");
+            const DUniqueString * s1 = table.intern("");
 
             REQUIRE(s1 != nullptr);
             REQUIRE(s1->size() == 0);
             REQUIRE(s1->chars()[0] == '\0');
 
             // idempotent for empty string too
-            const DString * s2 = table.intern("");
+            const DUniqueString * s2 = table.intern("");
             REQUIRE(s1 == s2);
         }
 
