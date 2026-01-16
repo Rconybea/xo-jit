@@ -10,6 +10,7 @@ set(SELF_SRCS
     StringTable.cpp
     DUniqueString.cpp
     IGCObject_DUniqueString.cpp
+    IPrintable_DUniqueString.cpp
     expression2_register_facets.cpp
     expression2_register_types.cpp
     )
