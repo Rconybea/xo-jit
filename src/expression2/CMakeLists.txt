@@ -6,6 +6,7 @@ set(SELF_SRCS
     TypeRef.cpp
     IExpression_Any.cpp
     IExpression_DConstant.cpp
+    StringTable.cpp
     expression2_register_facets.cpp
     )
 
