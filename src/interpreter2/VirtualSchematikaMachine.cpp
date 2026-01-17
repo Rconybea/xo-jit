@@ -45,6 +45,9 @@ namespace xo {
             case exprtype::constant:
                 _do_eval_constant_op();
                 break;
+            case exprtype::variable:
+                _do_eval_variable_op();
+                break;
             }
         }
 
@@ -58,6 +61,12 @@ namespace xo {
             this->pc_ = this->cont_;
         }
 
+        void
+        VirtualSchematikaMachine::_do_eval_variable_op()
+        {
+            // not implemented
+            assert(false);
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

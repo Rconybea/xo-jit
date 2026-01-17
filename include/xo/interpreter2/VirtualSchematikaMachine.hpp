@@ -45,6 +45,12 @@ namespace xo {
              **/
             void _do_eval_constant_op();
 
+            /** evaluate a variable expression
+             *  Require:
+             *  - expression in @ref expr_
+             **/
+            void _do_eval_variable_op();
+
         private:
             /*
              * Some registers are preserved by evaluation:
@@ -60,8 +66,10 @@ namespace xo {
             /** program counter **/
             VsmInstr pc_ = VsmInstr::halt();
 
+#ifdef NOT_YET
             /** stack pointer **/
             Stack stack_;
+#endif
 
             /** expression register **/
             obj<AExpression> expr_;
