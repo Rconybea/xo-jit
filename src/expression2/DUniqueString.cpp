@@ -6,13 +6,14 @@
 #include "DUniqueString.hpp"
 #include <xo/arena/padding.hpp>
 #include <xo/indentlog/scope.hpp>
+#include <cstring>
 
 namespace xo {
     using xo::mm::padding;
     using xo::facet::typeseq;
 
     namespace scm {
-        const DString *
+        DString *
         DUniqueString::_text() const noexcept
         {
             // location of paired DString is chosen
@@ -30,7 +31,7 @@ namespace xo {
             size_t offset = padding::with_padding(sizeof(*this));
             assert(offset > 0);
 
-            return (const DString *)(((std::byte *)this) + offset);
+            return (DString *)(((std::byte *)this) + offset);
         }
 
         bool
@@ -84,8 +85,17 @@ namespace xo {
 
             DUniqueString * copy = (DUniqueString *)mm.alloc_copy((std::byte *)this);
 
-            if (copy)
-                *copy = *this;
+            if (copy) {
+                // Copy assignment not implemented in general
+                //   *copy = *this;
+                // in this case *copy already has the same size as *this
+
+                assert(size() <= capacity());
+
+                strncpy(copy->_text()->data(),
+                        this->_text()->chars(),
+                        this->size());
+            }
 
             return copy;
         }

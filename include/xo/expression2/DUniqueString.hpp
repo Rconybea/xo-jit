@@ -59,6 +59,10 @@ namespace xo {
             /** @defgroup duniquestring-methods methods **/
             ///@{
 
+            /** Available storage for this instance.
+             *  For completeness' sake since uniquestring not modifiable
+             **/
+            size_type capacity() const noexcept { return _text()->capacity(); }
             size_type size() const noexcept { return _text()->size(); }
             const char * chars() const noexcept { return _text()->chars(); }
 
@@ -74,6 +78,8 @@ namespace xo {
 
             std::size_t hash() const noexcept { return _text()->hash(); }
             operator std::string_view() const noexcept { return std::string_view(*_text()); }
+            /** not assignable **/
+            DUniqueString & operator=(const DUniqueString &) = delete;
 
             ///@}
             /** @defgroup duniquestring-printable-methods printable facet methods **/
@@ -105,7 +111,7 @@ namespace xo {
             /** DString containing actual string content immediately follows DUniqueString
              *  in memory; part of same alloc
              **/
-            const DString * _text() const noexcept;
+            DString * _text() const noexcept;
 
             //explicit DUniqueString(const DString * text) : text_{text} {}
 
