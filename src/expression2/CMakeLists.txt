@@ -4,6 +4,7 @@ set(SELF_LIB xo_expression2)
 set(SELF_SRCS
     init_expression2.cpp
     DConstant.cpp
+    DVariable.cpp
     TypeRef.cpp
     IExpression_Any.cpp
     IExpression_DConstant.cpp
