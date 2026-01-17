@@ -3,15 +3,23 @@
 set(SELF_LIB xo_expression2)
 set(SELF_SRCS
     init_expression2.cpp
+
     DConstant.cpp
     DVariable.cpp
+
     TypeRef.cpp
+
     IExpression_Any.cpp
     IExpression_DConstant.cpp
+
+    ISymbolTable_Any.cpp
+
     StringTable.cpp
+
     DUniqueString.cpp
     IGCObject_DUniqueString.cpp
     IPrintable_DUniqueString.cpp
+
     expression2_register_facets.cpp
     expression2_register_types.cpp
     )

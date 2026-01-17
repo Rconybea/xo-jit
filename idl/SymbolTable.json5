@@ -1,0 +1,59 @@
+{
+    mode: "facet",
+    includes: [
+        "\"Binding.hpp\"",
+        "\"DUniqueString.hpp\""
+    ],
+    // extra includes in SymbolTable.hpp, if any
+    user_hpp_includes: [],
+    namespace1: "xo",
+    namespace2: "scm",
+    // text after includes, before ASymbolTable
+    pretext: [ "// {pretext} here" ],
+    facet: "SymbolTable",
+    detail_subdir: "symtab",
+    brief: "symbol table derived from a set of schematika expressions",
+    using_doxygen: true,
+    doc: [
+        "Map symbols to schematika expressions. Output of schematika parser"
+    ],
+    types: [
+        // { name: string, doc: [ string ], definition: string },
+    ],
+    const_methods: [
+
+        {
+            // bool is_global_symtab() const noexcept;
+            name: "is_global_symtab",
+            doc: ["true iff this is toplevel (global) symbol table."],
+            return_type: "bool",
+            args: [],
+            const: true,
+            noexcept: true,
+            attributes: [],
+        },
+
+        {
+            // Binding lookup_binding(const DUniqueString * sym) const noexcept;
+            name: "lookup_binding",
+            doc: ["report ingredients needed to address variable at runtime."],
+            return_type: "Binding",
+            args: [
+                {type: "const DUniqueString *", name: "sym"},
+            ],
+            const: true,
+            noexcept: true,
+            attributes: [],
+        },
+
+        // //
+        // obj<AExpression> lookup_var(const DUniqueString * sym) const noexcept;
+
+        // //
+        // obj<AExpression> lookup_local(const DUniqueString * sym) const noexcept;
+    ],
+    nonconst_methods: [
+        // // Variable gives both {name, type}
+        // void upsert_local(DVariable * target) = 0;
+    ],
+}
