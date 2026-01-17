@@ -61,7 +61,7 @@ namespace scm {
         [[noreturn]] TypeDescr valuetype(Copaque)  const  noexcept override { _fatal(); }
 
         // nonconst methods
-        [[noreturn]] void assign_valuetype(Opaque, TypeDescr)  noexcept override { _fatal(); }
+        [[noreturn]] void assign_valuetype(Opaque, TypeDescr)  noexcept override;
 
         ///@}
 

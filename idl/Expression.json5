@@ -3,9 +3,12 @@
     includes: [ "\"TypeRef.hpp\"",
                 "\"exprtype.hpp\"",
                 "<xo/reflect/TypeDescr.hpp>"],
-
+    // extra includes in Expression.hpp, if any
+    user_hpp_includes: [],
     namespace1: "xo",
     namespace2: "scm",
+    // text after includes, before AExpression
+    pretext: [ "// {pretext} here" ],
     facet: "Expression",
     detail_subdir: "detail",
     brief: "a schematika expression",

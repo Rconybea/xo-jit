@@ -5,48 +5,45 @@
 
 #pragma once
 
-#include "TypeRef.hpp"
-#include "exprtype.hpp"
-#include <xo/reflect/TaggedPtr.hpp>
-#include <xo/gc/GCObject.hpp>
+#include "Binding.hpp"
+#include "DUniqueString.hpp"
+//#include "exprtype.hpp"
+//#include <xo/reflect/TaggedPtr.hpp>
+//#include <xo/gc/GCObject.hpp>
 
 namespace xo {
     namespace scm {
         /** @class DLocalSymtab
-         *  @brief Schematika expression respresenting a literal constant
+         *  @brief symbol table for a local stack frame
          **/
         struct DLocalSymtab {
         public:
-            using TaggedPtr = xo::reflect::TaggedPtr;
-            using TypeDescr = xo::reflect::TypeDescr;
-            using AGCObject = xo::mm::AGCObject;
-            using typeseq = xo::reflect::typeseq;
+//            using TaggedPtr = xo::reflect::TaggedPtr;
+//            using TypeDescr = xo::reflect::TypeDescr;
+//            using AGCObject = xo::mm::AGCObject;
+//            using typeseq = xo::reflect::typeseq;
+
+            struct Slot {
+                // obj<Expression,DVariable> var_;
+                Binding binding_;
+            };
 
         public:
-            explicit DLocalSymtab(obj<AGCObject> value) noexcept;
+//            explicit DLocalSymtab(obj<AGCObject> value) noexcept;
 
-            bool is_resolved() const noexcept { return typeref_.is_resolved(); }
+            /** @defgroup xo-expression2-symboltable-facet symboltable facet**/
+            ///@{
 
-            exprtype extype() const noexcept { return exprtype::constant; }
-            TypeDescr value_td() const noexcept { return typeref_.td(); }
-            TaggedPtr value_tp() const noexcept { return TaggedPtr(typeref_.td(), value_.data()); }
+            /** true for global symbol table **/
+            bool is_global_symtab() const noexcept { return false; }
 
-            TypeRef typeref() const noexcept { return typeref_; }
-            TypeDescr valuetype() const noexcept { return typeref_.td(); }
-            obj<AGCObject> value() const noexcept { return value_; }
+            /** lookup binding for variable @p sym **/
+            Binding lookup_binding(const DUniqueString * sym) const noexcept;
 
-            void assign_valuetype(TypeDescr td) noexcept { typeref_.resolve(td); }
-
-        private:
-            static TypeDescr _lookup_td(typeseq tseq);
+            ///@}
 
         private:
-            /** type for value of this expression
-             *  or unification breadcrumb before unification
-             **/
-            TypeRef typeref_;
-            /** literal value **/
-            obj<AGCObject> value_;
+
         };
     } /*namespace scm*/
 } /*namespace xo*/

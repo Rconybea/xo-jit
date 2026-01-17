@@ -38,6 +38,9 @@ public:
     ///@{
     RExpression() {}
     RExpression(Object::DataPtr data) : Object{std::move(data)} {}
+    RExpression(const AExpression * iface, void * data)
+      requires std::is_same_v<typename Object::DataType, xo::facet::DVariantPlaceholder>
+      : Object(iface, data) {}
 
     ///@}
     /** @defgroup scm-expression-router-methods **/
@@ -55,9 +58,10 @@ public:
         return O::iface()->valuetype(O::data());
     }
 
-    // non-const methods
-    // << do something for non-const methods >>
-    //
+    // non-const methods (still const in router!)
+    void assign_valuetype(TypeDescr td)  noexcept {
+        return O::iface()->assign_valuetype(O::data(), td);
+    }
 
     ///@}
     /** @defgroup scm-expression-member-vars **/

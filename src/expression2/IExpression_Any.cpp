@@ -32,6 +32,15 @@ bool
 IExpression_Any::_valid
   = valid_facet_implementation<AExpression, IExpression_Any>();
 
+// nonconst methods
+
+auto
+IExpression_Any::assign_valuetype(Opaque, TypeDescr)  noexcept -> void
+{
+    _fatal();
+}
+
+
 } /*namespace scm*/
 } /*namespace xo*/
 

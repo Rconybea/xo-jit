@@ -21,6 +21,8 @@
 #include <xo/facet/facet_implementation.hpp>
 #include <xo/facet/typeseq.hpp>
 
+// {pretext} here
+
 namespace xo {
 namespace scm {
 
@@ -37,6 +39,8 @@ public:
     // types
     /** integer identifying a type **/
     using typeseq = xo::facet::typeseq;
+    using Copaque = const void *;
+    using Opaque = void *;
     /** struct describing a type **/
     using TypeDescr = xo::reflect::TypeDescr;
     ///@}
@@ -75,4 +79,4 @@ using IExpression_ImplType = xo::facet::FacetImplType<AExpression, DRepr>;
 } /*namespace scm*/
 } /*namespace xo*/
 
-/*  */
+/* AExpression.hpp */

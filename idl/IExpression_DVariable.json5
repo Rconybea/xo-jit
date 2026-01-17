@@ -5,8 +5,8 @@
     namespace1: "xo",
     namespace2: "scm",
     facet_idl: "idl/Expression.json5",
-    brief: "provide AExpression interface for DConstant state",
+    brief: "provide AExpression interface for DVariable state",
     using_doxygen: true,
-    repr: "DConstant",
-    doc: ["doc for something or other IExpression+DConstant" ],
+    repr: "DVariable",
+    doc: ["doc for IExpression+DVariable" ],
 }

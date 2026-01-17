@@ -11,6 +11,7 @@ set(SELF_SRCS
 
     IExpression_Any.cpp
     IExpression_DConstant.cpp
+    IExpression_DVariable.cpp
 
     ISymbolTable_Any.cpp
 
