@@ -19,7 +19,7 @@ namespace xo {
     public:
         struct rewind_state {
             explicit rewind_state(std::size_t solpos, std::size_t color_esc, std::uint32_t p)
-                : solpos{solpos}, color_escape_chars{color_esc}, pos{p} {}
+            : solpos{solpos}, color_escape_chars{color_esc}, pos{p} {}
 
             std::size_t solpos = 0;
             std::size_t color_escape_chars = 0;
@@ -33,17 +33,39 @@ namespace xo {
         } /*ctor*/
 
         std::streamsize capacity() const { return this->buf_v_.size(); }
-        char const * lo() const { return this->pbase(); }
-        char const * hi() const { return this->lo() + this->capacity(); }
+        const char * lo() const { return this->pbase(); }
+        const char * hi() const { return this->lo() + this->capacity(); }
         std::uint32_t pos() const { return this->pptr() - this->pbase(); }
+
+        /** output position (relative to pbase) when local state last computed. Exposed here for unit tests **/
+        const char * _local_ppos() const { return local_ppos_; }
+        /** position (relative to pbase) one character after last \n or \r. For unit tests **/
+        std::uint32_t _solpos() const { return solpos_; }
+        /** start of incomplete color-escape sequence **/
+        const char * _color_escape_start() const { return color_escape_start_; }
+        /** number of non-printing chars after @ref solpos_ from completed color-escape sequences **/
+        std::uint32_t _color_escape_chars() const { return color_escape_chars_; }
 
         /** number of visible characters since start of line (last \n or \r) **/
         std::uint32_t lpos() const {
-            assert(pos() >= solpos_ + color_escape_chars_);
+            if (debug_flag_) {
+                std::cerr << "log_streambuf::lpos: enter" << std::endl;
+            }
+
+            // logically-const. lazy implementation
+            log_streambuf * self = const_cast<log_streambuf *>(this);
+
+            self->_check_update_local_state();
+
             return pos() - solpos_ - color_escape_chars_;
         }
 
         rewind_state checkpoint() const {
+            // logically-const. lazy implementation
+            log_streambuf * self = const_cast<log_streambuf *>(this);
+
+            self->_check_update_local_state();
+
             return rewind_state(solpos_, color_escape_chars_, pos());
         }
 
@@ -56,6 +78,7 @@ namespace xo {
             /* tells parent our buffer extent */
             this->setp(p_lo, p_hi);
 
+            this->local_ppos_ = 0;
             this->solpos_ = 0;
             this->color_escape_chars_ = 0;
             this->color_escape_start_ = nullptr;
@@ -69,12 +92,16 @@ namespace xo {
                           << std::endl;
             }
 
-            /* .setp(): using for side effect: sets .pptr to .pbase */
+            /* .setp(): using just for side effect: sets .pptr to .pbase */
             this->setp(this->pbase(), this->epptr());
+            /* advance pptr to saved position */
             this->pbump(s.pos);
 
+            this->local_ppos_ = this->pptr() - this->pbase();
             this->solpos_ = s.solpos;
             this->color_escape_chars_ = s.color_escape_chars;
+            /* assuming we never try to capture rewind state with incomplete color escape */
+            this->color_escape_start_ = nullptr;
         }
 
     protected:
@@ -86,6 +113,8 @@ namespace xo {
 
             assert(old_n <= static_cast<std::streamsize>(buf_v_.size()));
             assert(new_z > buf_v_.capacity());
+
+            /* note: local_ppos_ invariant across expand_to() */
 
             this->buf_v_.resize(new_z);
 
@@ -132,51 +161,21 @@ namespace xo {
 
             std::memcpy(this->pptr(), s, ncopied);
 
-            /* scan range [pptr, pptr+n] for:
-             * 1. completed color escape sequences \033..m
-             *    - account for chars in these sequences, since non-printing
-             * 2. newlines (and carriage returns)
-             *    - remember position of last {newline or carriage return)
-             */
-            for (char const * p_lo = this->pptr(), * p_hi = p_lo + n, * p = p_lo; p < p_hi; ++p) {
-                if (*p == '\n' || *p == '\r') {
-                    this->solpos_ = (p+1 - this->pbase());
-                    /* reset, since these chars relevant as correction to solpos */
-                    this->color_escape_chars_ = 0;
-                    /* -> incomplete color escape, broken by newline */
-                    this->color_escape_start_ = nullptr;
-                } else if (*p == '\033') {
-                    if (debug_flag_) {
-                        std::cout << "xsputn: \\033 at p-p_lo=" << (p - p_lo) << std::endl;
-                    }
-                    this->color_escape_start_ = p;
-                } else if (this->color_escape_start_ != nullptr) {
-                    if (*p == 'm') {
-                        /* escape seq non-printing including both endpoints */
-                        std::int64_t esc_chars = (p+1 - color_escape_start_);
-                        this->color_escape_chars_ += esc_chars;
-
-                        if (debug_flag_) {
-                            std::cout << "xsputn: m at p-p_lo" << (p - p_lo) << " +" << esc_chars
-                                      << " -> color_escape_chars=" << color_escape_chars_ << std::endl;
-                        }
-                        this->color_escape_start_ = nullptr;
-                    } else if (!isdigit(*p) && (*p != '[') && (*p != ';')) {
-                        /* not color escape after all */
-                        this->color_escape_start_ = nullptr;
-                    }
-                }
-            }
-
             this->pbump(ncopied);
+
+            /* now {pbase, pptr} consistent with new input */
+
+            this->_check_update_local_state();
 
             return ncopied;
         } /*xsputn*/
 
         virtual int_type
         overflow(int_type new_ch) override {
+            char * old_base = this->pbase();
             char * old_pptr = this->pptr();
-            std::streamsize old_n = old_pptr - this->pbase();
+            /* #of chars buffered */
+            std::streamsize old_n = old_pptr - old_base;
 
             assert(old_n <= static_cast<std::streamsize>(this->buf_v_.size()));
 
@@ -184,6 +183,7 @@ namespace xo {
                 std::cout << "overflow: new_ch=" << quoted_char(new_ch) << std::endl;
             }
 
+            /* increase buffer size */
             this->expand_to(2 * buf_v_.size());
 
             this->buf_v_[old_n] = new_ch;
@@ -191,6 +191,8 @@ namespace xo {
 
             if ((new_ch == static_cast<int_type>('\n')) || (new_ch == static_cast<int_type>('\r'))) {
                 this->solpos_ = this->pos();
+
+                // what if new_ch starts color escape ?
             }
 
             if (new_ch == Traits::eof()) {
@@ -235,8 +237,130 @@ namespace xo {
         } /*seekoff*/
 
     private:
+        void _update_local_state_char(const char * p_lo, const char * p)
+        {
+            if ((*p == '\n') || (*p == '\r')) {
+                this->solpos_ = (p+1 - this->pbase());
+                /* reset, since these chars relevant as correction to solpos */
+                this->color_escape_chars_ = 0;
+                /* -> incomplete color escape, broken by newline */
+                this->color_escape_start_ = nullptr;
+            } else if (*p == '\033') {
+                if (debug_flag_) [[unlikely]] {
+                    std::cout << "xsputn: \\033 at p-p_lo=" << (p - p_lo) << std::endl;
+                }
+                this->color_escape_start_ = p;
+            } else if (this->color_escape_start_ != nullptr) {
+                if (*p == 'm') {
+                    /* escape seq non-printing including both endpoints */
+                    std::int64_t esc_chars = (p+1 - color_escape_start_);
+
+                    this->color_escape_chars_ += esc_chars;
+
+                    if (debug_flag_) [[unlikely]] {
+                        std::cout << "xsputn: m at p-p_lo" << (p - p_lo) << " +" << esc_chars
+                        << " -> color_escape_chars=" << color_escape_chars_ << std::endl;
+                    }
+                    this->color_escape_start_ = nullptr;
+                } else if (!isdigit(*p) && (*p != '[') && (*p != ';')) {
+                    /* not color escape after all */
+                    this->color_escape_start_ = nullptr;
+                }
+            }
+        }
+
+        /** recognize stale local state vars:
+         *  @ref solpos_, @ref color_escape_chars_, @ref color_escape_start_.
+         *
+         *  Require:
+         *  - {pbase, pptr} in consistent state
+         *  Promise:
+         *  - @c local_ppos_ + @c pbase = @c pptr
+         *  - @c solpos_, @c color_escape_chars_, @c color_escape_start_ all up-to-date
+         **/
+        void _check_update_local_state() {
+            const char * p0 = this->pbase();
+            const char * pn = this->pptr();
+
+            if (debug_flag_) {
+                std::cerr << "_check_update_local_state:" << std::endl;
+                std::cerr << "  buf: (p0=" << (void*)p0 << ", pn=" << (void*)pn << ")" << std::endl;
+                std::cerr << "  solpos_=" << solpos_ << ", color_escape_chars_=" << color_escape_chars_ << std::endl;
+            }
+
+            if (p0 + local_ppos_ == pn) [[likely]] {
+                // solpos_, color_escape_chars_, color_escape_start_ all up-to-date
+            } else {
+                // [pnew, pn): input that hasn't been incorporated into
+                //   {solpos_, color_escape_chars_, color_escape_start_)
+
+                const char * pnew = this->pbase() + this->local_ppos_;
+
+                if (debug_flag_) {
+                    std::cerr << "_check_update_local_state: range: (pnew=" << (void*)pnew << ", pn=" << (void*)pn << ")" << std::endl;
+                }
+
+                for(const char * p = pnew; p < pn; ++p) {
+                    this->_update_local_state_char(p0, p);
+                }
+            }
+
+            // solpos_, color_escape_chars_, color_escape_start_ all up-to-date
+            // for current buffered contents
+
+            this->local_ppos_ = pn - p0;
+
+            if (debug_flag_) {
+                std::cerr << "_check_update_local_state: pos=" << pos();
+                std::cerr << ", solpos=" << solpos_;
+                std::cerr << ", color_escape_chars=" << color_escape_chars_ << std::endl;
+            }
+
+            assert(pos() >= solpos_ + color_escape_chars_);
+        }
+
+    private:
+        /*
+         *   pbase: start of buffered text.  Thils will be address of buf_v_[0]
+         *
+         *
+         *   pbase                                          pptr             epptr
+         *   v                  >e1<  >e2<                     v                 v
+         *   |xx\xxEEExxx\xxxxxxxEExxxxEExxxxxxxEExxx\xEExxxxxx..................|
+         *                ^                 ^<------new------->
+         *           solpos        local_ppos
+         *
+         *   solpos           : first character after newline (stale)
+         *   color_escape_pos : e1+e2+.. (stale)
+         *   new              : new characters not reflected
+         *                      in local_ppos_, color_escape_chars_ etc.
+         *
+         *   Legend:
+         *    [\] newline
+         *    [x] visible character
+         *    [E] color escape chars
+         *
+         *
+         *   after _check_update_local_state():
+         *
+         *
+         *   pbase                                          pptr             epptr
+         *   v                                        >e1<     v                 v
+         *   |xx\xxEEExxx\xxxxxxxEExxxxEExxxxxxxEExxx\xEExxxxxx..................|
+         *                                            ^        ^
+         *                                       solpos        local_ppos
+         *
+         */
+
+        /** @defgroup logstreambuf-instance-vars **/
+        ///@{
+
+        /** value of pptr (relative to pbase) when _check_update_local_state() last ran **/
+        std::size_t local_ppos_ = 0;
         /** position (relative to pbase) one character after last \n or \r.
-         *  Use to drive @ref lpos
+         *  Use to drive @ref lpos.  This _has_ to be lazy, since
+         *  xsputn() isn'g guaranteed to be called when there's room in
+         *  in buffer.
          **/
         std::size_t solpos_ = 0;
         /** number of non-printing chars after @ref solpos_, from
@@ -245,11 +369,14 @@ namespace xo {
          **/
         std::size_t color_escape_chars_ = 0;
         /** non-null: start of incomplete color escape sequence **/
-        char const * color_escape_start_ = nullptr;
+        const char * color_escape_start_ = nullptr;
+
         /** buffered output stored here **/
         std::vector<char> buf_v_;
         /** true to debug log_streambuf itself **/
         bool debug_flag_ = false;
+
+        ///@}
     }; /*log_streambuf*/
 
 } /*namespace xo*/

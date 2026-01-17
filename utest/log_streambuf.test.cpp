@@ -1,28 +1,95 @@
 /* @file log_streambuf.test.cpp */
 
-#include "xo/indentlog/log_streambuf.hpp"
-#include "xo/indentlog/print/tag.hpp"
-#include "xo/indentlog/print/quoted.hpp"
+#include "scope.hpp"
+#include "log_streambuf.hpp"
+#include "print/tag.hpp"
+#include "print/quoted.hpp"
 #include <catch2/catch.hpp>
 //#include <sstream>
 
 namespace ut {
+    using xo::xtag;
+    using xo::scope;
     using xo::log_streambuf;
+    using std::cerr;
+    using std::endl;
 
-    TEST_CASE("log_streamhuf", "[log_streambuf]") {
+    TEST_CASE("log_streamhuf", "[log_streambuf]")
+    {
+        constexpr bool c_debug_flag = false;
+        //scope log(XO_DEBUG(c_debug_flag), "log_streambuf test");
+
         std::size_t z = 16;
-        log_streambuf<char, std::char_traits<char>> sbuf(z);
+        log_streambuf<char, std::char_traits<char>> sbuf(z, c_debug_flag);
         std::ostream ss(&sbuf);
+
+        REQUIRE(sbuf.debug_flag() == c_debug_flag);
+
+        if (c_debug_flag) {
+            cerr << "empty log_streambuf" << endl;
+            cerr << "sbuf.lo=" << (void*)sbuf.lo() << endl;
+            cerr << "sbuf.hi=" << (void*)sbuf.hi() << endl;
+            cerr << "sbuf._color_escape_chars=" << sbuf._color_escape_chars() << endl;
+        }
+
+        //REQUIRE(sbuf.lo() == sbuf.pbase());
 
         REQUIRE(sbuf.capacity() == z);
         REQUIRE(sbuf.pos() == 0);
+        REQUIRE(sbuf._solpos() == 0);
         REQUIRE(sbuf.lpos() == 0);
+
+        // note: log_streambuf doesn't get control on every character
 
         ss << '\n';
 
+        if (c_debug_flag) {
+            cerr << "after single newline" << endl;
+            cerr << "sbuf.lo=" << (void*)sbuf.lo() << endl;
+            cerr << "sbuf.hi=" << (void*)sbuf.hi() << endl;
+            cerr << "sbuf._color_escape_chars=" << sbuf._color_escape_chars() << endl;
+        }
+
         REQUIRE(sbuf.capacity() == z);
         REQUIRE(sbuf.pos() == 1);
+        // we don't know what sbuf._solpos is.  Could be 0 or 1 depending on
+        // ostream implementation
+        bool ok = (sbuf._solpos() == 0) || (sbuf._solpos() == 1);
+        REQUIRE(ok);
         REQUIRE(sbuf.lpos() == 0);  // at least on OSX
+    }
+
+    TEST_CASE("log_streambuf_xtag", "[log_streambuf][xtag]")
+    {
+        constexpr bool c_debug_flag = false;
+        scope log(XO_DEBUG(c_debug_flag), "log_streambuf_xtag test");
+
+        std::size_t z = 16;
+        log_streambuf<char, std::char_traits<char>> sbuf(z, false);
+        std::ostream ss(&sbuf);
+
+        ss <<"empty log_streambuf";
+        ss << xtag("sbuf.lo", (void*)sbuf.lo());
+        ss << xtag("sbuf.hi", (void*)sbuf.hi());
+        ss << xtag("sbuf.color_escape_chars", sbuf._color_escape_chars());
+
+        //REQUIRE(sbuf.lo() == sbuf.pbase());
+
+        /* sbuf size will have been expanded */
+        REQUIRE(sbuf.capacity() == 128);
+        REQUIRE(sbuf.pos() == 82);
+        REQUIRE(sbuf._solpos() == 0);
+        REQUIRE(sbuf.lpos() == 82);
+
+        // note: log_streambuf doesn't get control on every character
+
+        ss << '\n';
+
+        REQUIRE(sbuf.capacity() == 128);
+        REQUIRE(sbuf.pos() == 83);
+        REQUIRE(sbuf.lpos() == 0);
+        // note: solpos: updated b/c of call to lazy sbuf.lpos()
+        REQUIRE(sbuf._solpos() == 83);
     }
 
     // write test cases with some random strings.
