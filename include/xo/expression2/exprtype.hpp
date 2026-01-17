@@ -31,8 +31,10 @@ namespace xo {
             apply,
             /** function definition **/
             lambda,
+#endif
             /** variable reference **/
             variable,
+#ifdef NOT_YET
             /** if-then-else **/
             ifexpr,
             /** sequence **/
