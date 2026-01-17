@@ -40,7 +40,7 @@ namespace xo {
              *
              * Legend
              *   header   8 byte   allocation header
-             *   u        1 byte   DUniqueString placholder (c++ insists)
+             *   u        1 byte   DUniqueString placeholder (c++ insists)
              *   padding  7 bytes  allocator-imposed padding to 8-byte alignment
              *   cap      4 bytes  DString.capacity
              *   size     4 bytes  DString.size

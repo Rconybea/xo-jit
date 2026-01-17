@@ -11,7 +11,8 @@
 namespace xo {
     namespace scm {
         /** @class TypeRef
-         *  @brief name and (when established) resolution for type associate with an expression
+         *  @brief name and (when established) resolution for type
+         *  associated with an expression
          *
          *  Type inference / unification operates on
          *  @ref xo::scm::TypeBlueprint instances.  See also!
