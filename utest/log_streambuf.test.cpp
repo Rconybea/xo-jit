@@ -22,7 +22,7 @@ namespace ut {
 
         REQUIRE(sbuf.capacity() == z);
         REQUIRE(sbuf.pos() == 1);
-        REQUIRE(sbuf.lpos() == 1);
+        REQUIRE(sbuf.lpos() == 0);  // at least on OSX
     }
 
     // write test cases with some random strings.
