@@ -91,18 +91,13 @@ xo_add_genfacetimpl(
 )
 
 # ----------------------------------------------------------------
-# header-only library
+# shared library
 
 add_subdirectory(src/expression2)
 
-xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets)
-
 # ----------------------------------------------------------------
-# input dependencies
-#
-# NOTE: dependency set here must be kept consistent with
-#       xo-expression2/cmake/xo_expression2Config.cmake.in
+# cmake helper (for external xo-expression2 users)
 
-#xo_headeronly_dependency(${SELF_LIB} xo_flatstring)
+xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets)
 
 # end CMakeLists.txt
