@@ -22,20 +22,36 @@ add_definitions(${PROJECT_CXX_FLAGS})
 
 #add_subdirectory(utest)
 
-# ----------------------------------------------------------------
-# header-only library
+# note: manual target; generated code committed to git
+xo_add_genfacet(
+    TARGET xo-reader2-facet-syntaxstatemachine
+    FACET SyntaxStateMachine
+    INPUT idl/SyntaxStateMachine.json5
+    OUTPUT_HPP_DIR include/xo/reader2
+    OUTPUT_IMPL_SUBDIR ssm
+    OUTPUT_CPP_DIR src/reader2
+    )
 
-set(SELF_LIB xo_reader2)
-xo_add_headeronly_library(${SELF_LIB})
-xo_install_library4(${SELF_LIB} ${PROJECT_NAME}Targets)
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-syntaxstatemachine-exprseqstate
+    FACET_PKG xo_reader2
+    FACET SyntaxStateMachine
+    REPR ExprSeqState
+    INPUT idl/ISyntaxStateMachine_DExprSeqState.json5
+    OUTPUT_HPP_DIR include/xo/reader2
+    OUTPUT_IMPL_SUBDIR ssm
+    OUTPUT_CPP_DIR src/reader2
+)
+
+# ----------------------------------------------------------------
+# shared library
+
+add_subdirectory(src/reader2)
+
+# ----------------------------------------------------------------
+# cmake helper (for external xo-reader2 users)
+
 xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets)
-
-# ----------------------------------------------------------------
-# input dependencies
-#
-# NOTE: dependency set here must be kept consistent with
-#       xo-reader2/cmake/xo_reader2Config.cmake.in
-
-#xo_headeronly_dependency(${SELF_LIB} xo_flatstring)
 
 # end CMakeLists.txt

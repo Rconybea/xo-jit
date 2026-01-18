@@ -1,0 +1,56 @@
+{
+    mode: "facet",
+    // includes in ASyntaxStateMachine.hpp
+    includes: [
+        "\"ParserStateMachine.hpp\"",
+        "\"syntaxstatetype.hpp\"",
+        "<xo/tokenizer2/Token.hpp>",
+    ],
+    // extra includes in SyntaxStateMachine.hpp, if any
+    user_hpp_includes: [],
+    namespace1: "xo",
+    namespace2: "scm",
+    // text after includes, before ASyntaxStateMachine
+    pretext: ["// {pretex} here"],
+    facet: "SyntaxStateMachine",
+    detail_subdir: "ssm",
+    brief: "specialized state machine for parsing some particular schematika syntax",
+    using_doxygen: true,
+    doc: [
+        "Assistant to schematika parser dedicated to particular syntax"
+    ],
+    types: [
+        // { name: string, doc: [ string ], definition: string },
+    ],
+    const_methods: [
+        {
+            name: "ssm_type",
+            doc: ["identify a type of syntax state machine"],
+            return_type: "syntaxstatetype",
+            args: [],
+            const: true,
+            noexcept: true,
+            attributes: [],
+        },
+        {
+            name: "get_expect_str",
+            doc: ["text describing expected/allowed input to this ssm in current state"],
+            return_type: "std::string_view",
+            args: [],
+            const: true,
+            noexcept: true,
+            attributes: [],
+        },
+    ],
+    nonconst_methods: [
+        {
+            name: "on_if_token",
+            doc: ["update state machine for incoming if-keyword-token @p tk"],
+            return_type: "void",
+            args: [
+                {type: "const Token &", name: "tk"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
+    ],
+}
