@@ -10,6 +10,10 @@ namespace xo {
     using xo::facet::typeseq;
 
     namespace scm {
+        ParserStack::ParserStack(obj<ASyntaxStateMachine> ssm,
+                                 ParserStack * parent)
+            : ssm_{ssm}, parent_{parent}
+        {}
 
         ParserStack *
         ParserStack::push(obj<AAllocator> mm,
