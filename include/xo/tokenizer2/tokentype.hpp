@@ -164,8 +164,8 @@ namespace xo {
             /** keyword @c 'end' **/
             tk_end,
 
-            /** counts number of entries **/
-            n_tokentype
+            /** comes last, counts number of entries **/
+            N
         }; /*tokentype*/
 
         /** String representation for enum value.

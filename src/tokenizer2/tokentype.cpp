@@ -60,7 +60,7 @@ namespace xo {
                 CASE(tk_end);
 
             case tokentype::tk_invalid:
-            case tokentype::n_tokentype:
+            case tokentype::N:
                 return "?tokentype";
             }
 
