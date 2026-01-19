@@ -25,26 +25,23 @@ namespace xo {
 
         bool
         SchematikaParser::is_at_toplevel() const {
-            return psm_.stack() == nullptr;
+            return psm_.is_at_toplevel();
         }
 
         bool
         SchematikaParser::has_incomplete_expr() const {
-            /* (don't count toplevel exprseq) */
-            ParserStack * stack = psm_.stack();
-            if (!stack)
-                return false;
-            return stack->parent() != nullptr;
+            return !(this->is_at_toplevel());
         }
 
         void
         SchematikaParser::begin_interactive_session() {
-            DExprSeqState::start_interactive(psm_.expr_alloc(), &psm_);
+            DExprSeqState::establish_interactive(psm_.expr_alloc(), &psm_);
+
         }
 
         void
         SchematikaParser::begin_translation_unit() {
-            DExprSeqState::start_batch(psm_.expr_alloc(), &psm_);
+            DExprSeqState::establish_batch(psm_.expr_alloc(), &psm_);
         }
 
         const ParserResult &
@@ -75,8 +72,7 @@ namespace xo {
         void
         SchematikaParser::reset_to_idle_toplevel()
         {
-            psm_.reset_stack();
-            psm_.reset_result();
+            psm_.clear_error_reset();
         } /*reset_to_idle_toplevel*/
 
         void

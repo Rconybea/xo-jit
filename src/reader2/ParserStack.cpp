@@ -16,14 +16,15 @@ namespace xo {
         {}
 
         ParserStack *
-        ParserStack::push(obj<AAllocator> mm,
+        ParserStack::push(ParserStack * stack,
+                          obj<AAllocator> mm,
                           obj<ASyntaxStateMachine> ssm)
 
         {
             void * mem = mm.alloc(typeseq::id<ParserStack>(),
                                   sizeof(ParserStack));
 
-            return new (mem) ParserStack(ssm, parent_);
+            return new (mem) ParserStack(ssm, stack);
         }
 
     } /*namespace scm*/

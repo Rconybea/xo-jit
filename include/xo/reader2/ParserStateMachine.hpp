@@ -41,16 +41,28 @@ namespace xo {
             const ParserResult & result() const noexcept { return result_; }
             obj<AAllocator> expr_alloc() const noexcept { return expr_alloc_; }
 
+            /** true iff state machine is currently idle (at top-level) **/
+            bool is_at_toplevel() const noexcept;
+
+            /** true iff state machine currently has incomplete expression **/
+            bool has_incomplete_expr() const noexcept;
+
             ///@}
 
             /** @defgroup scm-parserstatemachine-bookkeeping bookkeeping methods **/
             ///@{
 
+            /** establish toplevel @p ssm.  Must have empty stack **/
+            void establish_toplevel_ssm(obj<ASyntaxStateMachine> ssm);
+
             /** push syntax @p ssm onto @ref stack_ **/
             void push_ssm(obj<ASyntaxStateMachine> ssm);
 
             /** reset result to none **/
-            void reset_result() { result_ = ParserResult(); }
+            void reset_result();
+
+            /** reset after reporting error **/
+            void clear_error_reset();
 
             ///@}
 
@@ -89,6 +101,7 @@ namespace xo {
             ///@}
 
         private:
+
             /** Arena for internal parsing stack.
              *  Must be owned exclusively because destructively
              *  modified as parser completes parsing of each sub-expression
@@ -96,6 +109,12 @@ namespace xo {
              *  Contents will be a stack of ExprState instances
              **/
             DArena parser_alloc_;
+
+            /** Checkpoint of toplevel parser allocator.
+             *  Retore parser_alloc to this checkpoint to proceed
+             *  after encountering a parsing error.
+             **/
+            DArena::Checkpoint parser_alloc_ckp_;
 
             /** parser stack. Memory from @ref parser_alloc_ **/
             ParserStack * stack_ = nullptr;

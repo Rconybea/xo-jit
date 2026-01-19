@@ -30,25 +30,21 @@ namespace xo {
         }
 
         void
-        DExprSeqState::start_interactive(obj<AAllocator> mm,
-                                         ParserStateMachine * p_psm)
+        DExprSeqState::establish_interactive(obj<AAllocator> mm,
+                                             ParserStateMachine * p_psm)
         {
-
-
-            p_psm->push_ssm(make_exprseq_ssm(mm,
-                                             exprseqtype::toplevel_interactive));
+            p_psm->establish_toplevel_ssm(make_exprseq_ssm
+                                          (mm,
+                                           exprseqtype::toplevel_interactive));
         }
 
         void
-        DExprSeqState::start_batch(obj<AAllocator> mm,
-                                   ParserStateMachine * p_psm)
+        DExprSeqState::establish_batch(obj<AAllocator> mm,
+                                       ParserStateMachine * p_psm)
         {
-            (void)mm;
-            (void)p_psm;
-#ifdef NOT_YET
-            p_psm->push_ssm(make_exprseq_ssm(mm,
-                                             exprseqtype::toplevel_batch));
-#endif
+            p_psm->establish_toplevel_ssm(make_exprseq_ssm
+                                          (mm,
+                                           exprseqtype::toplevel_batch));
         }
 
         // SyntaxStateMachine facet methods

@@ -38,11 +38,11 @@ namespace xo {
             explicit DExprSeqState(exprseqtype ty);
 
             /** start interactive top-level session **/
-            static void start_interactive(obj<AAllocator> mm,
-                                          ParserStateMachine * p_psm);
+            static void establish_interactive(obj<AAllocator> mm,
+                                              ParserStateMachine * p_psm);
             /** start non-interactive top-level session **/
-            static void start_batch(obj<AAllocator> mm,
-                                    ParserStateMachine * p_psm);
+            static void establish_batch(obj<AAllocator> mm,
+                                        ParserStateMachine * p_psm);
 
         public:
             /** @defgroup scm-exprseq-ssm-facet syntaxstatemachine facet methods **/

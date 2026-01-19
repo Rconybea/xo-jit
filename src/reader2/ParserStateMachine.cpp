@@ -23,6 +23,35 @@ namespace xo {
         {
         }
 
+        bool
+        ParserStateMachine::is_at_toplevel() const noexcept
+        {
+            return ((stack_ == nullptr)
+                    || (stack_->parent() == nullptr));
+        }
+
+        bool
+        ParserStateMachine::has_incomplete_expr() const noexcept
+        {
+            // don't count toplevel expression
+
+            return !(this->is_at_toplevel());
+        }
+
+        void
+        ParserStateMachine::establish_toplevel_ssm(obj<ASyntaxStateMachine> ssm)
+        {
+            scope log(XO_DEBUG(debug_flag_));
+
+            assert(stack_ == nullptr);
+
+            auto alloc = with_facet<AAllocator>::mkobj(&parser_alloc_);
+
+            this->stack_ = ParserStack::push(nullptr /*stack*/,
+                                             alloc, ssm);
+            this->parser_alloc_ckp_ = parser_alloc_.checkpoint();
+        }
+
         void
         ParserStateMachine::push_ssm(obj<ASyntaxStateMachine> ssm)
         {
@@ -32,7 +61,24 @@ namespace xo {
 
             auto alloc = with_facet<AAllocator>::mkobj(&parser_alloc_);
 
-            this->stack_ = stack_->push(alloc, ssm);
+            this->stack_ = ParserStack::push(stack_, alloc, ssm);
+        }
+
+        void
+        ParserStateMachine::reset_result()
+        {
+            this->result_ = ParserResult();
+        }
+
+        void
+        ParserStateMachine::clear_error_reset()
+        {
+            this->reset_result();
+
+            while (stack_ && stack_->parent())
+                stack_ = stack_->parent();
+
+            this->parser_alloc_.restore(parser_alloc_ckp_);
         }
 
         void

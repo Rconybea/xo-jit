@@ -28,8 +28,9 @@ namespace xo {
             /** create new top of stack for syntax @p ssm, using memory from @p mm.
              *  previous stack given by @p parent
              **/
-            ParserStack * push(obj<AAllocator> mm,
-                               obj<ASyntaxStateMachine> ssm);
+            static ParserStack * push(ParserStack * stack,
+                                      obj<AAllocator> mm,
+                                      obj<ASyntaxStateMachine> ssm);
 
             obj<ASyntaxStateMachine> top() const noexcept { return ssm_; }
             ParserStack * parent() const noexcept { return parent_; }
