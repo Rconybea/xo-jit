@@ -595,10 +595,13 @@ namespace xo {
                     tk_text.clear();
             }
 
+            // TOOD: report tk_text as span,
+            //       but must pin / unpin
+
             /* input.prefix(0):
              * require caller preserves current input line until it's entirely exhausted
              */
-            return result_type(token_type(tk_type, std::move(tk_text)),
+            return result_type(Token(tk_type, std::move(tk_text)),
                                p_input_state->current_line().prefix(0));
         } /*assemble_token*/
 
