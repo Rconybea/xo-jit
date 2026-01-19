@@ -48,7 +48,7 @@ namespace xo {
         }
 
         const ParserResult &
-        SchematikaParser::include_token(const token_type & tk)
+        SchematikaParser::on_token(const token_type & tk)
         {
             scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
 

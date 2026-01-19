@@ -1,0 +1,97 @@
+/** @file DDefineSsm.hpp
+ *
+ *  @author Roland Conybeare, Jan 2026
+ **/
+
+#include "ParserStateMachine.hpp"
+#include "SyntaxStateMachine.hpp"
+#include "syntaxstatetype.hpp"
+#include <xo/facet/obj.hpp>
+
+namespace xo {
+    namespace scm {
+        /**
+         * @pre
+         *
+         *   def foo : f64 = 1 ;
+         *  ^   ^   ^ ^   ^ ^ ^ ^
+         *  |   |   | |   | | | (done)
+         *  |   |   | |   | | def_6:expect_rhs_expression:expr_progress
+         *  |   |   | |   | def_5:expect_rhs_expression
+         *  |   |   | |   def_4
+         *  |   |   | def_3:expect_type
+         *  |   |   def_2
+         *  |   def_1:expect_symbol
+         *  def_0
+         *  expect_toplevel_expression_sequence
+         *
+         *   def_0 --on_def_token()--> def_1
+         *   def_1 --on_symbol()--> def_2
+         *   def_2 --on_colon_token()--> def_3
+         *         --on_singleassign_token()--> def_5
+         *   def_3 --on_typedescr()--> def_4
+         *   def_4 --on_singleassign_token()--> def_5
+         *   def_5 --on_expr()--> def_6
+         *   def_6 --on_semicolon_token()--> (done)
+         *
+         *   def_1:expect_symbol: got 'def' keyword, symbol to follow
+         *   def_1: got symbol name
+         *   def_3:expect_symbol got (optional) colon, type name to follow
+         *   def_4: got symbol type
+         *   def_6:expect_rhs_expression got (optional) equal sign, value to follow
+         *   (done): definition complete,  pop exprstate from stack
+         *
+         * @endpre
+         **/
+        enum class defexprstatetype {
+            invalid = -1,
+
+            def_0,
+            def_1,
+            def_2,
+            def_3,
+            def_4,
+            def_5,
+            def_6,
+
+            n_defexprstatetype,
+        };
+
+        extern const char * defexprstatetype_descr(defexprstatetype x);
+
+        std::ostream &
+        operator<<(std::ostream & os, defexprstatetype x);
+
+        /** @class DDefineSsm
+         *  @brief state machine for parsing a define expression
+         **/
+        class DDefineSsm {
+        public:
+
+        public:
+            /** @defgroup scm-define-ssm-facet syntaxstatemachine facet methods **/
+            ///@{
+
+            /** identifies the ssm implemented here **/
+            syntaxstatetype ssm_type() const noexcept;
+
+            /** text describing expected/allowed input to this ssm in current state.
+             *  Intended to drive error mesages
+             **/
+            std::string_view get_expect_str() const noexcept;
+
+            /** update state for this syntax on incoming token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_if_token(const Token & tk, ParserStateMachine * p_psm);
+
+            ///@}
+
+        private:
+            /** identify define-expression state **/
+            defexprstatetype defstate_;
+        };
+    } /*namespace scm*/
+} /*namespace xo*/
+
+/* end DDefineSsm.hpp */

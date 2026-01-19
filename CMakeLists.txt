@@ -20,7 +20,7 @@ add_definitions(${PROJECT_CXX_FLAGS})
 # ----------------------------------------------------------------
 # output targets
 
-#add_subdirectory(utest)
+add_subdirectory(utest)
 
 # note: manual target; generated code committed to git
 xo_add_genfacet(

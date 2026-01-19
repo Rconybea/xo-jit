@@ -21,6 +21,9 @@ namespace xo {
             /** toplevel of some translation unit. See @ref DExprSeqState **/
             expect_toplevel_expression_sequence,
 
+            /** handle define-expression. See @ref DDefineSsm **/
+            defexpr,
+
             /** comes lasts, counts number of valid enums **/
             N
         };

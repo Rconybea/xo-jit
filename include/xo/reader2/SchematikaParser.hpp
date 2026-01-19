@@ -198,7 +198,7 @@ namespace xo {
              *  @return parsed expression, if @p tk completes an expression.
              *  otherwise nullptr
              **/
-            const ParserResult & include_token(const token_type & tk);
+            const ParserResult & on_token(const token_type & tk);
 
             /** reset parsed result expression; use using return value from
              *  @ref include_token. Complicating api here to avoid copying ParserResult
