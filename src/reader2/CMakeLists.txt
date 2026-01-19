@@ -4,6 +4,7 @@ set(SELF_LIB xo_reader2)
 set(SELF_SRCS
     init_reader2.cpp
 
+    SchematikaParser.cpp
     ParserStateMachine.cpp
     ParserStack.cpp
     ParserResult.cpp

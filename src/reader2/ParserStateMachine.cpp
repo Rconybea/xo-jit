@@ -16,6 +16,13 @@ namespace xo {
     using xo::facet::with_facet;
 
     namespace scm {
+        ParserStateMachine::ParserStateMachine(const ArenaConfig & config)
+            : parser_alloc_{DArena::map(config)},
+              expr_alloc_{with_facet<AAllocator>::mkobj(&parser_alloc_)},
+              debug_flag_{config.debug_flag_}
+        {
+        }
+
         void
         ParserStateMachine::push_ssm(obj<ASyntaxStateMachine> ssm)
         {

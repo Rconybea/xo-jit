@@ -33,11 +33,24 @@ namespace xo {
         public:
             ParserStateMachine(const ArenaConfig & config);
 
+            /** @defgroup scm-parserstatemachine-accessors accessor methods **/
+            ///@{
+
+            bool debug_flag() const noexcept { return debug_flag_; }
+            ParserStack * stack() const noexcept { return stack_; }
+            const ParserResult & result() const noexcept { return result_; }
+            obj<AAllocator> expr_alloc() const noexcept { return expr_alloc_; }
+
+            ///@}
+
             /** @defgroup scm-parserstatemachine-bookkeeping bookkeeping methods **/
             ///@{
 
             /** push syntax @p ssm onto @ref stack_ **/
             void push_ssm(obj<ASyntaxStateMachine> ssm);
+
+            /** reset result to none **/
+            void reset_result() { result_ = ParserResult(); }
 
             ///@}
 
