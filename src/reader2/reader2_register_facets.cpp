@@ -6,6 +6,8 @@
 #include "reader2_register_facets.hpp"
 
 #include <xo/reader2/ssm/ISyntaxStateMachine_DExprSeqState.hpp>
+#include <xo/reader2/ssm/ISyntaxStateMachine_DDefineSsm.hpp>
+#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectSymbolSsm.hpp>
 
 #include <xo/reader2/ssm/ASyntaxStateMachine.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -22,8 +24,12 @@ namespace xo {
             scope log(XO_DEBUG(true));
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DExprSeqState>();
+            FacetRegistry::register_impl<ASyntaxStateMachine, DDefineSsm>();
+            FacetRegistry::register_impl<ASyntaxStateMachine, DExpectSymbolSsm>();
 
             log && log(xtag("DExprSeqState.tseq", typeseq::id<DExprSeqState>()));
+            log && log(xtag("DDefineSsm.tseq", typeseq::id<DDefineSsm>()));
+            log && log(xtag("DExpectSymbolSsm.tseq", typeseq::id<DExpectSymbolSsm>()));
 
             return true;
         }
