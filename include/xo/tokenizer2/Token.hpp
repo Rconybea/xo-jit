@@ -132,7 +132,7 @@ namespace xo {
             /** token representing keyword @c type **/
             static Token type() { return Token(tokentype::tk_type); }
             /** token representing keyword @c def **/
-            static Token def() { return Token(tokentype::tk_def); }
+            static Token def_token() { return Token(tokentype::tk_def); }
             /** token representing keyword @c lambda **/
             static Token lambda() { return Token(tokentype::tk_lambda); }
             /** token representing keyword @c if **/
