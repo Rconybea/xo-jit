@@ -2,7 +2,7 @@
 
 set(SELF_LIB xo_reader2)
 set(SELF_SRCS
-    #init_reader2.cpp
+    init_reader2.cpp
 
     ParserStateMachine.cpp
     ParserStack.cpp
@@ -14,7 +14,7 @@ set(SELF_SRCS
     ISyntaxStateMachine_DExprSeqState.cpp
 
     reader2_register_facets.cpp
-    #reader2_register_types.cpp
+    reader2_register_types.cpp
     )
 
 xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 ${SELF_SRCS})
@@ -26,5 +26,5 @@ xo_dependency(${SELF_LIB} xo_expression2)
 #xo_dependency(${SELF_LIB} xo_object2)
 #xo_dependency(${SELF_LIB} xo_printable2)
 #xo_dependency(${SELF_LIB} xo_flatstring)
-#xo_dependency(${SELF_LIB} subsys)
+xo_dependency(${SELF_LIB} subsys)
 #xo_dependency(${SELF_LIB} indentlog)
