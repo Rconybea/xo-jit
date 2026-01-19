@@ -16,9 +16,10 @@ namespace xo {
     using xo::facet::with_facet;
 
     namespace scm {
-        ParserStateMachine::ParserStateMachine(const ArenaConfig & config)
+        ParserStateMachine::ParserStateMachine(const ArenaConfig & config,
+                                               obj<AAllocator> * expr_alloc)
             : parser_alloc_{DArena::map(config)},
-              expr_alloc_{with_facet<AAllocator>::mkobj(&parser_alloc_)},
+              expr_alloc_{expr_alloc},
               debug_flag_{config.debug_flag_}
         {
         }
@@ -176,7 +177,9 @@ namespace xo {
                                        xtag("ssm", ssm_name),
                                        xtag("via", "ParserStateMachine::illegal_input_on_token"));
 
-            auto errmsg = DString::from_view(expr_alloc_,
+            assert(expr_alloc_);
+
+            auto errmsg = DString::from_view(*expr_alloc_,
                                              std::string_view(errmsg_string));
 
             this->capture_error(ssm_name, errmsg);

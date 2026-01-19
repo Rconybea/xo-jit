@@ -8,6 +8,7 @@
 #include "ParserStateMachine.hpp"
 #include "ParserResult.hpp"
 #include <xo/tokenizer2/Token.hpp>
+#include <xo/alloc2/Allocator.hpp>
 
 namespace xo {
     namespace scm {
@@ -153,6 +154,7 @@ namespace xo {
         class SchematikaParser {
         public:
             using ArenaConfig = xo::mm::ArenaConfig;
+            using AAllocator = xo::mm::AAllocator;
             using token_type = Token;
 
         public:
@@ -160,9 +162,13 @@ namespace xo {
              *  parser is ready to receive tokens via @ref include_token
              *
              *  @p config  arena configuration for parser memory
+             *  @p expr_alloc  allocator for schematika expressions.
+             *                 Probably shared with execution.
              *  @p debug_flag  true to enable debug logging
              **/
-            SchematikaParser(const ArenaConfig & config, bool debug_flag);
+            SchematikaParser(const ArenaConfig & config,
+                             obj<AAllocator> * expr_alloc,
+                             bool debug_flag);
 
             bool debug_flag() const { return debug_flag_; }
 

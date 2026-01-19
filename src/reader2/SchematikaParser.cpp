@@ -11,14 +11,17 @@
 #include <stdexcept>
 
 namespace xo {
+    using xo::mm::AAllocator;
     using xo::tostr;
     using xo::xtag;
 
     namespace scm {
         // ----- SchematikaParser -----
 
-        SchematikaParser::SchematikaParser(const ArenaConfig & config, bool debug_flag)
-            : psm_{config},
+        SchematikaParser::SchematikaParser(const ArenaConfig & config,
+                                           obj<AAllocator> * expr_alloc,
+                                           bool debug_flag)
+            : psm_{config, expr_alloc},
               debug_flag_{debug_flag}
         {
         }
@@ -35,13 +38,13 @@ namespace xo {
 
         void
         SchematikaParser::begin_interactive_session() {
-            DExprSeqState::establish_interactive(psm_.expr_alloc(), &psm_);
+            DExprSeqState::establish_interactive(*(psm_.expr_alloc()), &psm_);
 
         }
 
         void
         SchematikaParser::begin_translation_unit() {
-            DExprSeqState::establish_batch(psm_.expr_alloc(), &psm_);
+            DExprSeqState::establish_batch(*(psm_.expr_alloc()), &psm_);
         }
 
         const ParserResult &

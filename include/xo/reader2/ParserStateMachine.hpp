@@ -31,15 +31,16 @@ namespace xo {
             using DArena = xo::mm::DArena;
 
         public:
-            ParserStateMachine(const ArenaConfig & config);
+            ParserStateMachine(const ArenaConfig & config,
+                               obj<AAllocator> * expr_alloc);
 
             /** @defgroup scm-parserstatemachine-accessors accessor methods **/
             ///@{
 
             bool debug_flag() const noexcept { return debug_flag_; }
             ParserStack * stack() const noexcept { return stack_; }
+            obj<AAllocator> * expr_alloc() const noexcept { return expr_alloc_; }
             const ParserResult & result() const noexcept { return result_; }
-            obj<AAllocator> expr_alloc() const noexcept { return expr_alloc_; }
 
             /** true iff state machine is currently idle (at top-level) **/
             bool is_at_toplevel() const noexcept;
@@ -133,7 +134,7 @@ namespace xo {
              *  scenario, where top-level Expressions can be discarded
              *  once compiled.
              **/
-            obj<AAllocator> expr_alloc_;
+            obj<AAllocator> * expr_alloc_ = nullptr;
 
             /** current output from parser **/
             ParserResult result_;
