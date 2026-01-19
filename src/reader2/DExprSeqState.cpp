@@ -4,6 +4,7 @@
  **/
 
 #include "DExprSeqState.hpp"
+#include "DDefineSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExprSeqState.hpp"
 
 namespace xo {
@@ -74,12 +75,29 @@ namespace xo {
         }
 
         void
+        DExprSeqState::on_def_token(const Token & tk,
+                                    ParserStateMachine * p_psm)
+        {
+            (void)tk;
+
+            DDefineSsm::start(p_psm->parser_alloc(), p_psm);
+
+            /* keyword 'def' introduces a definition:
+             *   def pi : f64 = 3.14159265
+             *   def sq(x : f64) -> f64 { (x * x) }
+             */
+        }
+
+        void
         DExprSeqState::on_if_token(const Token & tk,
                                    ParserStateMachine * p_psm)
         {
             switch (seqtype_) {
             case exprseqtype::toplevel_interactive:
-                assert(false); // DfElseState::start(p_psm);
+                p_psm->illegal_input_on_token("DExprSeqState::on_if_token",
+                                              tk,
+                                              this->get_expect_str());
+                //assert(false); // DfElseState::start(p_psm);
                 break;
             case exprseqtype::toplevel_batch:
                 p_psm->illegal_input_on_token("DExprSeqState::on_if_token",

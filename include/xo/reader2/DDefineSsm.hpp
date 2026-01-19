@@ -3,6 +3,8 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
+#pragma once
+
 #include "ParserStateMachine.hpp"
 #include "SyntaxStateMachine.hpp"
 #include "syntaxstatetype.hpp"
@@ -67,8 +69,24 @@ namespace xo {
          **/
         class DDefineSsm {
         public:
+            using DArena = xo::mm::DArena;
 
         public:
+            /** @defgroup scm-define-ssm-facet constructors **/
+            ///@{
+
+            DDefineSsm();
+
+            /** create instance using memory from @p parser_mm **/
+            static DDefineSsm * make(DArena & parser_mm);
+
+            /** start nested parser for a define-expression,
+             *  on top of parser state machine @p p_psm
+             **/
+            static void start(DArena & parser_mm,
+                              ParserStateMachine * p_psm);
+
+            ///@}
             /** @defgroup scm-define-ssm-facet syntaxstatemachine facet methods **/
             ///@{
 
@@ -83,7 +101,14 @@ namespace xo {
             /** update state for this syntax on incoming token @p tk,
              *  overall parser state in @p p_psm
              **/
-            void on_if_token(const Token & tk, ParserStateMachine * p_psm);
+            void on_def_token(const Token & tk,
+                              ParserStateMachine * p_psm);
+
+            /** update state for this syntax on incoming token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_if_token(const Token & tk,
+                             ParserStateMachine * p_psm);
 
             ///@}
 

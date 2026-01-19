@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
+ *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/SyntaxStateMachine.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -55,6 +55,9 @@ public:
     }
 
     // non-const methods (still const in router!)
+    void on_def_token(const Token & tk, ParserStateMachine * ps_psm)  {
+        return O::iface()->on_def_token(O::data(), tk, ps_psm);
+    }
     void on_if_token(const Token & tk, ParserStateMachine * p_psm)  {
         return O::iface()->on_if_token(O::data(), tk, p_psm);
     }

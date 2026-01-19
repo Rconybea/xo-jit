@@ -59,6 +59,11 @@ namespace xo {
             /** update state for this syntax on incoming token @p tk,
              *  overall parser state in @p p_psm
              **/
+            void on_def_token(const Token & tk, ParserStateMachine * p_psm);
+
+            /** update state for this syntax on incoming token @p tk,
+             *  overall parser state in @p p_psm
+             **/
             void on_if_token(const Token & tk, ParserStateMachine * p_psm);
 
             ///@}

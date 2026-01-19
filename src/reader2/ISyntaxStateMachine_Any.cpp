@@ -35,6 +35,12 @@ ISyntaxStateMachine_Any::_valid
 // nonconst methods
 
 auto
+ISyntaxStateMachine_Any::on_def_token(Opaque, const Token &, ParserStateMachine *)  -> void
+{
+    _fatal();
+}
+
+auto
 ISyntaxStateMachine_Any::on_if_token(Opaque, const Token &, ParserStateMachine *)  -> void
 {
     _fatal();

@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
+ *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/ISyntaxStateMachine_DExprSeqState.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -53,6 +53,8 @@ namespace xo {
             static std::string_view get_expect_str(const DExprSeqState & self) noexcept;
 
             // non-const methods
+            /** update state machine for incoming define-keyworkd-token @p tk **/
+            static void on_def_token(DExprSeqState & self, const Token & tk, ParserStateMachine * ps_psm);
             /** update state machine for incoming if-keyword-token @p tk **/
             static void on_if_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
             ///@}

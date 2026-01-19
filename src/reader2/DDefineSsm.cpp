@@ -4,6 +4,8 @@
  **/
 
 #include "DDefineSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DDefineSsm.hpp"
+
 #ifdef NOT_YET
 #include "parserstatemachine.hpp"
 #include "expect_symbol_xs.hpp"
@@ -13,6 +15,9 @@
 #endif
 
 namespace xo {
+    using xo::facet::with_facet;
+    using xo::facet::typeseq;
+
     namespace scm {
         // ----- defexprstatetype -----
 
@@ -46,16 +51,11 @@ namespace xo {
         define_xs::make() {
             return std::make_unique<define_xs>(define_xs(DefineExprAccess::make_empty()));
         }
+#endif
 
-        void
-        define_xs::start(parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
+        // DDefineSsm::start
 
-            p_psm->push_exprstate(define_xs::make());
-            p_psm->top_exprstate().on_def_token(token_type::def(), p_psm);
-        }
-
+#ifdef NOT_YET
         define_xs::define_xs(rp<DefineExprAccess> def_expr)
             : exprstate(exprstatetype::defexpr),
               defxs_type_{defexprstatetype::def_0},
@@ -333,6 +333,36 @@ namespace xo {
 
         ////////////////////////////////////////////////////////////////
 
+        DDefineSsm::DDefineSsm()
+            : defstate_{defexprstatetype::def_0}
+        {}
+
+        DDefineSsm *
+        DDefineSsm::make(DArena & mm)
+        {
+            void * mem = mm.alloc(typeseq::id<DDefineSsm>(),
+                                  sizeof(DDefineSsm));
+
+            return new (mem) DDefineSsm();
+        }
+
+        void
+        DDefineSsm::start(DArena & mm,
+                          ParserStateMachine * p_psm)
+        {
+            //scope log(XO_DEBUG(p_psm->debug_flag()));
+
+            assert(p_psm->stack());
+
+            DDefineSsm * define_ssm = DDefineSsm::make(mm);
+
+            obj<ASyntaxStateMachine> ssm
+                = with_facet<ASyntaxStateMachine>::mkobj(define_ssm);
+
+            p_psm->push_ssm(ssm);
+            p_psm->on_def_token(Token::def_token());
+        }
+
         syntaxstatetype
         DDefineSsm::ssm_type() const noexcept
         {
@@ -378,6 +408,21 @@ namespace xo {
             }
 
             return "?expect";
+        }
+
+        void
+        DDefineSsm::on_def_token(const Token & tk,
+                                 ParserStateMachine * p_psm)
+        {
+            if (this->defstate_ == defexprstatetype::def_0) {
+                this->defstate_ = defexprstatetype::def_1;
+
+                // expect_symbol_xs::start(p_psm->parser_alloc(), p_psm);
+            }
+
+            p_psm->illegal_input_on_token("DDefineSsm::on_define_token",
+                                          tk,
+                                          this->get_expect_str());
         }
 
         void

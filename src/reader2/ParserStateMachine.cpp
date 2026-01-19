@@ -48,8 +48,7 @@ namespace xo {
 
             auto alloc = with_facet<AAllocator>::mkobj(&parser_alloc_);
 
-            this->stack_ = ParserStack::push(nullptr /*stack*/,
-                                             alloc, ssm);
+            this->stack_ = ParserStack::push(nullptr /*stack*/, alloc, ssm);
             this->parser_alloc_ckp_ = parser_alloc_.checkpoint();
         }
 
@@ -96,10 +95,13 @@ namespace xo {
             }
 
             switch (tk.tk_type()) {
+            case tokentype::tk_def:
+                this->on_def_token(tk);
+                break;
+
             case tokentype::tk_if:
                 this->on_if_token(tk);
                 break;
-
 
             // all the not-yet handled cases
             case tokentype::tk_invalid:
@@ -133,7 +135,6 @@ namespace xo {
             case tokentype::tk_cmpeq:
             case tokentype::tk_cmpne:
             case tokentype::tk_type:
-            case tokentype::tk_def:
             case tokentype::tk_lambda:
             case tokentype::tk_then:
             case tokentype::tk_else:
@@ -141,10 +142,19 @@ namespace xo {
             case tokentype::tk_in:
             case tokentype::tk_end:
             case tokentype::N:
-                throw std::runtime_error(tostr("NOT IMPLEMENTED",
+                throw std::runtime_error(tostr("ParserStateMachin::on_token:",
+                                               "NOT IMPLEMENTED",
                                                xtag("token", tk)));
 
             }
+        }
+
+        void
+        ParserStateMachine::on_def_token(const Token & tk)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
+
+            stack_->top().on_def_token(tk, this);
         }
 
         void

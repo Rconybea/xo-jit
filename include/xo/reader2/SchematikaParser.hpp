@@ -190,7 +190,7 @@ namespace xo {
             /** put parser into state for beginning of a translation unit
              *  (i.e. input stream)
              **/
-            void begin_translation_unit();
+            void begin_batch_session();
 
             /** include next token @p tk and increment parser state.
              *

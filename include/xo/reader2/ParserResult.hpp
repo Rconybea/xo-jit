@@ -40,6 +40,10 @@ namespace xo {
             obj<AExpression> result_expr() const { return result_expr_; }
             const DString * error_description() const { return error_description_; }
 
+            bool is_incomplete() const { return result_type_ == parser_result_type::none; }
+            bool is_expression() const { return result_type_ == parser_result_type::expression; }
+            bool      is_error() const { return result_type_ == parser_result_type::error; }
+
         private:
             parser_result_type result_type_ = parser_result_type::none;
             obj<AExpression> result_expr_;

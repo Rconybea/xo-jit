@@ -53,6 +53,9 @@ namespace xo {
             /** @defgroup scm-parserstatemachine-bookkeeping bookkeeping methods **/
             ///@{
 
+            /** allocator for parsing stack and ssm's **/
+            DArena & parser_alloc() noexcept { return parser_alloc_; }
+
             /** establish toplevel @p ssm.  Must have empty stack **/
             void establish_toplevel_ssm(obj<ASyntaxStateMachine> ssm);
 
@@ -74,6 +77,9 @@ namespace xo {
              *  record output (if any) in @ref result_
              **/
             void on_token(const Token & tk);
+
+            /** update state for incoming define-token @p tk **/
+            void on_def_token(const Token & tk);
 
             /** update state for incoming if-token @p tk **/
             void on_if_token(const Token & tk);

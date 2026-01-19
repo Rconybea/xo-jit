@@ -43,7 +43,7 @@ namespace xo {
         }
 
         void
-        SchematikaParser::begin_translation_unit() {
+        SchematikaParser::begin_batch_session() {
             DExprSeqState::establish_batch(*(psm_.expr_alloc()), &psm_);
         }
 

@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
+ *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/ISyntaxStateMachine_DExprSeqState.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -28,7 +28,16 @@ namespace xo {
         }
 
         auto
-        ISyntaxStateMachine_DExprSeqState::on_if_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm) -> void
+        ISyntaxStateMachine_DExprSeqState::on_def_token(DExprSeqState & self,
+                                                        const Token & tk,
+                                                        ParserStateMachine * p_psm) -> void
+        {
+            self.on_def_token(tk, p_psm);
+        }
+        auto
+        ISyntaxStateMachine_DExprSeqState::on_if_token(DExprSeqState & self,
+                                                       const Token & tk,
+                                                       ParserStateMachine * p_psm) -> void
         {
             self.on_if_token(tk, p_psm);
         }

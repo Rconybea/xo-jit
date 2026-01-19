@@ -15,6 +15,7 @@ set(SELF_SRCS
     ISyntaxStateMachine_DExprSeqState.cpp
 
     DDefineSsm.cpp
+    ISyntaxStateMachine_DDefineSsm.cpp
 
     reader2_register_facets.cpp
     reader2_register_types.cpp

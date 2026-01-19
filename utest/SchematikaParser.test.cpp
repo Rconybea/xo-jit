@@ -62,11 +62,36 @@ namespace xo {
 
             SchematikaParser parser(config, &expr_alloc, false /*debug_flag*/);
 
-            parser.begin_translation_unit();
+            parser.begin_batch_session();
 
             // after begin_translation_unit, parser has toplevel exprseq
             // but is still "at toplevel" in the sense of ready for input
             REQUIRE(parser.has_incomplete_expr() == false);
+        }
+
+        TEST_CASE("SchematikaParser-batch-def", "[reader2][SchematikaParser]")
+        {
+            ArenaConfig config;
+            config.name_ = "test-arena";
+            config.size_ = 16 * 1024;
+
+            DArena expr_arena = DArena::map(config);
+            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
+
+            SchematikaParser parser(config, &expr_alloc, false /*debug_flag*/);
+
+            parser.begin_batch_session();
+
+            auto & result = parser.on_token(Token::def_token());
+
+            // define-expressions not properly implemented
+
+            // after begin_interactive_session, parser has toplevel exprseq
+            // but is still "at toplevel" in the sense of ready for input
+            REQUIRE(parser.has_incomplete_expr() == true);
+            REQUIRE(result.is_error());
+
+            REQUIRE(result.error_description());
         }
 
         TEST_CASE("SchematikaParser-interactive-if", "[reader2][SchematikaParser]")
@@ -82,11 +107,16 @@ namespace xo {
 
             parser.begin_interactive_session();
 
-            parser.on_token(Token::if_token());
+            auto & result = parser.on_token(Token::if_token());
 
             // after begin_interactive_session, parser has toplevel exprseq
             // but is still "at toplevel" in the sense of ready for input
             REQUIRE(parser.has_incomplete_expr() == false);
+
+            REQUIRE(result.is_error());
+
+            // illegal input on token
+            REQUIRE(result.error_description());
         }
 
     } /*namespace ut*/
