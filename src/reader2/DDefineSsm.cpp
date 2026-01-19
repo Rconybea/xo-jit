@@ -46,12 +46,7 @@ namespace xo {
 
         // ----- define_xs -----
 
-#ifdef NOT_YET
-        std::unique_ptr<define_xs>
-        define_xs::make() {
-            return std::make_unique<define_xs>(define_xs(DefineExprAccess::make_empty()));
-        }
-#endif
+        // DDefineSsm::make
 
         // DDefineSsm::start
 
@@ -408,6 +403,15 @@ namespace xo {
             }
 
             return "?expect";
+        }
+
+        void
+        DDefineSsm::on_parsed_symbol(std::string_view sym,
+                                     ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_symbol("DDefineSsm::on_parsed_symbol",
+                                           sym,
+                                           this->get_expect_str());
         }
 
         void

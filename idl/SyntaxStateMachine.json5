@@ -45,11 +45,11 @@
     nonconst_methods: [
         {
             name: "on_def_token",
-            doc: ["update state machine for incoming define-keyworkd-token @p tk"],
+            doc: ["update state machine for incoming define-keyword-token @p tk"],
             return_type: "void",
             args: [
                 {type: "const Token &", name: "tk"},
-                {type: "ParserStateMachine *", name: "ps_psm"},
+                {type: "ParserStateMachine *", name: "p_psm"},
             ],
         },
         {
@@ -58,6 +58,15 @@
             return_type: "void",
             args: [
                 {type: "const Token &", name: "tk"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
+        {
+            name: "on_parsed_symbol",
+            doc: ["update  stat machine for incoming parsed symbol @p sym"],
+            return_type: "void",
+            args: [
+                {type: "std::string_view", name: "sym"},
                 {type: "ParserStateMachine *", name: "p_psm"},
             ],
         },

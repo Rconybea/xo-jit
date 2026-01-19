@@ -59,6 +59,7 @@ namespace scm {
         [[noreturn]] std::string_view get_expect_str(Copaque)  const  noexcept override { _fatal(); }
 
         // nonconst methods
+        [[noreturn]] void on_parsed_symbol(Opaque, std::string_view, ParserStateMachine *)  override;
         [[noreturn]] void on_def_token(Opaque, const Token &, ParserStateMachine *)  override;
         [[noreturn]] void on_if_token(Opaque, const Token &, ParserStateMachine *)  override;
 

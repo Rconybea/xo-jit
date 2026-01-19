@@ -55,8 +55,11 @@ public:
     }
 
     // non-const methods (still const in router!)
-    void on_def_token(const Token & tk, ParserStateMachine * ps_psm)  {
-        return O::iface()->on_def_token(O::data(), tk, ps_psm);
+    void on_parsed_symbol(std::string_view sym, ParserStateMachine * p_psm)  {
+        return O::iface()->on_parsed_symbol(O::data(), sym, p_psm);
+    }
+    void on_def_token(const Token & tk, ParserStateMachine * p_psm)  {
+        return O::iface()->on_def_token(O::data(), tk, p_psm);
     }
     void on_if_token(const Token & tk, ParserStateMachine * p_psm)  {
         return O::iface()->on_if_token(O::data(), tk, p_psm);

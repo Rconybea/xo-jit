@@ -21,6 +21,9 @@ namespace xo {
             /** toplevel of some translation unit. See @ref DExprSeqState **/
             expect_toplevel_expression_sequence,
 
+            /** expecting a s symbol. See @ref DExpectSymbolSsm **/
+            expect_symbol,
+
             /** handle define-expression. See @ref DDefineSsm **/
             defexpr,
 

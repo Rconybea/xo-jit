@@ -109,6 +109,15 @@ namespace xo {
                 break;
             }
         }
+
+        void
+        DExprSeqState::on_parsed_symbol(std::string_view sym,
+                                        ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_symbol("DExprSeqState::on_parsed_symbol",
+                                           sym,
+                                           this->get_expect_str());
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

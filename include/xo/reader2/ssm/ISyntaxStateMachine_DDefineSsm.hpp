@@ -53,8 +53,10 @@ namespace xo {
             static std::string_view get_expect_str(const DDefineSsm & self) noexcept;
 
             // non-const methods
-            /** update state machine for incoming define-keyworkd-token @p tk **/
-            static void on_def_token(DDefineSsm & self, const Token & tk, ParserStateMachine * ps_psm);
+            /** update  stat machine for incoming parsed symbol @p sym **/
+            static void on_parsed_symbol(DDefineSsm & self, std::string_view sym, ParserStateMachine * p_psm);
+            /** update state machine for incoming define-keyword-token @p tk **/
+            static void on_def_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for incoming if-keyword-token @p tk **/
             static void on_if_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm);
             ///@}

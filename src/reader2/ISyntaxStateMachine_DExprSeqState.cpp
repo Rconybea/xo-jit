@@ -28,16 +28,17 @@ namespace xo {
         }
 
         auto
-        ISyntaxStateMachine_DExprSeqState::on_def_token(DExprSeqState & self,
-                                                        const Token & tk,
-                                                        ParserStateMachine * p_psm) -> void
+        ISyntaxStateMachine_DExprSeqState::on_parsed_symbol(DExprSeqState & self, std::string_view sym, ParserStateMachine * p_psm) -> void
+        {
+            self.on_parsed_symbol(sym, p_psm);
+        }
+        auto
+        ISyntaxStateMachine_DExprSeqState::on_def_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm) -> void
         {
             self.on_def_token(tk, p_psm);
         }
         auto
-        ISyntaxStateMachine_DExprSeqState::on_if_token(DExprSeqState & self,
-                                                       const Token & tk,
-                                                       ParserStateMachine * p_psm) -> void
+        ISyntaxStateMachine_DExprSeqState::on_if_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm) -> void
         {
             self.on_if_token(tk, p_psm);
         }

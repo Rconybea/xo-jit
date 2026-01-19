@@ -50,8 +50,11 @@ namespace scm {
         }
 
         // non-const methods
-        void on_def_token(Opaque data, const Token & tk, ParserStateMachine * ps_psm)  override {
-            return I::on_def_token(_dcast(data), tk, ps_psm);
+        void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  override {
+            return I::on_parsed_symbol(_dcast(data), sym, p_psm);
+        }
+        void on_def_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
+            return I::on_def_token(_dcast(data), tk, p_psm);
         }
         void on_if_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
             return I::on_if_token(_dcast(data), tk, p_psm);

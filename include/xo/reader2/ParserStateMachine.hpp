@@ -62,6 +62,9 @@ namespace xo {
             /** push syntax @p ssm onto @ref stack_ **/
             void push_ssm(obj<ASyntaxStateMachine> ssm);
 
+            /** pop syntax state machine from top of @ref stack_ **/
+            void pop_ssm();
+
             /** reset result to none **/
             void reset_result();
 
@@ -72,6 +75,9 @@ namespace xo {
 
             /** @defgroup scm-parserstatemachine-inputmethods input methods **/
             ///@{
+
+            /** update state to respond to prsed symbol @p sym **/
+            void on_parsed_symbol(std::string_view sym);
 
             /** update state to respond to input token @p tk.
              *  record output (if any) in @ref result_
@@ -99,12 +105,19 @@ namespace xo {
 
             /** report illegal input from syntax state machine @p ssm_name
              *  recognized on input token @p tk. @p expect_str describes
-             *  expected input in that state
+             *  expected input in current ssm state
              **/
             void illegal_input_on_token(std::string_view ssm_name,
                                         const Token & tk,
                                         std::string_view expect_str);
 
+            /** report illegal input from syntax state machine @p ssm_name
+             *  receiving parsed symbol @p sym. @p expect_str describes
+             *  expected input in current ssm state
+             **/
+            void illegal_input_on_symbol(std::string_view ssm_name,
+                                         std::string_view sym,
+                                         std::string_view expect_str);
             ///@}
 
         private:

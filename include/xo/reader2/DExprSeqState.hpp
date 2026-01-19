@@ -66,6 +66,12 @@ namespace xo {
              **/
             void on_if_token(const Token & tk, ParserStateMachine * p_psm);
 
+            /** update state for this syntax on parsed symbol @p sym
+             *  from immediately-downstream ssm.
+             *  overall parser state in @p p_psm
+             **/
+            void on_parsed_symbol(std::string_view sym, ParserStateMachine * p_psm);
+
             ///@}
 
         private:

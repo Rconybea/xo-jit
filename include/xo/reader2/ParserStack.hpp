@@ -6,7 +6,7 @@
 #pragma once
 
 #include "SyntaxStateMachine.hpp"
-#include <xo/alloc2/Allocator.hpp>
+#include <xo/arena/DArena.hpp>
 #include <xo/facet/obj.hpp>
 
 namespace xo {
@@ -20,22 +20,31 @@ namespace xo {
          **/
         class ParserStack {
         public:
-            using AAllocator = xo::mm::AAllocator;
+            using DArena = xo::mm::DArena;
 
         public:
-            ParserStack(obj<ASyntaxStateMachine> ssm, ParserStack * parent);
+            ParserStack(DArena::Checkpoint ckp,
+                        obj<ASyntaxStateMachine> ssm,
+                        ParserStack * parent);
 
             /** create new top of stack for syntax @p ssm, using memory from @p mm.
              *  previous stack given by @p parent
              **/
             static ParserStack * push(ParserStack * stack,
-                                      obj<AAllocator> mm,
+                                      DArena & mm,
                                       obj<ASyntaxStateMachine> ssm);
 
+            /** unwind effect of last call to @ref push **/
+            static ParserStack * pop(ParserStack * stack,
+                                     DArena & mm);
+
+            DArena::Checkpoint ckp() const noexcept { return ckp_; }
             obj<ASyntaxStateMachine> top() const noexcept { return ssm_; }
             ParserStack * parent() const noexcept { return parent_; }
 
         private:
+            /** stack pointer: top of stack just before this instance created **/
+            DArena::Checkpoint ckp_;
             /** top of parsing stack: always non-null **/
             obj<ASyntaxStateMachine> ssm_;
             /** remainder of parsing stack excluding top **/

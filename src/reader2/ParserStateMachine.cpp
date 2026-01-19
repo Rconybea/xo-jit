@@ -46,9 +46,7 @@ namespace xo {
 
             assert(stack_ == nullptr);
 
-            auto alloc = with_facet<AAllocator>::mkobj(&parser_alloc_);
-
-            this->stack_ = ParserStack::push(nullptr /*stack*/, alloc, ssm);
+            this->stack_ = ParserStack::push(nullptr /*stack*/, parser_alloc_, ssm);
             this->parser_alloc_ckp_ = parser_alloc_.checkpoint();
         }
 
@@ -59,9 +57,17 @@ namespace xo {
 
             // note: using parser_alloc_ for parser stack, since stacklike behavior
 
-            auto alloc = with_facet<AAllocator>::mkobj(&parser_alloc_);
+            this->stack_ = ParserStack::push(stack_, parser_alloc_, ssm);
+        }
 
-            this->stack_ = ParserStack::push(stack_, alloc, ssm);
+        void
+        ParserStateMachine::pop_ssm()
+        {
+            scope log(XO_DEBUG(debug_flag_));
+
+            assert(this->stack_);
+
+            this->stack_ = ParserStack::pop(stack_, parser_alloc_);
         }
 
         void
@@ -79,6 +85,16 @@ namespace xo {
                 stack_ = stack_->parent();
 
             this->parser_alloc_.restore(parser_alloc_ckp_);
+        }
+
+        void
+        ParserStateMachine::on_parsed_symbol(std::string_view sym)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("sym", sym));
+
+            assert(stack_);
+
+            this->stack_->top().on_parsed_symbol(sym, this);
         }
 
         void
@@ -186,6 +202,29 @@ namespace xo {
                                        xtag("expecting", expect_str),
                                        xtag("ssm", ssm_name),
                                        xtag("via", "ParserStateMachine::illegal_input_on_token"));
+
+            assert(expr_alloc_);
+
+            auto errmsg = DString::from_view(*expr_alloc_,
+                                             std::string_view(errmsg_string));
+
+            this->capture_error(ssm_name, errmsg);
+        }
+
+        void
+        ParserStateMachine::illegal_input_on_symbol(std::string_view ssm_name,
+                                                    std::string_view sym,
+                                                   std::string_view expect_str)
+        {
+            // TODO:
+            // - want to write error message using DArena
+            // - need something like log_streambuf and/or tostr() that's arena-aware
+
+            auto errmsg_string = tostr("Unexpected symbol for parsing state",
+                                       xtag("symbol", sym),
+                                       xtag("expecting", expect_str),
+                                       xtag("ssm", ssm_name),
+                                       xtag("via", "ParserStateMachine::illegal_input_on_symbol"));
 
             assert(expr_alloc_);
 
