@@ -24,9 +24,13 @@ namespace xo {
             void * mem = mm.alloc(typeseq::id<DDefineExpr>(),
                                   sizeof(DDefineExpr));
 
+            TypeRef rhs_tref;
+            if (rhs_expr)
+                rhs_tref = rhs_expr.typeref();
+
             auto lhs_var = DVariable::make(mm,
                                            lhs_name,
-                                           rhs_expr.typeref());
+                                           rhs_tref);
 
             return new (mem) DDefineExpr(lhs_var, rhs_expr);
         }
