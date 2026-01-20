@@ -85,7 +85,8 @@ namespace xo {
                 return ppii.pps()->pretty_struct
                            (ppii,
                             "DDefineExpr",
-                            refrtag("lhs", lhs));
+                            refrtag("lhs", lhs),
+                            refrtag("rhs", "nullptr"));
             }
         }
 
