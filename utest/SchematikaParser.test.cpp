@@ -95,7 +95,7 @@ namespace xo {
                 auto & result = parser.on_token(Token::symbol_token("foo"));
 
                 REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(result.is_error());
+                REQUIRE(result.is_incomplete());
             }
 
             // define-expressions not properly implemented
