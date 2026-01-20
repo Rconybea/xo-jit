@@ -37,8 +37,21 @@ namespace ut {
 
         {
             std::stringstream ss;
+
             int * ptr = nullptr;
-            ss << cond(ptr != nullptr, xtag("ptr", 123), xtag("ptr", "null"));
+
+            ss << cond(ptr, xtag("ptr", 123), xtag("ptr", "null"));
+
+            REQUIRE(ss.str() == " :ptr null");
+        }
+
+        {
+            std::stringstream ss;
+
+            int * ptr = nullptr;
+
+            ss << xtag("ptr", cond(ptr, 123, "null"));
+
             REQUIRE(ss.str() == " :ptr null");
         }
     }
