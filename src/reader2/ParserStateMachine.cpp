@@ -73,6 +73,12 @@ namespace xo {
             this->stack_ = ParserStack::pop(stack_, parser_alloc_);
         }
 
+        const DUniqueString *
+        ParserStateMachine::intern_string(std::string_view str)
+        {
+            return stringtable_.intern(str);
+        }
+
         void
         ParserStateMachine::upsert_var(DVariable * var)
         {

@@ -412,11 +412,14 @@ namespace xo {
         }
 
         void
-        DDefineSsm::on_parsed_symbol(std::string_view sym,
+        DDefineSsm::on_parsed_symbol(std::string_view sym_name,
                                      ParserStateMachine * p_psm)
         {
             if (this->defstate_ == defexprstatetype::def_1) {
                 this->defstate_ = defexprstatetype::def_2;
+
+                const DUniqueString * sym
+                    = p_psm->intern_string(sym_name);
 
                 def_expr_.data()->assign_lhs_name(sym);
 
@@ -448,7 +451,7 @@ namespace xo {
             }
 
             p_psm->illegal_input_on_symbol("DDefineSsm::on_parsed_symbol",
-                                           sym,
+                                           sym_name,
                                            this->get_expect_str());
         }
 

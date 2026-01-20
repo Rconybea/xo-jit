@@ -69,6 +69,10 @@ namespace xo {
             /** pop syntax state machine from top of @ref stack_ **/
             void pop_ssm();
 
+            /** get unique string copy of @p str. Idempotent for each @p str.
+             **/
+            const DUniqueString * intern_string(std::string_view str);
+
             /** add variable to current local environment (innermost lexical scope) **/
             void upsert_var(DVariable * var);
 
