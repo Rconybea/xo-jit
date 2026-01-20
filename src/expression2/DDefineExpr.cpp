@@ -8,6 +8,7 @@
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>
+#include <xo/indentlog/print/cond.hpp>
 
 namespace xo {
     using xo::print::APrintable;
@@ -73,21 +74,11 @@ namespace xo {
             auto rhs = FacetRegistry::instance().try_variant<APrintable,
                                                              AExpression>(rhs_);
 
-            if (rhs_) {
-                assert(rhs);
-
-                return ppii.pps()->pretty_struct
-                           (ppii,
-                            "DDefineExpr",
-                            refrtag("lhs", lhs),
-                            refrtag("rhs", rhs));
-            } else {
-                return ppii.pps()->pretty_struct
-                           (ppii,
-                            "DDefineExpr",
-                            refrtag("lhs", lhs),
-                            refrtag("rhs", "nullptr"));
-            }
+            return ppii.pps()->pretty_struct
+                       (ppii,
+                        "DDefineExpr",
+                        refrtag("lhs", lhs),
+                        refrtag("rhs", cond(rhs_, rhs, "nullptr")));
         }
 
     } /*namespace scm*/
