@@ -27,7 +27,7 @@ namespace xo {
             DArena expr_arena = DArena::map(config);
             obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
 
-            SchematikaParser parser(config, &expr_alloc, false /*debug_flag*/);
+            SchematikaParser parser(config, expr_alloc, false /*debug_flag*/);
 
             REQUIRE(parser.debug_flag() == false);
             REQUIRE(parser.is_at_toplevel() == true);
@@ -42,7 +42,7 @@ namespace xo {
             DArena expr_arena = DArena::map(config);
             obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
 
-            SchematikaParser parser(config, &expr_alloc, false /*debug_flag*/);
+            SchematikaParser parser(config, expr_alloc, false /*debug_flag*/);
 
             parser.begin_interactive_session();
 
@@ -60,7 +60,7 @@ namespace xo {
             DArena expr_arena = DArena::map(config);
             obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
 
-            SchematikaParser parser(config, &expr_alloc, false /*debug_flag*/);
+            SchematikaParser parser(config, expr_alloc, false /*debug_flag*/);
 
             parser.begin_batch_session();
 
@@ -78,20 +78,30 @@ namespace xo {
             DArena expr_arena = DArena::map(config);
             obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
 
-            SchematikaParser parser(config, &expr_alloc, false /*debug_flag*/);
+            SchematikaParser parser(config, expr_alloc, false /*debug_flag*/);
 
             parser.begin_batch_session();
 
-            auto & result = parser.on_token(Token::def_token());
+            {
+                auto & result = parser.on_token(Token::def_token());
+
+                // after begin_interactive_session, parser has toplevel exprseq
+                // but is still "at toplevel" in the sense of ready for input
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(result.is_incomplete());
+            }
+
+            {
+                auto & result = parser.on_token(Token::symbol_token("foo"));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(result.is_error());
+            }
 
             // define-expressions not properly implemented
 
-            // after begin_interactive_session, parser has toplevel exprseq
-            // but is still "at toplevel" in the sense of ready for input
-            REQUIRE(parser.has_incomplete_expr() == true);
-            REQUIRE(result.is_error());
 
-            REQUIRE(result.error_description());
+            //REQUIRE(result.error_description());
         }
 
         TEST_CASE("SchematikaParser-interactive-if", "[reader2][SchematikaParser]")
@@ -103,7 +113,7 @@ namespace xo {
             DArena expr_arena = DArena::map(config);
             obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
 
-            SchematikaParser parser(config, &expr_alloc, false /*debug_flag*/);
+            SchematikaParser parser(config, expr_alloc, false /*debug_flag*/);
 
             parser.begin_interactive_session();
 

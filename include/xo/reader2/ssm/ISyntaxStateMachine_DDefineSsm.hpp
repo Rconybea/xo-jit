@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
+ *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/ISyntaxStateMachine_DDefineSsm.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -53,12 +53,14 @@ namespace xo {
             static std::string_view get_expect_str(const DDefineSsm & self) noexcept;
 
             // non-const methods
-            /** update  stat machine for incoming parsed symbol @p sym **/
-            static void on_parsed_symbol(DDefineSsm & self, std::string_view sym, ParserStateMachine * p_psm);
+            /** operate state machine for incoming symbol-token @p tk **/
+            static void on_symbol_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for incoming define-keyword-token @p tk **/
             static void on_def_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for incoming if-keyword-token @p tk **/
             static void on_if_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm);
+            /** update  stat machine for incoming parsed symbol @p sym **/
+            static void on_parsed_symbol(DDefineSsm & self, std::string_view sym, ParserStateMachine * p_psm);
             ///@}
         };
 

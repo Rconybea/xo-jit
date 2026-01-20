@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
+ *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/SyntaxStateMachine.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -59,9 +59,10 @@ namespace scm {
         [[noreturn]] std::string_view get_expect_str(Copaque)  const  noexcept override { _fatal(); }
 
         // nonconst methods
-        [[noreturn]] void on_parsed_symbol(Opaque, std::string_view, ParserStateMachine *)  override;
+        [[noreturn]] void on_symbol_token(Opaque, const Token &, ParserStateMachine *)  override;
         [[noreturn]] void on_def_token(Opaque, const Token &, ParserStateMachine *)  override;
         [[noreturn]] void on_if_token(Opaque, const Token &, ParserStateMachine *)  override;
+        [[noreturn]] void on_parsed_symbol(Opaque, std::string_view, ParserStateMachine *)  override;
 
         ///@}
 

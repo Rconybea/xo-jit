@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ParserResult.hpp"
+#include <xo/expression2/DVariable.hpp>
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/arena/DArena.hpp>
@@ -32,14 +33,14 @@ namespace xo {
 
         public:
             ParserStateMachine(const ArenaConfig & config,
-                               obj<AAllocator> * expr_alloc);
+                               obj<AAllocator> expr_alloc);
 
             /** @defgroup scm-parserstatemachine-accessors accessor methods **/
             ///@{
 
             bool debug_flag() const noexcept { return debug_flag_; }
             ParserStack * stack() const noexcept { return stack_; }
-            obj<AAllocator> * expr_alloc() const noexcept { return expr_alloc_; }
+            obj<AAllocator> expr_alloc() const noexcept { return expr_alloc_; }
             const ParserResult & result() const noexcept { return result_; }
 
             /** true iff state machine is currently idle (at top-level) **/
@@ -65,6 +66,9 @@ namespace xo {
             /** pop syntax state machine from top of @ref stack_ **/
             void pop_ssm();
 
+            /** add variable to current local environment (innermost lexical scope) **/
+            void upsert_var(DVariable * var);
+
             /** reset result to none **/
             void reset_result();
 
@@ -84,10 +88,13 @@ namespace xo {
              **/
             void on_token(const Token & tk);
 
-            /** update state for incoming define-token @p tk **/
+            /** operate state machine for incoming symbol-token @p tk **/
+            void on_symbol_token(const Token & tk);
+
+            /** operate state machine for incoming define-token @p tk **/
             void on_def_token(const Token & tk);
 
-            /** update state for incoming if-token @p tk **/
+            /** operate state machine for incoming if-token @p tk **/
             void on_if_token(const Token & tk);
 
             ///@}
@@ -153,7 +160,7 @@ namespace xo {
              *  scenario, where top-level Expressions can be discarded
              *  once compiled.
              **/
-            obj<AAllocator> * expr_alloc_ = nullptr;
+            obj<AAllocator> expr_alloc_;
 
             /** current output from parser **/
             ParserResult result_;

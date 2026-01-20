@@ -167,7 +167,7 @@ namespace xo {
              *  @p debug_flag  true to enable debug logging
              **/
             SchematikaParser(const ArenaConfig & config,
-                             obj<AAllocator> * expr_alloc,
+                             obj<AAllocator> expr_alloc,
                              bool debug_flag);
 
             bool debug_flag() const { return debug_flag_; }

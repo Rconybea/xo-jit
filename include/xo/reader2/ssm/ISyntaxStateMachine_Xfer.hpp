@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
+ *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/SyntaxStateMachine.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -50,14 +50,17 @@ namespace scm {
         }
 
         // non-const methods
-        void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  override {
-            return I::on_parsed_symbol(_dcast(data), sym, p_psm);
+        void on_symbol_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
+            return I::on_symbol_token(_dcast(data), tk, p_psm);
         }
         void on_def_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
             return I::on_def_token(_dcast(data), tk, p_psm);
         }
         void on_if_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
             return I::on_if_token(_dcast(data), tk, p_psm);
+        }
+        void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  override {
+            return I::on_parsed_symbol(_dcast(data), sym, p_psm);
         }
 
         ///@}

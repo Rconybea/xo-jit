@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
+ *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/ISyntaxStateMachine_DExpectSymbolSsm.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -28,9 +28,9 @@ namespace xo {
         }
 
         auto
-        ISyntaxStateMachine_DExpectSymbolSsm::on_parsed_symbol(DExpectSymbolSsm & self, std::string_view sym, ParserStateMachine * p_psm) -> void
+        ISyntaxStateMachine_DExpectSymbolSsm::on_symbol_token(DExpectSymbolSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
         {
-            self.on_parsed_symbol(sym, p_psm);
+            self.on_symbol_token(tk, p_psm);
         }
         auto
         ISyntaxStateMachine_DExpectSymbolSsm::on_def_token(DExpectSymbolSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
@@ -41,6 +41,11 @@ namespace xo {
         ISyntaxStateMachine_DExpectSymbolSsm::on_if_token(DExpectSymbolSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
         {
             self.on_if_token(tk, p_psm);
+        }
+        auto
+        ISyntaxStateMachine_DExpectSymbolSsm::on_parsed_symbol(DExpectSymbolSsm & self, std::string_view sym, ParserStateMachine * p_psm) -> void
+        {
+            self.on_parsed_symbol(sym, p_psm);
         }
 
     } /*namespace scm*/

@@ -50,6 +50,8 @@ namespace xo {
             std::string_view error_src_fn_;
             const DString * error_description_ = nullptr;
         };
+
+
     } /*namespace scm*/
 } /*namespace xo*/
 

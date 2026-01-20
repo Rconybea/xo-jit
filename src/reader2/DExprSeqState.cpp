@@ -75,12 +75,47 @@ namespace xo {
         }
 
         void
+        DExprSeqState::on_symbol_token(const Token & tk,
+                                       ParserStateMachine * p_psm)
+        {
+            switch (seqtype_) {
+            case exprseqtype::toplevel_interactive:
+                {
+#ifdef NOT_YET
+                    obj<AExpression,DVariable> var = p_psm->lookup_var(tk.text());
+
+                    if (var) {
+                        DProgressSsm::start(var, p_psm);
+                    } else {
+                        p_psm->unknown_variable_error("DExprSeqState::on_symbol_token",
+                                                      tk,
+                                                      this->get_expect_str(),
+                                                      p_psm);
+                    }
+#endif
+                }
+                break;
+            case exprseqtype::toplevel_batch:
+                break;
+            case exprseqtype::N:
+                assert(false); // unreachable
+                break;
+            }
+
+            p_psm->illegal_input_on_token("DExprSeqState::on_symbol_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
         DExprSeqState::on_def_token(const Token & tk,
                                     ParserStateMachine * p_psm)
         {
             (void)tk;
 
-            DDefineSsm::start(p_psm->parser_alloc(), p_psm);
+            DDefineSsm::start(p_psm->parser_alloc(),
+                              p_psm->expr_alloc(),
+                              p_psm);
 
             /* keyword 'def' introduces a definition:
              *   def pi : f64 = 3.14159265

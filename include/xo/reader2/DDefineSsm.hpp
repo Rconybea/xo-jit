@@ -8,6 +8,8 @@
 #include "ParserStateMachine.hpp"
 //#include "SyntaxStateMachine.hpp"
 #include "syntaxstatetype.hpp"
+#include <xo/expression2/detail/IExpression_DDefineExpr.hpp>
+#include <xo/expression2/DDefineExpr.hpp>
 #include <xo/facet/obj.hpp>
 
 namespace xo {
@@ -69,21 +71,29 @@ namespace xo {
          **/
         class DDefineSsm {
         public:
+            using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
 
         public:
             /** @defgroup scm-define-ssm-facet constructors **/
             ///@{
 
-            DDefineSsm();
+            /** constructor; using @p def_expr for initial expression scaffold **/
+            explicit DDefineSsm(DDefineExpr * def_expr);
 
-            /** create instance using memory from @p parser_mm **/
-            static DDefineSsm * make(DArena & parser_mm);
+            /** create instance using memory from @p parser_mm.
+             *  Initial expression scaffold @p def_expr
+             **/
+            static DDefineSsm * make(DArena & parser_mm,
+                                     DDefineExpr * def_expr);
 
             /** start nested parser for a define-expression,
              *  on top of parser state machine @p p_psm
+             *  Use @p parser_mm to allocate syntax state machines,
+             *  and @p expr_mm to allocate expressions
              **/
             static void start(DArena & parser_mm,
+                              obj<AAllocator> expr_mm,
                               ParserStateMachine * p_psm);
 
             ///@}
@@ -97,6 +107,12 @@ namespace xo {
              *  Intended to drive error mesages
              **/
             std::string_view get_expect_str() const noexcept;
+
+            /** operate state machine for this syntax on incoming symbol-token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_symbol_token(const Token & tk,
+                                 ParserStateMachine * p_psm);
 
             /** update state for this syntax on incoming token @p tk,
              *  overall parser state in @p p_psm
@@ -121,6 +137,11 @@ namespace xo {
         private:
             /** identify define-expression state **/
             defexprstatetype defstate_;
+
+            /** scaffolded define-expression.
+             *  This will eventually be the output of this ssm
+             **/
+            obj<AExpression,DDefineExpr> def_expr_;
         };
     } /*namespace scm*/
 } /*namespace xo*/

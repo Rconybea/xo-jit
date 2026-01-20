@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
+ *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/SyntaxStateMachine.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -54,12 +54,14 @@ public:
     virtual std::string_view get_expect_str(Copaque data)  const  noexcept = 0;
 
     // nonconst methods
-    /** update  stat machine for incoming parsed symbol @p sym **/
-    virtual void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  = 0;
+    /** operate state machine for incoming symbol-token @p tk **/
+    virtual void on_symbol_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming define-keyword-token @p tk **/
     virtual void on_def_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming if-keyword-token @p tk **/
     virtual void on_if_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
+    /** update  stat machine for incoming parsed symbol @p sym **/
+    virtual void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  = 0;
     ///@}
 }; /*ASyntaxStateMachine*/
 

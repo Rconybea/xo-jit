@@ -44,6 +44,15 @@
     ],
     nonconst_methods: [
         {
+            name: "on_symbol_token",
+            doc: ["operate state machine for incoming symbol-token @p tk"],
+            return_type: "void",
+            args: [
+                {type: "const Token &", name: "tk"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
+        {
             name: "on_def_token",
             doc: ["update state machine for incoming define-keyword-token @p tk"],
             return_type: "void",

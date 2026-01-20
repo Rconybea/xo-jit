@@ -1,9 +1,10 @@
-/** @file DDefineSsm.cpp
+ /** @file DDefineSsm.cpp
  *
  *  @author Roland Conybeare, Jan 2026
  **/
 
 #include "DDefineSsm.hpp"
+#include "DExpectSymbolSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DDefineSsm.hpp"
 
 #ifdef NOT_YET
@@ -328,28 +329,33 @@ namespace xo {
 
         ////////////////////////////////////////////////////////////////
 
-        DDefineSsm::DDefineSsm()
-            : defstate_{defexprstatetype::def_0}
+        DDefineSsm::DDefineSsm(DDefineExpr * def_expr)
+          : defstate_{defexprstatetype::def_0},
+            def_expr_{def_expr}
         {}
 
         DDefineSsm *
-        DDefineSsm::make(DArena & mm)
+        DDefineSsm::make(DArena & mm,
+                         DDefineExpr * def_expr)
         {
             void * mem = mm.alloc(typeseq::id<DDefineSsm>(),
                                   sizeof(DDefineSsm));
 
-            return new (mem) DDefineSsm();
+            return new (mem) DDefineSsm(def_expr);
         }
 
         void
         DDefineSsm::start(DArena & mm,
+                          obj<AAllocator> expr_mm,
                           ParserStateMachine * p_psm)
         {
             //scope log(XO_DEBUG(p_psm->debug_flag()));
 
             assert(p_psm->stack());
 
-            DDefineSsm * define_ssm = DDefineSsm::make(mm);
+            DDefineExpr * def_expr = DDefineExpr::make_empty(expr_mm);
+
+            DDefineSsm * define_ssm = DDefineSsm::make(mm, def_expr);
 
             obj<ASyntaxStateMachine> ssm
                 = with_facet<ASyntaxStateMachine>::mkobj(define_ssm);
@@ -387,7 +393,7 @@ namespace xo {
             case defexprstatetype::def_0:
             case defexprstatetype::n_defexprstatetype:
                 assert(false);  // impossible
-                return nullptr;
+                return "impossible!?";
             case defexprstatetype::def_1:
                 return "symbol";
             case defexprstatetype::def_2:
@@ -409,9 +415,55 @@ namespace xo {
         DDefineSsm::on_parsed_symbol(std::string_view sym,
                                      ParserStateMachine * p_psm)
         {
+            if (this->defstate_ == defexprstatetype::def_1) {
+                this->defstate_ = defexprstatetype::def_2;
+
+                def_expr_.data()->assign_lhs_name(sym);
+
+                // if this is a genuine top-level define (i.e. nesting level = 0),
+                // then we need to upsert so we can refer to rhs later.
+                //
+                // In other contexts (e.g. body-of-lambda) will be rewriting
+                //    {
+                //       def y = foo(x,x);
+                //       bar(y,y);
+                //    }
+                // into something like
+                //    {
+                //       (lambda (y123) bar(y123,y123))(foo(x,x));
+                //    }
+                //
+                // This works in the body of lambda, because we don't evaluate anything
+                // until lambda definition is complete.
+                //
+                // For interactive top-level defs we want to evaluate as we go,
+                // so need incremental bindings.
+
+                if (p_psm->is_at_toplevel()) {
+                    /** remember variable binding in current lexical context **/
+                    p_psm->upsert_var(def_expr_.data()->lhs());
+                }
+
+                return;
+            }
+
             p_psm->illegal_input_on_symbol("DDefineSsm::on_parsed_symbol",
                                            sym,
                                            this->get_expect_str());
+        }
+
+        void
+        DDefineSsm::on_symbol_token(const Token & tk,
+                                    ParserStateMachine * p_psm)
+        {
+            // note:
+            // in state def_1, DDefineSsm learns symbol via .on_parsed_symbol().
+            // symbol token arriving here means encountered symbol while
+            // in some other, which can't happen for valid Schematika input
+
+            p_psm->illegal_input_on_token("DDefineSssm::on_symbol_token",
+                                          tk,
+                                          this->get_expect_str());
         }
 
         void
@@ -421,7 +473,8 @@ namespace xo {
             if (this->defstate_ == defexprstatetype::def_0) {
                 this->defstate_ = defexprstatetype::def_1;
 
-                // expect_symbol_xs::start(p_psm->parser_alloc(), p_psm);
+                DExpectSymbolSsm::start(p_psm->parser_alloc(), p_psm);
+                return;
             }
 
             p_psm->illegal_input_on_token("DDefineSsm::on_define_token",

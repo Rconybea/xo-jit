@@ -17,7 +17,7 @@ namespace xo {
 
     namespace scm {
         ParserStateMachine::ParserStateMachine(const ArenaConfig & config,
-                                               obj<AAllocator> * expr_alloc)
+                                               obj<AAllocator> expr_alloc)
             : parser_alloc_{DArena::map(config)},
               expr_alloc_{expr_alloc},
               debug_flag_{config.debug_flag_}
@@ -71,6 +71,13 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::upsert_var(DVariable * var)
+        {
+            scope log(XO_DEBUG(true), "stub impl");
+            log && log(xtag("var", std::string_view(*(var->name()))));
+        }
+
+        void
         ParserStateMachine::reset_result()
         {
             this->result_ = ParserResult();
@@ -111,6 +118,10 @@ namespace xo {
             }
 
             switch (tk.tk_type()) {
+            case tokentype::tk_symbol:
+                this->on_symbol_token(tk);
+                break;
+
             case tokentype::tk_def:
                 this->on_def_token(tk);
                 break;
@@ -125,7 +136,6 @@ namespace xo {
             case tokentype::tk_i64:
             case tokentype::tk_f64:
             case tokentype::tk_string:
-            case tokentype::tk_symbol:
             case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
@@ -163,6 +173,14 @@ namespace xo {
                                                xtag("token", tk)));
 
             }
+        }
+
+        void
+        ParserStateMachine::on_symbol_token(const Token & tk)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
+
+            stack_->top().on_symbol_token(tk, this);
         }
 
         void
@@ -205,7 +223,7 @@ namespace xo {
 
             assert(expr_alloc_);
 
-            auto errmsg = DString::from_view(*expr_alloc_,
+            auto errmsg = DString::from_view(expr_alloc_,
                                              std::string_view(errmsg_string));
 
             this->capture_error(ssm_name, errmsg);
@@ -228,7 +246,7 @@ namespace xo {
 
             assert(expr_alloc_);
 
-            auto errmsg = DString::from_view(*expr_alloc_,
+            auto errmsg = DString::from_view(expr_alloc_,
                                              std::string_view(errmsg_string));
 
             this->capture_error(ssm_name, errmsg);
