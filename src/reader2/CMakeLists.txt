@@ -17,6 +17,7 @@ set(SELF_SRCS
 
     DDefineSsm.cpp
     ISyntaxStateMachine_DDefineSsm.cpp
+    IPrintable_DDefineSsm.cpp
 
     DExpectSymbolSsm.cpp
     ISyntaxStateMachine_DExpectSymbolSsm.cpp

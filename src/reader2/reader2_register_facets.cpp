@@ -9,6 +9,7 @@
 #include <xo/reader2/ssm/IPrintable_DExprSeqState.hpp>
 
 #include <xo/reader2/ssm/ISyntaxStateMachine_DDefineSsm.hpp>
+#include <xo/reader2/ssm/IPrintable_DDefineSsm.hpp>
 
 #include <xo/reader2/ssm/ISyntaxStateMachine_DExpectSymbolSsm.hpp>
 #include <xo/reader2/ssm/IPrintable_DExpectSymbolSsm.hpp>
@@ -33,6 +34,7 @@ namespace xo {
             FacetRegistry::register_impl<APrintable, DExprSeqState>();
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DDefineSsm>();
+            FacetRegistry::register_impl<APrintable, DDefineSsm>();
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectSymbolSsm>();
             FacetRegistry::register_impl<APrintable, DExpectSymbolSsm>();

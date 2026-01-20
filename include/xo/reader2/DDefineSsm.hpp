@@ -73,6 +73,7 @@ namespace xo {
         public:
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
+            using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             /** @defgroup scm-define-ssm-facet constructors **/
@@ -131,6 +132,12 @@ namespace xo {
              **/
             void on_parsed_symbol(std::string_view sym,
                                   ParserStateMachine * p_psm);
+
+            ///@}
+            /** @defgroup scm-define-printable-facet printable facet methods **/
+            ///@{
+
+            bool pretty(const ppindentinfo & ppii) const;
 
             ///@}
 

@@ -494,6 +494,14 @@ namespace xo {
                                           this->get_expect_str());
         }
 
+        bool
+        DDefineSsm::pretty(const ppindentinfo & ppii) const
+        {
+            return ppii.pps()->pretty_struct
+                (ppii,
+                 "DDefineSsm",
+                 refrtag("defstate", defstate_));
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 
