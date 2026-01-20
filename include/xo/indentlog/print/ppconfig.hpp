@@ -16,6 +16,21 @@ namespace xo {
          *  Need one read-only instance of this to invoke pretty printer
          **/
         struct ppconfig {
+            /** @defgroup ppconfig-ctors ppconfig constructors **/
+            ///@{
+
+            /** config to use pretty printer in degenerate form:
+             *  In this form right margin is absurdly far away,
+             *  so should not be forced to use multiple lines.
+             *
+             *  Note this won't prevent a printer from returning -1
+             **/
+            static inline ppconfig ugly() {
+                return ppconfig { .right_margin_ = 99999999, .indent_width_ = 0, .assert_indent_threshold = 10 };
+            }
+
+            ///@}
+
             /** @defgroup ppconfig-instance-vars ppconfig instance variables **/
             ///@{
 
