@@ -25,6 +25,9 @@ namespace xo {
             using TypeDescr = xo::reflect::TypeDescr;
 
         public:
+            /** @defgroup scm-defineexpr-constructors **/
+            ///@{
+
             /** create instance: define-expr using memory from @p mm
              *  with lhs name @p lhs_name and rhs expression @p rhs_expr
              **/
@@ -35,14 +38,20 @@ namespace xo {
              **/
             static DDefineExpr * make_empty(obj<AAllocator> mm);
 
+            DDefineExpr(DVariable * lhs_var,
+                        obj<AExpression> rhs);
+
+            ///@}
+            /** @defgroup scm-definexpr-access-methods **/
+            ///@{
+
             DVariable * lhs() const { return lhs_var_; }
             obj<AExpression> rhs() const noexcept { return rhs_; }
-
             const DUniqueString * name() const noexcept;
 
             void assign_lhs_name(const DUniqueString * name);
-            /** CONCESSION.  will use DUniqueString* once we have StringTable **/
-            void assign_lhs_name(std::string_view name);
+
+            ///@}
 
             /** @defgroup scm-defineexpr-expression-facet **/
             ///@{
@@ -55,10 +64,9 @@ namespace xo {
             ///@}
 
         private:
-            DDefineExpr(DVariable * lhs_var,
-                        obj<AExpression> rhs);
+            /** @defgrouop scm-defineexpr-instance-vars **/
+            ///@{
 
-        private:
             /** variable being defined by this expression.
              **/
             DVariable * lhs_var_ = nullptr;
@@ -68,6 +76,8 @@ namespace xo {
             obj<AExpression> rhs_;
 
             // std::set<std::string> free_var_set_;
+
+            ///@}
         };
     } /*namespace scm*/
 } /*namespace xo*/

@@ -56,15 +56,6 @@ namespace xo {
         }
 
         void
-        DDefineExpr::assign_lhs_name(std::string_view name)
-        {
-            scope log(XO_DEBUG(true), "bogus impl - will require unique string");
-            log && log(xtag("name", name));
-
-            //lhs_var_->assign_name(name);
-        }
-
-        void
         DDefineExpr::assign_valuetype(TypeDescr td) noexcept
         {
             lhs_var_->assign_valuetype(td);
