@@ -103,6 +103,16 @@ namespace xo {
                                            sym,
                                            this->get_expect_str());
         }
+
+        bool
+        DExpectSymbolSsm::pretty(const ppindentinfo & ppii) const
+        {
+            return ppii.pps()->pretty_struct
+                (ppii,
+                 "DExpectSymbolSsm"
+                 //refrtag("member", member_)
+                    );
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

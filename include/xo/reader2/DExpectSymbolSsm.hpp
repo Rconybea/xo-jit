@@ -8,6 +8,7 @@
 #include "ParserStateMachine.hpp"
 //#include "SyntaxStateMachine.hpp"
 #include "syntaxstatetype.hpp"
+#include <xo/indentlog/print/ppindentinfo.hpp>
 #include <xo/facet/obj.hpp>
 
 namespace xo {
@@ -21,6 +22,7 @@ namespace xo {
         class DExpectSymbolSsm {
         public:
             using DArena = xo::mm::DArena;
+            using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             DExpectSymbolSsm();
@@ -83,7 +85,12 @@ namespace xo {
 
 
             ///@}
+            /** @defgroup scm-expectsymbol-printable-facet printable facet methods **/
+            ///@{
 
+            bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
         };
     } /*namespace scm*/
 } /*namespace xo*/

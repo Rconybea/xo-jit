@@ -32,6 +32,8 @@ xo_add_genfacet(
     OUTPUT_CPP_DIR src/reader2
     )
 
+# ----------------------------------------------------------------
+
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-exprseqstate
@@ -56,6 +58,8 @@ xo_add_genfacetimpl(
     OUTPUT_CPP_DIR src/reader2
 )
 
+# ----------------------------------------------------------------
+
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-definessm
@@ -68,6 +72,8 @@ xo_add_genfacetimpl(
     OUTPUT_CPP_DIR src/reader2
 )
 
+# ----------------------------------------------------------------
+
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-expectsymbolssm
@@ -75,6 +81,18 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR ExpectSymbolSsm
     INPUT idl/ISyntaxStateMachine_DExpectSymbolSsm.json5
+    OUTPUT_HPP_DIR include/xo/reader2
+    OUTPUT_IMPL_SUBDIR ssm
+    OUTPUT_CPP_DIR src/reader2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-printable-expectsymbolssm
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR ExpectSymbolSsm
+    INPUT idl/IPrintable_DExpectSymbolSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
     OUTPUT_CPP_DIR src/reader2
