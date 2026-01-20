@@ -20,51 +20,51 @@ namespace xo {
     template <typename T, typename U>
     struct cond_impl {
     public:
-        cond_impl(bool condition, T const & then_value, U const & else_value)
+        cond_impl(bool condition, const T & if_true, const U & if_false)
             : condition_{condition},
-              then_value_{then_value},
-              else_value_{else_value} {}
+              if_true_{if_true},
+              if_false_{if_false} {}
 
         bool condition() const { return condition_; }
-        T const & then_value() const { return then_value_; }
-        U const & else_value() const { return else_value_; }
+        const T & if_true() const { return if_true_; }
+        const U & if_false() const { return if_false_; }
 
     private:
         bool condition_;
-        T then_value_;
-        U else_value_;
+        T if_true_;
+        U if_false_;
     };
 
     /** Create conditional stream inserter.
      *
-     *  @param condition   when true, print @p then_value; otherwise print @p else_value
-     *  @param then_value  value to print when condition is true
-     *  @param else_value  value to print when condition is false
+     *  @param condition   when true, print @p if_true; otherwise print @p if_false
+     *  @param if_true  value to print when condition is true
+     *  @param if_false  value to print when condition is false
      *
      *  Example:
      *  @code
-     *    std::cout << cond(ptr != nullptr, xtag("ptr", *ptr), "nullptr");
+     *    std::cout << cond(ptr, xtag("ptr", *ptr), "nullptr");
      *  @endcode
      **/
     template <typename T, typename U>
     auto
-    cond(bool condition, T && then_value, U && else_value)
+    cond(bool condition, T && if_true, U && if_false)
     {
         return cond_impl<std::decay_t<T>, std::decay_t<U>>
             (condition,
-             std::forward<T>(then_value),
-             std::forward<U>(else_value));
+             std::forward<T>(if_true),
+             std::forward<U>(if_false));
     }
 
     /** Stream insertion operator for cond_impl **/
     template <typename T, typename U>
     inline std::ostream &
-    operator<<(std::ostream & os, cond_impl<T, U> const & c)
+    operator<<(std::ostream & os, const cond_impl<T, U> & c)
     {
         if (c.condition())
-            os << c.then_value();
+            os << c.if_true();
         else
-            os << c.else_value();
+            os << c.if_false();
         return os;
     }
 
@@ -79,9 +79,9 @@ namespace xo {
                                      const target_type & c)
             {
                 if (c.condition())
-                    return ppdetail<T>::print_pretty(ppii, c.then_value());
+                    return ppdetail<T>::print_pretty(ppii, c.if_true());
                 else
-                    return ppdetail<U>::print_pretty(ppii, c.else_value());
+                    return ppdetail<U>::print_pretty(ppii, c.if_false());
             }
         };
     }
