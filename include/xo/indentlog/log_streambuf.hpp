@@ -4,6 +4,7 @@
 
 #include "print/quoted_char.hpp"
 #include <iostream>
+#include <string_view>
 #include <vector>
 #include <cstring>   // e.g. for std::memcpy()
 #include <cstdint>
@@ -70,6 +71,8 @@ namespace xo {
         }
 
         bool debug_flag() const { return debug_flag_; }
+
+        operator std::basic_string_view<CharT> () const { return std::basic_string_view<CharT>(this->pbase(), this->pptr()); }
 
         void reset_stream() {
             char * p_lo = &(this->buf_v_[0]);

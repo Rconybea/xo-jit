@@ -5,12 +5,14 @@
 #include "print/tag.hpp"
 #include "print/quoted.hpp"
 #include <catch2/catch.hpp>
+#include <string_view>
 //#include <sstream>
 
 namespace ut {
     using xo::xtag;
     using xo::scope;
     using xo::log_streambuf;
+    using std::string_view;
     using std::cerr;
     using std::endl;
 
@@ -68,28 +70,32 @@ namespace ut {
         log_streambuf<char, std::char_traits<char>> sbuf(z, false);
         std::ostream ss(&sbuf);
 
-        ss <<"empty log_streambuf";
-        ss << xtag("sbuf.lo", (void*)sbuf.lo());
-        ss << xtag("sbuf.hi", (void*)sbuf.hi());
+        ss << "empty log_streambuf";
+        ss << xtag("sbuf.lo", (void*)nullptr);
+        ss << xtag("sbuf.hi", (void*)nullptr);
         ss << xtag("sbuf.color_escape_chars", sbuf._color_escape_chars());
 
         //REQUIRE(sbuf.lo() == sbuf.pbase());
 
+        auto expected = string_view("empty log_streambuf :sbuf.lo 0 :sbuf.hi 0 :sbuf.color_escape_chars 0");
+
+        REQUIRE(string_view(sbuf) == expected);
+
         /* sbuf size will have been expanded */
         REQUIRE(sbuf.capacity() == 128);
-        REQUIRE(sbuf.pos() == 82);
+        REQUIRE(sbuf.pos() == expected.size());
         REQUIRE(sbuf._solpos() == 0);
-        REQUIRE(sbuf.lpos() == 82);
+        REQUIRE(sbuf.lpos() == expected.size());
 
         // note: log_streambuf doesn't get control on every character
 
         ss << '\n';
 
         REQUIRE(sbuf.capacity() == 128);
-        REQUIRE(sbuf.pos() == 83);
+        REQUIRE(sbuf.pos() == expected.size() + 1);
         REQUIRE(sbuf.lpos() == 0);
         // note: solpos: updated b/c of call to lazy sbuf.lpos()
-        REQUIRE(sbuf._solpos() == 83);
+        REQUIRE(sbuf._solpos() == expected.size() + 1);
     }
 
     // write test cases with some random strings.
