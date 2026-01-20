@@ -23,8 +23,10 @@ namespace xo {
 #ifdef NOT_YET
             /** a literal constant that refers to a linkable named function **/
             primitive,
+#endif
             /** variable/function definition **/
             define,
+#ifdef NOT_YET
             /** variable assignment **/
             assign,
             /** function call **/
@@ -55,7 +57,9 @@ namespace xo {
             case exprtype::constant: return "constant";
 #ifdef NOT_YET
             case exprtype::primitive: return "primitive";
+#endif
             case exprtype::define: return "define";
+#ifdef NOT_YET
             case exprtype::assign: return "assign";
             case exprtype::apply: return "apply";
             case exprtype::lambda: return "lambda";

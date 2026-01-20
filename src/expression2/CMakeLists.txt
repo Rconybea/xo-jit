@@ -6,12 +6,17 @@ set(SELF_SRCS
 
     DConstant.cpp
     DVariable.cpp
+    DDefineExpr.cpp
 
     TypeRef.cpp
 
     IExpression_Any.cpp
     IExpression_DConstant.cpp
     IExpression_DVariable.cpp
+    IExpression_DDefineExpr.cpp
+
+    DLocalSymtab.cpp
+    DGlobalSymtab.cpp
 
     ISymbolTable_Any.cpp
 

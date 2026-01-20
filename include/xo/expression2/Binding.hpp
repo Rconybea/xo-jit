@@ -15,6 +15,7 @@ namespace xo {
             static constexpr int32_t s_link_global = -1;
 
         public:
+            Binding() : i_link_{-2}, j_slot_{-1} {}
             Binding(int32_t i_link, int32_t j_slot)
                 : i_link_{i_link}, j_slot_{j_slot} {}
 
@@ -32,6 +33,7 @@ namespace xo {
              *  >= 0: number of parent links to traverse
              *        to a fixed-size frame
              *    -1: resolve globally
+             *    -2: sentinel (binding info not computed)
              **/
             int32_t i_link_ = s_link_sentinel;
             /** if @ref i_link_ >= 0, frame offset
