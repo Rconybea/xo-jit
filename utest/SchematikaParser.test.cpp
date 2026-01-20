@@ -71,6 +71,9 @@ namespace xo {
 
         TEST_CASE("SchematikaParser-batch-def", "[reader2][SchematikaParser]")
         {
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag));
+
             ArenaConfig config;
             config.name_ = "test-arena";
             config.size_ = 16 * 1024;
@@ -96,10 +99,11 @@ namespace xo {
 
                 REQUIRE(parser.has_incomplete_expr() == true);
                 REQUIRE(result.is_incomplete());
+
+                log && log(xtag("result", result));
             }
 
             // define-expressions not properly implemented
-
 
             //REQUIRE(result.error_description());
         }

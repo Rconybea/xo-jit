@@ -7,6 +7,7 @@
 
 #include <xo/expression2/Expression.hpp>
 #include <xo/object2/DString.hpp>
+#include <xo/indentlog/print/pretty.hpp>
 #include <string_view>
 
 namespace xo {
@@ -21,7 +22,18 @@ namespace xo {
             N
         };
 
+        /** @return string representation for enum @p x **/
+        const char * parser_result_type_descr(parser_result_type x);
+
+        inline std::ostream & operator<<(std::ostream & os, parser_result_type x) {
+            os << parser_result_type_descr(x);
+            return os;
+        }
+
         class ParserResult {
+        public:
+            using ppindentinfo = xo::print::ppindentinfo;
+
         public:
             ParserResult() = default;
             ParserResult(parser_result_type type,
@@ -44,15 +56,53 @@ namespace xo {
             bool is_expression() const { return result_type_ == parser_result_type::expression; }
             bool      is_error() const { return result_type_ == parser_result_type::error; }
 
+            /** ordinary not-pretty printer **/
+            void print(std::ostream & os) const;
+            /** pretty-printing support **/
+            bool pretty(const ppindentinfo & ppii) const;
+
         private:
+            /** none|expression|error_description
+             *
+             *  @text
+             *   result_type | error_src_function | error_description
+             *  -------------+--------------------+-------------------
+             *          none |            nullptr |             empty
+             *    expression |            nullptr |             empty
+             *         error |           non-null |         non-empty
+             *  @endtext
+             **/
             parser_result_type result_type_ = parser_result_type::none;
+            /** non-null iff @ref result_type_ is expression **/
             obj<AExpression> result_expr_;
+            /** non-null iff @ref result_type_ is error.
+             *  In which case gives parsing function detecting this error
+             **/
             std::string_view error_src_fn_;
+            /** non-null iff @ref result_type_ is error
+             *  Human-targeted error description.
+             **/
             const DString * error_description_ = nullptr;
         };
 
+        inline std::ostream & operator<<(std::ostream & os, const ParserResult & x) {
+            x.print(os);
+            return os;
+        }
 
     } /*namespace scm*/
+
+    namespace print {
+        /** pretty printer in <xo/indentlog/print/pretty.hpp> relies on this specialization
+         *  to handle ParserResult instances
+         **/
+        template <>
+        struct ppdetail<xo::scm::ParserResult> {
+            static inline bool print_pretty(const ppindentinfo & ppii, const xo::scm::ParserResult & x) {
+                return x.pretty(ppii);
+            }
+        };
+    }
 } /*namespace xo*/
 
 /* end ParserResult.hpp */
