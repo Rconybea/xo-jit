@@ -45,6 +45,12 @@ namespace xo {
              **/
             void _do_eval_constant_op();
 
+            /** evaluate a define-expression
+             *  Require:
+             *  - expression in @ref expr_
+             **/
+            void _do_eval_define_op();
+
             /** evaluate a variable expression
              *  Require:
              *  - expression in @ref expr_
