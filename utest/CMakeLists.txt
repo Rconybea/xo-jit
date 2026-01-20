@@ -4,7 +4,7 @@ set(SELF_EXECUTABLE_NAME utest.indentlog)
 set(SELF_SOURCE_FILES
     fixed.test.cpp quoted.test.cpp vector.test.cpp array.test.cpp timeutil.test.cpp tag.test.cpp
     filename.test.cpp code_location.test.cpp function.test.cpp pretty_vector.test.cpp
-    indentlog_utest_main.cpp log_streambuf.test.cpp toppstr.test.cpp)
+    indentlog_utest_main.cpp log_streambuf.test.cpp toppstr.test.cpp cond.test.cpp)
 
 xo_add_utest_executable(${SELF_EXECUTABLE_NAME} ${SELF_SOURCE_FILES})
 
