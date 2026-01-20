@@ -27,7 +27,7 @@ namespace xo {
             DArena expr_arena = DArena::map(config);
             obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
 
-            SchematikaParser parser(config, expr_alloc, false /*debug_flag*/);
+            SchematikaParser parser(config, 4096, expr_alloc, false /*debug_flag*/);
 
             REQUIRE(parser.debug_flag() == false);
             REQUIRE(parser.is_at_toplevel() == true);
@@ -42,7 +42,7 @@ namespace xo {
             DArena expr_arena = DArena::map(config);
             obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
 
-            SchematikaParser parser(config, expr_alloc, false /*debug_flag*/);
+            SchematikaParser parser(config, 4096, expr_alloc, false /*debug_flag*/);
 
             parser.begin_interactive_session();
 
@@ -60,7 +60,7 @@ namespace xo {
             DArena expr_arena = DArena::map(config);
             obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
 
-            SchematikaParser parser(config, expr_alloc, false /*debug_flag*/);
+            SchematikaParser parser(config, 4096, expr_alloc, false /*debug_flag*/);
 
             parser.begin_batch_session();
 
@@ -78,7 +78,7 @@ namespace xo {
             DArena expr_arena = DArena::map(config);
             obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
 
-            SchematikaParser parser(config, expr_alloc, false /*debug_flag*/);
+            SchematikaParser parser(config, 4096, expr_alloc, false /*debug_flag*/);
 
             parser.begin_batch_session();
 
@@ -113,7 +113,7 @@ namespace xo {
             DArena expr_arena = DArena::map(config);
             obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
 
-            SchematikaParser parser(config, expr_alloc, false /*debug_flag*/);
+            SchematikaParser parser(config, 4096, expr_alloc, false /*debug_flag*/);
 
             parser.begin_interactive_session();
 

@@ -17,11 +17,14 @@ namespace xo {
 
     namespace scm {
         ParserStateMachine::ParserStateMachine(const ArenaConfig & config,
+                                               size_type max_stringtable_capacity,
                                                obj<AAllocator> expr_alloc)
-            : parser_alloc_{DArena::map(config)},
+            : stringtable_{max_stringtable_capacity},
+              parser_alloc_{DArena::map(config)},
               expr_alloc_{expr_alloc},
               debug_flag_{config.debug_flag_}
         {
+
         }
 
         bool

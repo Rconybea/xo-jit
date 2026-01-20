@@ -167,6 +167,7 @@ namespace xo {
              *  @p debug_flag  true to enable debug logging
              **/
             SchematikaParser(const ArenaConfig & config,
+                             size_t max_stringtable_capacity,
                              obj<AAllocator> expr_alloc,
                              bool debug_flag);
 

@@ -7,6 +7,7 @@
 
 #include "ParserResult.hpp"
 #include <xo/expression2/DVariable.hpp>
+#include <xo/expression2/StringTable.hpp>
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/arena/DArena.hpp>
@@ -30,9 +31,11 @@ namespace xo {
             using AAllocator = xo::mm::AAllocator;
             using ArenaConfig = xo::mm::ArenaConfig;
             using DArena = xo::mm::DArena;
+            using size_type = std::size_t;
 
         public:
             ParserStateMachine(const ArenaConfig & config,
+                               size_type max_stringtable_capacity,
                                obj<AAllocator> expr_alloc);
 
             /** @defgroup scm-parserstatemachine-accessors accessor methods **/
@@ -128,6 +131,10 @@ namespace xo {
             ///@}
 
         private:
+
+            /** Table containing interned strings + symbols.
+             **/
+            StringTable stringtable_;
 
             /** Arena for internal parsing stack.
              *  Must be owned exclusively because destructively

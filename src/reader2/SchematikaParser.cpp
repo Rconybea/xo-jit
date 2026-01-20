@@ -19,9 +19,10 @@ namespace xo {
         // ----- SchematikaParser -----
 
         SchematikaParser::SchematikaParser(const ArenaConfig & config,
+                                           size_t max_stringtable_capacity,
                                            obj<AAllocator> expr_alloc,
                                            bool debug_flag)
-            : psm_{config, expr_alloc},
+            : psm_{config, max_stringtable_capacity, expr_alloc},
               debug_flag_{debug_flag}
         {
         }
