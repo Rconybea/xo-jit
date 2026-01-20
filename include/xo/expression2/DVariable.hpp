@@ -10,6 +10,7 @@
 #include "TypeRef.hpp"
 #include "exprtype.hpp"
 #include <xo/reflect/TypeDescr.hpp>
+#include <xo/indentlog/print/pretty.hpp>
 
 namespace xo {
     namespace scm {
@@ -19,6 +20,7 @@ namespace xo {
          **/
         class DVariable {
         public:
+            using ppindentinfo = xo::print::ppindentinfo;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
 
@@ -46,13 +48,19 @@ namespace xo {
 
             void assign_name(const DUniqueString * name) { this->name_ = name; }
 
-            /** @defgroup scm-variable-expression-facet**/
+            /** @defgroup scm-variable-expression-facet **/
             ///@{
 
             exprtype extype() const noexcept { return exprtype::variable; }
             TypeRef typeref() const noexcept { return typeref_; }
             TypeDescr valuetype() const noexcept { return typeref_.td(); };
             void assign_valuetype(TypeDescr td) noexcept;
+
+            ///@}
+            /** @defgroup scm-variable-printable-facet **/
+            ///@{
+
+            bool pretty(const ppindentinfo & ppii) const;
 
             ///@}
 

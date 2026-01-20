@@ -35,6 +35,19 @@ namespace xo {
             typeref_.resolve(td);
         }
 
+        bool
+        DVariable::pretty(const ppindentinfo & ppii) const
+        {
+            auto name = (name_
+                         ? std::string_view(*name_)
+                         : std::string_view(""));
+
+            return ppii.pps()->pretty_struct
+                       (ppii,
+                        "DVariable",
+                        refrtag("name", name));
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

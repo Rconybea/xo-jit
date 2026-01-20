@@ -8,6 +8,7 @@
 #include "Expression.hpp"
 #include "DVariable.hpp"
 #include <xo/alloc2/Allocator.hpp>
+#include <xo/indentlog/print/pretty.hpp>
 
 namespace xo {
     namespace scm {
@@ -21,6 +22,7 @@ namespace xo {
          **/
         class DDefineExpr {
         public:
+            using ppindentinfo = xo::print::ppindentinfo;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
 
@@ -60,6 +62,12 @@ namespace xo {
             TypeRef typeref() const noexcept { return lhs_var_->typeref(); }
             TypeDescr valuetype() const noexcept { return lhs_var_->typeref().td(); }
             void assign_valuetype(TypeDescr td) noexcept;
+
+            ///@}
+            /** @defgroup scm-defineexpr-printable-facet **/
+            ///@{
+
+            bool pretty(const ppindentinfo & ppii) const;
 
             ///@}
 

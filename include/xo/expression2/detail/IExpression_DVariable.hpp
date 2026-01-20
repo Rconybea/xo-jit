@@ -55,7 +55,7 @@ namespace xo {
             static TypeDescr valuetype(const DVariable & self) noexcept;
 
             // non-const methods
-            /** assing to valuetype member. Useful when scaffolding expressions **/
+            /** assign to valuetype member. Useful when scaffolding expressions **/
             static void assign_valuetype(DVariable & self, TypeDescr td) noexcept;
             ///@}
         };

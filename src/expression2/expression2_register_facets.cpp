@@ -8,6 +8,10 @@
 #include <xo/expression2/detail/IGCObject_DUniqueString.hpp>
 #include <xo/expression2/detail/IPrintable_DUniqueString.hpp>
 
+#include <xo/expression2/detail/IPrintable_DDefineExpr.hpp>
+
+#include <xo/expression2/detail/IPrintable_DVariable.hpp>
+
 #include <xo/gc/detail/AGCObject.hpp>
 #include <xo/printable2/detail/APrintable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -28,7 +32,15 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DUniqueString>();
             FacetRegistry::register_impl<APrintable, DUniqueString>();
 
+            FacetRegistry::register_impl<APrintable, DDefineExpr>();
+
+            FacetRegistry::register_impl<APrintable, DVariable>();
+
             log && log(xtag("DUniqueString.tseq", typeseq::id<DUniqueString>()));
+            log && log(xtag("DDefineExpr.tseq", typeseq::id<DDefineExpr>()));
+            log && log(xtag("DVariable.tseq", typeseq::id<DVariable>()));
+
+            log && log(xtag("AExpression.tqseq", typeseq::id<AExpression>()));
 
             return true;
         }

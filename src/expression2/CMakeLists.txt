@@ -12,8 +12,12 @@ set(SELF_SRCS
 
     IExpression_Any.cpp
     IExpression_DConstant.cpp
+
     IExpression_DVariable.cpp
+    IPrintable_DVariable.cpp
+
     IExpression_DDefineExpr.cpp
+    IPrintable_DDefineExpr.cpp
 
     DLocalSymtab.cpp
     DGlobalSymtab.cpp
