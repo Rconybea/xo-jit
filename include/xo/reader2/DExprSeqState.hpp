@@ -25,6 +25,13 @@ namespace xo {
             N
         };
 
+        const char * exprseqtype_descr(exprseqtype x);
+
+        inline std::ostream & operator<<(std::ostream & os, exprseqtype x) {
+            os << exprseqtype_descr(x);
+            return os;
+        }
+
         /** @class DExprSeqState
          *  @brief state machine for parsing a sequence of expression
          *
@@ -33,6 +40,7 @@ namespace xo {
         class DExprSeqState {
         public:
             using AAllocator = xo::mm::AAllocator;
+            using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             explicit DExprSeqState(exprseqtype ty);
@@ -76,6 +84,13 @@ namespace xo {
              *  overall parser state in @p p_psm
              **/
             void on_parsed_symbol(std::string_view sym, ParserStateMachine * p_psm);
+
+            ///@}
+            /** @defgroup scm-exprseq-printable-facet printable facet methods **/
+            ///@{
+
+            /** pretty-printing driver; combine layout+printing **/
+            bool pretty(const ppindentinfo & ppii) const;
 
             ///@}
 

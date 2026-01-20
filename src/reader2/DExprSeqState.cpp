@@ -13,6 +13,21 @@ namespace xo {
     using xo::reflect::typeseq;
 
     namespace scm {
+        const char *
+        exprseqtype_descr(exprseqtype x)
+        {
+            switch (x) {
+            case exprseqtype::toplevel_interactive:
+                return "toplevel-interactive";
+            case exprseqtype::toplevel_batch:
+                return "toplevel-batch";
+            case exprseqtype::N:
+                break;
+            }
+
+            return "exprseqtype?";
+        }
+
         DExprSeqState::DExprSeqState(exprseqtype ty) : seqtype_{ty}
         {}
 
@@ -152,6 +167,15 @@ namespace xo {
             p_psm->illegal_input_on_symbol("DExprSeqState::on_parsed_symbol",
                                            sym,
                                            this->get_expect_str());
+        }
+
+        bool
+        DExprSeqState::pretty(const ppindentinfo & ppii) const
+        {
+            return ppii.pps()->pretty_struct
+                (ppii,
+                 "DExprSeqState",
+                 refrtag("seqtype", seqtype_));
         }
     } /*namespace scm*/
 } /*namespace xo*/

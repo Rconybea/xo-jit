@@ -13,6 +13,7 @@ set(SELF_SRCS
 
     DExprSeqState.cpp
     ISyntaxStateMachine_DExprSeqState.cpp
+    IPrintable_DExprSeqState.cpp
 
     DDefineSsm.cpp
     ISyntaxStateMachine_DDefineSsm.cpp

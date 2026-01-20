@@ -46,6 +46,18 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-printable-exprseqstate
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR ExprSeqState
+    INPUT idl/IPrintable_DExprSeqState.json5
+    OUTPUT_HPP_DIR include/xo/reader2
+    OUTPUT_IMPL_SUBDIR ssm
+    OUTPUT_CPP_DIR src/reader2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-definessm
     FACET_PKG xo_reader2
     FACET SyntaxStateMachine
