@@ -8,6 +8,7 @@
 #include "SyntaxStateMachine.hpp"
 #include <xo/arena/DArena.hpp>
 #include <xo/facet/obj.hpp>
+#include <xo/indentlog/print/pretty.hpp>
 
 namespace xo {
     namespace scm {
@@ -21,6 +22,7 @@ namespace xo {
         class ParserStack {
         public:
             using DArena = xo::mm::DArena;
+            using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             ParserStack(DArena::Checkpoint ckp,
@@ -42,6 +44,11 @@ namespace xo {
             obj<ASyntaxStateMachine> top() const noexcept { return ssm_; }
             ParserStack * parent() const noexcept { return parent_; }
 
+            /** regular printing **/
+            void print(std::ostream & os) const;
+            /** pretty-printer support **/
+            bool pretty(const ppindentinfo & ppii) const;
+
         private:
             /** stack pointer: top of stack just before this instance created **/
             DArena::Checkpoint ckp_;
@@ -51,7 +58,32 @@ namespace xo {
             ParserStack * parent_ = nullptr;
         };
 
+        inline std::ostream & operator<< (std::ostream & os, const ParserStack * x) {
+            if (x) {
+                x->print(os);
+            } else {
+                os << "nullptr";
+            }
+            return os;
+        }
+
     } /*namespace scm*/
+
+    namespace print {
+        /** pretty printer in <xo/indentlog/print/pretty.hpp> relies on this specialization
+         *  to handle ParserResult instances
+         **/
+        template <>
+        struct ppdetail<xo::scm::ParserStack*> {
+            static inline bool print_pretty(const ppindentinfo & ppii, const xo::scm::ParserStack * p) {
+                if (p)
+                    return p->pretty(ppii);
+                else
+                    return ppii.pps()->print_upto("nullptr");
+            }
+        };
+    }
+
 } /*namespace xo*/
 
 /* end ParserStack.hpp */

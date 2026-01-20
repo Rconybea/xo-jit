@@ -86,6 +86,28 @@ namespace xo {
                << xtag("has_stack", (psm_.stack() != nullptr))
                << ">" << std::endl;
         }
+
+        bool
+        SchematikaParser::pretty(const ppindentinfo & ppii) const {
+            auto * pps = ppii.pps();
+
+            if (ppii.upto())
+                return false;
+
+            // TODO: consider printing:
+            //   psm.stringtable_
+            //   psm.parser_alloc_
+            //   psm.parser_alloc_ckp_
+            //   psm.expr_alloc_
+            //   psm.result_
+            //   psm.debug_flag_
+            //
+
+            return pps->pretty_struct
+                       (ppii,
+                        "SchematikaParser",
+                        refrtag("stack", psm_.stack()));
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

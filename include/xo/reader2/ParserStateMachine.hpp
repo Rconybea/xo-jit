@@ -19,7 +19,8 @@ namespace xo {
         //
         class ASyntaxStateMachine;
 
-        // note: load-bearing to forward-declare ParserStack,
+        // note: it's load-bearing here to forward-declare ParserStack,
+        //       see ParserStack.hpp for impl
         //       because ASyntaxStateMachine.hpp includes ParserStateMachine.hpp;
         //       before obj<SyntaxStateMachine> is defined.
         class ParserStack;

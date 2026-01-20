@@ -153,9 +153,10 @@ namespace xo {
          **/
         class SchematikaParser {
         public:
+            using token_type = Token;
             using ArenaConfig = xo::mm::ArenaConfig;
             using AAllocator = xo::mm::AAllocator;
-            using token_type = Token;
+            using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             /** create parser in initial state;
@@ -216,6 +217,8 @@ namespace xo {
 
             /** print human-readable representation on stream @p os **/
             void print(std::ostream & os) const;
+            /** pretty-printer support **/
+            bool pretty(const ppindentinfo & ppii) const;
 
         private:
             /** state machine **/
@@ -227,12 +230,31 @@ namespace xo {
 
         inline std::ostream &
         operator<< (std::ostream & os,
-                    const SchematikaParser & x) {
-            x.print(os);
+                    const SchematikaParser * x) {
+            if (x) {
+                x->print(os);
+            } else {
+                os << "nullptr";
+            }
             return os;
         }
 
     } /*namespace scm*/
+
+    namespace print {
+        /** pretty printer in <xo/indentlog/print/pretty.hpp> relies on this specialization
+         *  to handle ParserResult instances
+         **/
+        template <>
+        struct ppdetail<xo::scm::SchematikaParser*> {
+            static inline bool print_pretty(const ppindentinfo & ppii, const xo::scm::SchematikaParser* p) {
+                if (p)
+                    return p->pretty(ppii);
+                else
+                    return ppii.pps()->print_upto("nullptr");
+            }
+        };
+    }
 } /*namespace xo*/
 
 /* end SchematikaParser.hpp */

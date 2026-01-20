@@ -6,6 +6,9 @@
 #include "DDefineSsm.hpp"
 #include "DExpectSymbolSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DDefineSsm.hpp"
+#include "ssm/IPrintable_DDefineSsm.hpp"
+#include <xo/expression2/detail/IPrintable_DDefineExpr.hpp>
+#include <xo/printable2/Printable.hpp>
 
 #ifdef NOT_YET
 #include "parserstatemachine.hpp"
@@ -16,6 +19,7 @@
 #endif
 
 namespace xo {
+    using xo::print::APrintable;
     using xo::facet::with_facet;
     using xo::facet::typeseq;
 
@@ -497,10 +501,13 @@ namespace xo {
         bool
         DDefineSsm::pretty(const ppindentinfo & ppii) const
         {
+            auto expr = with_facet<APrintable>::mkobj(def_expr_.data());
+
             return ppii.pps()->pretty_struct
                 (ppii,
                  "DDefineSsm",
-                 refrtag("defstate", defstate_));
+                 refrtag("defstate", defstate_),
+                 refrtag("def_expr", expr));
         }
     } /*namespace scm*/
 } /*namespace xo*/

@@ -4,6 +4,7 @@
  **/
 
 #include <xo/reader2/SchematikaParser.hpp>
+#include <xo/reader2/init_reader2.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
 #include <catch2/catch.hpp>
 
@@ -16,6 +17,8 @@ namespace xo {
     using xo::mm::AAllocator;
     using xo::mm::DArena;
     using xo::facet::with_facet;
+
+    static InitEvidence s_init = (InitSubsys<S_reader2_tag>::require());
 
     namespace ut {
         TEST_CASE("SchematikaParser-ctor", "[reader2][SchematikaParser]")
@@ -92,6 +95,10 @@ namespace xo {
                 // but is still "at toplevel" in the sense of ready for input
                 REQUIRE(parser.has_incomplete_expr() == true);
                 REQUIRE(result.is_incomplete());
+
+                log && log("after def token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
             }
 
             {
@@ -100,6 +107,8 @@ namespace xo {
                 REQUIRE(parser.has_incomplete_expr() == true);
                 REQUIRE(result.is_incomplete());
 
+                log && log("after lhs symbol token:");
+                log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
             }
 
