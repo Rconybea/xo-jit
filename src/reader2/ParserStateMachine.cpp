@@ -139,6 +139,10 @@ namespace xo {
                 this->on_if_token(tk);
                 break;
 
+            case tokentype::tk_colon:
+                this->on_colon_token(tk);
+                break;
+
             // all the not-yet handled cases
             case tokentype::tk_invalid:
             case tokentype::tk_bool:
@@ -157,7 +161,6 @@ namespace xo {
             case tokentype::tk_greatequal:
             case tokentype::tk_dot:
             case tokentype::tk_comma:
-            case tokentype::tk_colon:
             case tokentype::tk_doublecolon:
             case tokentype::tk_semicolon:
             case tokentype::tk_singleassign:
@@ -206,6 +209,14 @@ namespace xo {
             scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
 
             stack_->top().on_if_token(tk, this);
+        }
+
+        void
+        ParserStateMachine::on_colon_token(const Token & tk)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
+
+            stack_->top().on_colon_token(tk, this);
         }
 
         void

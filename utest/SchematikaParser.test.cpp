@@ -112,6 +112,17 @@ namespace xo {
                 log && log(xtag("result", result));
             }
 
+            {
+                auto & result = parser.on_token(Token::colon_token());
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(result.is_incomplete());
+
+                log && log("after colon token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+            }
+
             // define-expressions not properly implemented
 
             //REQUIRE(result.error_description());

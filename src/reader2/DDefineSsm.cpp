@@ -477,7 +477,7 @@ namespace xo {
         DDefineSsm::on_def_token(const Token & tk,
                                  ParserStateMachine * p_psm)
         {
-            if (this->defstate_ == defexprstatetype::def_0) {
+            if (defstate_ == defexprstatetype::def_0) {
                 this->defstate_ = defexprstatetype::def_1;
 
                 DExpectSymbolSsm::start(p_psm->parser_alloc(), p_psm);
@@ -502,6 +502,13 @@ namespace xo {
         DDefineSsm::on_colon_token(const Token & tk,
                                    ParserStateMachine * p_psm)
         {
+            if (defstate_ == defexprstatetype::def_2) {
+                this->defstate_ = defexprstatetype::def_3;
+
+                // expect_type_xs::start(p_psm);
+                return;
+            }
+
             p_psm->illegal_input_on_token("DDefineSsm::on_colon_token",
                                           tk,
                                           this->get_expect_str());

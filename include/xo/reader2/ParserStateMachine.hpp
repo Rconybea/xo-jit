@@ -105,6 +105,9 @@ namespace xo {
             /** operate state machine for incoming if-token @p tk **/
             void on_if_token(const Token & tk);
 
+            /** operate state machine for incoming colon-token @p tk **/
+            void on_colon_token(const Token & tk);
+
             ///@}
 
             /** @defgroup scm-parserstatemachine-error-entrypoints error entry points **/
