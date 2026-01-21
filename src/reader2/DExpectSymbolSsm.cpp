@@ -57,6 +57,24 @@ namespace xo {
         }
 
         void
+        DExpectSymbolSsm::on_parsed_symbol(std::string_view sym,
+                                           ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_symbol("DExpectSymbolSsm::on_parsed_symbol",
+                                           sym,
+                                           this->get_expect_str());
+        }
+
+        void
+        DExpectSymbolSsm::on_parsed_typedescr(TypeDescr td,
+                                              ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_typedescr("DExpectSymbolSsm::on_parsed_typedescr",
+                                              td,
+                                              this->get_expect_str());
+        }
+
+        void
         DExpectSymbolSsm::on_symbol_token(const Token & tk,
                                           ParserStateMachine * p_psm)
         {
@@ -102,15 +120,6 @@ namespace xo {
             p_psm->illegal_input_on_token("DExpectSymbolSsm::on_colon_token",
                                           tk,
                                           this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_parsed_symbol(std::string_view sym,
-                                           ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_symbol("DExpectSymbolSsm::on_parsed_symbol",
-                                           sym,
-                                           this->get_expect_str());
         }
 
         bool

@@ -114,6 +114,16 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::on_parsed_typedescr(TypeDescr td)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("td", td));
+
+            assert(stack_);
+
+            this->stack_->top().on_parsed_typedescr(td, this);
+        }
+
+        void
         ParserStateMachine::on_token(const Token & tk)
         {
             scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
@@ -263,6 +273,29 @@ namespace xo {
                                        xtag("expecting", expect_str),
                                        xtag("ssm", ssm_name),
                                        xtag("via", "ParserStateMachine::illegal_input_on_symbol"));
+
+            assert(expr_alloc_);
+
+            auto errmsg = DString::from_view(expr_alloc_,
+                                             std::string_view(errmsg_string));
+
+            this->capture_error(ssm_name, errmsg);
+        }
+
+        void
+        ParserStateMachine::illegal_input_on_typedescr(std::string_view ssm_name,
+                                                       TypeDescr td,
+                                                       std::string_view expect_str)
+        {
+            // TODO:
+            // - want to write error message using DArena
+            // - need something like log_streambuf and/or tostr() that's arena-aware
+
+            auto errmsg_string = tostr("Unexpected type-description for parsing state",
+                                       xtag("td", td),
+                                       xtag("expecting", expect_str),
+                                       xtag("ssm", ssm_name),
+                                       xtag("via", "ParserStateMachine::illegal_input_on_typedescr"));
 
             assert(expr_alloc_);
 

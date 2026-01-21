@@ -71,6 +71,7 @@ namespace xo {
          **/
         class DDefineSsm {
         public:
+            using TypeDescr = xo::reflect::TypeDescr;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -138,6 +139,12 @@ namespace xo {
              **/
             void on_parsed_symbol(std::string_view sym,
                                   ParserStateMachine * p_psm);
+
+            /** update state for this syntax after parsing a type-description @p td,
+             *  overall parser state in @p p_psm
+             **/
+            void on_parsed_typedescr(TypeDescr td,
+                                     ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-define-printable-facet printable facet methods **/

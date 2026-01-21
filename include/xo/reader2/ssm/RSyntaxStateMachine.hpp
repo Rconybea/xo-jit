@@ -31,6 +31,7 @@ public:
     using ObjectType = Object;
     using DataPtr = Object::DataPtr;
     using typeseq = xo::reflect::typeseq;
+    using TypeDescr = ASyntaxStateMachine::TypeDescr;
     ///@}
 
     /** @defgroup scm-syntaxstatemachine-router-ctors **/
@@ -69,6 +70,9 @@ public:
     }
     void on_parsed_symbol(std::string_view sym, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_symbol(O::data(), sym, p_psm);
+    }
+    void on_parsed_typedescr(TypeDescr td, ParserStateMachine * p_psm)  {
+        return O::iface()->on_parsed_typedescr(O::data(), td, p_psm);
     }
 
     ///@}

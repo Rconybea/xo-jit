@@ -5,6 +5,7 @@
         "\"ParserStateMachine.hpp\"",
         "\"syntaxstatetype.hpp\"",
         "<xo/tokenizer2/Token.hpp>",
+        "<xo/reflect/TypeDescr.hpp>",
     ],
     // extra includes in SyntaxStateMachine.hpp, if any
     user_hpp_includes: [],
@@ -20,6 +21,7 @@
         "Assistant to schematika parser dedicated to particular syntax"
     ],
     types: [
+        { name: "TypeDescr", doc: [ "reflected c++ type" ], definition: "xo::reflect::TypeDescr" },
         // { name: string, doc: [ string ], definition: string },
     ],
     const_methods: [
@@ -85,6 +87,15 @@
             return_type: "void",
             args: [
                 {type: "std::string_view", name: "sym"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
+        {
+            name: "on_parsed_typedescr",
+            doc: ["operate state machine for incoming type description @p td"],
+            return_type: "void",
+            args: [
+                {type: "TypeDescr", name: "td"},
                 {type: "ParserStateMachine *", name: "p_psm"},
             ],
         },

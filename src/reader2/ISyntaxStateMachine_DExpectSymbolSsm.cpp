@@ -52,6 +52,11 @@ namespace xo {
         {
             self.on_parsed_symbol(sym, p_psm);
         }
+        auto
+        ISyntaxStateMachine_DExpectSymbolSsm::on_parsed_typedescr(DExpectSymbolSsm & self, TypeDescr td, ParserStateMachine * p_psm) -> void
+        {
+            self.on_parsed_typedescr(td, p_psm);
+        }
 
     } /*namespace scm*/
 } /*namespace xo*/

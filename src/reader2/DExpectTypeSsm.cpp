@@ -115,10 +115,7 @@ namespace xo {
             }
 
             p_psm->pop_ssm();
-
-            log && log("STUB: missing on_typedescr() call");
-
-            //p_psm->on_typedescr(td);
+            p_psm->on_parsed_typedescr(td);
         }
 
         void
@@ -128,6 +125,15 @@ namespace xo {
             p_psm->illegal_input_on_symbol("ExpectTypeSsm",
                                            sym,
                                            this->get_expect_str());
+        }
+
+        void
+        DExpectTypeSsm::on_parsed_typedescr(TypeDescr td,
+                                            ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_typedescr("ExpectTypeSsm",
+                                              td,
+                                              this->get_expect_str());
         }
 
         bool

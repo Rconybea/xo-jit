@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
+ *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/ISyntaxStateMachine_DExpectTypeSsm.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -41,6 +41,7 @@ namespace xo {
         public:
             /** @defgroup scm-syntaxstatemachine-dexpecttypessm-type-traits **/
             ///@{
+            using TypeDescr = xo::scm::ASyntaxStateMachine::TypeDescr;
             using Copaque = xo::scm::ASyntaxStateMachine::Copaque;
             using Opaque = xo::scm::ASyntaxStateMachine::Opaque;
             ///@}
@@ -63,6 +64,8 @@ namespace xo {
             static void on_colon_token(DExpectTypeSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update  stat machine for incoming parsed symbol @p sym **/
             static void on_parsed_symbol(DExpectTypeSsm & self, std::string_view sym, ParserStateMachine * p_psm);
+            /** operate state machine for incoming type description @p td **/
+            static void on_parsed_typedescr(DExpectTypeSsm & self, TypeDescr td, ParserStateMachine * p_psm);
             ///@}
         };
 

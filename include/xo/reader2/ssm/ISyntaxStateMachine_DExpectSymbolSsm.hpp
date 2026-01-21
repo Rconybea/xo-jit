@@ -41,6 +41,7 @@ namespace xo {
         public:
             /** @defgroup scm-syntaxstatemachine-dexpectsymbolssm-type-traits **/
             ///@{
+            using TypeDescr = xo::scm::ASyntaxStateMachine::TypeDescr;
             using Copaque = xo::scm::ASyntaxStateMachine::Copaque;
             using Opaque = xo::scm::ASyntaxStateMachine::Opaque;
             ///@}
@@ -63,6 +64,8 @@ namespace xo {
             static void on_colon_token(DExpectSymbolSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update  stat machine for incoming parsed symbol @p sym **/
             static void on_parsed_symbol(DExpectSymbolSsm & self, std::string_view sym, ParserStateMachine * p_psm);
+            /** operate state machine for incoming type description @p td **/
+            static void on_parsed_typedescr(DExpectSymbolSsm & self, TypeDescr td, ParserStateMachine * p_psm);
             ///@}
         };
 

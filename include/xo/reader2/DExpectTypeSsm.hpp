@@ -23,6 +23,7 @@ namespace xo {
          **/
         class DExpectTypeSsm {
         public:
+            using TypeDescr = xo::reflect::TypeDescr;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -70,7 +71,7 @@ namespace xo {
             void on_colon_token(const Token & tk,
                                 ParserStateMachine * p_psm);
 
-            /** Never called.
+            /** (Never called).
              *  Operate state machine for this syntax after symbol
              *  emitted from nested ssm.
              *  Impossible path for DExpectTypeSsm until such time as it relies
@@ -79,6 +80,14 @@ namespace xo {
              **/
             void on_parsed_symbol(std::string_view sym,
                                   ParserStateMachine * p_psm);
+
+            /** operate state machine for this syntax on receiving type-description
+             *  from nested parser.
+             *  Currently (jan 2026) impossible path for DExpectTypeSsm.
+             *  Active path is via on_symbol_token()
+             **/
+            void on_parsed_typedescr(TypeDescr td,
+                                     ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-expecttype-printable-facet printable facet methods **/

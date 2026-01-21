@@ -16,6 +16,7 @@
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/tokenizer2/Token.hpp>
+#include <xo/reflect/TypeDescr.hpp>
 
 namespace xo {
 namespace scm {
@@ -30,6 +31,7 @@ namespace scm {
         using Impl = ISyntaxStateMachine_DRepr;
         /** integer identifying a type **/
         using typeseq = ASyntaxStateMachine::typeseq;
+        using TypeDescr = ASyntaxStateMachine::TypeDescr;
         ///@}
 
         /** @defgroup scm-syntaxstatemachine-xfer-methods **/
@@ -64,6 +66,9 @@ namespace scm {
         }
         void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  override {
             return I::on_parsed_symbol(_dcast(data), sym, p_psm);
+        }
+        void on_parsed_typedescr(Opaque data, TypeDescr td, ParserStateMachine * p_psm)  override {
+            return I::on_parsed_typedescr(_dcast(data), td, p_psm);
         }
 
         ///@}

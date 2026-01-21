@@ -17,6 +17,7 @@
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/tokenizer2/Token.hpp>
+#include <xo/reflect/TypeDescr.hpp>
 #include <xo/facet/obj.hpp>
 #include <xo/facet/facet_implementation.hpp>
 #include <xo/facet/typeseq.hpp>
@@ -41,6 +42,8 @@ public:
     using typeseq = xo::facet::typeseq;
     using Copaque = const void *;
     using Opaque = void *;
+    /** reflected c++ type **/
+    using TypeDescr = xo::reflect::TypeDescr;
     ///@}
 
     /** @defgroup scm-syntaxstatemachine-methods **/
@@ -64,6 +67,8 @@ public:
     virtual void on_colon_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update  stat machine for incoming parsed symbol @p sym **/
     virtual void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  = 0;
+    /** operate state machine for incoming type description @p td **/
+    virtual void on_parsed_typedescr(Opaque data, TypeDescr td, ParserStateMachine * p_psm)  = 0;
     ///@}
 }; /*ASyntaxStateMachine*/
 

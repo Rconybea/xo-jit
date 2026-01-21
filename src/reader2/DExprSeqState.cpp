@@ -178,6 +178,15 @@ namespace xo {
                                            this->get_expect_str());
         }
 
+        void
+        DExprSeqState::on_parsed_typedescr(TypeDescr td,
+                                           ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_typedescr("DExprSeqState::on_parsed_typedescr",
+                                              td,
+                                              this->get_expect_str());
+        }
+
         bool
         DExprSeqState::pretty(const ppindentinfo & ppii) const
         {

@@ -64,6 +64,12 @@ ISyntaxStateMachine_Any::on_parsed_symbol(Opaque, std::string_view, ParserStateM
     _fatal();
 }
 
+auto
+ISyntaxStateMachine_Any::on_parsed_typedescr(Opaque, TypeDescr, ParserStateMachine *)  -> void
+{
+    _fatal();
+}
+
 
 } /*namespace scm*/
 } /*namespace xo*/

@@ -29,6 +29,7 @@ namespace xo {
          **/
         class ParserStateMachine {
         public:
+            using TypeDescr = xo::reflect::TypeDescr;
             using AAllocator = xo::mm::AAllocator;
             using ArenaConfig = xo::mm::ArenaConfig;
             using DArena = xo::mm::DArena;
@@ -88,8 +89,15 @@ namespace xo {
             /** @defgroup scm-parserstatemachine-inputmethods input methods **/
             ///@{
 
-            /** update state to respond to prsed symbol @p sym **/
+            /** update state to respond to parsed symbol @p sym
+             *  (from nested parsing state)
+             **/
             void on_parsed_symbol(std::string_view sym);
+
+            /** update state to respond to parsed type-description @p td
+             *  (from nested parsing state)
+             **/
+            void on_parsed_typedescr(TypeDescr td);
 
             /** update state to respond to input token @p tk.
              *  record output (if any) in @ref result_
@@ -109,7 +117,6 @@ namespace xo {
             void on_colon_token(const Token & tk);
 
             ///@}
-
             /** @defgroup scm-parserstatemachine-error-entrypoints error entry points **/
             ///@{
 
@@ -136,6 +143,15 @@ namespace xo {
             void illegal_input_on_symbol(std::string_view ssm_name,
                                          std::string_view sym,
                                          std::string_view expect_str);
+
+            /** report illegal input arriving in syntax state machine (ssm) @p ssm_name
+             *  receiving assembled type-description @p td.
+             *  @p expect_str sketches expected input in current ssm state
+             **/
+            void illegal_input_on_typedescr(std::string_view ssm_name,
+                                            TypeDescr td,
+                                            std::string_view expect_str);
+
             ///@}
 
         private:

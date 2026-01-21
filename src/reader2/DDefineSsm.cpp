@@ -420,7 +420,7 @@ namespace xo {
         DDefineSsm::on_parsed_symbol(std::string_view sym_name,
                                      ParserStateMachine * p_psm)
         {
-            if (this->defstate_ == defexprstatetype::def_1) {
+            if (defstate_ == defexprstatetype::def_1) {
                 this->defstate_ = defexprstatetype::def_2;
 
                 const DUniqueString * sym
@@ -458,6 +458,32 @@ namespace xo {
             p_psm->illegal_input_on_symbol("DDefineSsm::on_parsed_symbol",
                                            sym_name,
                                            this->get_expect_str());
+        }
+
+        void
+        DDefineSsm::on_parsed_typedescr(TypeDescr td,
+                                        ParserStateMachine * p_psm)
+        {
+            scope log(XO_DEBUG(true), xtag("td", td));
+
+            if (defstate_ == defexprstatetype::def_3) {
+                this->defstate_ = defexprstatetype::def_4;
+
+                // note: not present in x0-reader/ version
+                def_expr_.assign_valuetype(td);
+
+#ifdef NOT_YET
+                this->cvt_expr_ = ConvertExpr::make(td, nullptr);
+                def_expr_->assign_rhs(cvt_expr_);
+#endif
+                log && log("STUB: ConvertExpr not implemented, TypeDescr not captured");
+
+                return;
+            }
+
+            p_psm->illegal_input_on_typedescr("DDefineSsm::on_parsed_typedescr",
+                                              td,
+                                              this->get_expect_str());
         }
 
         void

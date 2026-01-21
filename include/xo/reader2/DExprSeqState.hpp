@@ -39,6 +39,7 @@ namespace xo {
          **/
         class DExprSeqState {
         public:
+            using TypeDescr = xo::reflect::TypeDescr;
             using AAllocator = xo::mm::AAllocator;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -89,6 +90,12 @@ namespace xo {
              *  overall parser state in @p p_psm
              **/
             void on_parsed_symbol(std::string_view sym, ParserStateMachine * p_psm);
+
+            /** update state for this syntax on parsed type-description @p td
+             *  from nested ssm.
+             *  overall parser state in @p p_psm
+             **/
+            void on_parsed_typedescr(TypeDescr td, ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-exprseq-printable-facet printable facet methods **/
