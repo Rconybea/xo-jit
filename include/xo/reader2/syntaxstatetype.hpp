@@ -24,6 +24,9 @@ namespace xo {
             /** expecting a s symbol. See @ref DExpectSymbolSsm **/
             expect_symbol,
 
+            /** expecting a type. See @ref DExpectTypeSsm **/
+            expect_type,
+
             /** handle define-expression. See @ref DDefineSsm **/
             defexpr,
 
