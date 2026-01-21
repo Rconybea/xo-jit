@@ -51,10 +51,13 @@ namespace xo {
             obj<AExpression> rhs() const noexcept { return rhs_; }
             const DUniqueString * name() const noexcept;
 
+            ///@}
+            /** @defgroup scm-definexpr-bookkeeping-methods **/
+            ///@{
+
             void assign_lhs_name(const DUniqueString * name);
 
             ///@}
-
             /** @defgroup scm-defineexpr-expression-facet **/
             ///@{
 
