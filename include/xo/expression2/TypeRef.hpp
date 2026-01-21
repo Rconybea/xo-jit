@@ -7,6 +7,7 @@
 
 #include <xo/reflect/TypeDescr.hpp>
 #include <xo/flatstring/flatstring.hpp>
+#include <xo/indentlog/print/pretty.hpp>
 
 namespace xo {
     namespace scm {
@@ -22,6 +23,7 @@ namespace xo {
             using TypeDescr = xo::reflect::TypeDescr;
             using type_var = flatstring<20>;
             using prefix_type = flatstring<8>;
+            using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             TypeRef() = default;
@@ -54,6 +56,9 @@ namespace xo {
             /** resolve TypeRef by supplying final type-description **/
             void resolve(TypeDescr td) noexcept { td_ = td; }
 
+            /** pretty-printer support **/
+            bool pretty(const ppindentinfo & ppii) const;
+
         private:
             /** unique (probably generated) name for type at this location **/
             type_var id_;
@@ -64,6 +69,18 @@ namespace xo {
             TypeDescr td_;
         };
     } /*namespace scm*/
+
+    namespace print {
+        /** pretty printer in <xo/indentlog/print/pretty.hpp> relies on this specialization
+         *  to handle TypeRef instances
+         **/
+        template <>
+        struct ppdetail<xo::scm::TypeRef> {
+            static inline bool print_pretty(const ppindentinfo & ppii, const xo::scm::TypeRef x) {
+                return x.pretty(ppii);
+            }
+        };
+    }
 } /*namespace xo*/
 
 /* end TypeRef.hpp */

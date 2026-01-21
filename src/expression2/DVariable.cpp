@@ -5,6 +5,7 @@
 
 #include "DVariable.hpp"
 #include "exprtype.hpp"
+#include <xo/indentlog/print/quoted.hpp>
 
 namespace xo {
     using xo::facet::typeseq;
@@ -38,6 +39,8 @@ namespace xo {
         bool
         DVariable::pretty(const ppindentinfo & ppii) const
         {
+            using xo::print::quot;
+
             auto name = (name_
                          ? std::string_view(*name_)
                          : std::string_view(""));
@@ -45,7 +48,8 @@ namespace xo {
             return ppii.pps()->pretty_struct
                        (ppii,
                         "DVariable",
-                        refrtag("name", name));
+                        refrtag("name", quot(name)),
+                        refrtag("typeref", typeref_));
         }
 
     } /*namespace scm*/
