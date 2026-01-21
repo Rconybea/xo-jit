@@ -101,7 +101,7 @@ namespace xo {
             static Token rightbracket() { return Token(tokentype::tk_rightbracket); }
             /** token representing left brace @c "{" **/
             static Token leftbrace() { return Token(tokentype::tk_leftbrace); }
-            /** token representing right brace @c "}' **/
+            /** token representing right brace @c "}" **/
             static Token rightbrace() { return Token(tokentype::tk_rightbrace); }
             /** token representing period @c "." **/
             static Token dot() { return Token(tokentype::tk_dot); }
@@ -113,8 +113,8 @@ namespace xo {
             static Token doublecolon() { return Token(tokentype::tk_doublecolon); }
             /** token representing semicolon @c ";" **/
             static Token semicolon() { return Token(tokentype::tk_semicolon); }
-            /** token representing single-assignment @c "=" **/
-            static Token singleassign() { return Token(tokentype::tk_singleassign); }
+            /** token representing single-assignment @c "=" (editor bait: equal_token) **/
+            static Token singleassign_token() { return Token(tokentype::tk_singleassign); }
             /** token representing unrestricted assignment @c ":=" **/
             static Token assign_token() { return Token(tokentype::tk_assign); }
             /** token representing indirection @c "->" **/
