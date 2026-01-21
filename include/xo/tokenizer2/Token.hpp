@@ -108,7 +108,7 @@ namespace xo {
             /** token representing comma @c "," **/
             static Token comma() { return Token(tokentype::tk_comma); }
             /** token representing colon @c ":" **/
-            static Token colon() { return Token(tokentype::tk_colon); }
+            static Token colon_token() { return Token(tokentype::tk_colon); }
             /** token representing double-colo @c "::" **/
             static Token doublecolon() { return Token(tokentype::tk_doublecolon); }
             /** token representing semicolon @c ";" **/
