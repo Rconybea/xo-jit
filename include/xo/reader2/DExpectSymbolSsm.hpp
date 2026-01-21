@@ -69,6 +69,12 @@ namespace xo {
             void on_if_token(const Token & tk,
                              ParserStateMachine * p_psm);
 
+            /** update state for this syntax on incoming colon token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_colon_token(const Token & tk,
+                                ParserStateMachine * p_psm);
+
             /** update state for this syntax after parsing a symbol @p sym;
              *  overall parser state in @p p_psm.
              *

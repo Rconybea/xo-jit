@@ -498,6 +498,15 @@ namespace xo {
                                           this->get_expect_str());
         }
 
+        void
+        DDefineSsm::on_colon_token(const Token & tk,
+                                   ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DDefineSsm::on_colon_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
         bool
         DDefineSsm::pretty(const ppindentinfo & ppii) const
         {

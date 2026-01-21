@@ -110,6 +110,8 @@ xo_add_genfacetimpl(
     OUTPUT_CPP_DIR src/reader2
 )
 
+xo_add_genfacet_all(xo-reader2-genfacet-all)
+
 # ----------------------------------------------------------------
 # shared library
 
