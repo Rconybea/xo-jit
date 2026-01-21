@@ -85,6 +85,11 @@ namespace xo {
              **/
             void on_colon_token(const Token & tk, ParserStateMachine * p_psm);
 
+            /** update state for this syntax on incoming single-assign token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_singleassign_token(const Token & tk, ParserStateMachine * p_psm);
+
             /** update state for this syntax on parsed symbol @p sym
              *  from immediately-downstream ssm.
              *  overall parser state in @p p_psm

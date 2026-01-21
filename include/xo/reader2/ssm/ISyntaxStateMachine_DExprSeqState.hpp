@@ -62,6 +62,8 @@ namespace xo {
             static void on_if_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for incoming colon-token @p tk **/
             static void on_colon_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
+            /** update state machine for incoming singleassign-token @p tk **/
+            static void on_singleassign_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
             /** update  stat machine for incoming parsed symbol @p sym **/
             static void on_parsed_symbol(DExprSeqState & self, std::string_view sym, ParserStateMachine * p_psm);
             /** operate state machine for incoming type description @p td **/

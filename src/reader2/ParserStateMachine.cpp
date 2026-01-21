@@ -153,6 +153,10 @@ namespace xo {
                 this->on_colon_token(tk);
                 break;
 
+            case tokentype::tk_singleassign:
+                this->on_singleassign_token(tk);
+                break;
+
             // all the not-yet handled cases
             case tokentype::tk_invalid:
             case tokentype::tk_bool:
@@ -173,7 +177,6 @@ namespace xo {
             case tokentype::tk_comma:
             case tokentype::tk_doublecolon:
             case tokentype::tk_semicolon:
-            case tokentype::tk_singleassign:
             case tokentype::tk_assign:
             case tokentype::tk_yields:
             case tokentype::tk_plus:
@@ -227,6 +230,14 @@ namespace xo {
             scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
 
             stack_->top().on_colon_token(tk, this);
+        }
+
+        void
+        ParserStateMachine::on_singleassign_token(const Token & tk)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
+
+            stack_->top().on_singleassign_token(tk, this);
         }
 
         void

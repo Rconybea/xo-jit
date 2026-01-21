@@ -97,6 +97,12 @@ namespace xo {
             void on_colon_token(const Token & tk,
                                 ParserStateMachine * p_psm);
 
+            /** update state for this syntax on incoming singleassign token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_singleassign_token(const Token & tk,
+                                       ParserStateMachine * p_psm);
+
             ///@}
             /** @defgroup scm-expectsymbol-printable-facet printable facet methods **/
             ///@{

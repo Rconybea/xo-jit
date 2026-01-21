@@ -64,6 +64,7 @@ namespace scm {
         [[noreturn]] void on_def_token(Opaque, const Token &, ParserStateMachine *)  override;
         [[noreturn]] void on_if_token(Opaque, const Token &, ParserStateMachine *)  override;
         [[noreturn]] void on_colon_token(Opaque, const Token &, ParserStateMachine *)  override;
+        [[noreturn]] void on_singleassign_token(Opaque, const Token &, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_symbol(Opaque, std::string_view, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_typedescr(Opaque, TypeDescr, ParserStateMachine *)  override;
 

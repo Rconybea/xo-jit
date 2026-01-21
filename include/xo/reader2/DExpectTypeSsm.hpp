@@ -71,6 +71,12 @@ namespace xo {
             void on_colon_token(const Token & tk,
                                 ParserStateMachine * p_psm);
 
+            /** operate state machine for this syntax on incoming singleassign-token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_singleassign_token(const Token & tk,
+                                       ParserStateMachine * p_psm);
+
             /** (Never called).
              *  Operate state machine for this syntax after symbol
              *  emitted from nested ssm.

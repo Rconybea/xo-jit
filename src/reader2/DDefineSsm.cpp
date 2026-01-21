@@ -543,6 +543,28 @@ namespace xo {
                                           this->get_expect_str());
         }
 
+        void
+        DDefineSsm::on_singleassign_token(const Token & tk,
+                                          ParserStateMachine * p_psm)
+        {
+            scope log(XO_DEBUG(true), xtag("defstate", defstate_));
+
+            if ((defstate_ == defexprstatetype::def_2)
+                || (defstate_ == defexprstatetype::def_4))
+            {
+                this->defstate_ = defexprstatetype::def_5;
+
+                // TODO: DExpectExprSsm::start(...)
+                log && log("STUB: DExpectExprSsm not implemented");
+
+                return;
+            }
+
+            p_psm->illegal_input_on_token("DDefineSsm::on_singleassign_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
         bool
         DDefineSsm::pretty(const ppindentinfo & ppii) const
         {

@@ -65,6 +65,8 @@ public:
     virtual void on_if_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming colon-token @p tk **/
     virtual void on_colon_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
+    /** update state machine for incoming singleassign-token @p tk **/
+    virtual void on_singleassign_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update  stat machine for incoming parsed symbol @p sym **/
     virtual void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  = 0;
     /** operate state machine for incoming type description @p td **/
