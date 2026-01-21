@@ -1735,6 +1735,8 @@ function(xo_add_genfacet)
 
     # Create a target for this generation
     add_custom_target(${GF_TARGET} DEPENDS ${generatedFiles})
+
+    set_property(DIRECTORY APPEND PROPERTY XO_GENFACET_TARGETS ${GF_TARGET})
 endfunction()
 
 function(xo_add_genfacetimpl)
@@ -1815,4 +1817,16 @@ function(xo_add_genfacetimpl)
 
     # Create a target for this generation
     add_custom_target(${GF_TARGET} DEPENDS ${generatedFiles})
+
+    set_property(DIRECTORY APPEND PROPERTY XO_GENFACET_TARGETS ${GF_TARGET})
+endfunction()
+
+# create umbrella target for all genfacet targets in current directory
+function(xo_add_genfacet_all target_name)
+    get_property(genfacet_targets DIRECTORY PROPERTY XO_GENFACET_TARGETS)
+    if(genfacet_targets)
+        add_custom_target(${target_name} DEPENDS ${genfacet_targets})
+    else()
+        message(WARNING "xo_add_genfacet_all: no genfacet targets found")
+    endif()
 endfunction()
