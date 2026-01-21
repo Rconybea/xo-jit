@@ -123,6 +123,17 @@ namespace xo {
                 log && log(xtag("result", result));
             }
 
+            {
+                auto & result = parser.on_token(Token::symbol_token("f64"));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(result.is_incomplete());
+
+                log && log("after typename symbol token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+            }
+
             // define-expressions not properly implemented
 
             //REQUIRE(result.error_description());

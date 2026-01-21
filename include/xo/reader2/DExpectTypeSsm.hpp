@@ -6,6 +6,7 @@
 #pragma once
 
 #include "SyntaxStateMachine.hpp"
+#include <xo/indentlog/print/ppindentinfo.hpp>
 
 namespace xo {
     namespace scm {
@@ -22,6 +23,10 @@ namespace xo {
          **/
         class DExpectTypeSsm {
         public:
+            using DArena = xo::mm::DArena;
+            using ppindentinfo = xo::print::ppindentinfo;
+
+        public:
             DExpectTypeSsm();
 
             static DExpectTypeSsm * make(DArena & parser_mm);
@@ -29,11 +34,6 @@ namespace xo {
             static void start(DArena & parser_mm,
                               //obj<AAllocator> expr_mm,
                               ParserStateMachine * p_psm);
-
-            virtual const char * get_expect_str() const override;
-
-            virtual void on_symbol_token(const token_type & tk,
-                                         parserstatemachine * p_psm) override;
 
             /** @defgroup scm-expecttype-ssm-facet syntaxstatemachine facet methods **/
             ///@{
@@ -52,13 +52,45 @@ namespace xo {
             void on_symbol_token(const Token & tk,
                                  ParserStateMachine * p_psm);
 
+            /** operate state machine for this syntax on incoming define-token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_def_token(const Token & tk,
+                              ParserStateMachine * p_psm);
+
+            /** operate state machine for this syntax on incoming if-token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_if_token(const Token & tk,
+                             ParserStateMachine * p_psm);
+
+            /** operate state machine for this syntax on incoming colon-token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_colon_token(const Token & tk,
+                                ParserStateMachine * p_psm);
+
+            /** Never called.
+             *  Operate state machine for this syntax after symbol
+             *  emitted from nested ssm.
+             *  Impossible path for DExpectTypeSsm until such time as it relies
+             *  on nested ssms.  Currently using on_symbol_token
+             *  entry point instead.
+             **/
+            void on_parsed_symbol(std::string_view sym,
+                                  ParserStateMachine * p_psm);
+
+            ///@}
+            /** @defgroup scm-expecttype-printable-facet printable facet methods **/
+            ///@{
+
+            bool pretty(const ppindentinfo & ppii) const;
+
             ///@}
 
-        private:
-            static std::unique_ptr<expect_type_xs> make();
         };
     } /*namespace scm*/
 } /*namespace xo*/
 
 
-/* end expect_type_xs.hpp */
+/* end DExpectTypeSsm.hpp */

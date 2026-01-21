@@ -14,6 +14,9 @@
 #include <xo/reader2/ssm/ISyntaxStateMachine_DExpectSymbolSsm.hpp>
 #include <xo/reader2/ssm/IPrintable_DExpectSymbolSsm.hpp>
 
+#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectTypeSsm.hpp>
+#include <xo/reader2/ssm/IPrintable_DExpectTypeSsm.hpp>
+
 #include <xo/reader2/ssm/ASyntaxStateMachine.hpp>
 #include <xo/printable2/detail/APrintable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -39,9 +42,13 @@ namespace xo {
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectSymbolSsm>();
             FacetRegistry::register_impl<APrintable, DExpectSymbolSsm>();
 
+            FacetRegistry::register_impl<ASyntaxStateMachine, DExpectTypeSsm>();
+            FacetRegistry::register_impl<APrintable, DExpectTypeSsm>();
+
             log && log(xtag("DExprSeqState.tseq", typeseq::id<DExprSeqState>()));
             log && log(xtag("DDefineSsm.tseq", typeseq::id<DDefineSsm>()));
             log && log(xtag("DExpectSymbolSsm.tseq", typeseq::id<DExpectSymbolSsm>()));
+            log && log(xtag("DExpectTypeSsm.tseq", typeseq::id<DExpectTypeSsm>()));
 
             return true;
         }

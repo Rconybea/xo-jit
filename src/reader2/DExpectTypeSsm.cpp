@@ -4,8 +4,20 @@
  **/
 
 #include "DExpectTypeSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DExpectTypeSsm.hpp"
+#include "SyntaxStateMachine.hpp"
+#include <string_view>
+#include <xo/reflect/Reflect.hpp>
+#include <xo/facet/facet_implementation.hpp>
+#include <xo/reflectutil/typeseq.hpp>
+#include <xo/indentlog/print/pretty.hpp>
 
 namespace xo {
+    using xo::facet::with_facet;
+    using xo::reflect::Reflect;
+    using xo::reflect::TypeDescr;
+    using xo::reflect::typeseq;
+
     namespace scm {
         DExpectTypeSsm::DExpectTypeSsm()
         {}
@@ -22,7 +34,7 @@ namespace xo {
         void
         DExpectTypeSsm::start(DArena & mm,
         //obj<AAllocator> expr_mm,
-                          PArserStateMachine * p_psm)
+                          ParserStateMachine * p_psm)
         {
             DExpectTypeSsm * expect_type_ssm = DExpectTypeSsm::make(mm);
 
@@ -36,6 +48,94 @@ namespace xo {
         DExpectTypeSsm::ssm_type() const noexcept
         {
             return syntaxstatetype::expect_type;
+        }
+
+        std::string_view
+        DExpectTypeSsm::get_expect_str() const noexcept
+        {
+            return "typename";
+        }
+
+        void
+        DExpectTypeSsm::on_def_token(const Token & tk,
+                                     ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExpectTypeSsm",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DExpectTypeSsm::on_if_token(const Token & tk,
+                                    ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DxpectTypeSsm",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DExpectTypeSsm::on_colon_token(const Token & tk,
+                                       ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DxpectTypeSsm",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DExpectTypeSsm::on_symbol_token(const Token & tk,
+                                        ParserStateMachine * p_psm)
+        {
+            scope log(XO_DEBUG(true));
+
+            TypeDescr td = nullptr;
+
+            /* TODO: replace with typetable lookup */
+
+            if (tk.text() == "bool")
+                td = Reflect::require<bool>();
+            else if (tk.text() == "str")
+                td = Reflect::require<std::string>();
+            else if (tk.text() == "f64")
+                td = Reflect::require<double>();
+            else if(tk.text() == "f32")
+                td = Reflect::require<float>();
+            else if(tk.text() == "i16")
+                td = Reflect::require<std::int16_t>();
+            else if(tk.text() == "i32")
+                td = Reflect::require<std::int32_t>();
+            else if(tk.text() == "i64")
+                td = Reflect::require<std::int64_t>();
+
+            if (!td) {
+                p_psm->illegal_input_on_token("DExpectTypeSsm",
+                                              tk,
+                                              this->get_expect_str());
+            }
+
+            p_psm->pop_ssm();
+
+            log && log("STUB: missing on_typedescr() call");
+
+            //p_psm->on_typedescr(td);
+        }
+
+        void
+        DExpectTypeSsm::on_parsed_symbol(std::string_view sym,
+                                         ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_symbol("ExpectTypeSsm",
+                                           sym,
+                                           this->get_expect_str());
+        }
+
+        bool
+        DExpectTypeSsm::pretty(const ppindentinfo & ppii) const
+        {
+            return ppii.pps()->pretty_struct
+                (ppii,
+                 "DExpectTypeSsm");
         }
 
     } /*namespace scm*/

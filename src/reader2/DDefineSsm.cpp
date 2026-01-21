@@ -5,6 +5,7 @@
 
 #include "DDefineSsm.hpp"
 #include "DExpectSymbolSsm.hpp"
+#include "DExpectTypeSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DDefineSsm.hpp"
 #include "ssm/IPrintable_DDefineSsm.hpp"
 #include <xo/expression2/detail/IPrintable_DDefineExpr.hpp>
@@ -505,7 +506,9 @@ namespace xo {
             if (defstate_ == defexprstatetype::def_2) {
                 this->defstate_ = defexprstatetype::def_3;
 
-                // expect_type_xs::start(p_psm);
+                DExpectTypeSsm::start(p_psm->parser_alloc(),
+                                      p_psm);
+
                 return;
             }
 

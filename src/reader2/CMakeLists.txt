@@ -23,6 +23,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DExpectSymbolSsm.cpp
     IPrintable_DExpectSymbolSsm.cpp
 
+    DExpectTypeSsm.cpp
+    ISyntaxStateMachine_DExpectTypeSsm.cpp
+    IPrintable_DExpectTypeSsm.cpp
+
     reader2_register_facets.cpp
     reader2_register_types.cpp
     )
