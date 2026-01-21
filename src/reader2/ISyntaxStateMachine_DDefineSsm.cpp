@@ -43,6 +43,11 @@ namespace xo {
             self.on_if_token(tk, p_psm);
         }
         auto
+        ISyntaxStateMachine_DDefineSsm::on_colon_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
+        {
+            self.on_colon_token(tk, p_psm);
+        }
+        auto
         ISyntaxStateMachine_DDefineSsm::on_parsed_symbol(DDefineSsm & self, std::string_view sym, ParserStateMachine * p_psm) -> void
         {
             self.on_parsed_symbol(sym, p_psm);

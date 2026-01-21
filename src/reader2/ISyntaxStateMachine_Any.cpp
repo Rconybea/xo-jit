@@ -53,6 +53,12 @@ ISyntaxStateMachine_Any::on_if_token(Opaque, const Token &, ParserStateMachine *
 }
 
 auto
+ISyntaxStateMachine_Any::on_colon_token(Opaque, const Token &, ParserStateMachine *)  -> void
+{
+    _fatal();
+}
+
+auto
 ISyntaxStateMachine_Any::on_parsed_symbol(Opaque, std::string_view, ParserStateMachine *)  -> void
 {
     _fatal();

@@ -59,6 +59,9 @@ namespace scm {
         void on_if_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
             return I::on_if_token(_dcast(data), tk, p_psm);
         }
+        void on_colon_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
+            return I::on_colon_token(_dcast(data), tk, p_psm);
+        }
         void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  override {
             return I::on_parsed_symbol(_dcast(data), sym, p_psm);
         }
