@@ -28,6 +28,8 @@ set(SELF_SRCS
     ISyntaxStateMachine_DExpectTypeSsm.cpp
     IPrintable_DExpectTypeSsm.cpp
 
+    DExpectExprSsm.cpp
+
     reader2_register_facets.cpp
     reader2_register_types.cpp
     )
