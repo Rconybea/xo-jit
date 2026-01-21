@@ -4,12 +4,18 @@
  **/
 
 #include <xo/reader2/SchematikaParser.hpp>
+#include <xo/reader2/DDefineSsm.hpp>
+#include <xo/reader2/ssm/ISyntaxStateMachine_DDefineSsm.hpp>
 #include <xo/reader2/init_reader2.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
 #include <catch2/catch.hpp>
 
 namespace xo {
     using xo::scm::SchematikaParser;
+    using xo::scm::ASyntaxStateMachine;
+    using xo::scm::syntaxstatetype;
+    using xo::scm::DDefineSsm;
+    using xo::scm::defexprstatetype;
     using xo::scm::ParserResult;
     using xo::scm::parser_result_type;
     using xo::scm::Token;
@@ -132,6 +138,24 @@ namespace xo {
                 log && log("after typename symbol token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
+            }
+
+            {
+                auto & result = parser.on_token(Token::singleassign_token());
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(result.is_incomplete());
+
+                log && log("after typename symbol token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                auto def_ssm
+                    = obj<ASyntaxStateMachine,DDefineSsm>::from(parser.top_ssm());
+
+                REQUIRE(def_ssm);
+                REQUIRE(def_ssm.data()->ssm_type() == syntaxstatetype::defexpr);
+                REQUIRE(def_ssm.data()->defstate() == defexprstatetype::def_5);
             }
 
             // define-expressions not properly implemented

@@ -9,6 +9,7 @@ set(SELF_SRCS
     ParserStack.cpp
     ParserResult.cpp
 
+    syntaxstatetype.cpp
     ISyntaxStateMachine_Any.cpp
 
     DExprSeqState.cpp

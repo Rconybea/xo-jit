@@ -28,23 +28,33 @@ namespace xo {
         }
 
         bool
-        SchematikaParser::is_at_toplevel() const {
+        SchematikaParser::is_at_toplevel() const
+        {
             return psm_.is_at_toplevel();
         }
 
         bool
-        SchematikaParser::has_incomplete_expr() const {
+        SchematikaParser::has_incomplete_expr() const
+        {
             return !(this->is_at_toplevel());
         }
 
+        obj<ASyntaxStateMachine>
+        SchematikaParser::top_ssm() const
+        {
+            return psm_.top_ssm();
+        }
+
         void
-        SchematikaParser::begin_interactive_session() {
+        SchematikaParser::begin_interactive_session()
+        {
             DExprSeqState::establish_interactive(psm_.expr_alloc(), &psm_);
 
         }
 
         void
-        SchematikaParser::begin_batch_session() {
+        SchematikaParser::begin_batch_session()
+        {
             DExprSeqState::establish_batch(psm_.expr_alloc(), &psm_);
         }
 

@@ -172,6 +172,9 @@ namespace xo {
                              obj<AAllocator> expr_alloc,
                              bool debug_flag);
 
+            /** scm-schematikaparser-access-methods **/
+            ///@{
+
             bool debug_flag() const { return debug_flag_; }
 
             /** true if parser is at top-level,
@@ -184,6 +187,13 @@ namespace xo {
              *  since end of last toplevel expression
              **/
             bool has_incomplete_expr() const;
+
+            /** top of parser stack **/
+            obj<ASyntaxStateMachine> top_ssm() const;
+
+            ///@}
+            /** scm-schematikaparser-general-methods **/
+            ///@{
 
             /** put parser into state for beginning an interactive session.
              **/
@@ -215,10 +225,16 @@ namespace xo {
              **/
             void reset_to_idle_toplevel();
 
+            ///@}
+            /** scm-schematikaparser-pretty-methods **/
+            ///@{
+
             /** print human-readable representation on stream @p os **/
             void print(std::ostream & os) const;
             /** pretty-printer support **/
             bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
 
         private:
             /** state machine **/

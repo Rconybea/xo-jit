@@ -42,6 +42,12 @@ namespace xo {
             return !(this->is_at_toplevel());
         }
 
+        obj<ASyntaxStateMachine>
+        ParserStateMachine::top_ssm() const
+        {
+            return this->stack_->top();
+        }
+
         void
         ParserStateMachine::establish_toplevel_ssm(obj<ASyntaxStateMachine> ssm)
         {

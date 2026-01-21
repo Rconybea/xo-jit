@@ -99,6 +99,13 @@ namespace xo {
                               ParserStateMachine * p_psm);
 
             ///@}
+            /** @defgroup scm-definessm-access-methods **/
+            ///@{
+
+            /** identify define-expression state **/
+            defexprstatetype defstate() const noexcept { return defstate_; }
+
+            ///@}
             /** @defgroup scm-define-ssm-facet syntaxstatemachine facet methods **/
             ///@{
 

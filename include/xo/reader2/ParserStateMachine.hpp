@@ -54,6 +54,9 @@ namespace xo {
             /** true iff state machine currently has incomplete expression **/
             bool has_incomplete_expr() const noexcept;
 
+            /** top of parser stack **/
+            obj<ASyntaxStateMachine> top_ssm() const;
+
             ///@}
 
             /** @defgroup scm-parserstatemachine-bookkeeping bookkeeping methods **/
