@@ -112,7 +112,7 @@ namespace xo {
             /** token representing double-colo @c "::" **/
             static Token doublecolon() { return Token(tokentype::tk_doublecolon); }
             /** token representing semicolon @c ";" **/
-            static Token semicolon() { return Token(tokentype::tk_semicolon); }
+            static Token semicolon_token() { return Token(tokentype::tk_semicolon); }
             /** token representing single-assignment @c "=" (editor bait: equal_token) **/
             static Token singleassign_token() { return Token(tokentype::tk_singleassign); }
             /** token representing unrestricted assignment @c ":=" **/
