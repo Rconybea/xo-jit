@@ -211,6 +211,29 @@ namespace xo {
         DProgressSsm::on_semicolon_token(const Token & tk,
                                          ParserStateMachine * p_psm)
         {
+            /* note: implementation should parallel .on_rightparen_token() */
+
+#ifdef NOT_YET
+            obj<AExpression> expr = this->assemble_expr(p_psm);
+
+            p_psm->pop_ssm();
+            p_psm->on_expr_with_semicolon(expr);
+
+            /* control here on input like:
+             *   (1.234;
+             *
+             * a. '(' sets up stack [lparen_0:expect_rhs_expression]
+             *     (see exprstate::on_leftparen())
+             * b. 1.234 pushes (in case operators) [lparen_0:expect_rhs_expression:expr_progress]
+             *     (see exprstate::on_f64())
+             * c. semicolon completes expr_progress [lparen_0:expect_rhs_expression]
+             *     deliver expresssion to expect_rhs_expression.on_expr_with_semicolon()
+             *     (see exprstate::on_expr_with_semicolon())
+             * d. expr_rhs_expression forwards expression to [lparen_0]
+             * e. lparen_0 would advance to [lparen_1],  but rejects semicolon
+             */
+#endif
+
             p_psm->illegal_input_on_token("DProgressSsm::on_semicolon_token",
                                           tk,
                                           this->get_expect_str());
