@@ -32,6 +32,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DExpectExprSsm.cpp
     IPrintable_DExpectExprSsm.cpp
 
+    DProgressSsm.cpp
+    ISyntaxStateMachine_DProgressSsm.cpp
+    IPrintable_DProgressSsm.cpp
+
     reader2_register_facets.cpp
     reader2_register_types.cpp
     )

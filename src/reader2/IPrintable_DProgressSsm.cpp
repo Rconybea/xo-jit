@@ -1,22 +1,22 @@
-/** @file IPrintable_DExpectExprSsm.cpp
+/** @file IPrintable_DProgressSsm.cpp
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
  *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
- *       --input [idl/IPrintable_DExpectExprSsm.json5]
+ *       --input [idl/IPrintable_DProgressSsm.json5]
  *  2. jinja2 template for abstract facet .hpp file:
  *       [iface_facet_any.hpp.j2]
  *  3. idl for facet methods
- *       [idl/IPrintable_DExpectExprSsm.json5]
+ *       [idl/IPrintable_DProgressSsm.json5]
 **/
 
-#include "ssm/IPrintable_DExpectExprSsm.hpp"
+#include "ssm/IPrintable_DProgressSsm.hpp"
 
 namespace xo {
     namespace scm {
         auto
-        IPrintable_DExpectExprSsm::pretty(const DExpectExprSsm & self, const ppindentinfo & ppii) -> bool
+        IPrintable_DProgressSsm::pretty(const DProgressSsm & self, const ppindentinfo & ppii) -> bool
         {
             return self.pretty(ppii);
         }
@@ -25,4 +25,4 @@ namespace xo {
     } /*namespace scm*/
 } /*namespace xo*/
 
-/* end IPrintable_DExpectExprSsm.cpp */
+/* end IPrintable_DProgressSsm.cpp */

@@ -163,7 +163,6 @@ namespace xo {
                 REQUIRE(exp_ssm.data()->cxl_on_rightbrace() == false);
             }
 
-#ifdef NOT_YET
             {
                 // future-proofing for Token only holding a string_view
                 const DString * str = DString::from_cstr(expr_alloc, "3.141593");
@@ -172,11 +171,10 @@ namespace xo {
 
                 REQUIRE(parser.has_incomplete_expr() == true);
 
-                log && log("after typename symbol token:");
+                log && log("after f64 token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
             }
-#endif
 
             {
 #ifdef NOT_YET

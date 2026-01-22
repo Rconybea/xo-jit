@@ -23,6 +23,8 @@ namespace xo {
                 return "expect-rhs-expression";
             case syntaxstatetype::defexpr:
                 return "defexpr";
+            case syntaxstatetype::progress:
+                return "progress";
             case syntaxstatetype::N:
                 break;
             }

@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
+ *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/ISyntaxStateMachine_DExpectExprSsm.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -64,6 +64,8 @@ namespace xo {
             static void on_colon_token(DExpectExprSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for incoming singleassign-token @p tk **/
             static void on_singleassign_token(DExpectExprSsm & self, const Token & tk, ParserStateMachine * p_psm);
+            /** update state machine for incoming f64-token @p tk **/
+            static void on_f64_token(DExpectExprSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update  stat machine for incoming parsed symbol @p sym **/
             static void on_parsed_symbol(DExpectExprSsm & self, std::string_view sym, ParserStateMachine * p_psm);
             /** operate state machine for incoming type description @p td **/

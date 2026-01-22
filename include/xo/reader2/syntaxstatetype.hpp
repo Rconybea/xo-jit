@@ -33,6 +33,9 @@ namespace xo {
             /** handle define-expression. See @ref DDefineSsm **/
             defexpr,
 
+            /** rhs expression.  state exists to achieve 1-token lookahead **/
+            progress,
+
             /** comes lasts, counts number of valid enums **/
             N
         };

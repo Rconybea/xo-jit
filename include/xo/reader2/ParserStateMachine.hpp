@@ -122,6 +122,9 @@ namespace xo {
             /** operate state machine for incoming singleassign-token @p tk **/
             void on_singleassign_token(const Token & tk);
 
+            /** operate state machine for incoming f64-token @p tk **/
+            void on_f64_token(const Token & tk);
+
             ///@}
             /** @defgroup scm-parserstatemachine-error-entrypoints error entry points **/
             ///@{

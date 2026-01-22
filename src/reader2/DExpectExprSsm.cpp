@@ -7,7 +7,13 @@
 #include "ParserStateMachine.hpp"
 #include "SyntaxStateMachine.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectExprSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DProgressSsm.hpp"
 #include "syntaxstatetype.hpp"
+#include <xo/expression2/DConstant.hpp>
+#include <xo/expression2/detail/IExpression_DConstant.hpp>
+#include <xo/object2/DFloat.hpp>
+#include <xo/object2/number/IGCObject_DFloat.hpp>
+#include <xo/gc/GCObject.hpp>
 #include <xo/facet/facet_implementation.hpp>
 
 #ifdef NOT_YET
@@ -27,6 +33,8 @@ namespace xo {
 #ifdef NOT_YET
     using xo::scm::Constant;
 #endif
+    using xo::scm::DFloat;
+    using xo::mm::AGCObject;
 
     using xo::reflect::typeseq;
     using xo::facet::with_facet;
@@ -137,6 +145,29 @@ namespace xo {
             p_psm->illegal_input_on_token("DExpectExprSsm",
                                           tk,
                                           this->get_expect_str());
+        }
+
+        void
+        DExpectExprSsm::on_f64_token(const Token & tk,
+                                     ParserStateMachine * p_psm)
+        {
+            auto f64o = DFloat::box<AGCObject>(p_psm->expr_alloc(),
+                                               tk.f64_value());
+
+            auto expr = with_facet<AExpression>::mkobj(DConstant::make(p_psm->expr_alloc(), f64o));
+
+            // DProgressSsm responsible for resolving cases like
+            //   1.9,
+            //   1.9;
+            //   1.9 + 2;
+            //   1.9 + 2 ..  // could be followed by infix
+            //   1.9 + 2 * 3;
+            //   1.9 + 2 * 3 ..  // could be followed by infix
+            //   1.9 * (2 + 3)
+
+            DProgressSsm::start(p_psm->parser_alloc(),
+                                expr,
+                                p_psm);
         }
 
         void

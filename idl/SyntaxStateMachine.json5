@@ -91,6 +91,15 @@
             ],
         },
         {
+            name: "on_f64_token",
+            doc: ["update state machine for incoming f64-token @p tk"],
+            return_type: "void",
+            args: [
+                {type: "const Token &", name: "tk"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
+        {
             name: "on_parsed_symbol",
             doc: ["update  stat machine for incoming parsed symbol @p sym"],
             return_type: "void",
