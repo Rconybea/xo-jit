@@ -11,7 +11,7 @@
  *       [idl/IExpression_DConstant.json5]
 **/
 
-#include "IExpression_DConstant.hpp"
+#include "detail/IExpression_DConstant.hpp"
 
 namespace xo {
     namespace scm {

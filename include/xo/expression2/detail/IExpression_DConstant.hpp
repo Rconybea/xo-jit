@@ -6,13 +6,14 @@
  *     arguments:
  *       --input [idl/IExpression_DConstant.json5]
  *  2. jinja2 template for abstract facet .hpp file:
- *       [iface_facet_any.hpp.j2]
+ *       [iface_facet_repr.hpp.j2]
  *  3. idl for facet methods
  *       [idl/IExpression_DConstant.json5]
  **/
 
 #pragma once
 
+#include "Expression.hpp"
 #include "Expression.hpp"
 #include "DConstant.hpp"
 
@@ -40,6 +41,8 @@ namespace xo {
             /** @defgroup scm-expression-dconstant-type-traits **/
             ///@{
             using TypeDescr = xo::scm::AExpression::TypeDescr;
+            using Copaque = xo::scm::AExpression::Copaque;
+            using Opaque = xo::scm::AExpression::Opaque;
             ///@}
             /** @defgroup scm-expression-dconstant-methods **/
             ///@{

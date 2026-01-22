@@ -135,6 +135,10 @@ xo_add_genfacetimpl(
 )
 
 # ----------------------------------------------------------------
+
+xo_add_genfacet_all(xo-expression2-genfacet-all)
+
+# ----------------------------------------------------------------
 # shared library
 
 add_subdirectory(src/expression2)

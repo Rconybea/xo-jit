@@ -34,6 +34,16 @@ namespace xo {
             }
         }
 
+        DConstant *
+        DConstant::make(obj<AAllocator> mm,
+                        obj<AGCObject> value)
+        {
+            void * mem = mm.alloc(typeseq::id<DConstant>(),
+                                  sizeof(DConstant));
+
+            return new (mem) DConstant(value);
+        }
+
         TypeDescr
         DConstant::_lookup_td(typeseq tseq)
         {

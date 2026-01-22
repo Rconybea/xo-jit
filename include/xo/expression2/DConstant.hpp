@@ -19,11 +19,19 @@ namespace xo {
         public:
             using TaggedPtr = xo::reflect::TaggedPtr;
             using TypeDescr = xo::reflect::TypeDescr;
+            using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
             using typeseq = xo::reflect::typeseq;
 
         public:
             explicit DConstant(obj<AGCObject> value) noexcept;
+
+            /** create instance
+             *  @p mm     memory allocator
+             *  @p value  literal constant
+             **/
+            static DConstant * make(obj<AAllocator> mm,
+                                    obj<AGCObject> value);
 
             bool is_resolved() const noexcept { return typeref_.is_resolved(); }
 
