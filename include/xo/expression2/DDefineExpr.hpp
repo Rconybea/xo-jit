@@ -56,6 +56,7 @@ namespace xo {
             ///@{
 
             void assign_lhs_name(const DUniqueString * name);
+            void assign_rhs(obj<AExpression> rhs);
 
             ///@}
             /** @defgroup scm-defineexpr-expression-facet **/

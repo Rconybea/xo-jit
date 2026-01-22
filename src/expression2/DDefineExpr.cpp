@@ -67,6 +67,11 @@ namespace xo {
             lhs_var_->assign_valuetype(td);
         }
 
+        void
+        DDefineExpr::assign_rhs(obj<AExpression> x) {
+            this->rhs_ = x;
+        }
+
         bool
         DDefineExpr::pretty(const ppindentinfo & ppii) const
         {
