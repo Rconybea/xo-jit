@@ -218,18 +218,16 @@ namespace xo {
         DExprSeqState::on_parsed_expression(obj<AExpression> expr,
                                             ParserStateMachine * p_psm)
         {
-            p_psm->illegal_parsed_expression("DExprSeqState::on_parsed_expression",
-                                             expr,
-                                             this->get_expect_str());
+            // toplevel expr sequence accepts an arbitrary number of expressions.
+
+            p_psm->capture_result("DExprSeqState::on_parsed_expression", expr);
         }
 
         void
         DExprSeqState::on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                          ParserStateMachine * p_psm)
+                                                           ParserStateMachine * p_psm)
         {
-            p_psm->illegal_parsed_expression("DExprSeqState::on_parsed_expression_with_semicolon",
-                                             expr,
-                                             this->get_expect_str());
+            p_psm->capture_result("DExprSeqState::on_parsed_expression_with_semicolon", expr);
         }
 
         bool

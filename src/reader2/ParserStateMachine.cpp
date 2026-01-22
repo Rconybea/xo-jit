@@ -289,6 +289,13 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::capture_result(std::string_view ssm_name,
+                                           obj<AExpression> expr)
+        {
+            this->result_ = ParserResult::expression(ssm_name, expr);
+        }
+
+        void
         ParserStateMachine::capture_error(std::string_view ssm_name,
                                           const DString * errmsg)
         {
@@ -321,7 +328,7 @@ namespace xo {
         void
         ParserStateMachine::illegal_input_on_symbol(std::string_view ssm_name,
                                                     std::string_view sym,
-                                                   std::string_view expect_str)
+                                                    std::string_view expect_str)
         {
             // TODO:
             // - want to write error message using DArena

@@ -37,6 +37,16 @@ namespace xo {
         {}
 
         ParserResult
+        ParserResult::expression(std::string_view ssm_name,
+                                 obj<AExpression> expr)
+        {
+            return ParserResult(parser_result_type::expression,
+                                expr,
+                                ssm_name,
+                                nullptr);
+        }
+
+        ParserResult
         ParserResult::error(std::string_view ssm_name,
                             const DString * errmsg)
         {

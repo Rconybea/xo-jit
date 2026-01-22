@@ -41,6 +41,12 @@ namespace xo {
                          std::string_view error_src_fn,
                          const DString * error_description);
 
+            /** create ParserResult for parsing success;
+             *  parsing yields expression @p expr
+             **/
+            static ParserResult expression(std::string_view ssm,
+                                           obj<AExpression> expr);
+
             /** create ParserResult for a parsing error.
              *  Reporting detailed message @p errmsg
              *  from syntax state machine @p ssm

@@ -148,6 +148,10 @@ namespace xo {
             /** @defgroup scm-parserstatemachine-error-entrypoints error entry points **/
             ///@{
 
+            /** capture result expression @p expr **/
+            void capture_result(std::string_view ssm_anme,
+                                obj<AExpression> expr);
+
             /** capture error message @p errmsg from @p ssm_name,
              *  as current state machine output.
              *
