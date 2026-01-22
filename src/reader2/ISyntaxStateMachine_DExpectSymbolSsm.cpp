@@ -58,6 +58,11 @@ namespace xo {
             self.on_f64_token(tk, p_psm);
         }
         auto
+        ISyntaxStateMachine_DExpectSymbolSsm::on_semicolon_token(DExpectSymbolSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
+        {
+            self.on_semicolon_token(tk, p_psm);
+        }
+        auto
         ISyntaxStateMachine_DExpectSymbolSsm::on_parsed_symbol(DExpectSymbolSsm & self, std::string_view sym, ParserStateMachine * p_psm) -> void
         {
             self.on_parsed_symbol(sym, p_psm);

@@ -188,6 +188,15 @@ namespace xo {
         }
 
         void
+        DExprSeqState::on_semicolon_token(const Token & tk,
+                                          ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExprSeqState::on_semicolon_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
         DExprSeqState::on_parsed_symbol(std::string_view sym,
                                         ParserStateMachine * p_psm)
         {

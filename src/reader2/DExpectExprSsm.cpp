@@ -171,6 +171,15 @@ namespace xo {
         }
 
         void
+        DExpectExprSsm::on_semicolon_token(const Token & tk,
+                                           ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExpectExprSsm::on_semicolon_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
         DExpectExprSsm::on_parsed_symbol(std::string_view sym,
                                          ParserStateMachine * p_psm)
         {

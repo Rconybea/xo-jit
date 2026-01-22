@@ -141,6 +141,8 @@ namespace xo {
                                        ParserStateMachine * p_psm);
             void on_f64_token(const Token & tk,
                               ParserStateMachine * p_psm);
+            void on_semicolon_token(const Token & tk,
+                                    ParserStateMachine * p_psm);
             void on_parsed_symbol(std::string_view sym,
                                   ParserStateMachine * p_psm);
             void on_parsed_typedescr(TypeDescr td,

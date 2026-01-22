@@ -70,6 +70,9 @@ namespace scm {
         void on_f64_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
             return I::on_f64_token(_dcast(data), tk, p_psm);
         }
+        void on_semicolon_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
+            return I::on_semicolon_token(_dcast(data), tk, p_psm);
+        }
         void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  override {
             return I::on_parsed_symbol(_dcast(data), sym, p_psm);
         }

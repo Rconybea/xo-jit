@@ -74,6 +74,9 @@ public:
     void on_f64_token(const Token & tk, ParserStateMachine * p_psm)  {
         return O::iface()->on_f64_token(O::data(), tk, p_psm);
     }
+    void on_semicolon_token(const Token & tk, ParserStateMachine * p_psm)  {
+        return O::iface()->on_semicolon_token(O::data(), tk, p_psm);
+    }
     void on_parsed_symbol(std::string_view sym, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_symbol(O::data(), sym, p_psm);
     }

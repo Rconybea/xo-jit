@@ -58,6 +58,11 @@ namespace xo {
             self.on_f64_token(tk, p_psm);
         }
         auto
+        ISyntaxStateMachine_DProgressSsm::on_semicolon_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
+        {
+            self.on_semicolon_token(tk, p_psm);
+        }
+        auto
         ISyntaxStateMachine_DProgressSsm::on_parsed_symbol(DProgressSsm & self, std::string_view sym, ParserStateMachine * p_psm) -> void
         {
             self.on_parsed_symbol(sym, p_psm);
