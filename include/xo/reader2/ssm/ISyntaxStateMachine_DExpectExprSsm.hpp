@@ -72,6 +72,8 @@ namespace xo {
             static void on_parsed_symbol(DExpectExprSsm & self, std::string_view sym, ParserStateMachine * p_psm);
             /** operate state machine for incoming type description @p td **/
             static void on_parsed_typedescr(DExpectExprSsm & self, TypeDescr td, ParserStateMachine * p_psm);
+            /** update state machine for incoming parsed expression @p expr **/
+            static void on_parsed_expression(DExpectExprSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm);
             ///@}
         };
 

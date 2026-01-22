@@ -79,6 +79,9 @@ namespace scm {
         void on_parsed_typedescr(Opaque data, TypeDescr td, ParserStateMachine * p_psm)  override {
             return I::on_parsed_typedescr(_dcast(data), td, p_psm);
         }
+        void on_parsed_expression(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  override {
+            return I::on_parsed_expression(_dcast(data), expr, p_psm);
+        }
 
         ///@}
 

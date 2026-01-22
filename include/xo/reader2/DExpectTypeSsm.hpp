@@ -107,6 +107,13 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
+            /** operate state machine for this syntax on receiving expression
+             *  from nested parser.
+             *  (provided to satisfy ASyntaxStateMachine api. not reachable)
+             **/
+            void on_parsed_expression(obj<AExpression> expr,
+                                      ParserStateMachine * p_psm);
+
             ///@}
             /** @defgroup scm-expecttype-printable-facet printable facet methods **/
             ///@{

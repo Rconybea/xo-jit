@@ -583,6 +583,15 @@ namespace xo {
                                           this->get_expect_str());
         }
 
+        void
+        DDefineSsm::on_parsed_expression(obj<AExpression> expr,
+                                         ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_expression("DDefineSsm::on_parsed_expression",
+                                             expr,
+                                             this->get_expect_str());
+        }
+
         bool
         DDefineSsm::pretty(const ppindentinfo & ppii) const
         {

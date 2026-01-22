@@ -164,6 +164,14 @@ namespace xo {
                                             TypeDescr td,
                                             std::string_view expect_str);
 
+            /** report illegal parsed expression from nested ssm.
+             *  Introducing as placeholder; not clear if this will be reachable
+             *  in full parser
+             **/
+            void illegal_parsed_expression(std::string_view ssm_name,
+                                           obj<AExpression>,
+                                           std::string_view expect_str);
+
             ///@}
 
         private:

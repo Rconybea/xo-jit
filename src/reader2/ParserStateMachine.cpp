@@ -343,6 +343,29 @@ namespace xo {
 
             this->capture_error(ssm_name, errmsg);
         }
+
+        void
+        ParserStateMachine::illegal_parsed_expression(std::string_view ssm_name,
+                                                      obj<AExpression> expr,
+                                                      std::string_view expect_str)
+        {
+            // TODO:
+            // - want to write error message using DArena
+            // - need something like log_streambuf and/or tostr() that's arena-aware
+
+            auto errmsg_string = tostr("Unexpected expression",
+                                       xtag("expr", expr),
+                                       xtag("expecting", expect_str),
+                                       xtag("ssm", ssm_name),
+                                       xtag("via", "ParserStateMachine::illegal_parsed_expression"));
+
+            assert(expr_alloc_);
+
+            auto errmsg = DString::from_view(expr_alloc_,
+                                             std::string_view(errmsg_string));
+
+            this->capture_error(ssm_name, errmsg);
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

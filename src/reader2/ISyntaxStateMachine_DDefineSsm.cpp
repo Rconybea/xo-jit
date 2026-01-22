@@ -72,6 +72,11 @@ namespace xo {
         {
             self.on_parsed_typedescr(td, p_psm);
         }
+        auto
+        ISyntaxStateMachine_DDefineSsm::on_parsed_expression(DDefineSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm) -> void
+        {
+            self.on_parsed_expression(expr, p_psm);
+        }
 
     } /*namespace scm*/
 } /*namespace xo*/

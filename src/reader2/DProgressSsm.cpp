@@ -257,6 +257,15 @@ namespace xo {
                                               this->get_expect_str());
         }
 
+        void
+        DProgressSsm::on_parsed_expression(obj<AExpression> expr,
+                                           ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_expression("DProgressSsm::on_parsed_expression",
+                                             expr,
+                                             this->get_expect_str());
+        }
+
 #ifdef NOT_YET
         void
         progress_xs::apply_type_error(const char * self_name,

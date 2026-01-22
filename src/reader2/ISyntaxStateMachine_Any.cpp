@@ -88,6 +88,12 @@ ISyntaxStateMachine_Any::on_parsed_typedescr(Opaque, TypeDescr, ParserStateMachi
     _fatal();
 }
 
+auto
+ISyntaxStateMachine_Any::on_parsed_expression(Opaque, obj<AExpression>, ParserStateMachine *)  -> void
+{
+    _fatal();
+}
+
 
 } /*namespace scm*/
 } /*namespace xo*/

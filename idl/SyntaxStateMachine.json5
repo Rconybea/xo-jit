@@ -126,5 +126,14 @@
                 {type: "ParserStateMachine *", name: "p_psm"},
             ],
         },
+        {
+            name: "on_parsed_expression",
+            doc: ["update state machine for incoming parsed expression @p expr"],
+            return_type: "void",
+            args: [
+                {type: "obj<AExpression>", name: "expr"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
     ],
 }

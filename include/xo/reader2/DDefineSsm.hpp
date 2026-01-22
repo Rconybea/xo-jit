@@ -171,6 +171,12 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
+            /** update state for this syntax after parsing an expression @p expr,
+             *  overall parser state in @p p_psm
+             **/
+            void on_parsed_expression(obj<AExpression> expr,
+                                      ParserStateMachine * p_psm);
+
             ///@}
             /** @defgroup scm-define-printable-facet printable facet methods **/
             ///@{

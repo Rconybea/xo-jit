@@ -214,6 +214,15 @@ namespace xo {
                                               this->get_expect_str());
         }
 
+        void
+        DExprSeqState::on_parsed_expression(obj<AExpression> expr,
+                                            ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_expression("DExprSeqState::on_parsed_expression",
+                                             expr,
+                                             this->get_expect_str());
+        }
+
         bool
         DExprSeqState::pretty(const ppindentinfo & ppii) const
         {
