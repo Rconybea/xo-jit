@@ -32,7 +32,16 @@ namespace xo {
                               bool allow_defs,
                               bool cxl_on_rightparen,
                               ParserStateMachine * p_psm);
+            static void start(DArena & parser_mm,
+                              ParserStateMachine * p_psm);
 
+            /** @defgroup scm-expectexpr-access-methods access methods **/
+            ///@{
+
+            bool allow_defs() const noexcept { return allow_defs_; }
+            bool cxl_on_rightbrace() const noexcept { return cxl_on_rightbrace_; }
+
+            ///@}
             /** @defgroup scm-expectexpr-ssm-facet syntaxstatemachine facet methods **/
             ///@{
 

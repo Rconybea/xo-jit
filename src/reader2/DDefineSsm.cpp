@@ -6,6 +6,7 @@
 #include "DDefineSsm.hpp"
 #include "DExpectSymbolSsm.hpp"
 #include "DExpectTypeSsm.hpp"
+#include "DExpectExprSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DDefineSsm.hpp"
 #include "ssm/IPrintable_DDefineSsm.hpp"
 #include <xo/expression2/detail/IPrintable_DDefineExpr.hpp>
@@ -554,9 +555,8 @@ namespace xo {
             {
                 this->defstate_ = defexprstatetype::def_5;
 
-                // TODO: DExpectExprSsm::start(...)
-                log && log("STUB: DExpectExprSsm not implemented");
-
+                DExpectExprSsm::start(p_psm->parser_alloc(),
+                                      p_psm);
                 return;
             }
 

@@ -5,6 +5,10 @@
 
 #include "DExpectExprSsm.hpp"
 #include "ParserStateMachine.hpp"
+#include "SyntaxStateMachine.hpp"
+#include "ssm/ISyntaxStateMachine_DExpectExprSsm.hpp"
+#include "syntaxstatetype.hpp"
+#include <xo/facet/facet_implementation.hpp>
 
 #ifdef NOT_YET
 #include "exprstatestack.hpp"
@@ -24,43 +28,64 @@ namespace xo {
     using xo::scm::Constant;
 #endif
 
+    using xo::reflect::typeseq;
+    using xo::facet::with_facet;
+
     namespace scm {
 
-#ifdef NOT_YET
-        std::unique_ptr<expect_expr_xs>
-        expect_expr_xs::make(bool allow_defs,
+        DExpectExprSsm::DExpectExprSsm(bool allow_defs,
+                                       bool cxl_on_rightbrace)
+            : allow_defs_{allow_defs},
+              cxl_on_rightbrace_{cxl_on_rightbrace}
+        {
+        }
+
+        DExpectExprSsm *
+        DExpectExprSsm::make(DArena & mm,
+                             bool allow_defs,
                              bool cxl_on_rightbrace)
         {
-            return std::make_unique<expect_expr_xs>(expect_expr_xs(allow_defs,
-                                                                   cxl_on_rightbrace));
+            void * mem = mm.alloc(typeseq::id<DExpectExprSsm>(),
+                                  sizeof(DExpectExprSsm));
 
+            return new (mem) DExpectExprSsm(allow_defs,
+                                            cxl_on_rightbrace);
         }
 
         void
-        expect_expr_xs::start(bool allow_defs,
+        DExpectExprSsm::start(DArena & mm,
+                              bool allow_defs,
                               bool cxl_on_rightbrace,
-                              parserstatemachine * p_psm)
+                              ParserStateMachine * p_psm)
         {
-            p_psm->push_exprstate(expect_expr_xs::make(allow_defs,
-                                                       cxl_on_rightbrace));
+            DExpectExprSsm * exp_expr
+                = DExpectExprSsm::make(mm,
+                                       allow_defs,
+                                       cxl_on_rightbrace);
+            obj<ASyntaxStateMachine> ssm
+                = with_facet<ASyntaxStateMachine>::mkobj(exp_expr);
+
+            p_psm->push_ssm(ssm);
         }
 
         void
-        expect_expr_xs::start(parserstatemachine * p_psm) {
-            start(false /*!allow_defs*/,
+        DExpectExprSsm::start(DArena & mm,
+                              ParserStateMachine * p_psm)
+        {
+            start(mm,
+                  false /*!allow_defs*/,
                   false /*!cxl_on_rightbrace*/,
                   p_psm);
         }
 
-        expect_expr_xs::expect_expr_xs(bool allow_defs,
-                                       bool cxl_on_rightbrace)
-            : exprstate(exprstatetype::expect_rhs_expression),
-              allow_defs_{allow_defs},
-              cxl_on_rightbrace_{cxl_on_rightbrace}
-        {}
+        syntaxstatetype
+        DExpectExprSsm::ssm_type() const noexcept
+        {
+            return syntaxstatetype::expect_rhs_expression;
+        }
 
-        const char *
-        expect_expr_xs::get_expect_str() const
+        std::string_view
+        DExpectExprSsm::get_expect_str() const noexcept
         {
             if (allow_defs_) {
                 return "def|lambda|lparen|lbrace|literal|var";
@@ -69,6 +94,80 @@ namespace xo {
             }
         }
 
+        void
+        DExpectExprSsm::on_symbol_token(const Token & tk,
+                                        ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExpectExprSsm",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DExpectExprSsm::on_def_token(const Token & tk,
+                                     ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExpectExprSsm",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DExpectExprSsm::on_if_token(const Token & tk,
+                                     ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExpectExprSsm",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DExpectExprSsm::on_colon_token(const Token & tk,
+                                     ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExpectExprSsm",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DExpectExprSsm::on_singleassign_token(const Token & tk,
+                                              ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExpectExprSsm",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DExpectExprSsm::on_parsed_symbol(std::string_view sym,
+                                         ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_symbol("DExpectExprSsm",
+                                           sym,
+                                           this->get_expect_str());
+        }
+
+        void
+        DExpectExprSsm::on_parsed_typedescr(TypeDescr td,
+                                            ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_typedescr("DExpectExprSsm",
+                                              td,
+                                              this->get_expect_str());
+        }
+
+        bool
+        DExpectExprSsm::pretty(const ppindentinfo & ppii) const
+        {
+            return ppii.pps()->pretty_struct
+                (ppii,
+                 "DExpectExprSsm",
+                 refrtag("allow_defs", allow_defs_),
+                 refrtag("cxl_on_rightbrace", cxl_on_rightbrace_));
+        }
+
+#ifdef NOT_YET
         void
         expect_expr_xs::on_def_token(const token_type & tk,
                                      parserstatemachine * p_psm)

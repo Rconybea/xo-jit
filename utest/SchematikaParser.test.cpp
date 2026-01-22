@@ -5,6 +5,8 @@
 
 #include <xo/reader2/SchematikaParser.hpp>
 #include <xo/reader2/DDefineSsm.hpp>
+#include <xo/reader2/DExpectExprSsm.hpp>
+#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectExprSsm.hpp>
 #include <xo/reader2/ssm/ISyntaxStateMachine_DDefineSsm.hpp>
 #include <xo/reader2/init_reader2.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
@@ -15,10 +17,12 @@ namespace xo {
     using xo::scm::ASyntaxStateMachine;
     using xo::scm::syntaxstatetype;
     using xo::scm::DDefineSsm;
+    using xo::scm::DExpectExprSsm;
     using xo::scm::defexprstatetype;
-    using xo::scm::ParserResult;
-    using xo::scm::parser_result_type;
+    //using xo::scm::ParserResult;
+    //using xo::scm::parser_result_type;
     using xo::scm::Token;
+    using xo::scm::DString;
     using xo::mm::ArenaConfig;
     using xo::mm::AAllocator;
     using xo::mm::DArena;
@@ -150,12 +154,39 @@ namespace xo {
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
+                auto exp_ssm
+                    = obj<ASyntaxStateMachine,DExpectExprSsm>::from(parser.top_ssm());
+
+                REQUIRE(exp_ssm);
+                REQUIRE(exp_ssm.data()->ssm_type() == syntaxstatetype::expect_rhs_expression);
+                REQUIRE(exp_ssm.data()->allow_defs() == false);
+                REQUIRE(exp_ssm.data()->cxl_on_rightbrace() == false);
+            }
+
+#ifdef NOT_YET
+            {
+                // future-proofing for Token only holding a string_view
+                const DString * str = DString::from_cstr(expr_alloc, "3.141593");
+
+                auto & result = parser.on_token(Token::f64_token(std::string(*str)));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+
+                log && log("after typename symbol token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+            }
+#endif
+
+            {
+#ifdef NOT_YET
                 auto def_ssm
                     = obj<ASyntaxStateMachine,DDefineSsm>::from(parser.top_ssm());
 
                 REQUIRE(def_ssm);
                 REQUIRE(def_ssm.data()->ssm_type() == syntaxstatetype::defexpr);
                 REQUIRE(def_ssm.data()->defstate() == defexprstatetype::def_5);
+#endif
             }
 
             // define-expressions not properly implemented

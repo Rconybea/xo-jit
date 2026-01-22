@@ -27,6 +27,9 @@ namespace xo {
             /** expecting a type. See @ref DExpectTypeSsm **/
             expect_type,
 
+            /** expecting a rhs expression. See @ref DExpectExprSsm **/
+            expect_rhs_expression,
+
             /** handle define-expression. See @ref DDefineSsm **/
             defexpr,
 

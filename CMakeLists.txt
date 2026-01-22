@@ -138,6 +138,32 @@ xo_add_genfacetimpl(
 
 # ----------------------------------------------------------------
 
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-syntaxstatemachine-expectexprssm
+    FACET_PKG xo_reader2
+    FACET SyntaxStateMachine
+    REPR ExpectExprSsm
+    INPUT idl/ISyntaxStateMachine_DExpectExprSsm.json5
+    OUTPUT_HPP_DIR include/xo/reader2
+    OUTPUT_IMPL_SUBDIR ssm
+    OUTPUT_CPP_DIR src/reader2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-printable-expectexprssm
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR ExpectExprSsm
+    INPUT idl/IPrintable_DExpectExprSsm.json5
+    OUTPUT_HPP_DIR include/xo/reader2
+    OUTPUT_IMPL_SUBDIR ssm
+    OUTPUT_CPP_DIR src/reader2
+)
+
+# ----------------------------------------------------------------
+
 xo_add_genfacet_all(xo-reader2-genfacet-all)
 
 # ----------------------------------------------------------------

@@ -29,6 +29,8 @@ set(SELF_SRCS
     IPrintable_DExpectTypeSsm.cpp
 
     DExpectExprSsm.cpp
+    ISyntaxStateMachine_DExpectExprSsm.cpp
+    IPrintable_DExpectExprSsm.cpp
 
     reader2_register_facets.cpp
     reader2_register_types.cpp
