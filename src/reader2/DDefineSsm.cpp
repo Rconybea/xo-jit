@@ -11,6 +11,7 @@
 #include "ssm/IPrintable_DDefineSsm.hpp"
 #include <xo/expression2/detail/IPrintable_DDefineExpr.hpp>
 #include <xo/printable2/Printable.hpp>
+#include <xo/facet/FacetRegistry.hpp>
 
 #ifdef NOT_YET
 #include "parserstatemachine.hpp"
@@ -22,6 +23,7 @@
 
 namespace xo {
     using xo::print::APrintable;
+    using xo::facet::FacetRegistry;
     using xo::facet::with_facet;
     using xo::facet::typeseq;
 
@@ -617,7 +619,7 @@ namespace xo {
         bool
         DDefineSsm::pretty(const ppindentinfo & ppii) const
         {
-            auto expr = with_facet<APrintable>::mkobj(def_expr_.data());
+            auto expr = FacetRegistry::instance().variant<APrintable,AExpression>(def_expr_);
 
             return ppii.pps()->pretty_struct
                 (ppii,

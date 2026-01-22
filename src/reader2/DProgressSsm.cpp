@@ -5,7 +5,10 @@
 
 #include "DProgressSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DProgressSsm.hpp"
+#include <xo/printable2/Printable.hpp>
+#include <xo/facet/FacetRegistry.hpp>
 #include <xo/reflectutil/typeseq.hpp>
+#include <xo/indentlog/print/cond.hpp>
 
 #ifdef NOT_YET
 #include "apply_xs.hpp"
@@ -25,6 +28,8 @@ namespace xo {
     using xo::scm::Variable;
     using xo::scm::Apply;
 #endif
+    using xo::print::APrintable;
+    using xo::facet::FacetRegistry;
     using xo::facet::with_facet;
     using xo::reflect::typeseq;
 
@@ -211,11 +216,22 @@ namespace xo {
         DProgressSsm::on_semicolon_token(const Token & tk,
                                          ParserStateMachine * p_psm)
         {
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag));
+
             /* note: implementation should parallel .on_rightparen_token() */
 
             (void)tk;
 
             obj<AExpression> expr = this->assemble_expr(p_psm);
+
+            {
+                obj<APrintable> expr_pr = FacetRegistry::instance().variant<APrintable,AExpression>(expr);
+
+                assert(expr_pr);
+
+                log && log(xtag("expr", expr_pr));
+            }
 
             p_psm->pop_ssm();
             p_psm->on_parsed_expression_with_semicolon(expr);
@@ -951,12 +967,23 @@ namespace xo {
         bool
         DProgressSsm::pretty(const xo::print::ppindentinfo & ppii) const
         {
+            scope log(XO_DEBUG(true));
+            log && log(xtag("lhs_.tseq", lhs_._typeseq()));
+            log && log(xtag("rhs_.tseq", rhs_._typeseq()));
+
+            obj<APrintable> lhs
+                = FacetRegistry::instance().variant<APrintable,AExpression>(lhs_);
+
+            obj<APrintable> rhs;
+            if (rhs_)
+                rhs = FacetRegistry::instance().variant<APrintable,AExpression>(rhs_);
+
             return ppii.pps()->pretty_struct
                        (ppii,
                         "DProgressSsm",
-                        refrtag("lhs", lhs_),
+                        refrtag("lhs", lhs),
                         refrtag("op", op_type_),
-                        refrtag("rhs", rhs_));
+                        cond(rhs, refrtag("rhs", rhs), "nullptr"));
 
 #ifdef NOPE
             if (ppii.upto()) {
