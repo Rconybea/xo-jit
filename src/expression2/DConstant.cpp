@@ -7,12 +7,16 @@
 #include "TypeDescr.hpp"
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/DInteger.hpp>
+#include <xo/facet/FacetRegistry.hpp>
 #include <xo/reflect/Reflect.hpp>
+#include <xo/printable2/Printable.hpp>
 #include <xo/reflectutil/typeseq.hpp>
 
 namespace xo {
     using xo::scm::DFloat;
     using xo::scm::DInteger;
+    using xo::print::APrintable;
+    using xo::facet::FacetRegistry;
     using xo::reflect::Reflect;
     using xo::reflect::TypeDescr;
     using xo::reflect::typeseq;
@@ -56,6 +60,20 @@ namespace xo {
             }
 
             return nullptr;
+        }
+
+        bool
+        DConstant::pretty(const ppindentinfo & ppii) const
+        {
+            obj<APrintable> value
+                = FacetRegistry::instance().variant<APrintable,AGCObject>(value_);
+
+            return ppii.pps()->pretty_struct
+                       (ppii,
+                        "DConstant",
+                        refrtag("value_.tseq", value_._typeseq()),
+                        refrtag("value.tseq", value._typeseq()),
+                        refrtag("value", value));
         }
     } /*namespace scm*/
 } /*namespace xo*/

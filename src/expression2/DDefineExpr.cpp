@@ -79,11 +79,21 @@ namespace xo {
             auto rhs = FacetRegistry::instance().try_variant<APrintable,
                                                              AExpression>(rhs_);
 
-            return ppii.pps()->pretty_struct
-                       (ppii,
-                        "DDefineExpr",
-                        refrtag("lhs", lhs),
-                        refrtag("rhs", cond(rhs_, rhs, "nullptr")));
+            // note: xo::print::cond() doesn't resolve the way we want here
+
+            if (rhs) {
+                return ppii.pps()->pretty_struct
+                           (ppii,
+                            "DDefineExpr",
+                            refrtag("lhs", lhs),
+                            refrtag("rhs", rhs));
+            } else {
+                return ppii.pps()->pretty_struct
+                           (ppii,
+                            "DDefineExpr",
+                            refrtag("lhs", lhs));
+
+            }
         }
 
     } /*namespace scm*/

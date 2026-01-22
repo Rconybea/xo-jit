@@ -11,7 +11,9 @@ set(SELF_SRCS
     TypeRef.cpp
 
     IExpression_Any.cpp
+
     IExpression_DConstant.cpp
+    IPrintable_DConstant.cpp
 
     IExpression_DVariable.cpp
     IPrintable_DVariable.cpp

@@ -22,6 +22,7 @@ namespace xo {
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
             using typeseq = xo::reflect::typeseq;
+            using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             explicit DConstant(obj<AGCObject> value) noexcept;
@@ -44,6 +45,8 @@ namespace xo {
             obj<AGCObject> value() const noexcept { return value_; }
 
             void assign_valuetype(TypeDescr td) noexcept { typeref_.resolve(td); }
+
+            bool pretty(const ppindentinfo & ppii) const;
 
         private:
             static TypeDescr _lookup_td(typeseq tseq);

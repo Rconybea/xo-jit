@@ -8,9 +8,14 @@
 #include <xo/expression2/detail/IGCObject_DUniqueString.hpp>
 #include <xo/expression2/detail/IPrintable_DUniqueString.hpp>
 
+#include <xo/expression2/detail/IExpression_DDefineExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DDefineExpr.hpp>
 
+#include <xo/expression2/detail/IExpression_DVariable.hpp>
 #include <xo/expression2/detail/IPrintable_DVariable.hpp>
+
+#include <xo/expression2/detail/IExpression_DConstant.hpp>
+#include <xo/expression2/detail/IPrintable_DConstant.hpp>
 
 #include <xo/gc/detail/AGCObject.hpp>
 #include <xo/printable2/detail/APrintable.hpp>
@@ -32,13 +37,24 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DUniqueString>();
             FacetRegistry::register_impl<APrintable, DUniqueString>();
 
-            FacetRegistry::register_impl<APrintable, DDefineExpr>();
+            // Expression
+            // +- Constant
+            // +- Variable
+            // \- DefineExpr
 
+            FacetRegistry::register_impl<AExpression, DConstant>();
+            FacetRegistry::register_impl<APrintable, DConstant>();
+
+            FacetRegistry::register_impl<AExpression, DVariable>();
             FacetRegistry::register_impl<APrintable, DVariable>();
+
+            FacetRegistry::register_impl<AExpression, DDefineExpr>();
+            FacetRegistry::register_impl<APrintable, DDefineExpr>();
 
             log && log(xtag("DUniqueString.tseq", typeseq::id<DUniqueString>()));
             log && log(xtag("DDefineExpr.tseq", typeseq::id<DDefineExpr>()));
             log && log(xtag("DVariable.tseq", typeseq::id<DVariable>()));
+            log && log(xtag("DConstant.tseq", typeseq::id<DConstant>()));
 
             log && log(xtag("AExpression.tqseq", typeseq::id<AExpression>()));
 
