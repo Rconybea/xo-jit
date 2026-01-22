@@ -223,6 +223,15 @@ namespace xo {
                                              this->get_expect_str());
         }
 
+        void
+        DExprSeqState::on_parsed_expression_with_semicolon(obj<AExpression> expr,
+                                                          ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_expression("DExprSeqState::on_parsed_expression_with_semicolon",
+                                             expr,
+                                             this->get_expect_str());
+        }
+
         bool
         DExprSeqState::pretty(const ppindentinfo & ppii) const
         {

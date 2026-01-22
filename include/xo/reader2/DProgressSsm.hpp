@@ -123,12 +123,14 @@ namespace xo {
 
             std::string_view get_expect_str() const noexcept;
 
-#ifdef NOT_YET
-            void on_expr(bp<Expression> expr,
-                                 parserstatemachine * p_psm) override;
-            void on_expr_with_semicolon(bp<Expression> expr,
-                                                parserstatemachine * p_psm) override;
-#endif
+            /** assemble expression from collected inputs.
+             *  Usually triggered by syntax like ';' or ')'
+             **/
+            obj<AExpression> assemble_expr(ParserStateMachine * p_psm);
+
+            /** @defgroup scm-progressssm-ssm-facet syntaxstatemachine facet methods **/
+            /// @{
+
             void on_symbol_token(const Token & tk,
                                  ParserStateMachine * p_psm);
             void on_def_token(const Token & tk,
@@ -149,11 +151,16 @@ namespace xo {
                                      ParserStateMachine * p_psm);
             void on_parsed_expression(obj<AExpression>,
                                       ParserStateMachine * p_psm);
+            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
+                                                     ParserStateMachine * p_psm);
 
+            ///@}
+            /** @defgroup scm-progressssm-printable-facet printable facet methods **/
             ///@{
 
-            /** @defgroup scm-progressssm-printable-facet printable facet methods **/
             bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
 
 #ifdef NOT_YET
             void on_comma_token(const token_type & tk,

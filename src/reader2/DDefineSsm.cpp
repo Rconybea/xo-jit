@@ -578,6 +578,12 @@ namespace xo {
         DDefineSsm::on_semicolon_token(const Token & tk,
                                        ParserStateMachine * p_psm)
         {
+            if (defstate_ == defexprstatetype::def_6) {
+                p_psm->pop_ssm();
+                p_psm->on_parsed_expression_with_semicolon(def_expr_);
+                return;
+            }
+
             p_psm->illegal_input_on_token("DDefineSsm::on_semicolon_token",
                                           tk,
                                           this->get_expect_str());
@@ -587,9 +593,25 @@ namespace xo {
         DDefineSsm::on_parsed_expression(obj<AExpression> expr,
                                          ParserStateMachine * p_psm)
         {
+            if (defstate_ == defexprstatetype::def_5)
+            {
+                this->defstate_ = defexprstatetype::def_6;
+
+                def_expr_.data()->assign_rhs(expr);
+                return;
+            }
+
             p_psm->illegal_parsed_expression("DDefineSsm::on_parsed_expression",
                                              expr,
                                              this->get_expect_str());
+        }
+
+        void
+        DDefineSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
+                                                        ParserStateMachine * p_psm)
+        {
+            this->on_parsed_expression(expr, p_psm);
+            this->on_semicolon_token(Token::semicolon_token(), p_psm);
         }
 
         bool

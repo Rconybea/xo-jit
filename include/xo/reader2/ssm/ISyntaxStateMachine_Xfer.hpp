@@ -82,6 +82,9 @@ namespace scm {
         void on_parsed_expression(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  override {
             return I::on_parsed_expression(_dcast(data), expr, p_psm);
         }
+        void on_parsed_expression_with_semicolon(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  override {
+            return I::on_parsed_expression_with_semicolon(_dcast(data), expr, p_psm);
+        }
 
         ///@}
 

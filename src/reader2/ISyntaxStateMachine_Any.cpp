@@ -94,6 +94,12 @@ ISyntaxStateMachine_Any::on_parsed_expression(Opaque, obj<AExpression>, ParserSt
     _fatal();
 }
 
+auto
+ISyntaxStateMachine_Any::on_parsed_expression_with_semicolon(Opaque, obj<AExpression>, ParserStateMachine *)  -> void
+{
+    _fatal();
+}
+
 
 } /*namespace scm*/
 } /*namespace xo*/

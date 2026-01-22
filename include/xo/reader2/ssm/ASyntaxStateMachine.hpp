@@ -77,6 +77,8 @@ public:
     virtual void on_parsed_typedescr(Opaque data, TypeDescr td, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming parsed expression @p expr **/
     virtual void on_parsed_expression(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  = 0;
+    /** update state machine for incoming parsed expression @p expr followed by semicolon **/
+    virtual void on_parsed_expression_with_semicolon(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  = 0;
     ///@}
 }; /*ASyntaxStateMachine*/
 

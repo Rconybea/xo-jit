@@ -130,6 +130,26 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::on_parsed_expression(obj<AExpression> expr)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("expr", expr));
+
+            assert(stack_);
+
+            this->top_ssm().on_parsed_expression(expr, this);
+        }
+
+        void
+        ParserStateMachine::on_parsed_expression_with_semicolon(obj<AExpression> expr)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("expr", expr));
+
+            assert(stack_);
+
+            this->top_ssm().on_parsed_expression_with_semicolon(expr, this);
+        }
+
+        void
         ParserStateMachine::on_token(const Token & tk)
         {
             scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));

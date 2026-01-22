@@ -206,6 +206,17 @@ namespace xo {
                                              this->get_expect_str());
         }
 
+        void
+        DExpectExprSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
+                                                            ParserStateMachine * p_psm)
+        {
+            // expression (reported by nested ProgressSsm)
+            // completes this DExpectExprSsm's assignment
+
+            p_psm->pop_ssm();
+            p_psm->on_parsed_expression_with_semicolon(expr);
+        }
+
         bool
         DExpectExprSsm::pretty(const ppindentinfo & ppii) const
         {

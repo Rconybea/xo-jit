@@ -86,6 +86,13 @@ namespace xo {
             void on_parsed_expression(obj<AExpression> expr,
                                       ParserStateMachine * p_psm);
 
+            /** update state for this syntax after parsing an expression @p expr
+             *  followed by semicolon in nested state machine.
+             *  (provided to satisfy ASyntaxStateMachine api. not reachable)
+             **/
+            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
+                                                     ParserStateMachine * p_psm);
+
             /** update state for this syntax on incoming token @p tk,
              *  overall parser state in @p p_psm.
              **/

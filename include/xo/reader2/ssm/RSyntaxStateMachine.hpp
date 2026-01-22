@@ -86,6 +86,9 @@ public:
     void on_parsed_expression(obj<AExpression> expr, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_expression(O::data(), expr, p_psm);
     }
+    void on_parsed_expression_with_semicolon(obj<AExpression> expr, ParserStateMachine * p_psm)  {
+        return O::iface()->on_parsed_expression_with_semicolon(O::data(), expr, p_psm);
+    }
 
     ///@}
     /** @defgroup scm-syntaxstatemachine-member-vars **/

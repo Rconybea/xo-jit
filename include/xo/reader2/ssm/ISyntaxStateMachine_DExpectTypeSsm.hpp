@@ -74,6 +74,8 @@ namespace xo {
             static void on_parsed_typedescr(DExpectTypeSsm & self, TypeDescr td, ParserStateMachine * p_psm);
             /** update state machine for incoming parsed expression @p expr **/
             static void on_parsed_expression(DExpectTypeSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm);
+            /** update state machine for incoming parsed expression @p expr followed by semicolon **/
+            static void on_parsed_expression_with_semicolon(DExpectTypeSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm);
             ///@}
         };
 

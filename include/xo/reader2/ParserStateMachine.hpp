@@ -102,6 +102,22 @@ namespace xo {
              **/
             void on_parsed_typedescr(TypeDescr td);
 
+            /** update state to respond to parsed expression @p expr
+             *  (from nested parsing state)
+             **/
+            void on_parsed_expression(obj<AExpression> expr);
+
+            /** update state to respond to parsed expression @p expr
+             *  (from nested parsing state), with trailing semicolon.
+             *
+             *  Need to distinguish cases like:
+             *    6    // ; allowed
+             *    f(6  // ) allowed    ; forbidden
+             *    6 +  // ) forbidden  ; forbidden
+             *
+             **/
+            void on_parsed_expression_with_semicolon(obj<AExpression> expr);
+
             /** update state to respond to input token @p tk.
              *  record output (if any) in @ref result_
              **/

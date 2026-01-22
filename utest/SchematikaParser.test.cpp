@@ -177,14 +177,13 @@ namespace xo {
             }
 
             {
-#ifdef NOT_YET
-                auto def_ssm
-                    = obj<ASyntaxStateMachine,DDefineSsm>::from(parser.top_ssm());
+                auto & result = parser.on_token(Token::semicolon_token());
 
-                REQUIRE(def_ssm);
-                REQUIRE(def_ssm.data()->ssm_type() == syntaxstatetype::defexpr);
-                REQUIRE(def_ssm.data()->defstate() == defexprstatetype::def_5);
-#endif
+                log && log("after semicolon token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == false);
             }
 
             // define-expressions not properly implemented

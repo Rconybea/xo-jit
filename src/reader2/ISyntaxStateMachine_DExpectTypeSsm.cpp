@@ -77,6 +77,11 @@ namespace xo {
         {
             self.on_parsed_expression(expr, p_psm);
         }
+        auto
+        ISyntaxStateMachine_DExpectTypeSsm::on_parsed_expression_with_semicolon(DExpectTypeSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm) -> void
+        {
+            self.on_parsed_expression_with_semicolon(expr, p_psm);
+        }
 
     } /*namespace scm*/
 } /*namespace xo*/

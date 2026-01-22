@@ -84,6 +84,15 @@ namespace xo {
         }
 
         void
+        DExpectSymbolSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
+                                                              ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_expression("DExpectSymbolSsm::on_parsed_expression_with_semicolon",
+                                             expr,
+                                             this->get_expect_str());
+        }
+
+        void
         DExpectSymbolSsm::on_symbol_token(const Token & tk,
                                           ParserStateMachine * p_psm)
         {

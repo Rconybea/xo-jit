@@ -135,5 +135,14 @@
                 {type: "ParserStateMachine *", name: "p_psm"},
             ],
         },
+        {
+            name: "on_parsed_expression_with_semicolon",
+            doc: ["update state machine for incoming parsed expression @p expr followed by semicolon"],
+            return_type: "void",
+            args: [
+                {type: "obj<AExpression>", name: "expr"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
     ],
 }
