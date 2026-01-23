@@ -32,7 +32,7 @@ namespace xo {
              *  @p tk_start   current position on entry to scanner
              *  @p error_pos  error location relative to token start
              **/
-            TokenizerError(const char * src_function,
+            TokenizerError(std::string_view src_function,
                            std::string error_description,
                            const TkInputState & input_state,
                            size_t error_pos)
@@ -46,12 +46,20 @@ namespace xo {
                     log && log(xtag("input_state.current_pos", input_state.current_pos()),
                                xtag("error_pos", error_pos));
                 }
+
+            TokenizerError with_error(std::string_view error_src_fn,
+                                      std::string error_msg) {
+                return TokenizerError(error_src_fn,
+                                      std::string(error_msg),
+                                      this->input_state_,
+                                      0 /*error_pos*/);
+            }
             ///@}
 
             /** @defgroup tokenizer-error-access-methods **/
             ///@{
 
-            const char * src_function() const { return src_function_; }
+            std::string_view src_function() const { return src_function_; }
             const std::string & error_description() const { return error_description_; }
 #pragma GCC diagnostic push
 #ifndef __APPLE__
@@ -88,8 +96,8 @@ namespace xo {
             ///@{
 
             /** source location (in tokenizer) at which error identified **/
-            char const * src_function_ = nullptr;
-            /** static error description **/
+            std::string_view src_function_;
+            /** error description **/
             std::string error_description_;
             /** input state associated with this error.
              *  Sufficient to precisely locate it with context.

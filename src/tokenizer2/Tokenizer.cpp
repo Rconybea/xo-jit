@@ -615,19 +615,18 @@ namespace xo {
         }
 
         auto
-        Tokenizer::buffer_input_line(const char * input_cstr,
+        Tokenizer::buffer_input_line(span_type input_ext,
                                      bool eof_flag) -> std::pair<input_error, span_type>
         {
             scope log(XO_DEBUG(input_state_.debug_flag()));
 
-            log && log(xtag("input", input_cstr));
+            log && log(xtag("input_ext", input_ext));
 
             auto buf_input_0 = input_buffer_.input_range().hi();
 
-            auto remainder = input_buffer_.append
-                                 (DCircularBuffer::const_span_type::from_cstr(input_cstr));
-            auto remainder2 = input_buffer_.append
-                                  (DCircularBuffer::const_span_type::from_cstr("\n"));
+            auto remainder = input_buffer_.append(input_ext);
+            auto remainder2 = input_buffer_.append(span_type::from_cstr("\n"));
+            //(DCircularBuffer::const_span_type::from_cstr("\n"));
 
             if (!remainder.empty() || !remainder2.empty()) {
                 throw std::runtime_error(tostr("Tokenizer::buffer_line: line too long!",
@@ -636,10 +635,10 @@ namespace xo {
 
             auto buf_input_1 = input_buffer_.input_range().hi();
 
-            span_type input = span_type(buf_input_0,
-                                        buf_input_1);
+            span_type input_ours = span_type(buf_input_0,
+                                             buf_input_1);
 
-            return this->input_state_.capture_current_line(input, eof_flag);
+            return this->input_state_.capture_current_line(input_ours, eof_flag);
         }
 
         auto

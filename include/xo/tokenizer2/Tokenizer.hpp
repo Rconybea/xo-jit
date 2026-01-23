@@ -129,10 +129,11 @@ namespace xo {
              **/
             bool has_prefix() const { return !prefix_.empty(); }
 
-            /** buffer contents of input_cstr.
+            /** copy into buffer the  contents of @p input.
              *  May throw if buffer space exhausted
              **/
-            std::pair<input_error, span_type> buffer_input_line(const char * input_cstr, bool eof_flag);
+            std::pair<input_error, span_type> buffer_input_line(span_type input,
+                                                                bool eof_flag);
 
             /** scan for next input token,  given @p input.
              *  Note:

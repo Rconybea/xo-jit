@@ -85,32 +85,33 @@ main() {
     {
         //cout << "input: " << input << endl;
 
+        auto input_ext = Tokenizer::span_type::from_cstr(input_cstr);
+
         // reminder: input may contain multiple tokens
-        if (input_cstr && *input_cstr) {
-            auto [error, input] = tkz.buffer_input_line(input_cstr, false /*!eof*/);
+        auto [error, input] = tkz.buffer_input_line(input_ext, false /*!eof*/);
 
-            if (log) {
-                log(xtag("msg", "buffered input line"));
-                log(xtag("input", input));
+        if (log) {
+            log(xtag("msg", "buffered input line"));
+            log(xtag("input", input));
+        }
+
+        while (!input.empty())
+        {
+            auto [tk, consumed, error] = tkz.scan(input);
+
+            log && log(xtag("consumed", consumed), xtag("tk", tk));
+
+            if (tk.is_valid()) {
+                cout << tk << endl;
+            } else if (error.is_error()) {
+                cout << "tokenizer error: " << endl;
+
+                error.report(cout);
+
+                break;
             }
 
-            while (!input.empty())
-            {
-                auto [tk, consumed, error] = tkz.scan(input);
-
-                log && log(xtag("consumed", consumed), xtag("tk", tk));
-
-                if (tk.is_valid()) {
-                    cout << tk << endl;
-                } else if (error.is_error()) {
-                    cout << "tokenizer error: " << endl;
-                    error.report(cout);
-
-                    break;
-                }
-
-                input = input.after_prefix(consumed);
-            }
+            input = input.after_prefix(consumed);
         }
 
         /* here: input.empty() or error encountered */
