@@ -143,6 +143,12 @@ namespace xo {
         }
 
         void
+        SchematikaReader::reset_result()
+        {
+            this->parser_.reset_result();
+        }
+
+        void
         SchematikaReader::reset_to_idle_toplevel()
         {
             this->tokenizer_.discard_current_line();

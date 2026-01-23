@@ -110,6 +110,8 @@ namespace {
 
             pps.prettyn(expr_pr);
 
+            p_reader->reset_result();
+
             *p_input = remaining;
 
             return true;

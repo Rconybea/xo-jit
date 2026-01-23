@@ -56,6 +56,9 @@ namespace xo {
             /** consume input @p input_cstr **/
             const ReaderResult & read_expr(span_type input_span, bool eof);
 
+            /** reset @ref result_ to nominal value **/
+            void reset_result();
+
             /** reset to known starting point after encountering an error.
              *  - remainder of stashed current line.
              *    Necesary for well-formatted error reporting.
