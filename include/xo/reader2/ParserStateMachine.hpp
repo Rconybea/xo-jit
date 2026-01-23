@@ -138,6 +138,9 @@ namespace xo {
             /** operate state machine for incoming singleassign-token @p tk **/
             void on_singleassign_token(const Token & tk);
 
+            /** operate state machine for incoming string-otoken @p tk **/
+            void on_string_token(const Token & tk);
+
             /** operate state machine for incoming f64-token @p tk **/
             void on_f64_token(const Token & tk);
 

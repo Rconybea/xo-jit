@@ -83,6 +83,12 @@ namespace xo {
             void on_singleassign_token(const Token & tk,
                                        ParserStateMachine * p_psm);
 
+            /** update state for this syntax on incoming string token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_string_token(const Token & tk,
+                                 ParserStateMachine * p_psm);
+
             /** update state for this syntax on incoming f64 token @p tk,
              *  overall parser state in @p p_psm
              **/

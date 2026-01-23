@@ -9,6 +9,8 @@
 #include <xo/reader2/DProgressSsm.hpp>
 #include <xo/expression2/DConstant.hpp>
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
+#include <xo/object2/DString.hpp>
+#include <xo/object2/string/IGCObject_DString.hpp>
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/number/IGCObject_DFloat.hpp>
 #include <xo/object2/DBoolean.hpp>
@@ -188,6 +190,36 @@ namespace xo {
                                              ParserStateMachine * p_psm)
         {
             p_psm->illegal_input_on_token("DExprSeqState::on_singleassign_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DExprSeqState::on_string_token(const Token & tk,
+                                       ParserStateMachine * p_psm)
+        {
+            switch (seqtype_) {
+            case exprseqtype::toplevel_interactive:
+                {
+                    DString * dstr = DString::from_cstr(p_psm->expr_alloc(),
+                                                        tk.text().c_str());
+                    obj<AGCObject,DString> str(dstr);
+                    auto * dconst = DConstant::make(p_psm->expr_alloc(), str);
+                    obj<AExpression,DConstant> expr(dconst);
+
+                    DProgressSsm::start(p_psm->parser_alloc(),
+                                        expr,
+                                        p_psm);
+                    return;
+                }
+            case exprseqtype::toplevel_batch:
+                break;
+            case exprseqtype::N:
+                assert(false); // unreachable
+                break;
+            }
+
+            p_psm->illegal_input_on_token("DExprSeqState::on_string_token",
                                           tk,
                                           this->get_expect_str());
         }

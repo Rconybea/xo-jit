@@ -76,6 +76,9 @@ namespace scm {
         void on_bool_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
             return I::on_bool_token(_dcast(data), tk, p_psm);
         }
+        void on_string_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
+            return I::on_string_token(_dcast(data), tk, p_psm);
+        }
         void on_semicolon_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
             return I::on_semicolon_token(_dcast(data), tk, p_psm);
         }

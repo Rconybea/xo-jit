@@ -150,6 +150,15 @@ namespace xo {
         }
 
         void
+        DExpectSymbolSsm::on_string_token(const Token & tk,
+                                          ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_string_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
         DExpectSymbolSsm::on_f64_token(const Token & tk,
                                        ParserStateMachine * p_psm)
         {

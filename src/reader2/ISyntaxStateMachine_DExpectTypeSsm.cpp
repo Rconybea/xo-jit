@@ -68,6 +68,11 @@ namespace xo {
             self.on_bool_token(tk, p_psm);
         }
         auto
+        ISyntaxStateMachine_DExpectTypeSsm::on_string_token(DExpectTypeSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
+        {
+            self.on_string_token(tk, p_psm);
+        }
+        auto
         ISyntaxStateMachine_DExpectTypeSsm::on_semicolon_token(DExpectTypeSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
         {
             self.on_semicolon_token(tk, p_psm);

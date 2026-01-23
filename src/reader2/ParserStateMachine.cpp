@@ -183,6 +183,10 @@ namespace xo {
                 this->on_singleassign_token(tk);
                 break;
 
+            case tokentype::tk_string:
+                this->on_string_token(tk);
+                break;
+
             case tokentype::tk_f64:
                 this->on_f64_token(tk);
                 break;
@@ -201,7 +205,6 @@ namespace xo {
 
             // all the not-yet handled cases
             case tokentype::tk_invalid:
-            case tokentype::tk_string:
             case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
@@ -276,6 +279,14 @@ namespace xo {
             scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
 
             stack_->top().on_singleassign_token(tk, this);
+        }
+
+        void
+        ParserStateMachine::on_string_token(const Token & tk)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
+
+            stack_->top().on_string_token(tk, this);
         }
 
         void

@@ -148,6 +148,15 @@ namespace xo {
         }
 
         void
+        DExpectExprSsm::on_string_token(const Token & tk,
+                                        ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExpectExprSsm::on_string_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
         DExpectExprSsm::on_f64_token(const Token & tk,
                                      ParserStateMachine * p_psm)
         {

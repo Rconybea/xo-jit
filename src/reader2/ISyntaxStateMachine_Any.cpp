@@ -83,6 +83,12 @@ ISyntaxStateMachine_Any::on_bool_token(Opaque, const Token &, ParserStateMachine
 }
 
 auto
+ISyntaxStateMachine_Any::on_string_token(Opaque, const Token &, ParserStateMachine *)  -> void
+{
+    _fatal();
+}
+
+auto
 ISyntaxStateMachine_Any::on_semicolon_token(Opaque, const Token &, ParserStateMachine *)  -> void
 {
     _fatal();

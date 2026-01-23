@@ -70,6 +70,8 @@ namespace xo {
             static void on_i64_token(DExpectSymbolSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for incoming bool-token @p tk **/
             static void on_bool_token(DExpectSymbolSsm & self, const Token & tk, ParserStateMachine * p_psm);
+            /** update state machine for incoming string-token @p tk **/
+            static void on_string_token(DExpectSymbolSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for incoming semicolon-token @p tk **/
             static void on_semicolon_token(DExpectSymbolSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update  stat machine for incoming parsed symbol @p sym **/

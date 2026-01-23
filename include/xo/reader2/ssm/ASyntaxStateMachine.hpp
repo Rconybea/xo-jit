@@ -73,6 +73,8 @@ public:
     virtual void on_i64_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming bool-token @p tk **/
     virtual void on_bool_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
+    /** update state machine for incoming string-token @p tk **/
+    virtual void on_string_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming semicolon-token @p tk **/
     virtual void on_semicolon_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update  stat machine for incoming parsed symbol @p sym **/
