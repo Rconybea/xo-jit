@@ -12,6 +12,8 @@
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/number/IGCObject_DFloat.hpp>
 #include <xo/object2/DBoolean.hpp>
+#include <xo/object2/number/IGCObject_DInteger.hpp>
+#include <xo/object2/DInteger.hpp>
 #include <xo/object2/boolean/IGCObject_DBoolean.hpp>
 #include <xo/gc/GCObject.hpp>
 
@@ -223,6 +225,26 @@ namespace xo {
         DExprSeqState::on_i64_token(const Token & tk,
                                     ParserStateMachine * p_psm)
         {
+            switch (seqtype_) {
+            case exprseqtype::toplevel_interactive:
+                {
+                    auto i64o = DFloat::box<AGCObject>(p_psm->expr_alloc(),
+                                                       tk.i64_value());
+                    auto * dconst = DConstant::make(p_psm->expr_alloc(), i64o);
+                    auto expr = with_facet<AExpression>::mkobj(dconst);
+
+                    DProgressSsm::start(p_psm->parser_alloc(),
+                                        expr,
+                                        p_psm);
+                    return;
+                }
+            case exprseqtype::toplevel_batch:
+                break;
+            case exprseqtype::N:
+                assert(false); // unreachable
+                break;
+            }
+
             p_psm->illegal_input_on_token("DExprSeqState::on_i64_token",
                                           tk,
                                           this->get_expect_str());
