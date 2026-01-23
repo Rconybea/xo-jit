@@ -6,8 +6,18 @@
 #include "DExprSeqState.hpp"
 #include "DDefineSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExprSeqState.hpp"
+#include <xo/reader2/DProgressSsm.hpp>
+#include <xo/expression2/DConstant.hpp>
+#include <xo/expression2/detail/IExpression_DConstant.hpp>
+#include <xo/object2/DFloat.hpp>
+#include <xo/object2/number/IGCObject_DFloat.hpp>
+#include <xo/gc/GCObject.hpp>
 
 namespace xo {
+    using xo::scm::DProgressSsm;
+    using xo::scm::DConstant;
+    using xo::scm::DFloat;
+    using xo::mm::AGCObject;
     using xo::mm::AAllocator;
     using xo::facet::with_facet;
     using xo::reflect::typeseq;
@@ -182,6 +192,26 @@ namespace xo {
         DExprSeqState::on_f64_token(const Token & tk,
                                     ParserStateMachine * p_psm)
         {
+            switch (seqtype_) {
+            case exprseqtype::toplevel_interactive:
+                {
+                    auto f64o = DFloat::box<AGCObject>(p_psm->expr_alloc(),
+                                                       tk.f64_value());
+                    auto * dconst = DConstant::make(p_psm->expr_alloc(), f64o);
+                    auto expr = with_facet<AExpression>::mkobj(dconst);
+
+                    DProgressSsm::start(p_psm->parser_alloc(),
+                                        expr,
+                                        p_psm);
+                    return;
+                }
+            case exprseqtype::toplevel_batch:
+                break;
+            case exprseqtype::N:
+                assert(false); // unreachable
+                break;
+            }
+
             p_psm->illegal_input_on_token("DExprSeqState::on_f64_token",
                                           tk,
                                           this->get_expect_str());

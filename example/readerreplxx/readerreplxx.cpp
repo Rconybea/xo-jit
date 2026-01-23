@@ -173,7 +173,7 @@ main()
     // accepting defaults too
     ReaderConfig rdr_config;
     {
-        //rdr_config.reader_debug_flag_ = true;
+        rdr_config.reader_debug_flag_ = true;
         //rdr_config.parser_debug_flag_ = true;
         //rdr_config.tk_debug_flag_ = true;
     }
