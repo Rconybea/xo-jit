@@ -67,7 +67,7 @@ namespace xo {
             /** pretty-printing support **/
             bool pretty(const ppindentinfo & ppii) const;
 
-        private:
+        public:
             /** none|expression|error_description
              *
              *  @text

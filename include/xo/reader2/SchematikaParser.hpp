@@ -162,7 +162,7 @@ namespace xo {
             /** create parser in initial state;
              *  parser is ready to receive tokens via @ref include_token
              *
-             *  @p config  arena configuration for parser memory
+             *  @p config      arena configuration for parser stack
              *  @p expr_alloc  allocator for schematika expressions.
              *                 Probably shared with execution.
              *  @p debug_flag  true to enable debug logging
