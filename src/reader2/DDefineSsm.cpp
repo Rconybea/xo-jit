@@ -577,6 +577,15 @@ namespace xo {
         }
 
         void
+        DDefineSsm::on_bool_token(const Token & tk,
+                                  ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DDefineSsm::on_bool_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
         DDefineSsm::on_semicolon_token(const Token & tk,
                                        ParserStateMachine * p_psm)
         {

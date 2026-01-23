@@ -187,13 +187,16 @@ namespace xo {
                 this->on_f64_token(tk);
                 break;
 
+            case tokentype::tk_bool:
+                this->on_bool_token(tk);
+                break;
+
             case tokentype::tk_semicolon:
                 this->on_semicolon_token(tk);
                 break;
 
             // all the not-yet handled cases
             case tokentype::tk_invalid:
-            case tokentype::tk_bool:
             case tokentype::tk_i64:
             case tokentype::tk_string:
             case tokentype::tk_leftparen:
@@ -278,6 +281,14 @@ namespace xo {
             scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
 
             stack_->top().on_f64_token(tk, this);
+        }
+
+        void
+        ParserStateMachine::on_bool_token(const Token & tk)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
+
+            stack_->top().on_bool_token(tk, this);
         }
 
         void

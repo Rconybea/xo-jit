@@ -69,6 +69,8 @@ public:
     virtual void on_singleassign_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming f64-token @p tk **/
     virtual void on_f64_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
+    /** update state machine for incoming bool-token @p tk **/
+    virtual void on_bool_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming semicolon-token @p tk **/
     virtual void on_semicolon_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update  stat machine for incoming parsed symbol @p sym **/

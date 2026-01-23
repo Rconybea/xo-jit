@@ -123,6 +123,12 @@ namespace xo {
             void on_f64_token(const Token & tk,
                               ParserStateMachine * p_psm);
 
+            /** update state for this syntax on incoming bool token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_bool_token(const Token & tk,
+                               ParserStateMachine * p_psm);
+
             /** update state for this syntax on incoming semicolon token @p tk,
              *  overall parser state in @p p_psm
              **/

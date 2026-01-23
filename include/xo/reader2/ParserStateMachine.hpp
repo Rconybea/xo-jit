@@ -141,6 +141,9 @@ namespace xo {
             /** operate state machine for incoming f64-token @p tk **/
             void on_f64_token(const Token & tk);
 
+            /** operate state machine for incoming bool-token @p tk **/
+            void on_bool_token(const Token & tk);
+
             /** operate state machine for incoming semicolon-token @p tk **/
             void on_semicolon_token(const Token & tk);
 

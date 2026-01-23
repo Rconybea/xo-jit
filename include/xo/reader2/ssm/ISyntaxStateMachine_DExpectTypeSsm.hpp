@@ -66,6 +66,8 @@ namespace xo {
             static void on_singleassign_token(DExpectTypeSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for incoming f64-token @p tk **/
             static void on_f64_token(DExpectTypeSsm & self, const Token & tk, ParserStateMachine * p_psm);
+            /** update state machine for incoming bool-token @p tk **/
+            static void on_bool_token(DExpectTypeSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for incoming semicolon-token @p tk **/
             static void on_semicolon_token(DExpectTypeSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update  stat machine for incoming parsed symbol @p sym **/
