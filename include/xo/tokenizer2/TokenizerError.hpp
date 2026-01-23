@@ -99,7 +99,7 @@ namespace xo {
             size_t error_pos_ = 0;
 
             ///@}
-        }; /*error_token*/
+        };
 
         inline std::ostream &
         operator<< (std::ostream & os,

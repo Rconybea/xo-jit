@@ -28,9 +28,9 @@ namespace xo {
          **/
         class scan_result {
         public:
-            using CharT = char;
+            //using CharT = char;
             using token_type = Token;
-            using span_type = xo::mm::span<const CharT>;
+            using span_type = xo::mm::span<const char>;
             using error_type = TokenizerError;
             using input_state_type = TkInputState;
 
