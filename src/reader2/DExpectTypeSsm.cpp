@@ -102,6 +102,15 @@ namespace xo {
         }
 
         void
+        DExpectTypeSsm::on_i64_token(const Token & tk,
+                                     ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExpectTypeSsm::on_i64_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
         DExpectTypeSsm::on_bool_token(const Token & tk,
                                       ParserStateMachine * p_psm)
         {

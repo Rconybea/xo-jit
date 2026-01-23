@@ -143,6 +143,8 @@ namespace xo {
                                        ParserStateMachine * p_psm);
             void on_f64_token(const Token & tk,
                               ParserStateMachine * p_psm);
+            void on_i64_token(const Token & tk,
+                              ParserStateMachine * p_psm);
             void on_bool_token(const Token & tk,
                                ParserStateMachine * p_psm);
             void on_semicolon_token(const Token & tk,

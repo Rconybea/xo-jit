@@ -220,6 +220,15 @@ namespace xo {
         }
 
         void
+        DExprSeqState::on_i64_token(const Token & tk,
+                                    ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DExprSeqState::on_i64_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
         DExprSeqState::on_bool_token(const Token & tk,
                                      ParserStateMachine * p_psm)
         {

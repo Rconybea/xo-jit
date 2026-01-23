@@ -58,6 +58,11 @@ namespace xo {
             self.on_f64_token(tk, p_psm);
         }
         auto
+        ISyntaxStateMachine_DExprSeqState::on_i64_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm) -> void
+        {
+            self.on_i64_token(tk, p_psm);
+        }
+        auto
         ISyntaxStateMachine_DExprSeqState::on_bool_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm) -> void
         {
             self.on_bool_token(tk, p_psm);

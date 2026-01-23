@@ -74,6 +74,9 @@ public:
     void on_f64_token(const Token & tk, ParserStateMachine * p_psm)  {
         return O::iface()->on_f64_token(O::data(), tk, p_psm);
     }
+    void on_i64_token(const Token & tk, ParserStateMachine * p_psm)  {
+        return O::iface()->on_i64_token(O::data(), tk, p_psm);
+    }
     void on_bool_token(const Token & tk, ParserStateMachine * p_psm)  {
         return O::iface()->on_bool_token(O::data(), tk, p_psm);
     }

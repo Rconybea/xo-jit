@@ -213,6 +213,15 @@ namespace xo {
         }
 
         void
+        DProgressSsm::on_i64_token(const Token & tk,
+                                   ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_input_on_token("DProgressSsm::on_i64_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
         DProgressSsm::on_bool_token(const Token & tk,
                                     ParserStateMachine * p_psm)
         {

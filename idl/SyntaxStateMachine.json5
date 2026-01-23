@@ -100,6 +100,15 @@
             ],
         },
         {
+            name: "on_i64_token",
+            doc: ["update state machine for incoming i64-token @p tk"],
+            return_type: "void",
+            args: [
+                {type: "const Token &", name: "tk"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
+        {
             name: "on_bool_token",
             doc: ["update state machine for incoming bool-token @p tk"],
             return_type: "void",
