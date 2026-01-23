@@ -216,8 +216,7 @@ namespace xo {
         DProgressSsm::on_semicolon_token(const Token & tk,
                                          ParserStateMachine * p_psm)
         {
-            constexpr bool c_debug_flag = true;
-            scope log(XO_DEBUG(c_debug_flag));
+            scope log(XO_DEBUG(p_psm->debug_flag()));
 
             /* note: implementation should parallel .on_rightparen_token() */
 

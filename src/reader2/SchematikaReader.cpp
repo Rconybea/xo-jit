@@ -9,11 +9,13 @@ namespace xo {
     namespace scm {
         SchematikaReader::SchematikaReader(const ReaderConfig & config,
                                            obj<AAllocator> expr_alloc)
-                : tokenizer_{config.tk_buffer_config_, config.tk_debug_flag_},
+                : tokenizer_{config.tk_buffer_config_,
+                             config.tk_debug_flag_},
                   parser_{config.parser_arena_config_,
                           config.max_stringtable_cap_,
                           expr_alloc,
-                          config.parser_debug_flag_}
+                          config.parser_debug_flag_},
+                  debug_flag_{config.reader_debug_flag_}
         {
         }
 
@@ -35,17 +37,33 @@ namespace xo {
         const ReaderResult &
         SchematikaReader::read_expr(span_type input_ext, bool eof)
         {
+            scope log(XO_DEBUG(debug_flag_));
+
+            if (log) {
+                log(xtag("input_ext", input_ext));
+                log(xtag("eof", eof));
+            }
+
             if (!input_ext.empty()) {
                 auto [error, input]
                     = tokenizer_.buffer_input_line(input_ext, eof);
 
-                // log && log(xtag("msg", "buffered input line"));
-                // log && log(xtag("input", input));
+                if (log) {
+                    log(xtag("msg", "before loop: buffered input line"));
+                    log(xtag("input", input));
+                }
 
                 while (!input.empty()) {
+                    log && log(xtag("msg", "loop"),
+                               xtag("input", input));
+
                     auto [tk, consumed, error] = tokenizer_.scan(input);
 
+                    log && log(xtag("tk", tk), xtag("consumed", consumed));
+
                     auto rem_input = input.after_prefix(consumed);
+
+                    log && log(xtag("rem_input", rem_input));
 
                     if (!tk.is_valid() && error.is_error()) {
                         this->result_

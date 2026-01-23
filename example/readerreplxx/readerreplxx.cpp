@@ -1,11 +1,14 @@
 /** @file readerreplxx.cpp **/
 
+#include <xo/reader2/init_reader2.hpp>
 #include <xo/reader2/SchematikaReader.hpp>
 #include <xo/gc/DX1Collector.hpp>
 #include <xo/gc/detail/IAllocator_DX1Collector.hpp>
 #include <xo/alloc2/Allocator.hpp>
-//#include <xo/facet/facet.hpp>
+#include <xo/printable2/Printable.hpp>
+#include <xo/facet/FacetRegistry.hpp>
 #include <xo/facet/obj.hpp>
+#include <xo/subsys/Subsystem.hpp>
 #include <replxx.hxx>
 #include <iostream>
 #include <unistd.h> // for isatty
@@ -32,7 +35,8 @@ bool replxx_getline(bool interactive,
     if (retval)
         *p_input = input_cstr;
 
-    rx.history_add(input_cstr);
+    if (input_cstr)
+        rx.history_add(input_cstr);
 
     return retval;
 }
@@ -56,8 +60,14 @@ welcome(std::ostream & os)
 
 namespace {
     using xo::scm::SchematikaReader;
+    using xo::scm::AExpression;
+    using xo::print::APrintable;
     using xo::print::ppstate_standalone;
     using xo::print::ppconfig;
+    using xo::facet::FacetRegistry;
+    using xo::facet::obj;
+    using xo::xtag;
+    using xo::scope;
     using std::cout;
     using std::endl;
 
@@ -69,15 +79,36 @@ namespace {
     bool
     reader_seq(SchematikaReader * p_reader,
                SchematikaReader::span_type * p_input,
-               bool eof)
+               bool eof,
+               bool debug_flag)
     {
+        scope log(XO_DEBUG(debug_flag));
+
+        if (!p_input || p_input->empty())
+            return true;
+
         auto [expr, remaining, error] = p_reader->read_expr(*p_input, eof);
+
+        obj<APrintable> expr_pr;
+
+        if (expr) {
+            expr_pr = FacetRegistry::instance().variant<APrintable,AExpression>(expr);
+            assert(expr_pr);
+        }
+
+        if (log) {
+            if (expr_pr) {
+                log(xtag("expr", expr_pr));
+            }
+            log(xtag("remaining", remaining));
+            log(xtag("error", error));
+        }
 
         if (expr) {
             ppconfig ppc;
             ppstate_standalone pps(&cout, 0, &ppc);
 
-            pps.prettyn(expr);
+            pps.prettyn(expr_pr);
 
             *p_input = remaining;
 
@@ -93,6 +124,8 @@ namespace {
 
             return false;
         } else {
+            *p_input = remaining;
+
             /* partial expression or whitespace input, no error */
             return true;
         }
@@ -110,14 +143,18 @@ main()
     using xo::mm::DX1Collector;
     using xo::mm::CollectorConfig;
     using xo::mm::DArena;
-    //using xo::print::ppconfig;
-    //using xo::print::ppstate_standalone;
     using xo::facet::with_facet;
     using xo::facet::obj;
+    using xo::S_reader2_tag;
+    using xo::InitSubsys;
+    using xo::Subsystem;
     using xo::scope;
     using namespace std;
 
     bool interactive = isatty(STDIN_FILENO);
+
+    InitSubsys<S_reader2_tag>::require();
+    Subsystem::initialize_all();
 
     Replxx rx;
     rx.set_max_history_size(1000);
@@ -134,7 +171,12 @@ main()
     obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&x1);
 
     // accepting defaults too
-    ReaderConfig rdr_config = ReaderConfig();
+    ReaderConfig rdr_config;
+    {
+        //rdr_config.reader_debug_flag_ = true;
+        //rdr_config.parser_debug_flag_ = true;
+        //rdr_config.tk_debug_flag_ = true;
+    }
 
     SchematikaReader rdr(rdr_config, expr_alloc);
     using span_type = SchematikaReader::span_type;
@@ -144,24 +186,28 @@ main()
     rdr.begin_interactive_session();
 
     bool eof = false;
-    const char * input_str;
+    const char * input_str = nullptr;
     span_type input;
 
     while (replxx_getline(interactive, rdr.is_at_toplevel(), rx, &input_str)) {
-        input = span_type::from_cstr(input_str);
+        if (input_str && *input_str) {
+            input = span_type::from_cstr(input_str);
 
-        while (!input.empty() && reader_seq(&rdr, &input, false /*eof*/)) {
-            ;
+            while (!input.empty()
+                   && reader_seq(&rdr, &input, false /*eof*/, c_debug_flag))
+                {
+                    ;
+                }
+
+            /* here: either:
+             * 1. input.empty() or
+             * 2. error encountered
+             */
         }
-
-        /* here: either:
-         * 1. input.empty() or
-         * 2. error encountered
-         */
     }
 
     /* reminder: eof can complete at most one token */
-    reader_seq(&rdr, &input, true /*eof*/);
+    reader_seq(&rdr, &input, true /*eof*/, c_debug_flag);
 
     rx.history_save("repl_history.txt");
 }

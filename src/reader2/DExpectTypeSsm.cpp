@@ -114,7 +114,7 @@ namespace xo {
         DExpectTypeSsm::on_symbol_token(const Token & tk,
                                         ParserStateMachine * p_psm)
         {
-            scope log(XO_DEBUG(true));
+            scope log(XO_DEBUG(p_psm->debug_flag()));
 
             TypeDescr td = nullptr;
 

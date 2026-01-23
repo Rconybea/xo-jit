@@ -77,6 +77,8 @@ namespace xo {
             /** current output from reader **/
             ReaderResult result_;
 
+            /** true to enable reader debug logging **/
+            bool debug_flag_ = false;
         };
     } /*namespace scm*/
 } /*namespace xo*/

@@ -550,7 +550,7 @@ namespace xo {
         DDefineSsm::on_singleassign_token(const Token & tk,
                                           ParserStateMachine * p_psm)
         {
-            scope log(XO_DEBUG(true), xtag("defstate", defstate_));
+            scope log(XO_DEBUG(p_psm->debug_flag()), xtag("defstate", defstate_));
 
             if ((defstate_ == defexprstatetype::def_2)
                 || (defstate_ == defexprstatetype::def_4))
