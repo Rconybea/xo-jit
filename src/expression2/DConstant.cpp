@@ -65,15 +65,15 @@ namespace xo {
         bool
         DConstant::pretty(const ppindentinfo & ppii) const
         {
-            obj<APrintable> value
+            obj<APrintable> value_pr
                 = FacetRegistry::instance().variant<APrintable,AGCObject>(value_);
 
             return ppii.pps()->pretty_struct
                        (ppii,
                         "DConstant",
                         refrtag("value_.tseq", value_._typeseq()),
-                        refrtag("value.tseq", value._typeseq()),
-                        refrtag("value", value));
+                        refrtag("value.tseq", value_pr._typeseq()),
+                        refrtag("value", value_pr));
         }
     } /*namespace scm*/
 } /*namespace xo*/
