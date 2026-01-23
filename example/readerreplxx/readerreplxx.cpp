@@ -1,6 +1,11 @@
 /** @file readerreplxx.cpp **/
 
-#include "xo/reader/reader.hpp"
+#include <xo/reader2/SchematikaReader.hpp>
+#include <xo/gc/DX1Collector.hpp>
+#include <xo/gc/detail/IAllocator_DX1Collector.hpp>
+#include <xo/alloc2/Allocator.hpp>
+//#include <xo/facet/facet.hpp>
+#include <xo/facet/obj.hpp>
 #include <replxx.hxx>
 #include <iostream>
 #include <unistd.h> // for isatty
@@ -8,7 +13,7 @@
 // presumeably replxx assumes input is a tty
 //
 bool replxx_getline(bool interactive,
-                    std::size_t parser_stack_size,
+                    bool is_at_toplevel,
                     replxx::Replxx & rx,
                     const char ** p_input)
 {
@@ -17,32 +22,23 @@ bool replxx_getline(bool interactive,
     char const * prompt = "";
 
     if (interactive) {
-        if (parser_stack_size <= 1)
-            prompt = "> ";
-        else
-            prompt = ". ";
+        prompt = ((is_at_toplevel) ? "> " : ". ");
     }
 
     const char * input_cstr = rx.input(prompt);
 
     bool retval = (input_cstr != nullptr);
 
-    if (retval) {
-        //cerr << "got reval->true" << endl;
+    if (retval)
+        *p_input = input_cstr;
 
-        input = input_cstr;
-
-    } else {
-        //cerr << "got retval->false" << endl;
-    }
-
-    rx.history_add(input);
+    rx.history_add(input_cstr);
 
     return retval;
 }
 
 void
-welcome(std::ostream& os)
+welcome(std::ostream & os)
 {
     using namespace std;
 
@@ -58,18 +54,68 @@ welcome(std::ostream& os)
     os << endl;
 }
 
+namespace {
+    using xo::scm::SchematikaReader;
+    using xo::print::ppstate_standalone;
+    using xo::print::ppconfig;
+    using std::cout;
+    using std::endl;
+
+    /** body of read-parse-print loop
+     *
+     *  true -> no errors;
+     *  false -> reader encountered error
+     **/
+    bool
+    reader_seq(SchematikaReader * p_reader,
+               SchematikaReader::span_type * p_input,
+               bool eof)
+    {
+        auto [expr, remaining, error] = p_reader->read_expr(*p_input, eof);
+
+        if (expr) {
+            ppconfig ppc;
+            ppstate_standalone pps(&cout, 0, &ppc);
+
+            pps.prettyn(expr);
+
+            *p_input = remaining;
+
+            return true;
+        } else if (error.is_error()) {
+            cout << "parsing error (detected in " << error.src_function() << "): " << endl;
+            error.report(cout);
+
+            /* discard stashed remainder of input line
+             * (for nicely-formatted errors)
+             */
+            p_reader->reset_to_idle_toplevel();
+
+            return false;
+        } else {
+            /* partial expression or whitespace input, no error */
+            return true;
+        }
+    }
+}
+
 int
 main()
 {
     using namespace replxx;
-    using namespace xo::scm;
-    using xo::scm::Expression;
-    using xo::print::ppconfig;
-    using xo::print::ppstate_standalone;
-    using xo::rp;
-    using namespace std;
 
-    using span_type = xo::scm::span<const char>;
+    using xo::scm::SchematikaReader;
+    using xo::scm::ReaderConfig;
+    using xo::mm::AAllocator;
+    using xo::mm::DX1Collector;
+    using xo::mm::CollectorConfig;
+    using xo::mm::DArena;
+    //using xo::print::ppconfig;
+    //using xo::print::ppstate_standalone;
+    using xo::facet::with_facet;
+    using xo::facet::obj;
+    using xo::scope;
+    using namespace std;
 
     bool interactive = isatty(STDIN_FILENO);
 
@@ -82,63 +128,40 @@ main()
     constexpr bool c_debug_flag = false;
     scope log(XO_DEBUG(c_debug_flag));
 
-    DArena expr_arena = DArena::map(ArenaConfig{ .name_ = "expr-arena", .size_ = 2*1024*1024; });
-    obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-    constexpr size_t c_max_stringtable_cap = 1024*1024;
-    SchematikaParser parser(expr_arena.config_, c_max_stringtable_cap, expr_alloc, c_debug_flag);
+    CollectorConfig x1_config = (CollectorConfig()
+                                 .with_size(4*1024*1024));
+    DX1Collector x1(x1_config);
+    obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&x1);
 
-    parser.begin_interactive_session();
+    // accepting defaults too
+    ReaderConfig rdr_config = ReaderConfig();
 
-    string input_str;
-
-    bool eof = false;
-
-    span_type input;
-    std::size_t parser_stack_size = 0;
+    SchematikaReader rdr(rdr_config, expr_alloc);
+    using span_type = SchematikaReader::span_type;
 
     welcome(cerr);
 
-    while (replxx_getline(interactive, parser_stack_size, rx, input_str)) {
-        input = span_type::from_string(input_str);
+    rdr.begin_interactive_session();
 
-        while (!input.empty()) {
-            auto [expr, consumed, psz, error] = rdr.read_expr(input, eof);
+    bool eof = false;
+    const char * input_str;
+    span_type input;
 
-            if (expr) {
-                ppconfig ppc;
-                ppstate_standalone pps(&cout, 0, &ppc);
+    while (replxx_getline(interactive, rdr.is_at_toplevel(), rx, &input_str)) {
+        input = span_type::from_cstr(input_str);
 
-                pps.prettyn(expr);
-            } else if (error.is_error()) {
-                cout << "parsing error (detected in " << error.src_function() << "): " << endl;
-                error.report(cout);
-
-                /* discard stashed remainder of input line
-                 * (for nicely-formatted errors)
-                 */
-                rdr.reset_to_idle_toplevel();
-                break;
-            }
-
-            input = input.after_prefix(consumed);
-            parser_stack_size = psz;
+        while (!input.empty() && reader_seq(&rdr, &input, false /*eof*/)) {
+            ;
         }
 
-        /* here: input.empty() or error encountered */
-
+        /* here: either:
+         * 1. input.empty() or
+         * 2. error encountered
+         */
     }
 
-    auto [expr, _1, _2, error] = rdr.read_expr(input, true /*eof*/);
-
-    if (expr) {
-        ppconfig ppc;
-        ppstate_standalone pps(&cout, 0, &ppc);
-
-        pps.prettyn<rp<Expression>>(rp<Expression>(expr));
-    } else if (error.is_error()) {
-        cout << "parsing error (detected in " << error.src_function() << "): " << endl;
-        error.report(cout);
-    }
+    /* reminder: eof can complete at most one token */
+    reader_seq(&rdr, &input, true /*eof*/);
 
     rx.history_save("repl_history.txt");
 }

@@ -7,6 +7,7 @@
 #include "ParserStateMachine.hpp"
 #include "ParserStack.hpp"
 #include "DExprSeqState.hpp"
+#include <cstddef>
 #include <xo/indentlog/scope.hpp>
 #include <stdexcept>
 

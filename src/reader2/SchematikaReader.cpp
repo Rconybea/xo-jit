@@ -17,6 +17,12 @@ namespace xo {
         {
         }
 
+        bool
+        SchematikaReader::is_at_toplevel() const noexcept
+        {
+            return parser_.is_at_toplevel();
+        }
+
         void
         SchematikaReader::begin_interactive_session()
         {
@@ -27,24 +33,28 @@ namespace xo {
         // Schematika::end_interactive_session()
 
         const ReaderResult &
-        SchematikaReader::read_expr(const char * input_cstr, bool eof)
+        SchematikaReader::read_expr(span_type input_ext, bool eof)
         {
-            if (input_cstr && *input_cstr) {
+            if (!input_ext.empty()) {
                 auto [error, input]
-                    = tokenizer_.buffer_input_line(input_cstr,
-                                                   false /*!eof*/);
+                    = tokenizer_.buffer_input_line(input_ext, eof);
+
                 // log && log(xtag("msg", "buffered input line"));
                 // log && log(xtag("input", input));
 
-
-
                 while (!input.empty()) {
-                    auto [tk, consumed, error] = tkz.scan(input);
+                    auto [tk, consumed, error] = tokenizer_.scan(input);
+
+                    auto rem_input = input.after_prefix(consumed);
 
                     if (!tk.is_valid() && error.is_error()) {
-                        this->result_ = ReaderResult { .expr_ = obj<AExpression>(),
-                                                       .tk_error_ = std::move(error),
-                                                       .consumed_ = nullptr };
+                        this->result_
+                            = ReaderResult
+                            { .expr_ = obj<AExpression>(),
+                              .remaining_input_ = rem_input,
+                              .tk_error_ = std::move(error)
+                            };
+
                         return result_;
                     }
 
@@ -58,7 +68,7 @@ namespace xo {
                         //   error_description :: const DString *
                         // }
                         //
-                        const ParserResult & presult = parser_include_token(tk);
+                        const ParserResult & presult = parser_.on_token(tk);
 
                         if (presult.is_error()) {
                             // tk_error {
@@ -76,29 +86,50 @@ namespace xo {
                             //
                             // tk_error.report(cout);
 
-                            this->result_ = ReaderResult { .expr = obj<AExpression>(),
-                                                           .tk_error_ = std::move(error),
-                                                           .consumed_ = nullptr };
+                            this->result_
+                                = ReaderResult
+                                { .expr_     = obj<AExpression>(),
+                                  .remaining_input_ = rem_input,
+                                  .tk_error_ = std::move(error) };
+
+                            assert(presult.error_description());
 
                             // carefully created error description, maybe
-                            this->result.tk_error_.error_description_ = presult.error_description_;
+                            this->result_.tk_error_
+                                = result_.tk_error_.with_error
+                                (presult.error_src_fn_,
+                                 std::string
+                                 (std::string_view(*(presult.error_description()))));
 
+                            return result_;
+                        } else if (presult.is_expression()) {
+                            this->result_
+                                = ReaderResult
+                                {
+                                    .expr_     = presult.result_expr(),
+                                    .remaining_input_ = rem_input,
+                                    .tk_error_ = TokenizerError()
+                                };
+
+                            return result_;
                         }
-
-                        xxxx;
-                    } else if (error.is_error()) {
-                        xxxx;
-                        // error.report(cout);
-                        break;
                     }
 
-                    input = input.after_prefix(consumed);
+                    input = rem_input;
                 }
             }
 
-            ++line_no;
+            this->result_ = ReaderResult();
+
+            return this->result_;
         }
 
+        void
+        SchematikaReader::reset_to_idle_toplevel()
+        {
+            this->tokenizer_.discard_current_line();
+            this->parser_.reset_to_idle_toplevel();
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

@@ -3,6 +3,8 @@
 set(SELF_LIB xo_reader2)
 set(SELF_SRCS
     init_reader2.cpp
+    reader2_register_facets.cpp
+    reader2_register_types.cpp
 
     SchematikaReader.cpp
     ReaderConfig.cpp
@@ -39,8 +41,6 @@ set(SELF_SRCS
     ISyntaxStateMachine_DProgressSsm.cpp
     IPrintable_DProgressSsm.cpp
 
-    reader2_register_facets.cpp
-    reader2_register_types.cpp
     )
 
 xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 ${SELF_SRCS})

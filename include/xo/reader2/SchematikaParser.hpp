@@ -157,6 +157,7 @@ namespace xo {
             using ArenaConfig = xo::mm::ArenaConfig;
             using AAllocator = xo::mm::AAllocator;
             using ppindentinfo = xo::print::ppindentinfo;
+            using size_type = std::size_t;
 
         public:
             /** create parser in initial state;
