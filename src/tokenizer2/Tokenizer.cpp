@@ -110,8 +110,8 @@ namespace xo {
         }
 
         auto
-        Tokenizer::assemble_token(std::size_t initial_whitespace,
-                                  const span_type & token_text,
+        Tokenizer::assemble_token(span_type ws_span,
+                                  span_type token_text,
                                   TkInputState * p_input_state) -> result_type
         {
             /* literal|pretty|streamlined */
@@ -119,7 +119,7 @@ namespace xo {
 
             scope log(XO_DEBUG(p_input_state->debug_flag()));
             log && log(xtag("token_text", token_text),
-                       xtag("initial_whitespace", initial_whitespace),
+                       xtag("initial_whitespace", ws_span.size()),
                        xtag("input_state", *p_input_state));
 
             tokentype tk_type = tokentype::tk_invalid;
@@ -598,18 +598,16 @@ namespace xo {
             // TOOD: report tk_text as span,
             //       but must pin / unpin
 
-            /* input.prefix(0):
-             * require caller preserves current input line until it's entirely exhausted
-             */
             return result_type(Token(tk_type, std::move(tk_text)),
-                               p_input_state->current_line().prefix(0));
+                               span_type::concat(ws_span,
+                                                 span_type(tk_start, tk_end)));
         } /*assemble_token*/
 
         auto
-        Tokenizer::assemble_final_token(const span_type & token_text,
+        Tokenizer::assemble_final_token(span_type token_text,
                                         TkInputState * p_input_state) -> result_type
         {
-            return assemble_token(0 /*initial_whitespace*/,
+            return assemble_token(token_text.prefix(0) /*ws_span*/,
                                   token_text,
                                   p_input_state);
         }
@@ -645,6 +643,7 @@ namespace xo {
         Tokenizer::scan(const span_type & input) -> result_type
         {
             scope log(XO_DEBUG(input_state_.debug_flag()));
+            log && log(xtag("input", input));
 
             /* - Always at beginning of token when scan() invoked
              * - scan will not report any portion of line as consumed until it has
@@ -659,12 +658,14 @@ namespace xo {
             const CharT * ix = this->input_state_.skip_leading_whitespace();
 
             if(ix == input.hi()) {
-                log && log("end input -> consume current line");
+                log && log("end buffered input -> consume current line");
 
                 /* entirety of current line has been tokenized
                  *  -> caller may consume it
                  */
-                return result_type::make_whitespace(this->input_state_.consume_current_line());
+                this->input_state_.consume_current_line();
+
+                return result_type::make_whitespace(input);
             }
 
             /* ix: if ix < input.hi: first non-whitespace character after input_state_.current_pos_ */
@@ -697,27 +698,17 @@ namespace xo {
 
                 ++ix;
 
-#ifdef OBSOLETE // no longer a thing. either input ends in whitespace, or ends translation unit
-                if (ix == input.hi()) {
-                    /* need more input to know if/when token complete */
-                    this->prefix_ += std::string(tk_start, input.hi());
+                CharT ch2 = *ix;
 
-                    log && log(xtag("captured-prefix1", this->prefix_));
-                } else
-#endif
-                    {
-                    CharT ch2 = *ix;
-
-                    if (((ch2 >= '0') && (ch2 <= '9'))
-                        || ((ch2 >= 'A') && (ch2 <= 'Z'))
-                        || ((ch2 >= 'a') && (ch2 <= 'z')))
+                if (((ch2 >= '0') && (ch2 <= '9'))
+                    || ((ch2 >= 'A') && (ch2 <= 'Z'))
+                    || ((ch2 >= 'a') && (ch2 <= 'z')))
                     {
                         /* treat as 1 char punctuation */
                         ;
                     } else {
-                        /* include next char */
-                        ++ix;
-                    }
+                    /* include next char */
+                    ++ix;
                 }
             } else if (*ix == '"') {
                 bool complete_flag = false;
@@ -779,7 +770,7 @@ namespace xo {
 
                             this->input_state_.advance_until(ix);
 
-                            return assemble_token(whitespace_z,
+                            return assemble_token(span_type(input.lo(), tk_start),
                                                   span_type(tk_start, ix) /*token*/,
                                                   &(this->input_state_));
                         }
@@ -803,7 +794,7 @@ namespace xo {
                             this->input_state_.advance_until(ix);
 
                             /* ignore next char and complete token */
-                            return assemble_token(whitespace_z,
+                            return assemble_token(span_type(input.lo(), tk_start),
                                                   span_type(tk_start, ix) /*token*/,
                                                   &(this->input_state_));
                         }
@@ -854,7 +845,7 @@ namespace xo {
 
             this->input_state_.advance_until(ix);
 
-            return assemble_token(whitespace_z,
+            return assemble_token(span_type(input.lo(), tk_start),
                                   span_type(tk_start, ix) /*token*/,
                                   &(this->input_state_));
         } /*_scan_aux*/
