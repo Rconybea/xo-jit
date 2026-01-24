@@ -54,26 +54,8 @@ namespace xo {
             static std::string_view get_expect_str(const DExprSeqState & self) noexcept;
 
             // non-const methods
-            /** operate state machine for incoming symbol-token @p tk **/
-            static void on_symbol_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming define-keyword-token @p tk **/
-            static void on_def_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming if-keyword-token @p tk **/
-            static void on_if_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming colon-token @p tk **/
-            static void on_colon_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming singleassign-token @p tk **/
-            static void on_singleassign_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming f64-token @p tk **/
-            static void on_f64_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming i64-token @p tk **/
-            static void on_i64_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming bool-token @p tk **/
-            static void on_bool_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming string-token @p tk **/
-            static void on_string_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming semicolon-token @p tk **/
-            static void on_semicolon_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
+            /** operate state machine for incoming token @p tk **/
+            static void on_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
             /** update  stat machine for incoming parsed symbol @p sym **/
             static void on_parsed_symbol(DExprSeqState & self, std::string_view sym, ParserStateMachine * p_psm);
             /** operate state machine for incoming type description @p td **/

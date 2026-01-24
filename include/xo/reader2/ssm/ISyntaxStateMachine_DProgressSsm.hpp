@@ -54,26 +54,8 @@ namespace xo {
             static std::string_view get_expect_str(const DProgressSsm & self) noexcept;
 
             // non-const methods
-            /** operate state machine for incoming symbol-token @p tk **/
-            static void on_symbol_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming define-keyword-token @p tk **/
-            static void on_def_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming if-keyword-token @p tk **/
-            static void on_if_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming colon-token @p tk **/
-            static void on_colon_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming singleassign-token @p tk **/
-            static void on_singleassign_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming f64-token @p tk **/
-            static void on_f64_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming i64-token @p tk **/
-            static void on_i64_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming bool-token @p tk **/
-            static void on_bool_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming string-token @p tk **/
-            static void on_string_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
-            /** update state machine for incoming semicolon-token @p tk **/
-            static void on_semicolon_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
+            /** operate state machine for incoming token @p tk **/
+            static void on_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update  stat machine for incoming parsed symbol @p sym **/
             static void on_parsed_symbol(DProgressSsm & self, std::string_view sym, ParserStateMachine * p_psm);
             /** operate state machine for incoming type description @p td **/

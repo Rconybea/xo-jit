@@ -53,6 +53,12 @@ namespace xo {
              **/
             std::string_view get_expect_str() const noexcept;
 
+            /** operate state machine for this syntax on incoming token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_token(const Token & tk,
+                          ParserStateMachine * p_psm);
+
             /** operate state machine for this syntax on incoming symbol-token @p tk
              *  with overall parser state in @p p_psm
              **/

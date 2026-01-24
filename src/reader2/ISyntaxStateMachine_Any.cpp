@@ -35,61 +35,7 @@ ISyntaxStateMachine_Any::_valid
 // nonconst methods
 
 auto
-ISyntaxStateMachine_Any::on_symbol_token(Opaque, const Token &, ParserStateMachine *)  -> void
-{
-    _fatal();
-}
-
-auto
-ISyntaxStateMachine_Any::on_def_token(Opaque, const Token &, ParserStateMachine *)  -> void
-{
-    _fatal();
-}
-
-auto
-ISyntaxStateMachine_Any::on_if_token(Opaque, const Token &, ParserStateMachine *)  -> void
-{
-    _fatal();
-}
-
-auto
-ISyntaxStateMachine_Any::on_colon_token(Opaque, const Token &, ParserStateMachine *)  -> void
-{
-    _fatal();
-}
-
-auto
-ISyntaxStateMachine_Any::on_singleassign_token(Opaque, const Token &, ParserStateMachine *)  -> void
-{
-    _fatal();
-}
-
-auto
-ISyntaxStateMachine_Any::on_f64_token(Opaque, const Token &, ParserStateMachine *)  -> void
-{
-    _fatal();
-}
-
-auto
-ISyntaxStateMachine_Any::on_i64_token(Opaque, const Token &, ParserStateMachine *)  -> void
-{
-    _fatal();
-}
-
-auto
-ISyntaxStateMachine_Any::on_bool_token(Opaque, const Token &, ParserStateMachine *)  -> void
-{
-    _fatal();
-}
-
-auto
-ISyntaxStateMachine_Any::on_string_token(Opaque, const Token &, ParserStateMachine *)  -> void
-{
-    _fatal();
-}
-
-auto
-ISyntaxStateMachine_Any::on_semicolon_token(Opaque, const Token &, ParserStateMachine *)  -> void
+ISyntaxStateMachine_Any::on_token(Opaque, const Token &, ParserStateMachine *)  -> void
 {
     _fatal();
 }

@@ -28,54 +28,9 @@ namespace xo {
         }
 
         auto
-        ISyntaxStateMachine_DDefineSsm::on_symbol_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
+        ISyntaxStateMachine_DDefineSsm::on_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
         {
-            self.on_symbol_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DDefineSsm::on_def_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_def_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DDefineSsm::on_if_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_if_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DDefineSsm::on_colon_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_colon_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DDefineSsm::on_singleassign_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_singleassign_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DDefineSsm::on_f64_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_f64_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DDefineSsm::on_i64_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_i64_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DDefineSsm::on_bool_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_bool_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DDefineSsm::on_string_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_string_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DDefineSsm::on_semicolon_token(DDefineSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_semicolon_token(tk, p_psm);
+            self.on_token(tk, p_psm);
         }
         auto
         ISyntaxStateMachine_DDefineSsm::on_parsed_symbol(DDefineSsm & self, std::string_view sym, ParserStateMachine * p_psm) -> void

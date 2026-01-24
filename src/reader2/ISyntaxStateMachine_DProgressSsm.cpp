@@ -28,54 +28,9 @@ namespace xo {
         }
 
         auto
-        ISyntaxStateMachine_DProgressSsm::on_symbol_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
+        ISyntaxStateMachine_DProgressSsm::on_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
         {
-            self.on_symbol_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DProgressSsm::on_def_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_def_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DProgressSsm::on_if_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_if_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DProgressSsm::on_colon_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_colon_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DProgressSsm::on_singleassign_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_singleassign_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DProgressSsm::on_f64_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_f64_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DProgressSsm::on_i64_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_i64_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DProgressSsm::on_bool_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_bool_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DProgressSsm::on_string_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_string_token(tk, p_psm);
-        }
-        auto
-        ISyntaxStateMachine_DProgressSsm::on_semicolon_token(DProgressSsm & self, const Token & tk, ParserStateMachine * p_psm) -> void
-        {
-            self.on_semicolon_token(tk, p_psm);
+            self.on_token(tk, p_psm);
         }
         auto
         ISyntaxStateMachine_DProgressSsm::on_parsed_symbol(DProgressSsm & self, std::string_view sym, ParserStateMachine * p_psm) -> void

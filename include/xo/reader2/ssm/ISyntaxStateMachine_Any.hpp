@@ -60,16 +60,7 @@ namespace scm {
         [[noreturn]] std::string_view get_expect_str(Copaque)  const  noexcept override { _fatal(); }
 
         // nonconst methods
-        [[noreturn]] void on_symbol_token(Opaque, const Token &, ParserStateMachine *)  override;
-        [[noreturn]] void on_def_token(Opaque, const Token &, ParserStateMachine *)  override;
-        [[noreturn]] void on_if_token(Opaque, const Token &, ParserStateMachine *)  override;
-        [[noreturn]] void on_colon_token(Opaque, const Token &, ParserStateMachine *)  override;
-        [[noreturn]] void on_singleassign_token(Opaque, const Token &, ParserStateMachine *)  override;
-        [[noreturn]] void on_f64_token(Opaque, const Token &, ParserStateMachine *)  override;
-        [[noreturn]] void on_i64_token(Opaque, const Token &, ParserStateMachine *)  override;
-        [[noreturn]] void on_bool_token(Opaque, const Token &, ParserStateMachine *)  override;
-        [[noreturn]] void on_string_token(Opaque, const Token &, ParserStateMachine *)  override;
-        [[noreturn]] void on_semicolon_token(Opaque, const Token &, ParserStateMachine *)  override;
+        [[noreturn]] void on_token(Opaque, const Token &, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_symbol(Opaque, std::string_view, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_typedescr(Opaque, TypeDescr, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_expression(Opaque, obj<AExpression>, ParserStateMachine *)  override;

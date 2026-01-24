@@ -131,6 +131,12 @@ namespace xo {
             /** @defgroup scm-progressssm-ssm-facet syntaxstatemachine facet methods **/
             /// @{
 
+            /** operate state machine for this syntax on incoming token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_token(const Token & tk,
+                          ParserStateMachine * p_psm);
+
             void on_symbol_token(const Token & tk,
                                  ParserStateMachine * p_psm);
             void on_def_token(const Token & tk,

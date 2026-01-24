@@ -52,35 +52,8 @@ namespace scm {
         }
 
         // non-const methods
-        void on_symbol_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
-            return I::on_symbol_token(_dcast(data), tk, p_psm);
-        }
-        void on_def_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
-            return I::on_def_token(_dcast(data), tk, p_psm);
-        }
-        void on_if_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
-            return I::on_if_token(_dcast(data), tk, p_psm);
-        }
-        void on_colon_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
-            return I::on_colon_token(_dcast(data), tk, p_psm);
-        }
-        void on_singleassign_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
-            return I::on_singleassign_token(_dcast(data), tk, p_psm);
-        }
-        void on_f64_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
-            return I::on_f64_token(_dcast(data), tk, p_psm);
-        }
-        void on_i64_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
-            return I::on_i64_token(_dcast(data), tk, p_psm);
-        }
-        void on_bool_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
-            return I::on_bool_token(_dcast(data), tk, p_psm);
-        }
-        void on_string_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
-            return I::on_string_token(_dcast(data), tk, p_psm);
-        }
-        void on_semicolon_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
-            return I::on_semicolon_token(_dcast(data), tk, p_psm);
+        void on_token(Opaque data, const Token & tk, ParserStateMachine * p_psm)  override {
+            return I::on_token(_dcast(data), tk, p_psm);
         }
         void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  override {
             return I::on_parsed_symbol(_dcast(data), sym, p_psm);

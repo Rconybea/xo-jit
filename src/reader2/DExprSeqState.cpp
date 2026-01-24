@@ -106,6 +106,92 @@ namespace xo {
         }
 
         void
+        DExprSeqState::on_token(const Token & tk,
+                                ParserStateMachine * p_psm)
+        {
+            scope log(XO_DEBUG(p_psm->debug_flag()), xtag("tk", tk));
+
+            switch (tk.tk_type()) {
+            case tokentype::tk_symbol:
+                this->on_symbol_token(tk, p_psm);
+                break;
+
+            case tokentype::tk_def:
+                this->on_def_token(tk, p_psm);
+                break;
+
+            case tokentype::tk_if:
+                this->on_if_token(tk, p_psm);
+                break;
+
+            case tokentype::tk_colon:
+                this->on_colon_token(tk, p_psm);
+                break;
+
+            case tokentype::tk_singleassign:
+                this->on_singleassign_token(tk, p_psm);
+                break;
+
+            case tokentype::tk_string:
+                this->on_string_token(tk, p_psm);
+                break;
+
+            case tokentype::tk_f64:
+                this->on_f64_token(tk, p_psm);
+                break;
+
+            case tokentype::tk_i64:
+                this->on_i64_token(tk, p_psm);
+                break;
+
+            case tokentype::tk_bool:
+                this->on_bool_token(tk, p_psm);
+                break;
+
+            case tokentype::tk_semicolon:
+                this->on_semicolon_token(tk, p_psm);
+                break;
+
+            // all the not-yet handled cases
+            case tokentype::tk_invalid:
+            case tokentype::tk_leftparen:
+            case tokentype::tk_rightparen:
+            case tokentype::tk_leftbracket:
+            case tokentype::tk_rightbracket:
+            case tokentype::tk_leftbrace:
+            case tokentype::tk_rightbrace:
+            case tokentype::tk_leftangle:
+            case tokentype::tk_rightangle:
+            case tokentype::tk_lessequal:
+            case tokentype::tk_greatequal:
+            case tokentype::tk_dot:
+            case tokentype::tk_comma:
+            case tokentype::tk_doublecolon:
+            case tokentype::tk_assign:
+            case tokentype::tk_yields:
+            case tokentype::tk_plus:
+            case tokentype::tk_minus:
+            case tokentype::tk_star:
+            case tokentype::tk_slash:
+            case tokentype::tk_cmpeq:
+            case tokentype::tk_cmpne:
+            case tokentype::tk_type:
+            case tokentype::tk_lambda:
+            case tokentype::tk_then:
+            case tokentype::tk_else:
+            case tokentype::tk_let:
+            case tokentype::tk_in:
+            case tokentype::tk_end:
+            case tokentype::N:
+                break;
+            }
+
+            p_psm->illegal_input_on_token("DExprSeqState::on_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
         DExprSeqState::on_symbol_token(const Token & tk,
                                        ParserStateMachine * p_psm)
         {

@@ -56,35 +56,8 @@ public:
     }
 
     // non-const methods (still const in router!)
-    void on_symbol_token(const Token & tk, ParserStateMachine * p_psm)  {
-        return O::iface()->on_symbol_token(O::data(), tk, p_psm);
-    }
-    void on_def_token(const Token & tk, ParserStateMachine * p_psm)  {
-        return O::iface()->on_def_token(O::data(), tk, p_psm);
-    }
-    void on_if_token(const Token & tk, ParserStateMachine * p_psm)  {
-        return O::iface()->on_if_token(O::data(), tk, p_psm);
-    }
-    void on_colon_token(const Token & tk, ParserStateMachine * p_psm)  {
-        return O::iface()->on_colon_token(O::data(), tk, p_psm);
-    }
-    void on_singleassign_token(const Token & tk, ParserStateMachine * p_psm)  {
-        return O::iface()->on_singleassign_token(O::data(), tk, p_psm);
-    }
-    void on_f64_token(const Token & tk, ParserStateMachine * p_psm)  {
-        return O::iface()->on_f64_token(O::data(), tk, p_psm);
-    }
-    void on_i64_token(const Token & tk, ParserStateMachine * p_psm)  {
-        return O::iface()->on_i64_token(O::data(), tk, p_psm);
-    }
-    void on_bool_token(const Token & tk, ParserStateMachine * p_psm)  {
-        return O::iface()->on_bool_token(O::data(), tk, p_psm);
-    }
-    void on_string_token(const Token & tk, ParserStateMachine * p_psm)  {
-        return O::iface()->on_string_token(O::data(), tk, p_psm);
-    }
-    void on_semicolon_token(const Token & tk, ParserStateMachine * p_psm)  {
-        return O::iface()->on_semicolon_token(O::data(), tk, p_psm);
+    void on_token(const Token & tk, ParserStateMachine * p_psm)  {
+        return O::iface()->on_token(O::data(), tk, p_psm);
     }
     void on_parsed_symbol(std::string_view sym, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_symbol(O::data(), sym, p_psm);

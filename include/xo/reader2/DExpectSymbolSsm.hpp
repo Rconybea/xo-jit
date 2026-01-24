@@ -93,6 +93,12 @@ namespace xo {
             void on_parsed_expression_with_semicolon(obj<AExpression> expr,
                                                      ParserStateMachine * p_psm);
 
+            /** operate state machine for this syntax on incoming token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_token(const Token & tk,
+                          ParserStateMachine * p_psm);
+
             /** update state for this syntax on incoming token @p tk,
              *  overall parser state in @p p_psm.
              **/

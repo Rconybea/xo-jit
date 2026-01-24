@@ -123,36 +123,6 @@ namespace xo {
              **/
             void on_token(const Token & tk);
 
-            /** operate state machine for incoming symbol-token @p tk **/
-            void on_symbol_token(const Token & tk);
-
-            /** operate state machine for incoming define-token @p tk **/
-            void on_def_token(const Token & tk);
-
-            /** operate state machine for incoming if-token @p tk **/
-            void on_if_token(const Token & tk);
-
-            /** operate state machine for incoming colon-token @p tk **/
-            void on_colon_token(const Token & tk);
-
-            /** operate state machine for incoming singleassign-token @p tk **/
-            void on_singleassign_token(const Token & tk);
-
-            /** operate state machine for incoming string-otoken @p tk **/
-            void on_string_token(const Token & tk);
-
-            /** operate state machine for incoming f64-token @p tk **/
-            void on_f64_token(const Token & tk);
-
-            /** operate state machine for incoming i64-token @p tk **/
-            void on_i64_token(const Token & tk);
-
-            /** operate state machine for incoming bool-token @p tk **/
-            void on_bool_token(const Token & tk);
-
-            /** operate state machine for incoming semicolon-token @p tk **/
-            void on_semicolon_token(const Token & tk);
-
             ///@}
             /** @defgroup scm-parserstatemachine-error-entrypoints error entry points **/
             ///@{
