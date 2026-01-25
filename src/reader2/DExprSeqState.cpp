@@ -114,43 +114,43 @@ namespace xo {
             switch (tk.tk_type()) {
             case tokentype::tk_symbol:
                 this->on_symbol_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_def:
                 this->on_def_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_if:
                 this->on_if_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_colon:
                 this->on_colon_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_singleassign:
                 this->on_singleassign_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_string:
                 this->on_string_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_f64:
                 this->on_f64_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_i64:
                 this->on_i64_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_bool:
                 this->on_bool_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_semicolon:
                 this->on_semicolon_token(tk, p_psm);
-                break;
+                return;
 
             // all the not-yet handled cases
             case tokentype::tk_invalid:

@@ -170,12 +170,12 @@ namespace xo {
             case tokentype::tk_in:
             case tokentype::tk_end:
             case tokentype::N:
+                p_psm->illegal_input_on_token("DExpectSymbolSsm::on_token",
+                                              tk,
+                                              this->get_expect_str());
                 break;
             }
 
-            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_token",
-                                          tk,
-                                          this->get_expect_str());
         }
 
         void
