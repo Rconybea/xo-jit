@@ -57,6 +57,12 @@ namespace xo {
              **/
             void _do_eval_variable_op();
 
+            /** evaluate an apply expression
+             *  Require:
+             * - expression in @ref expr_
+             **/
+            void _do_eval_apply_op();
+
         private:
             /*
              * Some registers are preserved by evaluation:
