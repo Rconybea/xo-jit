@@ -15,7 +15,7 @@
 namespace xo {
     namespace scm {
 
-        /** @class DVariable*
+        /** @class DVariable
          *  @brief syntax for a variable reference
          **/
         class DVariable {

@@ -7,6 +7,7 @@ set(SELF_SRCS
     DConstant.cpp
     DVariable.cpp
     DDefineExpr.cpp
+    DApplyExpr.cpp
 
     TypeRef.cpp
 

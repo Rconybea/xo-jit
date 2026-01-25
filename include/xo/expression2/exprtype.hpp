@@ -29,8 +29,10 @@ namespace xo {
 #ifdef NOT_YET
             /** variable assignment **/
             assign,
+#endif
             /** function call **/
             apply,
+#ifdef NOT_YET
             /** function definition **/
             lambda,
 #endif
@@ -61,7 +63,9 @@ namespace xo {
             case exprtype::define: return "define";
 #ifdef NOT_YET
             case exprtype::assign: return "assign";
+#endif
             case exprtype::apply: return "apply";
+#ifdef NOT_YET
             case exprtype::lambda: return "lambda";
             case exprtype::variable: return "variable";
             case exprtype::ifexpr: return "if_expr";
