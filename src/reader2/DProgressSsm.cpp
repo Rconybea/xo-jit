@@ -226,8 +226,11 @@ namespace xo {
             case tokentype::tk_minus:
                 break;
             case tokentype::tk_star:
+#ifdef NOT_YET
                 this->on_operator_token(tk, p_psm);
                 return;
+#endif
+                break;
             case tokentype::tk_slash:
             case tokentype::tk_cmpeq:
             case tokentype::tk_cmpne:
