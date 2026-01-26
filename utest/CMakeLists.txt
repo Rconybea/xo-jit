@@ -6,6 +6,7 @@ set(UTEST_SRCS
     StringTable.test.cpp
     X1Collector.test.cpp
     DConstant.test.cpp
+    DVariable.test.cpp
 )
 
 xo_add_utest_executable(${UTEST_EXE} ${UTEST_SRCS})
