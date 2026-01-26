@@ -7,7 +7,7 @@
 #include "expression2_register_facets.hpp"
 #include "expression2_register_types.hpp"
 
-#include <xo/object2/init_object2.hpp>
+#include <xo/procedure2/init_procedure2.hpp>
 #include <xo/gc/CollectorTypeRegistry.hpp>
 
 namespace xo {
@@ -29,7 +29,7 @@ namespace xo {
             InitEvidence retval;
 
             /* direct subsystem deps for xo-object2/ */
-            retval ^= InitSubsys<S_object2_tag>::require();
+            retval ^= InitSubsys<S_procedure2_tag>::require();
 
             /* xo-expression2/'s own initialization code */
             retval ^= Subsystem::provide<S_expression2_tag>("expression2", &init);
