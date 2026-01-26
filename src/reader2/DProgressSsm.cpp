@@ -9,9 +9,15 @@
 #include "DExpectExprSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectExprSsm.hpp"
 
+#include <xo/expression2/DApplyExpr.hpp>
+#include <xo/expression2/detail/IExpression_DApplyExpr.hpp>
 
 #include <xo/expression2/DConstant.hpp>
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
+
+#include <xo/procedure2/init_primitives.hpp>  // for xo::scm::Primitives
+#include <xo/procedure2/detail/IGCObject_DPrimitive_gco_2_gco_gco.hpp>
+
 #ifdef NOT_YET
 #include "DApplySsm.hpp"
 #include "ssm/ISyntaxStateMachine_DApplySsm.hpp"
@@ -1179,20 +1185,36 @@ namespace xo {
                 break;
 
             case optype::op_multiply:
-#ifdef NOT_YET
                 {
+                    auto pm_obj = with_facet<AGCObject>::mkobj(&Primitives::s_mul_gco_gco_pm);
+
+                    auto fn_expr = DConstant::make(p_psm->expr_alloc(), pm_obj);
+
                     /* note:
                      * 1. don't assume we know lhs_ / rhs_ value types yet.
                      *    perhaps have expression like
                      *      f(..) * g(..)
                      *    where f is the function that contains current ssm.
+                     *
                      * 2. consequence: we need representation for
                      *    polymorphic multiply on unknown numeric arguments.
+                     *
+                     * 3. TypeRef::dwim(..) is a placeholder.
+                     *    Plan to later provide abstract interpreter
+                     *    (ie compiler pass :) to drive type inference/unification
+                     *
+                     * 4. Alternatively could supply type-annotation syntax
+                     *    so human can assist inference; context here is we want
+                     *    to automate the boring stuff
                      */
 
-                    DApplyExpr::make2();
+                    TypeRef tref = TypeRef::dwim
+                                       (TypeRef::prefix_type::from_chars("_mul_gco"),
+                                        nullptr);
+
+                    return DApplyExpr::make2(p_psm->expr_alloc(),
+                                             tref, fn_expr, lhs_, rhs_);
                 }
-#endif
 
                 break;
             case optype::op_divide:
