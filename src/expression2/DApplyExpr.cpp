@@ -3,8 +3,9 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "DApplyExpr.hpp"
 #include "Expression.hpp"
+#include "DApplyExpr.hpp"
+#include "detail/IExpression_DApplyExpr.hpp"
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 
@@ -15,7 +16,34 @@ namespace xo {
     using xo::mm::AGCObject;
 
     namespace scm {
-        /* incomplete! */
+        obj<AExpression,DApplyExpr>
+        DApplyExpr::make2(obj<AAllocator> mm,
+                          TypeRef typeref,
+                          obj<AExpression> fn_expr,
+                          obj<AExpression> arg1,
+                          obj<AExpression> arg2)
+        {
+            return obj<AExpression,DApplyExpr>
+                       (DApplyExpr::_make2(mm, typeref, fn_expr, arg1, arg2));
+        }
+
+        DApplyExpr *
+        DApplyExpr::_make2(obj<AAllocator> mm,
+                           TypeRef typeref,
+                           obj<AExpression> fn_expr,
+                           obj<AExpression> arg1,
+                           obj<AExpression> arg2)
+        {
+            DApplyExpr * result
+                = DApplyExpr::scaffold(mm, typeref, fn_expr, 2 /*n_args*/);
+
+            result->assign_arg(0, arg1);
+            result->assign_arg(1, arg2);
+
+            return result;
+        }
+
+        /* incomplete, in the sense that does not populate args_[] */
         DApplyExpr::DApplyExpr(TypeRef typeref,
                                obj<AExpression> fn_expr,
                                size_type n_args) : typeref_{typeref},
