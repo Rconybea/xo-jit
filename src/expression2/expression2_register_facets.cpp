@@ -17,6 +17,9 @@
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
 #include <xo/expression2/detail/IPrintable_DConstant.hpp>
 
+#include <xo/expression2/detail/IExpression_DApplyExpr.hpp>
+#include <xo/expression2/detail/IPrintable_DApplyExpr.hpp>
+
 #include <xo/gc/detail/AGCObject.hpp>
 #include <xo/printable2/detail/APrintable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -40,7 +43,8 @@ namespace xo {
             // Expression
             // +- Constant
             // +- Variable
-            // \- DefineExpr
+            // +- DefineExpr
+            // \- ApplyExpr
 
             FacetRegistry::register_impl<AExpression, DConstant>();
             FacetRegistry::register_impl<APrintable, DConstant>();
@@ -51,10 +55,14 @@ namespace xo {
             FacetRegistry::register_impl<AExpression, DDefineExpr>();
             FacetRegistry::register_impl<APrintable, DDefineExpr>();
 
+            FacetRegistry::register_impl<AExpression, DApplyExpr>();
+            FacetRegistry::register_impl<APrintable, DApplyExpr>();
+
             log && log(xtag("DUniqueString.tseq", typeseq::id<DUniqueString>()));
             log && log(xtag("DDefineExpr.tseq", typeseq::id<DDefineExpr>()));
             log && log(xtag("DVariable.tseq", typeseq::id<DVariable>()));
             log && log(xtag("DConstant.tseq", typeseq::id<DConstant>()));
+            log && log(xtag("DApplyExpr.tseq", typeseq::id<DApplyExpr>()));
 
             log && log(xtag("AExpression.tqseq", typeseq::id<AExpression>()));
 

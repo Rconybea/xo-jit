@@ -11,30 +11,62 @@
 namespace xo {
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
+    using xo::reflect::typeseq;
     using xo::mm::AGCObject;
 
     namespace scm {
+        /* incomplete! */
+        DApplyExpr::DApplyExpr(TypeRef typeref,
+                               obj<AExpression> fn_expr,
+                               size_type n_args) : typeref_{typeref},
+                                                   fn_{fn_expr},
+                                                   n_args_{n_args}
+        {}
+
+        DApplyExpr *
+        DApplyExpr::scaffold(obj<AAllocator> mm,
+                             TypeRef typeref,
+                             obj<AExpression> fn_expr,
+                             size_type n_args)
+        {
+            void * mem = mm.alloc(typeseq::id<DApplyExpr>(),
+                                  sizeof(DApplyExpr) + (n_args * sizeof(obj<AExpression>)));
+
+            DApplyExpr * result = new (mem) DApplyExpr(typeref,
+                                                       fn_expr,
+                                                       n_args);
+
+            return result;
+        }
+
+        void
+        DApplyExpr::assign_arg(size_type i_arg,
+                               obj<AExpression> expr)
+        {
+            if (i_arg < n_args_) {
+                this->args_[i_arg] = expr;
+            } else {
+                assert(false);
+
+                throw std::runtime_error(tostr("assign out-of-range argument i_arg where [0..n_args) expected",
+                                               xtag("i_arg", i_arg),
+                                               xtag("expr", expr),
+                                               xtag("n_args", n_args_)));
+
+            }
+        }
+
         obj<AExpression>
         DApplyExpr::arg(size_type i) const
         {
-            if (i >= args_->size()) [[unlikely]] {
+            if (i >= n_args_) [[unlikely]] {
                 throw std::runtime_error(tostr("attempt to fetch argument i where [0..n) expected",
                                                xtag("i", i),
-                                               xtag("n", args_->size()),
+                                               xtag("n", n_args_),
                                                xtag("src", "DApplyExpr::arg")));
             }
 
-            obj<AGCObject> arg_i = args_->at(i);
-
-            auto expr_i = FacetRegistry::instance().variant<AExpression>(arg_i);
-
-            if (!expr_i) [[unlikely]] {
-                throw std::runtime_error(tostr("expected expression interface on argument i",
-                                               xtag("i", i),
-                                               xtag("arg[i]", arg_i)));
-            }
-
-            return expr_i;
+            return args_[i];
         }
 
         void
@@ -60,9 +92,9 @@ namespace xo {
                         return false;
                 }
 
-                for (size_t i_arg = 0, n_arg = this->n_arg(); i_arg < n_arg; ++i_arg) {
+                for (size_t i_arg = 0; i_arg < n_args_; ++i_arg) {
                     obj<APrintable> arg_i
-                        = FacetRegistry::instance().variant<APrintable>(this->arg(i_arg));
+                        = FacetRegistry::instance().variant<APrintable>(args_[i_arg]);
 
                     if (!pps->print_upto(refrtag(concat("arg", 1+i_arg), arg_i)))
                         return false;
@@ -78,13 +110,14 @@ namespace xo {
                 pps->newline_indent(ppii.ci1());
                 pps->pretty(refrtag("fn", fn));
 
-                for (size_t i_arg = 0, n_arg = this->n_arg(); i_arg < n_arg; ++i_arg) {
+                for (size_t i_arg = 0; i_arg < n_args_; ++i_arg) {
                     obj<APrintable> arg_i
-                        = FacetRegistry::instance().variant<APrintable>(fn_);
+                        = FacetRegistry::instance().variant<APrintable>(args_[i_arg]);
 
                     pps->newline_indent(ppii.ci1());
                     pps->pretty(refrtag(concat("arg", 1+i_arg), arg_i));
                 }
+
                 return false;
             }
         }

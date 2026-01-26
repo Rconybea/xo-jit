@@ -22,6 +22,9 @@ set(SELF_SRCS
     IExpression_DDefineExpr.cpp
     IPrintable_DDefineExpr.cpp
 
+    IExpression_DApplyExpr.cpp
+    IPrintable_DApplyExpr.cpp
+
     DLocalSymtab.cpp
     DGlobalSymtab.cpp
 

@@ -20,18 +20,55 @@ namespace xo {
          **/
         class DApplyExpr {
         public:
+            using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
-            using size_type = std::size_t;
+            using size_type = std::uint32_t;
 
         public:
+            /** @defgroup scm-applyexpr-constructors **/
+            ///@{
+
+            /** construct empty instance, but with argument expressions empty **/
+            DApplyExpr(TypeRef typeref,
+                       obj<AExpression> fn_expr,
+                       size_type n_args);
+
+            /** create apply for function with 2 arguments **/
+            static obj<AExpression,DApplyExpr> make2(obj<AAllocator> mm,
+                                                     TypeRef typeref,
+                                                     obj<AExpression> fn_expr,
+                                                     obj<AExpression> arg1,
+                                                     obj<AExpression> arg2);
+
+            /** create apply for function with 2 arguments **/
+            static DApplyExpr * _make2(obj<AAllocator> mm,
+                                       TypeRef typeref,
+                                       obj<AExpression> fn_expr,
+                                       obj<AExpression> arg1,
+                                       obj<AExpression> arg2);
+
+            /** scaffold incomplete instance.
+             *  apply-expr using memory from @p mm.
+             *  will construct instance with space for @p n_args arguments
+             *  but expressions left empty.
+             *  use @ref assign_arg for all arguments to complete.
+             **/
+            static DApplyExpr * scaffold(obj<AAllocator> mm,
+                                         TypeRef typeref,
+                                         obj<AExpression> fn_expr,
+                                         size_type n_args);
+            void assign_arg(size_type i_arg, obj<AExpression> expr);
+
+            ///@}
+            /** @defgroup scm-applyexpr-access-methods **/
+            ///@{
 
             obj<AExpression>  fn() const noexcept { return fn_; }
-            const DArray * args() const noexcept { return args_; }
-
-            size_type n_arg() const noexcept { return args_->size(); }
+            size_type n_args() const noexcept { return n_args_; }
             obj<AExpression> arg(size_type i) const;
 
+            ///@}
             /** @defgroup scm-applyexpr-expression-facet **/
             ///@{
 
@@ -39,6 +76,12 @@ namespace xo {
             TypeRef typeref() const noexcept { return typeref_; }
             TypeDescr valuetype() const noexcept { return typeref_.td(); }
             void assign_valuetype(TypeDescr td) noexcept;
+
+            ///@}
+            /** @defgroup scm-applyexpr-gcobject-facet **/
+            ///@{
+
+            // shallow_copy() etc.
 
             ///@}
             /** @defgroup scm-applyexpr-printable-facet **/
@@ -55,8 +98,10 @@ namespace xo {
             TypeRef typeref_;
             /** expression for function/procedure to invoke **/
             obj<AExpression> fn_;
-            /** expression for each argument vector **/
-            const DArray * args_;
+            /** number of arguments (not counting @ref fn_ **/
+            size_type n_args_ = 0;
+            /** args_[i] is expression for i'th argument to @ref fn_ **/
+            obj<AExpression> args_[];
         };
     }
 }
