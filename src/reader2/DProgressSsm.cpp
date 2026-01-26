@@ -9,6 +9,9 @@
 #include "DExpectExprSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectExprSsm.hpp"
 
+
+#include <xo/expression2/DConstant.hpp>
+#include <xo/expression2/detail/IExpression_DConstant.hpp>
 #ifdef NOT_YET
 #include "DApplySsm.hpp"
 #include "ssm/ISyntaxStateMachine_DApplySsm.hpp"

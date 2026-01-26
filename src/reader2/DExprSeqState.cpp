@@ -290,8 +290,7 @@ namespace xo {
                     DString * dstr = DString::from_cstr(p_psm->expr_alloc(),
                                                         tk.text().c_str());
                     obj<AGCObject,DString> str(dstr);
-                    auto * dconst = DConstant::make(p_psm->expr_alloc(), str);
-                    obj<AExpression,DConstant> expr(dconst);
+                    obj<AExpression,DConstant> expr = DConstant::make(p_psm->expr_alloc(), str);
 
                     DProgressSsm::start(p_psm->parser_alloc(),
                                         expr,
@@ -319,8 +318,7 @@ namespace xo {
                 {
                     auto f64o = DFloat::box<AGCObject>(p_psm->expr_alloc(),
                                                        tk.f64_value());
-                    auto * dconst = DConstant::make(p_psm->expr_alloc(), f64o);
-                    auto expr = with_facet<AExpression>::mkobj(dconst);
+                    auto expr = DConstant::make(p_psm->expr_alloc(), f64o);
 
                     DProgressSsm::start(p_psm->parser_alloc(),
                                         expr,
@@ -348,8 +346,7 @@ namespace xo {
                 {
                     auto i64o = DFloat::box<AGCObject>(p_psm->expr_alloc(),
                                                        tk.i64_value());
-                    auto * dconst = DConstant::make(p_psm->expr_alloc(), i64o);
-                    auto expr = with_facet<AExpression>::mkobj(dconst);
+                    auto expr = DConstant::make(p_psm->expr_alloc(), i64o);
 
                     DProgressSsm::start(p_psm->parser_alloc(),
                                         expr,
@@ -377,8 +374,7 @@ namespace xo {
                 {
                     auto dvalue = DBoolean::box<AGCObject>(p_psm->expr_alloc(),
                                                            tk.bool_value());
-                    auto * dconst = DConstant::make(p_psm->expr_alloc(), dvalue);
-                    auto expr = with_facet<AExpression>::mkobj(dconst);
+                    auto expr = DConstant::make(p_psm->expr_alloc(), dvalue);
 
                     DProgressSsm::start(p_psm->parser_alloc(),
                                         expr,

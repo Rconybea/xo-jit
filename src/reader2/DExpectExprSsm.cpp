@@ -248,7 +248,7 @@ namespace xo {
             auto f64o = DFloat::box<AGCObject>(p_psm->expr_alloc(),
                                                tk.f64_value());
 
-            auto expr = with_facet<AExpression>::mkobj(DConstant::make(p_psm->expr_alloc(), f64o));
+            auto expr = DConstant::make(p_psm->expr_alloc(), f64o);
 
             // DProgressSsm responsible for resolving cases like
             //   1.9,
