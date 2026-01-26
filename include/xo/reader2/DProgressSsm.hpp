@@ -100,14 +100,12 @@ namespace xo {
                                        optype op);
 
             static void start(DArena & parser_mm,
-                              obj<AExpression> valex,
+                              obj<AExpression> lhs,
                               ParserStateMachine * p_psm);
-
-#ifdef NOT_YET
-            static void start(rp<Expression> valex,
+            static void start(DArena & parsermm,
+                              obj<AExpression> lhs,
                               optype optype,
-                              parserstatemachine * p_psm);
-#endif
+                              ParserStateMachine * p_psm);
 
             syntaxstatetype ssm_type() const noexcept;
 
@@ -147,6 +145,8 @@ namespace xo {
                                 ParserStateMachine * p_psm);
             void on_singleassign_token(const Token & tk,
                                        ParserStateMachine * p_psm);
+            void on_operator_token(const Token & tk,
+                                   ParserStateMachine * p_psm);
             void on_string_token(const Token & tk,
                                  ParserStateMachine * p_psm);
             void on_f64_token(const Token & tk,
@@ -207,17 +207,6 @@ namespace xo {
 
 
             void print(std::ostream & os) const override;
-
-        private:
-            /** assemble expression representing
-             *  value of
-             *  @code
-             *    f(lhs_, rhs_)
-             *  @endcode
-             *
-             *  where f determined by @ref op_type_
-             **/
-            obj<AExpression> assemble_expr(ParserStateMachine * p_psm);
 #endif
 
         private:
@@ -227,7 +216,14 @@ namespace xo {
             /** infix operator,  if supplied **/
             optype op_type_ = optype::invalid;
 
-            /** populate an expression here, following infix operator */
+            /** populate an expression here, that follows an infix operator.
+             *
+             *  Note this may not resolve immediately.
+             *  Consider input
+             *    5 + 6
+             *  Need to know if following token is *
+             *  before deciding if 6 belongs to addition 5 + 6
+             **/
             obj<AExpression> rhs_;
         };
     } /*namespace scm*/

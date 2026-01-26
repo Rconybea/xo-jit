@@ -5,6 +5,15 @@
 
 #include "DProgressSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DProgressSsm.hpp"
+
+#include "DExpectExprSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DExpectExprSsm.hpp"
+
+#ifdef NOT_YET
+#include "DApplySsm.hpp"
+#include "ssm/ISyntaxStateMachine_DApplySsm.hpp"
+#endif
+
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/reflectutil/typeseq.hpp>
@@ -67,6 +76,7 @@ namespace xo {
             return "???";
         }
 
+        /** higher-precedence operators bind before lower-preference operators **/
         int
         precedence(optype x) {
             switch (x) {
@@ -97,6 +107,40 @@ namespace xo {
             return 0;
         }
 
+        namespace {
+            optype
+            tk2op(const tokentype & tktype) {
+                switch (tktype) {
+                case tokentype::tk_assign:
+                    return optype::op_assign;
+                case tokentype::tk_plus:
+                    return optype::op_add;
+                case tokentype::tk_minus:
+                    return optype::op_subtract;
+                case tokentype::tk_star:
+                    return optype::op_multiply;
+                case tokentype::tk_slash:
+                    return optype::op_divide;
+                case tokentype::tk_cmpeq:
+                    return optype::op_equal;
+                case tokentype::tk_cmpne:
+                    return optype::op_not_equal;
+                case tokentype::tk_leftangle:
+                    return optype::op_less;
+                case tokentype::tk_lessequal:
+                    return optype::op_less_equal;
+                case tokentype::tk_rightangle:
+                    return optype::op_great;
+                case tokentype::tk_greatequal:
+                    return optype::op_great_equal;
+                default:
+                    assert(false);
+                    return optype::invalid;
+                }
+                return optype::invalid;
+            }
+        }
+
         DProgressSsm *
         DProgressSsm::make(DArena & mm,
                            obj<AExpression> lhs,
@@ -112,25 +156,25 @@ namespace xo {
 
         void
         DProgressSsm::start(DArena & parser_mm,
-                            obj<AExpression> valex,
+                            obj<AExpression> lhs,
+                            optype op,
                             ParserStateMachine * p_psm)
         {
             DProgressSsm * progress_ssm
-                = DProgressSsm::make(parser_mm, valex, optype::invalid);
+                = DProgressSsm::make(parser_mm, lhs, op);
 
-            obj<ASyntaxStateMachine> ssm
-                = with_facet<ASyntaxStateMachine>::mkobj(progress_ssm);
+            obj<ASyntaxStateMachine,DProgressSsm> ssm(progress_ssm);
 
             p_psm->push_ssm(ssm);
         }
 
-#ifdef NOT_YET
         void
-        progress_xs::start(rp<Expression> valex, optype op, parserstatemachine * p_psm) {
-            p_psm->push_exprstate(progress_xs::make(valex, op));
+        DProgressSsm::start(DArena & parser_mm,
+                            obj<AExpression> lhs,
+                            ParserStateMachine * p_psm)
+        {
+            start(parser_mm, lhs, optype::invalid, p_psm);
         }
-
-#endif
 
         DProgressSsm::DProgressSsm(obj<AExpression> valex,
                                    optype op)
@@ -225,12 +269,11 @@ namespace xo {
             case tokentype::tk_plus:
             case tokentype::tk_minus:
                 break;
+
             case tokentype::tk_star:
-#ifdef NOT_YET
                 this->on_operator_token(tk, p_psm);
                 return;
-#endif
-                break;
+
             case tokentype::tk_slash:
             case tokentype::tk_cmpeq:
             case tokentype::tk_cmpne:
@@ -291,6 +334,75 @@ namespace xo {
                                             ParserStateMachine * p_psm)
         {
             p_psm->illegal_input_on_token("DProgressSsm::on_singleassign_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DProgressSsm::on_operator_token(const Token & tk,
+                                        ParserStateMachine * p_psm)
+        {
+            if (op_type_ == optype::invalid) {
+                // tk is the operator this instance was waiting for
+                this->op_type_ = tk2op(tk.tk_type());
+
+                DExpectExprSsm::start(p_psm->parser_alloc(), p_psm);
+                return;
+            } else if (rhs_) {
+                optype op_type2 = tk2op(tk.tk_type());
+
+                /* already have {lhs_, op_type_, rhs_},
+                 * with incoming op_type2 operator decides whether to parse like
+                 *    (lhs_, op_type_, rhs_) op_type2 ...
+                 * or
+                 *    (lhs_, op_type_, (rhs_ op_type2 ...))
+                 */
+
+                if (precedence(op_type_) >= precedence(op_type2)) {
+                    /* associate to the left
+                     *
+                     * parse              like
+                     *   a + b - ...        (a + b) - ...
+                     *   a * b - ...        (a * b) - ...
+                     */
+
+                    auto lhs2 = this->assemble_expr(p_psm);
+
+                    p_psm->pop_ssm();
+
+                    DProgressSsm::start(p_psm->parser_alloc(),
+                                        lhs2,
+                                        op_type2,
+                                        p_psm);
+                    return;
+                } else {
+                    /* associate to the right
+                     *
+                     * parse             like
+                     *  a + b * ...        (a + (b * ...))
+                     */
+
+                    p_psm->pop_ssm();
+
+                    /* (a + ..) */
+                    DProgressSsm::start(p_psm->parser_alloc(),
+                                        lhs_,
+                                        op_type_,
+                                        p_psm);
+                    DExpectExprSsm::start(p_psm->parser_alloc(),
+                                          p_psm);
+                    /* (b * ..) */
+                    DProgressSsm::start(p_psm->parser_alloc(),
+                                        rhs_,
+                                        op_type2,
+                                        p_psm);
+                    DExpectExprSsm::start(p_psm->parser_alloc(),
+                                          p_psm);
+                    return;
+                }
+            }
+
+            p_psm->illegal_input_on_token("DProgressSsm::on_operator_token",
                                           tk,
                                           this->get_expect_str());
         }
@@ -905,112 +1017,10 @@ namespace xo {
              *   { n * n }
              */
         }
+#endif
 
-        namespace {
-            optype
-            tk2op(const tokentype & tktype) {
-                switch (tktype) {
-                case tokentype::tk_assign:
-                    return optype::op_assign;
-                case tokentype::tk_plus:
-                    return optype::op_add;
-                case tokentype::tk_minus:
-                    return optype::op_subtract;
-                case tokentype::tk_star:
-                    return optype::op_multiply;
-                case tokentype::tk_slash:
-                    return optype::op_divide;
-                case tokentype::tk_cmpeq:
-                    return optype::op_equal;
-                case tokentype::tk_cmpne:
-                    return optype::op_not_equal;
-                case tokentype::tk_leftangle:
-                    return optype::op_less;
-                case tokentype::tk_lessequal:
-                    return optype::op_less_equal;
-                case tokentype::tk_rightangle:
-                    return optype::op_great;
-                case tokentype::tk_greatequal:
-                    return optype::op_great_equal;
-                default:
-                    assert(false);
-                    return optype::invalid;
-                }
-                return optype::invalid;
-            }
-        }
-
-        void
-        progress_xs::on_operator_token(const token_type & tk,
-                                       parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            constexpr const char * c_self_name = "progress_xs::on_operator_token";
-
-            if (op_type_ == optype::invalid) {
-                this->op_type_ = tk2op(tk.tk_type());
-
-                /* infix operator must be followed by non-empty expression */
-                expect_expr_xs::start(p_psm);
-            } else if (rhs_) {
-                /* already have complete expression stashed.
-                 * behavior depends on operator precedence for tk with stored operator
-                 * this->op_type_
-                 */
-                optype op2 = tk2op(tk.tk_type());
-
-                if (precedence(op2) <= precedence(this->op_type_)) {
-                    /* e.g.
-                     *   6.2 * 4.9 + ...
-                     *
-                     * in stack:
-                     *   1. progress_xs lhs=6.2, op=*, rhs=4.9
-                     *
-                     * out stack
-                     *   1. progress_xs lhs=apply(*,6.2,4.9), op=+
-                     */
-
-                    /* 1. instantiate expression for *this */
-                    auto expr = this->assemble_expr(p_psm);
-
-                    /* 2. remove from stack */
-                    std::unique_ptr<exprstate> self  = p_psm->pop_exprstate();
-
-                    /* 3. replace with new progress_xs: */
-                    progress_xs::start(expr, op2, p_psm);
-
-                    /* infix operator must be followed by non-empty expression */
-                    expect_expr_xs::start(p_psm);
-                } else {
-                    /* e.g.
-                     *   6.2 + 4.9 * ...
-                     *
-                     * in stack:
-                     *   1. progress_xs lhs=6.2, op=+, rhs=4.9
-                     *
-                     * out stack:
-                     *   1. progress_xs lhs=6.2, op=+
-                     *   2. expect_rhs_expression
-                     *   3. progress_xs lhs=4.9, op=*
-                     *   4. expect_rhs_expression
-                     */
-
-                    std::unique_ptr<exprstate> self = p_psm->pop_exprstate();
-
-                    /* 1. replace with nested incomplete infix exprs */
-                    progress_xs::start(lhs_, op_type_, p_psm);
-                    expect_expr_xs::start(p_psm);
-                    progress_xs::start(rhs_, op2, p_psm);
-                    expect_expr_xs::start(p_psm);
-                }
-
-            } else {
-                throw std::runtime_error(tostr(c_self_name,
-                                               ": expected expression following operator",
-                                               xtag("tk", tk)));
-            }
-        }
+#ifdef OBSOLETE
+        //void progress_xs::on_operator_token(const token_type & tk, parserstatemachine * p_psm)
 
         void
         progress_xs::on_bool_token(const token_type & tk,
@@ -1163,7 +1173,25 @@ namespace xo {
             case optype::op_great_equal:
             case optype::op_add:
             case optype::op_subtract:
+                break;
+
             case optype::op_multiply:
+#ifdef NOT_YET
+                {
+                    /* note:
+                     * 1. don't assume we know lhs_ / rhs_ value types yet.
+                     *    perhaps have expression like
+                     *      f(..) * g(..)
+                     *    where f is the function that contains current ssm.
+                     * 2. consequence: we need representation for
+                     *    polymorphic multiply on unknown numeric arguments.
+                     */
+
+                    DApplyExpr::make2();
+                }
+#endif
+
+                break;
             case optype::op_divide:
                 // TODO: implement binary operator expression assembly
                 break;
