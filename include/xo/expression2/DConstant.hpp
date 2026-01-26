@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "Expression.hpp"
 #include "TypeRef.hpp"
 #include "exprtype.hpp"
 #include <xo/reflect/TaggedPtr.hpp>
@@ -27,12 +28,19 @@ namespace xo {
         public:
             explicit DConstant(obj<AGCObject> value) noexcept;
 
+            /** create isntance
+             *  @p mm     memory allocator
+             *  @p value  literal constant
+             **/
+            static obj<AExpression,DConstant> make(obj<AAllocator> mm,
+                                                   obj<AGCObject> value);
+
             /** create instance
              *  @p mm     memory allocator
              *  @p value  literal constant
              **/
-            static DConstant * make(obj<AAllocator> mm,
-                                    obj<AGCObject> value);
+            static DConstant * _make(obj<AAllocator> mm,
+                                     obj<AGCObject> value);
 
             bool is_resolved() const noexcept { return typeref_.is_resolved(); }
 

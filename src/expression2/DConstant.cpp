@@ -4,10 +4,12 @@
  **/
 
 #include "DConstant.hpp"
+#include "detail/IExpression_DConstant.hpp"
 #include "TypeDescr.hpp"
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/DInteger.hpp>
 #include <xo/facet/FacetRegistry.hpp>
+#include <xo/facet/obj.hpp>
 #include <xo/reflect/Reflect.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/reflectutil/typeseq.hpp>
@@ -38,9 +40,16 @@ namespace xo {
             }
         }
 
-        DConstant *
+        obj<AExpression,DConstant>
         DConstant::make(obj<AAllocator> mm,
                         obj<AGCObject> value)
+        {
+            return obj<AExpression,DConstant>(_make(mm, value));
+        }
+
+        DConstant *
+        DConstant::_make(obj<AAllocator> mm,
+                         obj<AGCObject> value)
         {
             void * mem = mm.alloc(typeseq::id<DConstant>(),
                                   sizeof(DConstant));
