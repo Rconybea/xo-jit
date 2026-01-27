@@ -1186,9 +1186,10 @@ namespace xo {
 
             case optype::op_multiply:
                 {
-                    auto pm_obj = with_facet<AGCObject>::mkobj(&Primitives::s_mul_gco_gco_pm);
-
-                    auto fn_expr = DConstant::make(p_psm->expr_alloc(), pm_obj);
+                    auto pm_obj  = (with_facet<AGCObject>::mkobj
+                                    (&Primitives::s_mul_gco_gco_pm));
+                    auto fn_expr = (DConstant::make
+                                    (p_psm->expr_alloc(), pm_obj));
 
                     /* note:
                      * 1. don't assume we know lhs_ / rhs_ value types yet.
