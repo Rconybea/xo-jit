@@ -66,7 +66,7 @@ namespace xo {
              *  May be null when this TypeRef created,
              *  but expected to be immutable once established.
              **/
-            TypeDescr td_;
+            TypeDescr td_ = nullptr;
         };
     } /*namespace scm*/
 
