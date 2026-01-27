@@ -59,6 +59,12 @@ namespace xo {
                                        obj<AExpression> when_true,
                                        obj<AExpression> when_false);
 
+            /** create empty if-else expression using memory from @p mm **/
+            static obj<AExpression,DIfElseExpr> make_empty(obj<AAllocator> mm);
+
+            /** create empty if-else expression using memory from @p mm **/
+            static DIfElseExpr * _make_empty(obj<AAllocator> mm);
+
             ///@}
             /** @defgroup scm-ifelseexpr-access-methods **/
             ///@{
@@ -66,6 +72,10 @@ namespace xo {
             obj<AExpression> test() const noexcept { return test_; }
             obj<AExpression> when_true() const noexcept { return when_true_; }
             obj<AExpression> when_false() const noexcept { return when_false_; }
+
+            void assign_test(obj<AExpression> x) { this->test_ = x; }
+            void assign_when_true(obj<AExpression> x) { this->when_true_ = x; }
+            void assign_when_false(obj<AExpression> x) { this->when_false_ = x; }
 
             ///@}
             /** @defgroup scm-ifelseexpr-expression-facet **/

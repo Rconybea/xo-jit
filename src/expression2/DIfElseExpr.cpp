@@ -57,6 +57,21 @@ namespace xo {
                                          when_false);
         }
 
+        obj<AExpression,DIfElseExpr>
+        DIfElseExpr::make_empty(obj<AAllocator> mm)
+        {
+            return obj<AExpression,DIfElseExpr>(_make_empty(mm));
+        }
+
+        DIfElseExpr *
+        DIfElseExpr::_make_empty(obj<AAllocator> mm)
+        {
+            return _make(mm,
+                         obj<AExpression>() /*test*/,
+                         obj<AExpression>() /*when_true*/,
+                         obj<AExpression>() /*when_false*/);
+        }
+
         void
         DIfElseExpr::assign_valuetype(TypeDescr td) noexcept
         {
@@ -76,14 +91,33 @@ namespace xo {
                 = FacetRegistry::instance().try_variant<APrintable,
                                                         AExpression>(when_false_);
 
-
-            return ppii.pps()->pretty_struct
-                (ppii,
-                 "DIfElseExpr",
-                 refrtag("typeref", typeref_),
-                 refrtag("test", test),
-                 refrtag("when_true", when_true),
-                 refrtag("when_false", when_false));
+            if (when_false) {
+                return ppii.pps()->pretty_struct
+                           (ppii,
+                            "DIfElseExpr",
+                            refrtag("typeref", typeref_),
+                            refrtag("test", test),
+                            refrtag("when_true", when_true),
+                            refrtag("when_false", when_false));
+            } else if (when_true) {
+                return ppii.pps()->pretty_struct
+                           (ppii,
+                            "DIfElseExpr",
+                            refrtag("typeref", typeref_),
+                            refrtag("test", test),
+                            refrtag("when_true", when_true));
+            } else if (test) {
+                return ppii.pps()->pretty_struct
+                           (ppii,
+                            "DIfElseExpr",
+                            refrtag("typeref", typeref_),
+                            refrtag("test", test));
+            } else {
+                return ppii.pps()->pretty_struct
+                           (ppii,
+                            "DIfElseExpr",
+                            refrtag("typeref", typeref_));
+            }
         }
 
         // ----------------------------------------------------------------
@@ -141,10 +175,13 @@ namespace xo {
 
         std::uint32_t
         IfExpr::pretty_print(const ppindentinfo & ppii) const {
+            return ppii.pps()->pretty_struct(ppii, "IfExpr");
+#ifdef NOT_YET
             return ppii.pps()->pretty_struct(ppii, "IfExpr",
                                              refrtag("test", test_),
                                              refrtag("when_true", when_true_),
                                              refrtag("when_false", when_false_));
+#endif
         }
 
         rp<IfExprAccess>
