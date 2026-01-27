@@ -54,6 +54,9 @@ namespace xo {
             case exprtype::apply:
                 _do_eval_apply_op();
                 break;
+            case exprtype::ifexpr:
+                _do_eval_if_else_op();
+                break;
             }
         }
 
@@ -83,6 +86,13 @@ namespace xo {
 
         void
         VirtualSchematikaMachine::_do_eval_apply_op()
+        {
+            // not implemented
+            assert(false);
+        }
+
+        void
+        VirtualSchematikaMachine::_do_eval_if_else_op()
         {
             // not implemented
             assert(false);
