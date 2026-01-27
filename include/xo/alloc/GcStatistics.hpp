@@ -1,16 +1,16 @@
-/* GcStatistics.hpp
+/** @file GcStatistics.hpp
  *
- * author: Roland Conybeare, Aug 2025
- */
+ *  @author Roland Conybeare, Aug 2025
+ **/
 
 #pragma once
 
 #include "generation.hpp"
 #include "CircularBuffer.hpp"
-#include "xo/reflect/TypeDescr.hpp"
-#include "xo/unit/quantity.hpp"
-#include "xo/unit/quantity_iostream.hpp"
-#include "xo/indentlog/print/pretty.hpp"
+#include <xo/reflect/TypeDescr.hpp>
+#include <xo/unit/quantity.hpp>
+#include <xo/unit/quantity_iostream.hpp>
+#include <xo/indentlog/print/pretty.hpp>
 #include <ostream>
 #include <array>
 
