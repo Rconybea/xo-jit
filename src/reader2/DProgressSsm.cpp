@@ -527,9 +527,25 @@ namespace xo {
         DProgressSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
                                                           ParserStateMachine * p_psm)
         {
-            p_psm->illegal_parsed_expression("DProgressSsm::on_parsed_expression_with_semicolon",
-                                             expr,
-                                             this->get_expect_str());
+            scope log(XO_DEBUG(p_psm->debug_flag()),
+                      xtag("expr", expr));
+
+            if (op_type_ == optype::invalid) {
+                p_psm->illegal_parsed_expression
+                    ("DProgressSsm::on_parsed_expression_with_semicolon",
+                     expr,
+                     this->get_expect_str());
+                return;
+            }
+
+            this->rhs_ = expr;
+
+            obj<AExpression> expr2 = this->assemble_expr(p_psm);
+
+            if (expr2) {
+                p_psm->pop_ssm();
+                p_psm->on_parsed_expression_with_semicolon(expr2);
+            }
         }
 
 #ifdef NOT_YET
