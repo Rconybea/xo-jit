@@ -75,23 +75,36 @@ namespace xo {
         bool
         DDefineExpr::pretty(const ppindentinfo & ppii) const
         {
+            assert(lhs_var_);
+
             auto lhs = obj<APrintable,DVariable>(lhs_var_);
             auto rhs = FacetRegistry::instance().try_variant<APrintable,
                                                              AExpression>(rhs_);
+
+            if (lhs_var_)
+                assert(lhs.data());
+
+            (void)lhs;
+            (void)rhs;
+
+            if (rhs_)
+                assert(rhs.data());
 
             // note: xo::print::cond() doesn't resolve the way we want here
 
             if (rhs) {
                 return ppii.pps()->pretty_struct
                            (ppii,
-                            "DDefineExpr",
-                            refrtag("lhs", lhs),
-                            refrtag("rhs", rhs));
+                            "DDefineExpr"
+                            , refrtag("lhs", lhs)
+                            , refrtag("rhs", rhs)
+                               );
             } else {
                 return ppii.pps()->pretty_struct
                            (ppii,
-                            "DDefineExpr",
-                            refrtag("lhs", lhs));
+                            "DDefineExpr"
+                            , refrtag("lhs", lhs)
+                               );
 
             }
         }

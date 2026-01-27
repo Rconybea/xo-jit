@@ -4,6 +4,7 @@
  **/
 
 #include "TypeRef.hpp"
+#include <xo/indentlog/print/cond.hpp>
 #include <xo/indentlog/print/pretty.hpp>
 #include <xo/indentlog/print/quoted.hpp>
 
@@ -71,9 +72,10 @@ namespace xo {
 
             return ppii.pps()->pretty_struct
                        (ppii,
-                        "TypeRef",
-                        refrtag("id", quot(id_)),
-                        refrtag("td", td_));
+                        "TypeRef"
+                        , refrtag("id", quot(id_))
+                        , refrtag("td", cond(td_, td_, "null"))
+                           );
         }
 
     } /*namespace scm*/

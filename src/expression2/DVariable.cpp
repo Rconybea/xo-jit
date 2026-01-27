@@ -47,9 +47,10 @@ namespace xo {
 
             return ppii.pps()->pretty_struct
                        (ppii,
-                        "DVariable",
-                        refrtag("name", quot(name)),
-                        refrtag("typeref", typeref_));
+                        "DVariable"
+                        , refrtag("name", quot(name))
+                        , refrtag("typeref", typeref_)
+                           );
         }
 
     } /*namespace scm*/
