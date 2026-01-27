@@ -9,6 +9,7 @@ set(UTEST_SRCS
     DVariable.test.cpp
     DApplyExpr.test.cpp
     DDefineExpr.test.cpp
+    DIfElseExpr.test.cpp
 )
 
 xo_add_utest_executable(${UTEST_EXE} ${UTEST_SRCS})

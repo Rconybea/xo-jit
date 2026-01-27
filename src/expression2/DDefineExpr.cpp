@@ -1,5 +1,5 @@
 /** @file DDefineExpr.cpp
-*
+ *
  *  @author Roland Conybeare, Jan 2026
  **/
 

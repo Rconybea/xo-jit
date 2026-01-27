@@ -8,6 +8,7 @@ set(SELF_SRCS
     DVariable.cpp
     DDefineExpr.cpp
     DApplyExpr.cpp
+    DIfElseExpr.cpp
 
     TypeRef.cpp
 
@@ -24,6 +25,9 @@ set(SELF_SRCS
 
     IExpression_DApplyExpr.cpp
     IPrintable_DApplyExpr.cpp
+
+    IExpression_DIfElseExpr.cpp
+    IPrintable_DIfElseExpr.cpp
 
     DLocalSymtab.cpp
     DGlobalSymtab.cpp

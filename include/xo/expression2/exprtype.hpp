@@ -38,9 +38,9 @@ namespace xo {
 #endif
             /** variable reference **/
             variable,
-#ifdef NOT_YET
             /** if-then-else **/
             ifexpr,
+#ifdef NOT_YET
             /** sequence **/
             sequence,
             /** type conversion **/
