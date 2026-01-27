@@ -733,13 +733,18 @@ namespace xo {
         bool
         DDefineSsm::pretty(const ppindentinfo & ppii) const
         {
-            auto expr = FacetRegistry::instance().variant<APrintable,AExpression>(def_expr_);
+            auto expr
+                = FacetRegistry::instance().variant<APrintable,
+                                                    AExpression>(def_expr_);
+            assert(expr.data());
+            (void)expr;
 
             return ppii.pps()->pretty_struct
                 (ppii,
                  "DDefineSsm",
                  refrtag("defstate", defstate_),
-                 refrtag("def_expr", expr));
+                 refrtag("def_expr", expr)
+                    );
         }
     } /*namespace scm*/
 } /*namespace xo*/

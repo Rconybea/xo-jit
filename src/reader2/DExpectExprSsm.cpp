@@ -336,7 +336,8 @@ namespace xo {
                 (ppii,
                  "DExpectExprSsm",
                  refrtag("allow_defs", allow_defs_),
-                 refrtag("cxl_on_rightbrace", cxl_on_rightbrace_));
+                 refrtag("cxl_on_rightbrace", cxl_on_rightbrace_)
+                    );
         }
 
 #ifdef NOT_YET

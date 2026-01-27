@@ -73,8 +73,9 @@ namespace xo {
                 char buf[80];
                 snprintf(buf, sizeof(buf), "[%lu]", i_frame);
 
-                auto ssm = FacetRegistry::instance().variant<APrintable,
-                                                             ASyntaxStateMachine> (frame->top());
+                auto ssm = (FacetRegistry::instance().variant
+                            <APrintable, ASyntaxStateMachine> (frame->top()));
+                assert(ssm.data());
 
                 pps->newline_pretty_tag(ppii.ci1(), buf, ssm);
 

@@ -1115,32 +1115,16 @@ namespace xo {
             if (rhs_)
                 rhs = FacetRegistry::instance().variant<APrintable,AExpression>(rhs_);
 
+            (void)lhs;
+
             return ppii.pps()->pretty_struct
                        (ppii,
                         "DProgressSsm",
                         refrtag("lhs", lhs),
                         refrtag("op", op_type_),
-                        cond(rhs, refrtag("rhs", rhs), "nullptr"));
+                        cond(rhs, refrtag("rhs", rhs), "nullptr")
+                           );
 
-#ifdef NOPE
-            if (ppii.upto()) {
-                return (ppii.pps()->print_upto("<progress_xs")
-                        && (lhs_ ? ppii.pps()->print_upto(refrtag("lhs", lhs_)) : true)
-                        && (op_type_ != optype::invalid ? ppii.pps()->print_upto(refrtag("op", op_type_)) : true)
-                        && (rhs_ ? ppii.pps()->print_upto(refrtag("rhs", rhs_)) : true)
-                        && ppii.pps()->print_upto(">"));
-            } else {
-                ppii.pps()->write("<progress_xs ");
-                if (lhs_)
-                    ppii.pps()->pretty(refrtag("lhs", lhs_));
-                if (op_type_ != optype::invalid)
-                    ppii.pps()->pretty(refrtag("op", op_type_));
-                if (rhs_)
-                    ppii.pps()->pretty(refrtag("rhs", rhs_));
-                ppii.pps()->write(">");
-                return false;
-            }
-#endif
         }
 
         obj<AExpression>

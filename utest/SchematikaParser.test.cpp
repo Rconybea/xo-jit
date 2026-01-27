@@ -16,9 +16,9 @@ namespace xo {
     using xo::scm::SchematikaParser;
     using xo::scm::ASyntaxStateMachine;
     using xo::scm::syntaxstatetype;
-    using xo::scm::DDefineSsm;
+//    using xo::scm::DDefineSsm;
     using xo::scm::DExpectExprSsm;
-    using xo::scm::defexprstatetype;
+//    using xo::scm::defexprstatetype;
     //using xo::scm::ParserResult;
     //using xo::scm::parser_result_type;
     using xo::scm::Token;

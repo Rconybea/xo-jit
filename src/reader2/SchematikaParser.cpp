@@ -117,7 +117,8 @@ namespace xo {
             return pps->pretty_struct
                        (ppii,
                         "SchematikaParser",
-                        refrtag("stack", psm_.stack()));
+                        refrtag("stack", psm_.stack())
+                           );
         }
     } /*namespace scm*/
 } /*namespace xo*/
