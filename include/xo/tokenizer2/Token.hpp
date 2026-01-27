@@ -137,6 +137,8 @@ namespace xo {
             static Token lambda() { return Token(tokentype::tk_lambda); }
             /** token representing keyword @c if **/
             static Token if_token() { return Token(tokentype::tk_if); }
+            /** token representing keyword @c then **/
+            static Token then_token() { return Token(tokentype::tk_then); }
             /** token representing keyword @c else **/
             static Token else_token() { return Token(tokentype::tk_else); }
             /** token representing keyword @c let **/
