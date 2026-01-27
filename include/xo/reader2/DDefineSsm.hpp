@@ -113,7 +113,7 @@ namespace xo {
             syntaxstatetype ssm_type() const noexcept;
 
             /** text describing expected/allowed input to this ssm in current state.
-             *  Intended to drive error mesages
+             *  Intended to drive error messages
              **/
             std::string_view get_expect_str() const noexcept;
 
@@ -212,6 +212,7 @@ namespace xo {
             /** @defgroup scm-define-printable-facet printable facet methods **/
             ///@{
 
+            /** pretty-printer support **/
             bool pretty(const ppindentinfo & ppii) const;
 
             ///@}

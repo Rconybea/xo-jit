@@ -11,8 +11,14 @@
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/DConstant.hpp>
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
+#include <xo/object2/DBoolean.hpp>
+#include <xo/object2/boolean/IGCObject_DBoolean.hpp>
+#include <xo/object2/DInteger.hpp>
+#include <xo/object2/number/IGCObject_DInteger.hpp>
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/number/IGCObject_DFloat.hpp>
+#include <xo/object2/DString.hpp>
+#include <xo/object2/string/IGCObject_DString.hpp>
 #include <xo/gc/GCObject.hpp>
 #include <xo/facet/facet_implementation.hpp>
 
@@ -233,12 +239,21 @@ namespace xo {
         }
 
         void
-        DExpectExprSsm::on_string_token(const Token & tk,
-                                        ParserStateMachine * p_psm)
+        DExpectExprSsm::on_bool_token(const Token & tk,
+                                      ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DExpectExprSsm::on_string_token",
-                                          tk,
-                                          this->get_expect_str());
+            auto flag = DBoolean::box<AGCObject>(p_psm->expr_alloc(),
+                                                 tk.bool_value());
+
+            auto expr = DConstant::make(p_psm->expr_alloc(), flag);
+
+            // DProgressSsm responsible for resolving cases like
+            //  true;
+            //  true && false;
+
+            DProgressSsm::start(p_psm->parser_alloc(),
+                                expr,
+                                p_psm);
         }
 
         void
@@ -268,18 +283,48 @@ namespace xo {
         DExpectExprSsm::on_i64_token(const Token & tk,
                                      ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DExpectExprSsm::on_i64_token",
-                                          tk,
-                                          this->get_expect_str());
+            auto i64o = DInteger::box<AGCObject>(p_psm->expr_alloc(),
+                                                 tk.i64_value());
+
+            auto expr = DConstant::make(p_psm->expr_alloc(), i64o);
+
+            // DProgressSsm responsible for resolving cases like
+            //   1,
+            //   1;
+            //   1 + 2;
+            //   1 + 2 ..  // could be followed by infix
+            //   1 + 2 * 3;
+            //   1 + 2 * 3 ..  // could be followed by infix
+            //   1 * (2 + 3)
+
+            DProgressSsm::start(p_psm->parser_alloc(),
+                                expr,
+                                p_psm);
         }
 
         void
-        DExpectExprSsm::on_bool_token(const Token & tk,
-                                      ParserStateMachine * p_psm)
+        DExpectExprSsm::on_string_token(const Token & tk,
+                                        ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DExpectExprSsm::on_bool_token",
-                                          tk,
-                                          this->get_expect_str());
+            auto str = DString::from_str(p_psm->expr_alloc(),
+                                         tk.text());
+            auto str_o = obj<AGCObject,DString>(str);
+
+            auto expr = DConstant::make(p_psm->expr_alloc(), str_o);
+
+            /* e.g.
+             *   def msg = "hello, world";
+             *              \----tk----/
+             *
+             * DProgressSsm responsible for operators that apply to string
+             *   "foo";
+             *   "foo" <= "bar"
+             *   "foo" + ", she said";
+             */
+
+            DProgressSsm::start(p_psm->parser_alloc(),
+                                expr,
+                                p_psm);
         }
 
         void
@@ -313,9 +358,8 @@ namespace xo {
         DExpectExprSsm::on_parsed_expression(obj<AExpression> expr,
                                              ParserStateMachine * p_psm)
         {
-            p_psm->illegal_parsed_expression("DExpectExprSsm::on_parsed_expression",
-                                             expr,
-                                             this->get_expect_str());
+            p_psm->pop_ssm();
+            p_psm->on_parsed_expression(expr);
         }
 
         void
@@ -462,62 +506,6 @@ namespace xo {
                                                p_stack, p_emit_expr);
 #endif
             return;
-        }
-
-        void
-        expect_expr_xs::on_bool_token(const token_type & tk,
-                                      parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            progress_xs::start
-                (Constant<bool>::make(tk.bool_value()),
-                 p_psm);
-        }
-
-        void
-        expect_expr_xs::on_i64_token(const token_type & tk,
-                                     parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()),
-                      xtag("tk", tk),
-                      xtag("do", "push progress xs w/ tk value"));
-
-            progress_xs::start
-                (Constant<int64_t>::make(tk.i64_value()),
-                 p_psm);
-        }
-
-        void
-        expect_expr_xs::on_f64_token(const token_type & tk,
-                                     parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            //constexpr const char * self_name = "exprstate::on_f64_token";
-
-            /* e.g.
-             *   def pi = 3.14159265;
-             *            \---tk---/
-             */
-            progress_xs::start
-                (Constant<double>::make(tk.f64_value()),
-                 p_psm);
-        }
-
-        void
-        expect_expr_xs::on_string_token(const token_type & tk,
-                                        parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            /* e.g.
-             *   def msg = "hello, world";
-             *              \----tk----/
-             */
-            progress_xs::start
-                (Constant<std::string>::make(tk.text()),
-                 p_psm);
         }
 
         void

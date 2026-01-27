@@ -230,6 +230,14 @@ namespace xo {
                 this->on_if_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_then:
+                this->on_then_token(tk, p_psm);
+                return;
+
+            case tokentype::tk_else:
+                this->on_else_token(tk, p_psm);
+                return;
+
             case tokentype::tk_colon:
                 this->on_colon_token(tk, p_psm);
                 return;
@@ -288,8 +296,7 @@ namespace xo {
             case tokentype::tk_cmpne:
             case tokentype::tk_type:
             case tokentype::tk_lambda:
-            case tokentype::tk_then:
-            case tokentype::tk_else:
+                break;
             case tokentype::tk_let:
             case tokentype::tk_in:
             case tokentype::tk_end:
@@ -327,6 +334,42 @@ namespace xo {
             p_psm->illegal_input_on_token("DProgressSsm::on_if_token",
                                           tk,
                                           this->get_expect_str());
+        }
+
+        void
+        DProgressSsm::on_then_token(const Token & tk,
+                                    ParserStateMachine * p_psm)
+        {
+            scope log(XO_DEBUG(p_psm->debug_flag()));
+
+            (void)tk;
+
+            obj<AExpression> expr = this->assemble_expr(p_psm);
+
+            p_psm->pop_ssm();  // completes self
+
+            // TODO: perhaps need to generalize on_parsed_expression_with_semicolon() ..?
+            p_psm->on_parsed_expression(expr);
+            p_psm->on_token(tk);
+        }
+
+        void
+        DProgressSsm::on_else_token(const Token & tk,
+                                    ParserStateMachine * p_psm)
+        {
+            // note: common with .on_then_token()
+
+            scope log(XO_DEBUG(p_psm->debug_flag()));
+
+            (void)tk;
+
+            obj<AExpression> expr = this->assemble_expr(p_psm);
+
+            p_psm->pop_ssm();  // completes self
+
+            // TODO: perhaps need to generalize on_parsed_expression_with_semicolon() ..?
+            p_psm->on_parsed_expression(expr);
+            p_psm->on_token(tk);
         }
 
         void
@@ -466,9 +509,7 @@ namespace xo {
 
             {
                 obj<APrintable> expr_pr = FacetRegistry::instance().variant<APrintable,AExpression>(expr);
-
                 assert(expr_pr);
-
                 log && log(xtag("expr", expr_pr));
             }
 
@@ -980,28 +1021,6 @@ namespace xo {
          }
 
         void
-        progress_xs::on_then_token(const token_type & tk,
-                                   parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            rp<Expression> expr = this->assemble_expr(p_psm);
-
-            log && log(xtag("assembled-expr", expr));
-
-            std::unique_ptr<exprstate> self = p_psm->pop_exprstate();
-
-            p_psm->on_expr(expr);
-            p_psm->on_then_token(tk);
-
-            /* control here on input like:
-             *
-             *   if a > b then..
-             *
-             */
-        }
-
-        void
         progress_xs::on_else_token(const token_type & tk,
                                    parserstatemachine * p_psm)
         {
@@ -1120,7 +1139,7 @@ namespace xo {
         bool
         DProgressSsm::pretty(const xo::print::ppindentinfo & ppii) const
         {
-            scope log(XO_DEBUG(true));
+            scope log(XO_DEBUG(false));
             log && log(xtag("lhs_.tseq", lhs_._typeseq()));
             log && log(xtag("rhs_.tseq", rhs_._typeseq()));
 

@@ -33,6 +33,9 @@ namespace xo {
             /** handle define-expression. See @ref DDefineSsm **/
             defexpr,
 
+            /** handle ifelse-expression. See @ref DIfElseSsm **/
+            ifelseexpr,
+
             /** rhs expression.  state exists to achieve 1-token lookahead **/
             progress,
 

@@ -7,6 +7,7 @@
 #include "DDefineSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExprSeqState.hpp"
 #include <xo/reader2/DProgressSsm.hpp>
+#include <xo/reader2/DIfElseSsm.hpp>
 #include <xo/expression2/DConstant.hpp>
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
 #include <xo/object2/DString.hpp>
@@ -246,20 +247,20 @@ namespace xo {
         {
             switch (seqtype_) {
             case exprseqtype::toplevel_interactive:
-                p_psm->illegal_input_on_token("DExprSeqState::on_if_token",
-                                              tk,
-                                              this->get_expect_str());
-                //assert(false); // DfElseState::start(p_psm);
-                break;
+                DIfElseSsm::start(p_psm->parser_alloc(),
+                                  p_psm->expr_alloc(),
+                                  p_psm);
+                return;
             case exprseqtype::toplevel_batch:
-                p_psm->illegal_input_on_token("DExprSeqState::on_if_token",
-                                              tk,
-                                              this->get_expect_str());
                 break;
             case exprseqtype::N:
                 assert(false); // unreachable
                 break;
             }
+
+            p_psm->illegal_input_on_token("DExprSeqState::on_if_token",
+                                          tk,
+                                          this->get_expect_str());
         }
 
         void

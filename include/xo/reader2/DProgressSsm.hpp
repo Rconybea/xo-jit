@@ -126,6 +126,17 @@ namespace xo {
              **/
             obj<AExpression> assemble_expr(ParserStateMachine * p_psm);
 
+            /** @defgroup scm-progressssm-methods general methods **/
+            ///@{
+
+            void on_if_token(const Token & tk,
+                             ParserStateMachine * p_psm);
+            void on_then_token(const Token & tk,
+                               ParserStateMachine * p_psm);
+            void on_else_token(const Token & tk,
+                               ParserStateMachine * p_psm);
+
+            ///@}
             /** @defgroup scm-progressssm-ssm-facet syntaxstatemachine facet methods **/
             /// @{
 
@@ -139,8 +150,6 @@ namespace xo {
                                  ParserStateMachine * p_psm);
             void on_def_token(const Token & tk,
                               ParserStateMachine * p_psm);
-            void on_if_token(const Token & tk,
-                             ParserStateMachine * p_psm);
             void on_colon_token(const Token & tk,
                                 ParserStateMachine * p_psm);
             void on_singleassign_token(const Token & tk,

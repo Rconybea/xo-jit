@@ -42,6 +42,34 @@ namespace xo {
             bool cxl_on_rightbrace() const noexcept { return cxl_on_rightbrace_; }
 
             ///@}
+            /** @defgroup scm-expectexpr-methods general methods **/
+            ///@{
+
+            /** step state machine for this syntax on incoming boolean literal token @p tkk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_bool_token(const Token & tk,
+                               ParserStateMachine * p_psm);
+
+            /** update state for this syntax on incoming f64 token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_f64_token(const Token & tk,
+                              ParserStateMachine * p_psm);
+
+            /** update state for this syntax on incoming i64 token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_i64_token(const Token & tk,
+                              ParserStateMachine * p_psm);
+
+            /** update state for this syntax on incoming string token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_string_token(const Token & tk,
+                                 ParserStateMachine * p_psm);
+
+            ///@}
             /** @defgroup scm-expectexpr-ssm-facet syntaxstatemachine facet methods **/
             ///@{
 
@@ -88,30 +116,6 @@ namespace xo {
              **/
             void on_singleassign_token(const Token & tk,
                                        ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming string token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_string_token(const Token & tk,
-                                 ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming f64 token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_f64_token(const Token & tk,
-                              ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming i64 token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_i64_token(const Token & tk,
-                              ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming bool token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_bool_token(const Token & tk,
-                               ParserStateMachine * p_psm);
 
             /** update state for this syntax on incoming semicolon token @p tk,
              *  overall parser state in @p p_psm
