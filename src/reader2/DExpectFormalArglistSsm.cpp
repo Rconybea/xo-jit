@@ -5,6 +5,8 @@
 
 #include "DExpectFormalArglistSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp"
+#include "DExpectFormalArgSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp"
 #include <xo/printable2/Printable.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -213,14 +215,10 @@ namespace xo {
         DExpectFormalArglistSsm::on_leftparen_token(const Token & tk,
                                                     ParserStateMachine * p_psm)
         {
-            scope log(XO_DEBUG(true));
-
             if (fastate_ == formalarglstatetype::argl_0) {
                 this->fastate_ = formalarglstatetype::argl_1a;
 
-                log && log("STUB: DExpectFormalArglistSsm::on_leftparen_token -> DExpectFormalSsm::start()");
-
-                //DExpectFormalSsm::start(p_psm);
+                DExpectFormalArgSsm::start(p_psm);
                 return;
             }
 

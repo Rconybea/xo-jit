@@ -20,6 +20,9 @@
 #include <xo/reader2/ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp>
 #include <xo/reader2/ssm/IPrintable_DExpectFormalArglistSsm.hpp>
 
+#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp>
+#include <xo/reader2/ssm/IPrintable_DExpectFormalArgSsm.hpp>
+
 #include <xo/reader2/ssm/ISyntaxStateMachine_DExpectSymbolSsm.hpp>
 #include <xo/reader2/ssm/IPrintable_DExpectSymbolSsm.hpp>
 
@@ -63,6 +66,9 @@ namespace xo {
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectFormalArglistSsm>();
             FacetRegistry::register_impl<APrintable, DExpectFormalArglistSsm>();
 
+            FacetRegistry::register_impl<ASyntaxStateMachine, DExpectFormalArgSsm>();
+            FacetRegistry::register_impl<APrintable, DExpectFormalArgSsm>();
+
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectSymbolSsm>();
             FacetRegistry::register_impl<APrintable, DExpectSymbolSsm>();
 
@@ -80,6 +86,7 @@ namespace xo {
             log && log(xtag("DLambdaSsm.tseq", typeseq::id<DLambdaSsm>()));
             log && log(xtag("DIfElseSsm.tseq", typeseq::id<DIfElseSsm>()));
             log && log(xtag("DExpectFormalArglistSsm.tseq", typeseq::id<DExpectFormalArglistSsm>()));
+            log && log(xtag("DExpectFormalArgSsm.tseq", typeseq::id<DExpectFormalArgSsm>()));
             log && log(xtag("DExpectSymbolSsm.tseq", typeseq::id<DExpectSymbolSsm>()));
             log && log(xtag("DExpectTypeSsm.tseq", typeseq::id<DExpectTypeSsm>()));
             log && log(xtag("DExpectExprSsm.tseq", typeseq::id<DExpectExprSsm>()));

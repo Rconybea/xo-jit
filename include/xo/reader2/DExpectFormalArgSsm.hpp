@@ -54,8 +54,12 @@ namespace xo {
             DExpectFormalArgSsm();
 
             /** create empty instance using memory from @p mm **/
-            DExpectFormalArgSsm * _make(DArena & mm);
+            static obj<ASyntaxStateMachine,DExpectFormalArgSsm> make(DArena & mm);
 
+            /** create empty instance using memory from @p mm **/
+            static DExpectFormalArgSsm * _make(DArena & mm);
+
+            /** puah instance of this ssm onto @p p_psm **/
             static void start(ParserStateMachine * p_psm);
 
             /** @defgroup scm-expectformalargssm-ssm-facet syntaxstatemachine facet methods **/

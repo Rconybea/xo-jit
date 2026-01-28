@@ -38,8 +38,7 @@ namespace xo {
              *  to the state machine on top of the stack
              *  as of when this start() method invoked
              **/
-            static void start(DArena & parser_mm,
-                              ParserStateMachine * p_psm);
+            static void start(ParserStateMachine * p_psm);
 
             /** update state for this syntax on incoming token @p tk,
              *  with overall parser state in @p p_psm

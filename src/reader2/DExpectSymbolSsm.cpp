@@ -29,11 +29,10 @@ namespace xo {
         }
 
         void
-        DExpectSymbolSsm::start(DArena & parser_alloc,
-                                ParserStateMachine * p_psm)
+        DExpectSymbolSsm::start(ParserStateMachine * p_psm)
         {
             DExpectSymbolSsm * sym_ssm
-                = DExpectSymbolSsm::make(parser_alloc);
+                = DExpectSymbolSsm::make(p_psm->parser_alloc());
 
             // note:
             // relying on [ISyntaxStateMachine_DExpectedSymbolSsm.hpp]

@@ -4,12 +4,14 @@
  **/
 
 #include "DExpectFormalArgSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp"
+#include "DExpectSymbolSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DExpectSymbolSsm.hpp"
 
 #ifdef NOT_YET
-#include "expect_symbol_xs.hpp"
 #include "expect_type_xs.hpp"
-#include "parserstatemachine.hpp"
-#include "exprstatestack.hpp"
+//#include "parserstatemachine.hpp"
+//#include "exprstatestack.hpp"
 #include "xo/expression/Variable.hpp"
 #endif
 
@@ -38,12 +40,26 @@ namespace xo {
 
         DExpectFormalArgSsm::DExpectFormalArgSsm() = default;
 
+        obj<ASyntaxStateMachine,DExpectFormalArgSsm>
+        DExpectFormalArgSsm::make(DArena & mm)
+        {
+            return obj<ASyntaxStateMachine,DExpectFormalArgSsm>(_make(mm));
+        }
+
         DExpectFormalArgSsm *
         DExpectFormalArgSsm::_make(DArena & mm)
         {
             void * mem = mm.alloc(typeseq::id<DExpectFormalArgSsm>(), sizeof(DExpectFormalArgSsm));
 
             return new (mem) DExpectFormalArgSsm();
+        }
+
+        void
+        DExpectFormalArgSsm::start(ParserStateMachine * p_psm)
+        {
+            p_psm->push_ssm(DExpectFormalArgSsm::make(p_psm->parser_alloc()));
+
+            DExpectSymbolSsm::start(p_psm);
         }
 
         syntaxstatetype
@@ -161,14 +177,8 @@ namespace xo {
                                              expr,
                                              this->get_expect_str());
         }
+
 #ifdef NOT_YET
-        void
-        DExpectFormalSsm::start(ParserStateMachine * p_psm) {
-            p_psm->push_exprstate(expect_formal_xs::make());
-
-            expect_symbol_xs::start(p_psm);
-        }
-
         expect_formal_xs::expect_formal_xs()
             : exprstate(exprstatetype::expect_formal)
         {}
