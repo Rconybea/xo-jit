@@ -48,6 +48,9 @@ namespace xo {
             case exprtype::define:
                 _do_eval_define_op();
                 break;
+            case exprtype::lambda:
+                _do_eval_lambda_op();
+                break;
             case exprtype::variable:
                 _do_eval_variable_op();
                 break;
@@ -72,6 +75,13 @@ namespace xo {
 
         void
         VirtualSchematikaMachine::_do_eval_define_op()
+        {
+            // not implemented
+            assert(false);
+        }
+
+        void
+        VirtualSchematikaMachine::_do_eval_lambda_op()
         {
             // not implemented
             assert(false);
