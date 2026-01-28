@@ -4,7 +4,7 @@
  **/
 
 #include "DLambdaExpr.hpp"
-// #include "detail/IExpression_DLambdaExpr.hpp"
+#include "detail/IExpression_DLambdaExpr.hpp"
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -53,7 +53,6 @@ namespace xo {
         {
         }
 
-#ifdef NOT_YET
         obj<AExpression,DLambdaExpr>
         DLambdaExpr::make(obj<AAllocator> mm,
                           TypeRef typeref,
@@ -62,9 +61,8 @@ namespace xo {
                           obj<AExpression> body)
         {
             return obj<AExpression,DLambdaExpr>(_make(mm, typeref,
-                                                      name, local_symtab, body);
+                                                      name, local_symtab, body));
         }
-#endif
 
         DLambdaExpr *
         DLambdaExpr::_make(obj<AAllocator> mm,

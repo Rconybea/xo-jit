@@ -44,17 +44,25 @@ namespace xo {
 
             bool is_resolved() const noexcept { return typeref_.is_resolved(); }
 
-            exprtype extype() const noexcept { return exprtype::constant; }
+            obj<AGCObject> value() const noexcept { return value_; }
             TypeDescr value_td() const noexcept { return typeref_.td(); }
             TaggedPtr value_tp() const noexcept { return TaggedPtr(typeref_.td(), value_.data()); }
 
+            /** @defgroup scm-constant-expression-facet **/
+            ///@{
+
+            exprtype extype() const noexcept { return exprtype::constant; }
             TypeRef typeref() const noexcept { return typeref_; }
             TypeDescr valuetype() const noexcept { return typeref_.td(); }
-            obj<AGCObject> value() const noexcept { return value_; }
-
             void assign_valuetype(TypeDescr td) noexcept { typeref_.resolve(td); }
 
+            ///@}
+            /** @defgroup scm-constant-printable-facet **/
+            ///@{
+
             bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
 
         private:
             static TypeDescr _lookup_td(typeseq tseq);

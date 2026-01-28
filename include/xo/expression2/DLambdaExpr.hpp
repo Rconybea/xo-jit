@@ -34,14 +34,12 @@ namespace xo {
                         DLocalSymtab * local_symtab,
                         obj<AExpression> body);
 
-#ifdef NOT_YET
             /** create instance using memory from @p mm **/
             static obj<AExpression,DLambdaExpr> make(obj<AAllocator> mm,
                                                      TypeRef typeref,
                                                      const DUniqueString * name,
                                                      DLocalSymtab * local_symtab,
                                                      obj<AExpression> body);
-#endif
 
             /** create instance, using memory from @p mm **/
             static DLambdaExpr * _make(obj<AAllocator> mm,
@@ -52,6 +50,8 @@ namespace xo {
             ///@}
             /** @defgroup scm-lambdaexpr-methods **/
             ///@{
+
+            DLocalSymtab * local_symtab() const noexcept { return local_symtab_; }
 
             // get_free_variables()
             // visit_preorder()
