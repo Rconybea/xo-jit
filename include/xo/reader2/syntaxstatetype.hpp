@@ -33,6 +33,9 @@ namespace xo {
             /** handle define-expression. See @ref DDefineSsm **/
             defexpr,
 
+            /** handle lambda-expression. See @ref DLambdaSsm **/
+            lambdaexpr,
+
             /** handle ifelse-expression. See @ref DIfElseSsm **/
             ifelseexpr,
 

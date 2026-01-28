@@ -102,7 +102,7 @@ namespace xo {
             /** @defgroup scm-definessm-access-methods **/
             ///@{
 
-            /** identify define-expression state **/
+            /** identify this nested state machine **/
             defexprstatetype defstate() const noexcept { return defstate_; }
 
             ///@}
