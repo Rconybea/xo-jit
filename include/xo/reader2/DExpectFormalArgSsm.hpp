@@ -48,6 +48,7 @@ namespace xo {
         public:
             using TypeDescr = xo::reflect::TypeDescr;
             using DArena = xo::mm::DArena;
+            using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             DExpectFormalArgSsm();
@@ -97,6 +98,13 @@ namespace xo {
                                                      ParserStateMachine * p_psm);
 
             ///@}
+            /** @defgroup scm-expectformalargssm-printable-facet printable facet methods **/
+            ///@{
+
+            /** pretty-printing support **/
+            bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
 
 #ifdef NOT_YET
 
@@ -116,8 +124,6 @@ namespace xo {
 
             virtual void on_typedescr(TypeDescr td,
                                       parserstatemachine * p_psm) override;
-
-            virtual void print(std::ostream & os) const override;
 
         private:
             static std::unique_ptr<expect_formal_xs> make();

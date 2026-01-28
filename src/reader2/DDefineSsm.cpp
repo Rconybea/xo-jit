@@ -739,12 +739,10 @@ namespace xo {
             assert(expr.data());
             (void)expr;
 
-            return ppii.pps()->pretty_struct
-                (ppii,
-                 "DDefineSsm",
-                 refrtag("defstate", defstate_),
-                 refrtag("def_expr", expr)
-                    );
+            return ppii.pps()->pretty_struct(ppii,
+                                             "DDefineSsm",
+                                             refrtag("defstate", defstate_),
+                                             refrtag("def_expr", expr));
         }
     } /*namespace scm*/
 } /*namespace xo*/

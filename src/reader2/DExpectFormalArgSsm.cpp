@@ -216,18 +216,15 @@ namespace xo {
                 exprstate::on_typedescr(td, p_psm);
             }
         }
-
-        void
-        expect_formal_xs::print(std::ostream & os) const {
-            os << "<expect_formal_xs"
-               << xtag("type", formalxs_type_);
-            if (!result_.name().empty())
-                os << xtag("result.name", result_.name());
-            if (result_.td())
-                os << xtag("result.td", result_.td());
-            os << ">";
-        }
 #endif
+
+        bool
+        DExpectFormalArgSsm::pretty(const ppindentinfo & ppii) const {
+            return ppii.pps()->pretty_struct
+                       (ppii,
+                        "DExpectFormalArgSsm");
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

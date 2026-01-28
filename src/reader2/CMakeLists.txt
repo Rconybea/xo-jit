@@ -39,7 +39,7 @@ set(SELF_SRCS
 
     DExpectFormalArgSsm.cpp
     ISyntaxStateMachine_DExpectFormalArgSsm.cpp
-    # IPrintable_DExpectFormalArgSsm.cpp
+    IPrintable_DExpectFormalArgSsm.cpp
 
     DExpectSymbolSsm.cpp
     ISyntaxStateMachine_DExpectSymbolSsm.cpp
