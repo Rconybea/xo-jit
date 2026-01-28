@@ -33,6 +33,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DLambdaSsm.cpp
     IPrintable_DLambdaSsm.cpp
 
+    DExpectFormalArglistSsm.cpp
+    ISyntaxStateMachine_DExpectFormalArglistSsm.cpp
+    IPrintable_DExpectFormalArglistSsm.cpp
+
     DExpectSymbolSsm.cpp
     ISyntaxStateMachine_DExpectSymbolSsm.cpp
     IPrintable_DExpectSymbolSsm.cpp

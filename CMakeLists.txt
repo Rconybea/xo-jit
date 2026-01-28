@@ -114,6 +114,32 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-syntaxstatemachine-expectformalarglistssm
+    FACET_PKG xo_reader2
+    FACET SyntaxStateMachine
+    REPR ExpectFormalArglistSsm
+    INPUT idl/ISyntaxStateMachine_DExpectFormalArglistSsm.json5
+    OUTPUT_HPP_DIR include/xo/reader2
+    OUTPUT_IMPL_SUBDIR ssm
+    OUTPUT_CPP_DIR src/reader2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-printable-expectformalarglistssm
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR ExpectFormalArglistSsm
+    INPUT idl/IPrintable_DExpectFormalArglistSsm.json5
+    OUTPUT_HPP_DIR include/xo/reader2
+    OUTPUT_IMPL_SUBDIR ssm
+    OUTPUT_CPP_DIR src/reader2
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-ifelsessm
     FACET_PKG xo_reader2
     FACET SyntaxStateMachine

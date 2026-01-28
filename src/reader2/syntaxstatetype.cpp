@@ -15,6 +15,8 @@ namespace xo {
                 break;
             case syntaxstatetype::expect_toplevel_expression_sequence:
                 return "expect-toplevel-expression-sequence";
+            case syntaxstatetype::expect_formal_arglist:
+                return "expect-formal-arglist";
             case syntaxstatetype::expect_symbol:
                 return "expect-symbol";
             case syntaxstatetype::expect_type:

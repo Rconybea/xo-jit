@@ -5,6 +5,8 @@
 
 #include "DLambdaSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DLambdaSsm.hpp"
+#include "DExpectFormalArglistSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp"
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/printable2/Printable.hpp>
@@ -25,6 +27,7 @@
 
 namespace xo {
     using xo::print::APrintable;
+    using xo::mm::AAllocator;
     using xo::facet::FacetRegistry;
     using xo::reflect::typeseq;
 
@@ -117,10 +120,76 @@ namespace xo {
         DLambdaSsm::on_token(const Token & tk,
                              ParserStateMachine * p_psm)
         {
+            switch (tk.tk_type()) {
+            case tokentype::tk_lambda:
+                this->on_lambda_token(tk, p_psm);
+                return;
+
+                // all the not-yet-handled cases
+            case tokentype::tk_def:
+            case tokentype::tk_if:
+            case tokentype::tk_symbol:
+            case tokentype::tk_colon:
+            case tokentype::tk_singleassign:
+            case tokentype::tk_string:
+            case tokentype::tk_f64:
+            case tokentype::tk_i64:
+            case tokentype::tk_bool:
+            case tokentype::tk_semicolon:
+            case tokentype::tk_invalid:
+            case tokentype::tk_leftparen:
+            case tokentype::tk_rightparen:
+            case tokentype::tk_leftbracket:
+            case tokentype::tk_rightbracket:
+            case tokentype::tk_leftbrace:
+            case tokentype::tk_rightbrace:
+            case tokentype::tk_leftangle:
+            case tokentype::tk_rightangle:
+            case tokentype::tk_lessequal:
+            case tokentype::tk_greatequal:
+            case tokentype::tk_dot:
+            case tokentype::tk_comma:
+            case tokentype::tk_doublecolon:
+            case tokentype::tk_assign:
+            case tokentype::tk_yields:
+            case tokentype::tk_plus:
+            case tokentype::tk_minus:
+            case tokentype::tk_star:
+            case tokentype::tk_slash:
+            case tokentype::tk_cmpeq:
+            case tokentype::tk_cmpne:
+            case tokentype::tk_type:
+            case tokentype::tk_then:
+            case tokentype::tk_else:
+            case tokentype::tk_let:
+            case tokentype::tk_in:
+            case tokentype::tk_end:
+            case tokentype::N:
+                break;
+            }
+
             p_psm->illegal_input_on_token("DLambdaSsm::on_token",
                                           tk,
                                           this->get_expect_str());
         }
+
+        void
+        DLambdaSsm::on_lambda_token(const Token & tk,
+                                    ParserStateMachine * p_psm)
+        {
+            if (lmstate_ == lambdastatetype::lm_0) {
+                this->lmstate_ = lambdastatetype::lm_1;
+
+                DExpectFormalArglistSsm::start(p_psm);
+
+                return;
+            }
+
+            p_psm->illegal_input_on_token("DLambdaSsm::on_lambda_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
 
 #ifdef NOT_YET
         void
@@ -386,8 +455,8 @@ namespace xo {
         DLambdaSsm::pretty(const ppindentinfo & ppii) const
         {
             obj<APrintable> body
-                = FacetRegistry::instance().variant<APrintable,
-                                                    AExpression>(body_);
+                = FacetRegistry::instance().try_variant<APrintable,
+                                                        AExpression>(body_);
 
             if (body) {
                 return ppii.pps()->pretty_struct

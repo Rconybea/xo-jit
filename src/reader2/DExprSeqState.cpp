@@ -4,10 +4,12 @@
  **/
 
 #include "DExprSeqState.hpp"
-#include "DDefineSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExprSeqState.hpp"
-#include <xo/reader2/DProgressSsm.hpp>
-#include <xo/reader2/DIfElseSsm.hpp>
+#include "DDefineSsm.hpp"
+#include "DLambdaSsm.hpp"
+#include "DProgressSsm.hpp"
+#include "DIfElseSsm.hpp"
+
 #include <xo/expression2/DConstant.hpp>
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
 #include <xo/object2/DString.hpp>
@@ -121,6 +123,10 @@ namespace xo {
                 this->on_def_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_lambda:
+                this->on_lambda_token(tk, p_psm);
+                return;
+
             case tokentype::tk_if:
                 this->on_if_token(tk, p_psm);
                 return;
@@ -177,7 +183,6 @@ namespace xo {
             case tokentype::tk_cmpeq:
             case tokentype::tk_cmpne:
             case tokentype::tk_type:
-            case tokentype::tk_lambda:
             case tokentype::tk_then:
             case tokentype::tk_else:
             case tokentype::tk_let:
@@ -239,6 +244,29 @@ namespace xo {
              *   def pi : f64 = 3.14159265
              *   def sq(x : f64) -> f64 { (x * x) }
              */
+        }
+
+        void
+        DExprSeqState::on_lambda_token(const Token & tk,
+                                       ParserStateMachine * p_psm)
+        {
+            (void)tk;
+
+            switch (seqtype_) {
+            case exprseqtype::toplevel_interactive:
+                DLambdaSsm::start(p_psm);
+                return;
+            case exprseqtype::toplevel_batch:
+                /* lambda not allowed at top-level in batch mode */
+                break;
+            case exprseqtype::N:
+                assert(false); // unreachable
+                break;
+            }
+
+            p_psm->illegal_input_on_token("DExprSeqState::on_lambda_token",
+                                          tk,
+                                          this->get_expect_str());
         }
 
         void

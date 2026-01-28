@@ -59,6 +59,7 @@ namespace xo {
         public:
             //using DSymbolTable = xo::scm::DSymbolTable;
             using DLocalSymtab = xo::scm::DLocalSymtab;
+            using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -80,6 +81,12 @@ namespace xo {
             ///@{
 
             static void start(ParserStateMachine * p_psm);
+
+            /** update ssm on lambda keyword token @p tk,
+             *  with overall parser state in @p p_psm
+             **/
+            void on_lambda_token(const Token & tk,
+                                 ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-lambdassm-syntaxstatemachine-facet **/
@@ -124,8 +131,6 @@ namespace xo {
 #ifdef NOT_YET
             virtual const char * get_expect_str() const override;
 
-            virtual void on_lambda_token(const token_type & tk,
-                                         parserstatemachine * p_psm) override;
             virtual void on_typedescr(TypeDescr td,
                                       parserstatemachine * p_psm) override;
             virtual void on_formal_arglist(const std::vector<rp<Variable>> & argl,

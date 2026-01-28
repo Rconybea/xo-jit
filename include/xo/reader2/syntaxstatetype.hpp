@@ -21,6 +21,9 @@ namespace xo {
             /** toplevel of some translation unit. See @ref DExprSeqState **/
             expect_toplevel_expression_sequence,
 
+            /** expecting a formal argument list (sub-syntax within lambda-expression) **/
+            expect_formal_arglist,
+
             /** expecting a s symbol. See @ref DExpectSymbolSsm **/
             expect_symbol,
 
