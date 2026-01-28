@@ -128,6 +128,8 @@ namespace xo {
                         return false;
                 }
 
+                pps->write(">");
+
                 return true;
             } else {
                 pps->write("<ApplyExpr");
@@ -145,6 +147,8 @@ namespace xo {
                     pps->newline_indent(ppii.ci1());
                     pps->pretty(refrtag(concat("arg", 1+i_arg), arg_i));
                 }
+
+                pps->write(">");
 
                 return false;
             }
