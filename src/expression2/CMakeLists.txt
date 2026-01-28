@@ -7,6 +7,7 @@ set(SELF_SRCS
     DConstant.cpp
     DVariable.cpp
     DDefineExpr.cpp
+    DLambdaExpr.cpp
     DApplyExpr.cpp
     DIfElseExpr.cpp
 
@@ -25,6 +26,9 @@ set(SELF_SRCS
 
     IExpression_DApplyExpr.cpp
     IPrintable_DApplyExpr.cpp
+
+    IExpression_DLambdaExpr.cpp
+    IPrintable_DLambdaExpr.cpp
 
     IExpression_DIfElseExpr.cpp
     IPrintable_DIfElseExpr.cpp

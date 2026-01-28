@@ -32,10 +32,10 @@ namespace xo {
 #endif
             /** function call **/
             apply,
-#ifdef NOT_YET
+
             /** function definition **/
             lambda,
-#endif
+
             /** variable reference **/
             variable,
             /** if-then-else **/

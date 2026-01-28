@@ -152,6 +152,32 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-expression-lambdaexpr
+    FACET_PKG xo_expression2
+    FACET Expression
+    REPR LambdaExpr
+    INPUT idl/IExpression_DLambdaExpr.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-printable-lambdaexpr
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR LambdaExpr
+    INPUT idl/IPrintable_DLambdaExpr.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-ifelseexpr
     FACET_PKG xo_expression2
     FACET Expression

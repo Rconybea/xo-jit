@@ -19,6 +19,7 @@ namespace xo {
             Binding(int32_t i_link, int32_t j_slot)
                 : i_link_{i_link}, j_slot_{j_slot} {}
 
+            static Binding null() { return Binding(); }
             /** global bindings are located by symbol name **/
             static Binding global() { return Binding(s_link_global, 0); }
             static Binding local(int32_t j_slot) { return Binding(0, j_slot); }

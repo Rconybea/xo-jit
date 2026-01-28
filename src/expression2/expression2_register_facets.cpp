@@ -20,6 +20,9 @@
 #include <xo/expression2/detail/IExpression_DApplyExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DApplyExpr.hpp>
 
+#include <xo/expression2/detail/IExpression_DLambdaExpr.hpp>
+#include <xo/expression2/detail/IPrintable_DLambdaExpr.hpp>
+
 #include <xo/expression2/detail/IExpression_DIfElseExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DIfElseExpr.hpp>
 
@@ -48,6 +51,7 @@ namespace xo {
             // +- Variable
             // +- DefineExpr
             // +- ApplyExpr
+            // +- LambdaExpr
             // \- IfElseExpr
 
             FacetRegistry::register_impl<AExpression, DConstant>();
@@ -62,6 +66,9 @@ namespace xo {
             FacetRegistry::register_impl<AExpression, DApplyExpr>();
             FacetRegistry::register_impl<APrintable, DApplyExpr>();
 
+            FacetRegistry::register_impl<AExpression, DLambdaExpr>();
+            FacetRegistry::register_impl<APrintable, DLambdaExpr>();
+
             FacetRegistry::register_impl<AExpression, DIfElseExpr>();
             FacetRegistry::register_impl<APrintable, DIfElseExpr>();
 
@@ -70,6 +77,7 @@ namespace xo {
             log && log(xtag("DVariable.tseq", typeseq::id<DVariable>()));
             log && log(xtag("DConstant.tseq", typeseq::id<DConstant>()));
             log && log(xtag("DApplyExpr.tseq", typeseq::id<DApplyExpr>()));
+            log && log(xtag("DLambdaExpr.tseq", typeseq::id<DLambdaExpr>()));
             log && log(xtag("DIfElseExpr.tseq", typeseq::id<DIfElseExpr>()));
 
             log && log(xtag("AExpression.tqseq", typeseq::id<AExpression>()));
