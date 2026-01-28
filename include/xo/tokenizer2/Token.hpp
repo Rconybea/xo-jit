@@ -92,7 +92,7 @@ namespace xo {
             /** token representing right angle bracket @c ">" **/
             static Token rightangle() { return Token(tokentype::tk_rightangle); }
             /** token representing left parenthesis @c "(" **/
-            static Token leftparen() { return Token(tokentype::tk_leftparen); }
+            static Token leftparen_token() { return Token(tokentype::tk_leftparen); }
             /** Token representing right parenthesis @c ")" **/
             static Token rightparen() { return Token(tokentype::tk_rightparen); }
             /** token representing left bracket @c "[" **/
