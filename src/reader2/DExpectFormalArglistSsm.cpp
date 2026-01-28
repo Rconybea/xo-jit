@@ -5,7 +5,10 @@
 
 #include "DExpectFormalArglistSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp"
+#include <xo/printable2/Printable.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
+#include <xo/facet/FacetRegistry.hpp>
+#include <xo/indentlog/scope.hpp>
 
 #ifdef NOT_YET
 #include "parserstatemachine.hpp"
@@ -17,8 +20,12 @@
 #endif
 
 namespace xo {
-    using xo::mm::AAllocator;
+    using xo::print::APrintable;
+    using xo::print::ppstate;
     using xo::print::ppindentinfo;
+    using xo::mm::AGCObject;
+    using xo::mm::AAllocator;
+    using xo::facet::FacetRegistry;
     using xo::reflect::typeseq;
 
     namespace scm {
@@ -106,6 +113,54 @@ namespace xo {
         DExpectFormalArglistSsm::on_token(const Token & tk,
                                           ParserStateMachine * p_psm)
         {
+            switch (tk.tk_type()) {
+            case tokentype::tk_leftparen:
+                this->on_leftparen_token(tk, p_psm);
+                return;
+
+                // all the not-yet-handled cases
+            case tokentype::tk_lambda:
+            case tokentype::tk_def:
+            case tokentype::tk_if:
+            case tokentype::tk_symbol:
+            case tokentype::tk_colon:
+            case tokentype::tk_singleassign:
+            case tokentype::tk_string:
+            case tokentype::tk_f64:
+            case tokentype::tk_i64:
+            case tokentype::tk_bool:
+            case tokentype::tk_semicolon:
+            case tokentype::tk_invalid:
+            case tokentype::tk_rightparen:
+            case tokentype::tk_leftbracket:
+            case tokentype::tk_rightbracket:
+            case tokentype::tk_leftbrace:
+            case tokentype::tk_rightbrace:
+            case tokentype::tk_leftangle:
+            case tokentype::tk_rightangle:
+            case tokentype::tk_lessequal:
+            case tokentype::tk_greatequal:
+            case tokentype::tk_dot:
+            case tokentype::tk_comma:
+            case tokentype::tk_doublecolon:
+            case tokentype::tk_assign:
+            case tokentype::tk_yields:
+            case tokentype::tk_plus:
+            case tokentype::tk_minus:
+            case tokentype::tk_star:
+            case tokentype::tk_slash:
+            case tokentype::tk_cmpeq:
+            case tokentype::tk_cmpne:
+            case tokentype::tk_type:
+            case tokentype::tk_then:
+            case tokentype::tk_else:
+            case tokentype::tk_let:
+            case tokentype::tk_in:
+            case tokentype::tk_end:
+            case tokentype::N:
+                break;
+            }
+
             p_psm->illegal_input_on_token("DExpectFormalArglistSsm::on_token",
                                           tk,
                                           this->get_expect_str());
@@ -152,20 +207,29 @@ namespace xo {
             : exprstate(exprstatetype::expect_formal_arglist),
               farglxs_type_{formalarglstatetype::argl_0}
         {}
+#endif
 
         void
-        expect_formal_arglist_xs::on_leftparen_token(const token_type & tk,
-                                                     parserstatemachine * p_psm)
+        DExpectFormalArglistSsm::on_leftparen_token(const Token & tk,
+                                                    ParserStateMachine * p_psm)
         {
-            if (farglxs_type_ == formalarglstatetype::argl_0) {
-                this->farglxs_type_ = formalarglstatetype::argl_1a;
-                /* TODO: refactor to have setup method on each exprstate */
-                expect_formal_xs::start(p_psm);
-            } else {
-                exprstate::on_leftparen_token(tk, p_psm);
+            scope log(XO_DEBUG(true));
+
+            if (fastate_ == formalarglstatetype::argl_0) {
+                this->fastate_ = formalarglstatetype::argl_1a;
+
+                log && log("STUB: DExpectFormalArglistSsm::on_leftparen_token -> DExpectFormalSsm::start()");
+
+                //DExpectFormalSsm::start(p_psm);
+                return;
             }
+
+            p_psm->illegal_input_on_token("DExpectFormalArglistSsm::on_token",
+                                          tk,
+                                          this->get_expect_str());
         }
 
+#ifdef NOT_YET
         void
         expect_formal_arglist_xs::on_formal(const rp<Variable> & formal,
                                             parserstatemachine * p_psm)
@@ -216,8 +280,58 @@ namespace xo {
         bool
         DExpectFormalArglistSsm::pretty(const ppindentinfo & ppii) const
         {
-            return ppii.pps()->pretty_struct(ppii,
-                                             "DExpectFormalArglistSsm");
+            ppstate * pps = ppii.pps();
+
+            if (ppii.upto()) {
+                if (!pps->print_upto("<DExpectFormalArglistSsm"))
+                    return false;
+
+                if (!pps->print_upto(xrefrtag("fastate", fastate_)))
+                    return false;
+
+                if (!pps->print_upto(xrefrtag("n_args", n_args_)))
+                    return false;
+
+                for (size_type i_arg = 0; i_arg < n_args_; ++i_arg) {
+                    char buf[80];
+                    snprintf(buf, sizeof(buf), "arg[%ud]", i_arg);
+
+                    auto arg_gco = argl_->at(i_arg);
+                    obj<APrintable> arg_pr
+                        = FacetRegistry::instance().try_variant<APrintable,AGCObject>(arg_gco);
+
+                    if (!pps->print_upto(xrefrtag(buf, arg_pr)))
+                        return false;
+                }
+
+                pps->write(">");
+
+                return true;
+            } else {
+                pps->write("<DExpectFormalArglistSsm");
+
+                pps->newline_indent(ppii.ci1());
+                pps->pretty(refrtag("fastate", fastate_));
+
+                pps->newline_indent(ppii.ci1());
+                pps->pretty(refrtag("n_args", n_args_));
+
+                for (size_type i_arg = 0; i_arg < n_args_; ++i_arg) {
+                    char buf[80];
+                    snprintf(buf, sizeof(buf), "arg[%ud]", i_arg);
+
+                    auto arg_gco = argl_->at(i_arg);
+                    obj<APrintable> arg_pr
+                        = FacetRegistry::instance().try_variant<APrintable,AGCObject>(arg_gco);
+
+                    pps->newline_indent(ppii.ci1());
+                    pps->pretty(refrtag(buf, arg_pr));
+                }
+
+                pps->write(">");
+
+                return false;
+            }
         }
 
     } /*namespace scm*/

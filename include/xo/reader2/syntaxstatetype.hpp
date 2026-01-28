@@ -24,6 +24,9 @@ namespace xo {
             /** expecting a formal argument list (sub-syntax within lambda-expression) **/
             expect_formal_arglist,
 
+            /** expecting a formal argument (sub-syntax within formal-arglist) **/
+            expect_formal_arg,
+
             /** expecting a s symbol. See @ref DExpectSymbolSsm **/
             expect_symbol,
 

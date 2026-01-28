@@ -68,12 +68,21 @@ namespace xo {
 
             static void start(ParserStateMachine * p_psm);
 
+            /** @defgroup scm-expectformalarglistssm-methods general methods **/
+            ///@{
+
+            /** update state on incoming token @p tk, with overall parser state in @p psm **/
+            void on_leftparen_token(const Token & tk,
+                                    ParserStateMachine * p_psm);
+
+            ///@}
             /** @defgroup scm-expectformalarglistssm-ssm-facet syntaxstatemachine facet methods **/
             ///@{
 
             /** identifies the ssm implemented here **/
             syntaxstatetype ssm_type() const noexcept;
 
+            /** mnemonic for expected input (for this ssm) in current state **/
             std::string_view get_expect_str() const;
 
             /** update state on incoming token @p tk,
@@ -108,8 +117,6 @@ namespace xo {
 
 #ifdef NOT_YET
 
-            virtual void on_leftparen_token(const token_type & tk,
-                                            parserstatemachine * p_psm) override;
             virtual void on_formal(const rp<Variable> & formal,
                                    parserstatemachine * p_psm) override;
             virtual void on_comma_token(const token_type & tk,
