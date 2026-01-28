@@ -134,7 +134,7 @@ namespace xo {
             /** token representing keyword @c def **/
             static Token def_token() { return Token(tokentype::tk_def); }
             /** token representing keyword @c lambda **/
-            static Token lambda() { return Token(tokentype::tk_lambda); }
+            static Token lambda_token() { return Token(tokentype::tk_lambda); }
             /** token representing keyword @c if **/
             static Token if_token() { return Token(tokentype::tk_if); }
             /** token representing keyword @c then **/
