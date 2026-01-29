@@ -146,6 +146,12 @@ namespace xo {
         DExpectFormalArgSsm::on_parsed_symbol(std::string_view sym,
                                               ParserStateMachine * p_psm)
         {
+            if (fstate_ == formalstatetype::formal_0) {
+                this->fstate_ = formalstatetype::formal_1;
+                this->name_ = p_psm->intern_string(sym);
+                return;
+            }
+
             p_psm->illegal_input_on_symbol("DExpectFormalArgSsm::on_parsed_symbol",
                                            sym,
                                            this->get_expect_str());
@@ -230,9 +236,18 @@ namespace xo {
 
         bool
         DExpectFormalArgSsm::pretty(const ppindentinfo & ppii) const {
-            return ppii.pps()->pretty_struct
-                       (ppii,
-                        "DExpectFormalArgSsm");
+            if (name_) {
+                return ppii.pps()->pretty_struct
+                    (ppii,
+                     "DExpectFormalArgSsm",
+                     refrtag("fstate", fstate_),
+                     refrtag("name", std::string_view(*name_)));
+            } else {
+                return ppii.pps()->pretty_struct
+                    (ppii,
+                     "DExpectFormalArgSsm",
+                     refrtag("fstate", fstate_));
+            }
         }
 
     } /*namespace scm*/

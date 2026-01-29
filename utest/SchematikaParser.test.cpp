@@ -215,7 +215,7 @@ namespace xo {
 
             /** Walkthrough parsing input equivalent to:
              *
-             *    lambda ;
+             *    lambda (n : i64;
              *
              **/
 
@@ -243,11 +243,10 @@ namespace xo {
                 REQUIRE(result.is_incomplete());
             }
 
-#ifdef NOT_YET
             {
-                auto & result = parser.on_token(Token::then_token());
+                auto & result = parser.on_token(Token::symbol_token("n"));
 
-                log && log("after then token:");
+                log && log("after symbol(n) token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
@@ -256,6 +255,31 @@ namespace xo {
                 REQUIRE(result.is_incomplete());
             }
 
+            {
+                auto & result = parser.on_token(Token::colon_token());
+
+                log && log("after colon token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
+            {
+                auto & result = parser.on_token(Token::symbol_token("i64"));
+
+                log && log("after symbol(i64) token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
+#ifdef NOT_YET
             {
                 auto & result = parser.on_token(Token::i64_token("777"));
 

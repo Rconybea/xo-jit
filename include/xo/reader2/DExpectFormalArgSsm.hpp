@@ -140,8 +140,10 @@ namespace xo {
             /** formal parameter name **/
             const DUniqueString * name_ = nullptr;
 
+#ifdef NOT_YET
             /** formal parameter type (if specified) **/
             TypeDescr td_ = nullptr;
+#endif
         };
     } /*namespace scm*/
 } /*namespace xo*/
