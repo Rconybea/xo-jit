@@ -106,7 +106,7 @@ namespace xo {
             /** token representing period @c "." **/
             static Token dot() { return Token(tokentype::tk_dot); }
             /** token representing comma @c "," **/
-            static Token comma() { return Token(tokentype::tk_comma); }
+            static Token comma_token() { return Token(tokentype::tk_comma); }
             /** token representing colon @c ":" **/
             static Token colon_token() { return Token(tokentype::tk_colon); }
             /** token representing double-colo @c "::" **/
