@@ -287,6 +287,9 @@ namespace xo {
                 if (!pps->print_upto(xrefrtag("fastate", fastate_)))
                     return false;
 
+                if (!pps->print_upto(xrefrtag("expect", this->get_expect_str())))
+                    return false;
+
                 if (!pps->print_upto(xrefrtag("n_args", n_args_)))
                     return false;
 
@@ -310,6 +313,9 @@ namespace xo {
 
                 pps->newline_indent(ppii.ci1());
                 pps->pretty(refrtag("fastate", fastate_));
+
+                pps->newline_indent(ppii.ci1());
+                pps->pretty(refrtag("expect", this->get_expect_str()));
 
                 pps->newline_indent(ppii.ci1());
                 pps->pretty(refrtag("n_args", n_args_));

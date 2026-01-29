@@ -246,12 +246,15 @@ namespace xo {
                     (ppii,
                      "DExpectFormalArgSsm",
                      refrtag("fstate", fstate_),
+                     refrtag("expect", this->get_expect_str()),
                      refrtag("name", std::string_view(*name_)));
             } else {
                 return ppii.pps()->pretty_struct
                     (ppii,
                      "DExpectFormalArgSsm",
-                     refrtag("fstate", fstate_));
+                     refrtag("fstate", fstate_),
+                     refrtag("expect", this->get_expect_str())
+                     );
             }
         }
 

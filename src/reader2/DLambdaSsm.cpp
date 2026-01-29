@@ -463,12 +463,14 @@ namespace xo {
                     (ppii,
                      "DLambdaSsm",
                      refrtag("lmstate", lmstate_),
+                     refrtag("expect", this->get_expect_str()),
                      refrtag("body", body));
             } else {
                 return ppii.pps()->pretty_struct
                     (ppii,
                      "DLambdaSsm",
-                     refrtag("lmstate", lmstate_));
+                     refrtag("lmstate", lmstate_),
+                     refrtag("expect", this->get_expect_str()));
             }
         }
 

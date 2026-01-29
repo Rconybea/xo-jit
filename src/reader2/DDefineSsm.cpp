@@ -741,6 +741,7 @@ namespace xo {
             return ppii.pps()->pretty_struct(ppii,
                                              "DDefineSsm",
                                              refrtag("defstate", defstate_),
+                                             refrtag("expect", this->get_expect_str()),
                                              refrtag("def_expr", expr));
         }
     } /*namespace scm*/
