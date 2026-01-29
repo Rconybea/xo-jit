@@ -622,8 +622,7 @@ namespace xo {
             if (defstate_ == defexprstatetype::def_2) {
                 this->defstate_ = defexprstatetype::def_3;
 
-                DExpectTypeSsm::start(p_psm->parser_alloc(),
-                                      p_psm);
+                DExpectTypeSsm::start(p_psm);
 
                 return;
             }

@@ -7,11 +7,10 @@
 #include "ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp"
 #include "DExpectSymbolSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectSymbolSsm.hpp"
+#include "DExpectTypeSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DExpectTypeSsm.hpp"
 
 #ifdef NOT_YET
-#include "expect_type_xs.hpp"
-//#include "parserstatemachine.hpp"
-//#include "exprstatestack.hpp"
 #include "xo/expression/Variable.hpp"
 #endif
 
@@ -93,13 +92,15 @@ namespace xo {
                                       ParserStateMachine * p_psm)
         {
             switch (tk.tk_type()) {
+            case tokentype::tk_colon:
+                this->on_colon_token(tk, p_psm);
+                return;
                 // all the not-yet-handled cases
             case tokentype::tk_leftparen:
             case tokentype::tk_lambda:
             case tokentype::tk_def:
             case tokentype::tk_if:
             case tokentype::tk_symbol:
-            case tokentype::tk_colon:
             case tokentype::tk_singleassign:
             case tokentype::tk_string:
             case tokentype::tk_f64:
@@ -138,6 +139,24 @@ namespace xo {
             }
 
             p_psm->illegal_input_on_token("DExpectFormalArgSsm::on_token",
+                                          tk,
+                                          this->get_expect_str());
+        }
+
+        void
+        DExpectFormalArgSsm::on_colon_token(const Token & tk,
+                                            ParserStateMachine * p_psm)
+        {
+            if (fstate_ == formalstatetype::formal_1) {
+                this->fstate_ = formalstatetype::formal_2;
+
+                DExpectTypeSsm::start(p_psm);
+
+                /* control reenters via DExpectFormalArgSsm::on_parsed_typedescr() */
+                return;
+            }
+
+            p_psm->illegal_input_on_token("DExpectFormalArgSsm::on_colon_token",
                                           tk,
                                           this->get_expect_str());
         }
@@ -198,20 +217,6 @@ namespace xo {
                 this->result_.assign_name(symbol_name);
             } else {
                 exprstate::on_symbol(symbol_name, p_psm);
-            }
-        }
-
-        void
-        expect_formal_xs::on_colon_token(const token_type & tk,
-                                         parserstatemachine * p_psm)
-        {
-            if (this->formalxs_type_ == formalstatetype::formal_1) {
-                this->formalxs_type_ = formalstatetype::formal_2;
-                expect_type_xs::start(p_psm);
-                /* control reenters via expect_formal_xs::on_typedescr() */
-            } else {
-                exprstate::on_colon_token(tk,
-                                          p_psm);
             }
         }
 

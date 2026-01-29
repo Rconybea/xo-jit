@@ -51,6 +51,9 @@ namespace xo {
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
+            /** @defgroupo scm-expectfromalargssm-ctors constructors **/
+            ///@{
+
             DExpectFormalArgSsm();
 
             /** create empty instance using memory from @p mm **/
@@ -62,6 +65,18 @@ namespace xo {
             /** puah instance of this ssm onto @p p_psm **/
             static void start(ParserStateMachine * p_psm);
 
+            ///@}
+
+            /** @defgroup scm-expectformalargssm-methods general methods **/
+            ///@{
+
+            /** update state on incoming colon token @p tk;
+             *  with overall parser state in @p p_psm
+             **/
+            void on_colon_token(const Token & tk,
+                                ParserStateMachine * p_psm);
+
+            ///@}
             /** @defgroup scm-expectformalargssm-ssm-facet syntaxstatemachine facet methods **/
             ///@{
 
@@ -114,9 +129,6 @@ namespace xo {
 
             virtual void on_symbol(const std::string & symbol_name,
                                    parserstatemachine * p_psm) override;
-
-            virtual void on_colon_token(const token_type & tk,
-                                        parserstatemachine * p_psm) override;
 
             // virtual void on_comma_token(...) override;
 

@@ -32,9 +32,7 @@ namespace xo {
 
             static DExpectTypeSsm * make(DArena & parser_mm);
 
-            static void start(DArena & parser_mm,
-                              //obj<AAllocator> expr_mm,
-                              ParserStateMachine * p_psm);
+            static void start(ParserStateMachine * p_psm);
 
             /** @defgroup scm-expecttype-ssm-facet syntaxstatemachine facet methods **/
             ///@{

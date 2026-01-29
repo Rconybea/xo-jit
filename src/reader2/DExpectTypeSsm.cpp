@@ -32,11 +32,10 @@ namespace xo {
         }
 
         void
-        DExpectTypeSsm::start(DArena & mm,
-        //obj<AAllocator> expr_mm,
-                          ParserStateMachine * p_psm)
+        DExpectTypeSsm::start(ParserStateMachine * p_psm)
         {
-            DExpectTypeSsm * expect_type_ssm = DExpectTypeSsm::make(mm);
+            DExpectTypeSsm * expect_type_ssm
+                = DExpectTypeSsm::make(p_psm->parser_alloc());
 
             auto ssm
                 = with_facet<ASyntaxStateMachine>::mkobj(expect_type_ssm);
