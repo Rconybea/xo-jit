@@ -86,6 +86,18 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-gcobject-variable
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR Variable
+    INPUT idl/IGCObject_DVariable.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-variable
     FACET_PKG xo_printable2
     FACET Printable

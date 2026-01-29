@@ -5,9 +5,11 @@
 
 #include "DVariable.hpp"
 #include "exprtype.hpp"
+#include <cstddef>
 #include <xo/indentlog/print/quoted.hpp>
 
 namespace xo {
+    using xo::mm::ACollector;
     using xo::facet::typeseq;
 
     namespace scm {
@@ -34,6 +36,35 @@ namespace xo {
         DVariable::assign_valuetype(TypeDescr td) noexcept
         {
             typeref_.resolve(td);
+        }
+
+        size_t
+        DVariable::shallow_size() const noexcept
+        {
+            return sizeof(DVariable);
+        }
+
+        DVariable *
+        DVariable::shallow_copy(obj<AAllocator> mm) const noexcept
+        {
+            DVariable * copy = (DVariable *)mm.alloc_copy((std::byte *)this);
+
+            if (copy) {
+                *copy = *this;
+            }
+
+            return copy;
+        }
+
+        size_t
+        DVariable::forward_children(obj<ACollector>) noexcept
+        {
+            // nothing to collect.
+            //  - DUniqueString never in GC space
+            //  - TypeDescr not in GC space
+            //  - path only integers
+
+            return shallow_size();
         }
 
         bool

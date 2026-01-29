@@ -12,6 +12,7 @@
 #include <xo/expression2/detail/IPrintable_DDefineExpr.hpp>
 
 #include <xo/expression2/detail/IExpression_DVariable.hpp>
+#include <xo/expression2/detail/IGCObject_DVariable.hpp>
 #include <xo/expression2/detail/IPrintable_DVariable.hpp>
 
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
@@ -58,6 +59,7 @@ namespace xo {
             FacetRegistry::register_impl<APrintable, DConstant>();
 
             FacetRegistry::register_impl<AExpression, DVariable>();
+            FacetRegistry::register_impl<AGCObject, DVariable>();
             FacetRegistry::register_impl<APrintable, DVariable>();
 
             FacetRegistry::register_impl<AExpression, DDefineExpr>();

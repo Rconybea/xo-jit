@@ -19,6 +19,7 @@ set(SELF_SRCS
     IPrintable_DConstant.cpp
 
     IExpression_DVariable.cpp
+    IGCObject_DVariable.cpp
     IPrintable_DVariable.cpp
 
     IExpression_DDefineExpr.cpp

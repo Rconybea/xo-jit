@@ -21,6 +21,7 @@ namespace xo {
         class DVariable {
         public:
             using ppindentinfo = xo::print::ppindentinfo;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
 
@@ -55,6 +56,14 @@ namespace xo {
             TypeRef typeref() const noexcept { return typeref_; }
             TypeDescr valuetype() const noexcept { return typeref_.td(); };
             void assign_valuetype(TypeDescr td) noexcept;
+
+            ///@}
+            /** @defgroup scm-variable-gcobject-facet **/
+            ///@{
+
+            size_t shallow_size() const noexcept;
+            DVariable * shallow_copy(obj<AAllocator> mm) const noexcept;
+            size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
             /** @defgroup scm-variable-printable-facet **/
