@@ -75,6 +75,10 @@ namespace xo {
             void on_leftparen_token(const Token & tk,
                                     ParserStateMachine * p_psm);
 
+            /** update state on incoming token @p tk, with overall parser state in @p psm **/
+            void on_comma_token(const Token & tk,
+                                ParserStateMachine * p_psm);
+
             ///@}
             /** @defgroup scm-expectformalarglistssm-ssm-facet syntaxstatemachine facet methods **/
             ///@{
@@ -140,10 +144,6 @@ namespace xo {
         private:
             /** parsing state-machine state **/
             formalarglstatetype fastate_ = formalarglstatetype::argl_0;
-            /** number of formal parameters encountered.
-             *  Invariant: n_args_ <= argl_->size()
-             **/
-            size_type n_args_ = 0;
             /** populate with (parmaeter-name, parameter-type) list
              *  as they're encountered.
              *

@@ -122,6 +122,10 @@ namespace xo {
                 this->on_leftparen_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_comma:
+                this->on_comma_token(tk, p_psm);
+                return;
+
                 // all the not-yet-handled cases
             case tokentype::tk_lambda:
             case tokentype::tk_def:
@@ -145,7 +149,6 @@ namespace xo {
             case tokentype::tk_lessequal:
             case tokentype::tk_greatequal:
             case tokentype::tk_dot:
-            case tokentype::tk_comma:
             case tokentype::tk_doublecolon:
             case tokentype::tk_assign:
             case tokentype::tk_yields:
@@ -238,20 +241,6 @@ namespace xo {
                                          this->get_expect_str());
         }
 
-#ifdef NOT_YET
-        void
-        expect_formal_arglist_xs::on_formal(const rp<Variable> & formal,
-                                            parserstatemachine * p_psm)
-        {
-            if (farglxs_type_ == formalarglstatetype::argl_1a) {
-                this->farglxs_type_ = formalarglstatetype::argl_1b;
-                this->argl_.push_back(formal);
-            } else {
-                exprstate::on_formal(formal, p_psm);
-            }
-        }
-#endif
-
         void
         DExpectFormalArglistSsm::on_parsed_expression(obj<AExpression> expr,
                                                      ParserStateMachine * p_psm)
@@ -270,13 +259,6 @@ namespace xo {
                                              this->get_expect_str());
         }
 
-#ifdef NOT_YET
-        expect_formal_arglist_xs::expect_formal_arglist_xs()
-            : exprstate(exprstatetype::expect_formal_arglist),
-              farglxs_type_{formalarglstatetype::argl_0}
-        {}
-#endif
-
         void
         DExpectFormalArglistSsm::on_leftparen_token(const Token & tk,
                                                     ParserStateMachine * p_psm)
@@ -293,19 +275,23 @@ namespace xo {
                                           this->get_expect_str());
         }
 
-#ifdef NOT_YET
         void
-        expect_formal_arglist_xs::on_comma_token(const token_type & tk,
-                                                 parserstatemachine * p_psm)
+        DExpectFormalArglistSsm::on_comma_token(const Token & tk,
+                                                ParserStateMachine * p_psm)
         {
-            if (farglxs_type_ == formalarglstatetype::argl_1b) {
-                this->farglxs_type_ = formalarglstatetype::argl_1a;
-                expect_formal_xs::start(p_psm);
-            } else {
-                exprstate::on_comma_token(tk, p_psm);
+            if (fastate_ == formalarglstatetype::argl_1b) {
+                this->fastate_ = formalarglstatetype::argl_1a;
+
+                DExpectFormalArgSsm::start(p_psm);
+                return;
             }
+
+            p_psm->illegal_input_on_token("DExpectFormalArglistSsm::on_comma_token",
+                                          tk,
+                                          this->get_expect_str());
         }
 
+#ifdef NOT_YET
         void
         expect_formal_arglist_xs::on_rightparen_token(const token_type & tk,
                                                       parserstatemachine * p_psm)
@@ -317,15 +303,6 @@ namespace xo {
             } else {
                 exprstate::on_rightparen_token(tk, p_psm);
             }
-        }
-
-        void
-        expect_formal_arglist_xs::print(std::ostream & os) const {
-            os << "<expect_formal_arglist_xs"
-               << xtag("type", farglxs_type_);
-            os << xtag("farglxs_type", farglxs_type_);
-            os << xtag("argl", argl_);
-            os << ">";
         }
 #endif
 
@@ -344,12 +321,12 @@ namespace xo {
                 if (!pps->print_upto(xrefrtag("expect", this->get_expect_str())))
                     return false;
 
-                if (!pps->print_upto(xrefrtag("n_args", n_args_)))
+                if (!pps->print_upto(xrefrtag("n_args", argl_->size())))
                     return false;
 
-                for (size_type i_arg = 0; i_arg < n_args_; ++i_arg) {
+                for (size_type i_arg = 0; i_arg < argl_->size(); ++i_arg) {
                     char buf[80];
-                    snprintf(buf, sizeof(buf), "arg[%ud]", i_arg);
+                    snprintf(buf, sizeof(buf), "arg[%u]", i_arg);
 
                     auto arg_gco = argl_->at(i_arg);
                     obj<APrintable> arg_pr
@@ -372,11 +349,11 @@ namespace xo {
                 pps->pretty(refrtag("expect", this->get_expect_str()));
 
                 pps->newline_indent(ppii.ci1());
-                pps->pretty(refrtag("n_args", n_args_));
+                pps->pretty(refrtag("n_args", argl_->size()));
 
-                for (size_type i_arg = 0; i_arg < n_args_; ++i_arg) {
+                for (size_type i_arg = 0, n_arg = argl_->size(); i_arg < n_arg; ++i_arg) {
                     char buf[80];
-                    snprintf(buf, sizeof(buf), "arg[%ud]", i_arg);
+                    snprintf(buf, sizeof(buf), "arg[%u]", i_arg);
 
                     auto arg_gco = argl_->at(i_arg);
                     obj<APrintable> arg_pr
