@@ -193,18 +193,6 @@ namespace xo {
 
 #ifdef NOT_YET
         void
-        lambda_xs::on_lambda_token(const token_type & tk,
-                                   parserstatemachine * p_psm)
-        {
-            if (lmxs_type_ == lambdastatetype::lm_0) {
-                this->lmxs_type_ = lambdastatetype::lm_1;
-                expect_formal_arglist_xs::start(p_psm);
-            } else {
-                exprstate::on_lambda_token(tk, p_psm);
-            }
-        }
-
-        void
         lambda_xs::on_formal_arglist(const std::vector<rp<Variable>> & argl,
                                      parserstatemachine * p_psm)
         {
@@ -351,13 +339,14 @@ namespace xo {
         }
 
         void
-        DLambdaSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                        ParserStateMachine * p_psm)
+        DLambdaSsm::on_parsed_formal(const DUniqueString * param_name,
+                                     TypeDescr param_type,
+                                     ParserStateMachine * p_psm)
         {
-            p_psm->illegal_parsed_expression
-                ("DLambdaSsm::on_parsed_expression_with_semicolon",
-                 expr,
-                 this->get_expect_str());
+            p_psm->illegal_parsed_formal("DLambdaSsm::on_parsed_formal",
+                                         param_name,
+                                         param_type,
+                                         this->get_expect_str());
         }
 
         void
@@ -367,6 +356,16 @@ namespace xo {
             p_psm->illegal_parsed_expression("DLambdaSsm::on_parsed_expression",
                                              expr,
                                              this->get_expect_str());
+        }
+
+        void
+        DLambdaSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
+                                                        ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_expression
+                ("DLambdaSsm::on_parsed_expression_with_semicolon",
+                 expr,
+                 this->get_expect_str());
         }
 
 #ifdef NOT_YET

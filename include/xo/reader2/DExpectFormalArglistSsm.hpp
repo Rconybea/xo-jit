@@ -103,6 +103,13 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
+            /** update state to consume parsed param (name,type) emitted by
+             *  nested ssm, with overall parser state in @p p_psm
+             **/
+            void on_parsed_formal(const DUniqueString * param_name,
+                                  TypeDescr param_type,
+                                  ParserStateMachine * p_psm);
+
             /** update state on parsed expression emitted by nested ssm
              *  with overall parser state in @p p_psm
              **/
@@ -116,9 +123,6 @@ namespace xo {
                                                      ParserStateMachine * p_psm);
 
 #ifdef NOT_YET
-
-            virtual void on_formal(const rp<Variable> & formal,
-                                   parserstatemachine * p_psm) override;
             virtual void on_comma_token(const token_type & tk,
                                         parserstatemachine * p_psm) override;
             virtual void on_rightparen_token(const token_type & tk,

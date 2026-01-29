@@ -60,6 +60,8 @@ namespace xo {
             static void on_parsed_symbol(DIfElseSsm & self, std::string_view sym, ParserStateMachine * p_psm);
             /** operate state machine for incoming type description @p td **/
             static void on_parsed_typedescr(DIfElseSsm & self, TypeDescr td, ParserStateMachine * p_psm);
+            /** operate state machine for formal emitted by nested ssm **/
+            static void on_parsed_formal(DIfElseSsm & self, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm);
             /** update state machine for incoming parsed expression @p expr **/
             static void on_parsed_expression(DIfElseSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm);
             /** update state machine for incoming parsed expression @p expr followed by semicolon **/

@@ -340,7 +340,7 @@ namespace xo {
         DExpectExprSsm::on_parsed_symbol(std::string_view sym,
                                          ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_symbol("DExpectExprSsm",
+            p_psm->illegal_input_on_symbol("DExpectExprSsm::on_parsed_symbol",
                                            sym,
                                            this->get_expect_str());
         }
@@ -349,9 +349,20 @@ namespace xo {
         DExpectExprSsm::on_parsed_typedescr(TypeDescr td,
                                             ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_typedescr("DExpectExprSsm",
+            p_psm->illegal_input_on_typedescr("DExpectExprSsm::on_parsed_typedescr",
                                               td,
                                               this->get_expect_str());
+        }
+
+        void
+        DExpectExprSsm::on_parsed_formal(const DUniqueString * param_name,
+                                         TypeDescr param_type,
+                                         ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_formal("DExpectExprSsm::on_parsed_formal",
+                                         param_name,
+                                         param_type,
+                                         this->get_expect_str());
         }
 
         void

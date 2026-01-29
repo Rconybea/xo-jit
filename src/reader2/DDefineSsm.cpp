@@ -705,6 +705,17 @@ namespace xo {
         }
 
         void
+        DDefineSsm::on_parsed_formal(const DUniqueString * param_name,
+                                     TypeDescr param_type,
+                                     ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_formal("DDefineSsm::on_parsed_formal",
+                                         param_name,
+                                         param_type,
+                                         this->get_expect_str());
+        }
+
+        void
         DDefineSsm::on_parsed_expression(obj<AExpression> expr,
                                          ParserStateMachine * p_psm)
         {

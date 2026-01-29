@@ -140,11 +140,11 @@ namespace xo {
             void on_semicolon_token(const Token & tk,
                                     ParserStateMachine * p_psm);
 
-            /** update state for this syntax after parsing an expression @p expr,
-             *  overall parser state in @p p_psm.
+            /** update state for this syntax after parsing a symbol @p sym,
+             *  with overall parser state in @p p_psm
              **/
-            void on_parsed_expression(obj<AExpression> expr,
-                                      ParserStateMachine * p_psm);
+            void on_parsed_symbol(std::string_view sym,
+                                  ParserStateMachine * p_psm);
 
             /** update state for this syntax after parsing a type description @p td;
              *  overall parser state in @p p_psm
@@ -152,18 +152,25 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
+            /** update state to consume formal param (name,value)
+             *  from nested ssm
+             **/
+            void on_parsed_formal(const DUniqueString * param_name,
+                                  TypeDescr param_type,
+                                  ParserStateMachine * p_psm);
+
+            /** update state for this syntax after parsing an expression @p expr,
+             *  overall parser state in @p p_psm.
+             **/
+            void on_parsed_expression(obj<AExpression> expr,
+                                      ParserStateMachine * p_psm);
+
             /** update state for this syntax after parsing an expression @p expr,
              *  followed by semicolon,
              *  with overall parser state in @p p_psm.
              **/
             void on_parsed_expression_with_semicolon(obj<AExpression> expr,
                                                      ParserStateMachine * p_psm);
-
-            /** update state for this syntax after parsing a symbol @p sym,
-             *  with overall parser state in @p p_psm
-             **/
-            void on_parsed_symbol(std::string_view sym,
-                                  ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-ifelsessm-printable-facet printable facet methods **/

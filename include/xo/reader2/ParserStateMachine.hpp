@@ -102,6 +102,12 @@ namespace xo {
              **/
             void on_parsed_typedescr(TypeDescr td);
 
+            /** update state to consume param (name, value) emitted by
+             *  nested (but not popped) parsing state
+             **/
+            void on_parsed_formal(const DUniqueString * param_name,
+                                  TypeDescr param_type);
+
             /** update state to respond to parsed expression @p expr
              *  (from nested parsing state)
              **/
@@ -162,6 +168,15 @@ namespace xo {
             void illegal_input_on_typedescr(std::string_view ssm_name,
                                             TypeDescr td,
                                             std::string_view expect_str);
+
+            /** report illegal parsed formal (param_name, param_type) from nested ssm.
+             *  Introducing as placeholder; not expected to be reachable in
+             *  full parser
+             **/
+            void illegal_parsed_formal(std::string_view ssm_name,
+                                       const DUniqueString * param_name,
+                                       TypeDescr param_type,
+                                       std::string_view expect_str);
 
             /** report illegal parsed expression from nested ssm.
              *  Introducing as placeholder; not clear if this will be reachable

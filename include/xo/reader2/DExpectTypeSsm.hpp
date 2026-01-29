@@ -129,6 +129,13 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
+            /** operate state machine to consume formal param (name,value)
+             *  emitted by nested ssm
+             **/
+            void on_parsed_formal(const DUniqueString * param_name,
+                                  TypeDescr param_type,
+                                  ParserStateMachine * p_psm);
+
             /** operate state machine for this syntax on receiving expression
              *  from nested parser.
              *  (provided to satisfy ASyntaxStateMachine api. not reachable)

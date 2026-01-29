@@ -130,6 +130,17 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::on_parsed_formal(const DUniqueString * sym,
+                                             TypeDescr td)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("sym", std::string_view(*sym)), xtag("td", td));
+
+            assert(stack_);
+
+            this->stack_->top().on_parsed_formal(sym, td, this);
+        }
+
+        void
         ParserStateMachine::on_parsed_expression(obj<AExpression> expr)
         {
             scope log(XO_DEBUG(debug_flag_), xtag("expr", expr));
@@ -239,6 +250,31 @@ namespace xo {
                                        xtag("expecting", expect_str),
                                        xtag("ssm", ssm_name),
                                        xtag("via", "ParserStateMachine::illegal_input_on_typedescr"));
+
+            assert(expr_alloc_);
+
+            auto errmsg = DString::from_view(expr_alloc_,
+                                             std::string_view(errmsg_string));
+
+            this->capture_error(ssm_name, errmsg);
+        }
+
+        void
+        ParserStateMachine::illegal_parsed_formal(std::string_view ssm_name,
+                                                  const DUniqueString * param_name,
+                                                  TypeDescr param_type,
+                                                  std::string_view expect_str)
+        {
+            // TODO:
+            // - want to write error message using DArena
+            // - need something like log_streambuf and/or tostr() that's arena-aware
+
+            auto errmsg_string = tostr("Unexpected expression",
+                                       xtag("param_name", std::string_view(*param_name)),
+                                       xtag("param_type", param_type),
+                                       xtag("expecting", expect_str),
+                                       xtag("ssm", ssm_name),
+                                       xtag("via", "ParserStateMachine::illegal_parsed_expression"));
 
             assert(expr_alloc_);
 

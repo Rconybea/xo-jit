@@ -247,7 +247,7 @@ namespace xo {
                 td = Reflect::require<std::int64_t>();
 
             if (!td) {
-                p_psm->illegal_input_on_token("DExpectTypeSsm",
+                p_psm->illegal_input_on_token("DExpectTypeSsm::on_symbol_token",
                                               tk,
                                               this->get_expect_str());
             }
@@ -260,7 +260,7 @@ namespace xo {
         DExpectTypeSsm::on_parsed_symbol(std::string_view sym,
                                          ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_symbol("ExpectTypeSsm",
+            p_psm->illegal_input_on_symbol("ExpectTypeSsm::on_parsed_symbol",
                                            sym,
                                            this->get_expect_str());
         }
@@ -269,9 +269,20 @@ namespace xo {
         DExpectTypeSsm::on_parsed_typedescr(TypeDescr td,
                                             ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_typedescr("ExpectTypeSsm",
+            p_psm->illegal_input_on_typedescr("ExpectTypeSsm::on_parsed_typedescr",
                                               td,
                                               this->get_expect_str());
+        }
+
+        void
+        DExpectTypeSsm::on_parsed_formal(const DUniqueString * param_name,
+                                         TypeDescr param_type,
+                                         ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_formal("DExpectTypeSsm::on_parsed_formal",
+                                         param_name,
+                                         param_type,
+                                         this->get_expect_str());
         }
 
         void

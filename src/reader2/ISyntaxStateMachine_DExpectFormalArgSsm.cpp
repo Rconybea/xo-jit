@@ -43,6 +43,11 @@ namespace xo {
             self.on_parsed_typedescr(td, p_psm);
         }
         auto
+        ISyntaxStateMachine_DExpectFormalArgSsm::on_parsed_formal(DExpectFormalArgSsm & self, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm) -> void
+        {
+            self.on_parsed_formal(param_name, param_type, p_psm);
+        }
+        auto
         ISyntaxStateMachine_DExpectFormalArgSsm::on_parsed_expression(DExpectFormalArgSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm) -> void
         {
             self.on_parsed_expression(expr, p_psm);

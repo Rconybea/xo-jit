@@ -170,6 +170,9 @@ namespace xo {
                                   ParserStateMachine * p_psm);
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
+            void on_parsed_formal(const DUniqueString * param_name,
+                                  TypeDescr param_type,
+                                  ParserStateMachine * p_psm);
             void on_parsed_expression(obj<AExpression>,
                                       ParserStateMachine * p_psm);
             void on_parsed_expression_with_semicolon(obj<AExpression> expr,

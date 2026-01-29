@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
+ *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/ISyntaxStateMachine_DLambdaSsm.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -32,7 +32,6 @@ namespace xo {
         {
             self.on_token(tk, p_psm);
         }
-
         auto
         ISyntaxStateMachine_DLambdaSsm::on_parsed_symbol(DLambdaSsm & self, std::string_view sym, ParserStateMachine * p_psm) -> void
         {
@@ -42,6 +41,11 @@ namespace xo {
         ISyntaxStateMachine_DLambdaSsm::on_parsed_typedescr(DLambdaSsm & self, TypeDescr td, ParserStateMachine * p_psm) -> void
         {
             self.on_parsed_typedescr(td, p_psm);
+        }
+        auto
+        ISyntaxStateMachine_DLambdaSsm::on_parsed_formal(DLambdaSsm & self, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm) -> void
+        {
+            self.on_parsed_formal(param_name, param_type, p_psm);
         }
         auto
         ISyntaxStateMachine_DLambdaSsm::on_parsed_expression(DLambdaSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm) -> void

@@ -73,6 +73,16 @@
             ],
         },
         {
+            name: "on_parsed_formal",
+            doc: ["operate state machine for formal emitted by nested ssm"],
+            return_type: "void",
+            args: [
+                {type: "const DUniqueString *", name: "param_name"},
+                {type: "TypeDescr", name: "param_type"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
+        {
             name: "on_parsed_expression",
             doc: ["update state machine for incoming parsed expression @p expr"],
             return_type: "void",

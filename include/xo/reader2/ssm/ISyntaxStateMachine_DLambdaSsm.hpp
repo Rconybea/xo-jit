@@ -2,7 +2,7 @@
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
- *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
+ *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
  *       --input [idl/ISyntaxStateMachine_DLambdaSsm.json5]
  *  2. jinja2 template for abstract facet .hpp file:
@@ -60,6 +60,8 @@ namespace xo {
             static void on_parsed_symbol(DLambdaSsm & self, std::string_view sym, ParserStateMachine * p_psm);
             /** operate state machine for incoming type description @p td **/
             static void on_parsed_typedescr(DLambdaSsm & self, TypeDescr td, ParserStateMachine * p_psm);
+            /** operate state machine for formal emitted by nested ssm **/
+            static void on_parsed_formal(DLambdaSsm & self, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm);
             /** update state machine for incoming parsed expression @p expr **/
             static void on_parsed_expression(DLambdaSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm);
             /** update state machine for incoming parsed expression @p expr followed by semicolon **/

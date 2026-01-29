@@ -105,18 +105,6 @@ namespace xo {
                           ParserStateMachine * p_psm);
 
             /** update this ssm when nested parser
-             *  emits expression @p expr
-             **/
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                     ParserStateMachine * p_psm);
-
-            /** update this ssm when nested parser
-             *  emits expression @p expr
-             **/
-            void on_parsed_expression(obj<AExpression> expr,
-                                      ParserStateMachine * p_psm);
-
-            /** update this ssm when nested parser
              *  emits @p td.
              **/
             void on_parsed_symbol(std::string_view sym,
@@ -128,17 +116,30 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
+            /** update this ssm to consume parsed formal (name,value)
+             *  from nested (and now expired) ssm
+             **/
+            void on_parsed_formal(const DUniqueString * sym,
+                                  TypeDescr td,
+                                  ParserStateMachine * p_psm);
+
+            /** update this ssm when nested parser
+             *  emits expression @p expr
+             **/
+            void on_parsed_expression(obj<AExpression> expr,
+                                      ParserStateMachine * p_psm);
+
+            /** update this ssm when nested parser
+             *  emits expression @p expr
+             **/
+            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
+                                                     ParserStateMachine * p_psm);
+
 #ifdef NOT_YET
             virtual const char * get_expect_str() const override;
 
-            virtual void on_typedescr(TypeDescr td,
-                                      parserstatemachine * p_psm) override;
             virtual void on_formal_arglist(const std::vector<rp<Variable>> & argl,
                                            parserstatemachine * p_psm) override;
-            virtual void on_expr(bp<Expression> expr,
-                                 parserstatemachine * p_psm) override;
-            virtual void on_expr_with_semicolon(bp<Expression> expr,
-                                                parserstatemachine * p_psm) override;
             virtual void on_leftbrace_token(const token_type & tk,
                                             parserstatemachine * p_psm) override;
             virtual void on_colon_token(const token_type & tk,

@@ -510,6 +510,17 @@ namespace xo {
                                               this->get_expect_str());
         }
 
+        void
+        DIfElseSsm::on_parsed_formal(const DUniqueString * param_name,
+                                     TypeDescr param_type,
+                                     ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_formal("DIfElseSsm::on_parsed_formal",
+                                         param_name,
+                                         param_type,
+                                         this->get_expect_str());
+        }
+
         bool
         DIfElseSsm::pretty(const ppindentinfo & ppii) const
         {

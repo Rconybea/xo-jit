@@ -104,6 +104,14 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
+            /** consume parsed formal (name,type) = (@p sym, @p td) from nested ssm
+             *  with overall parser state in @p p_psm.
+             *  (In practice not reachable)
+             **/
+            void on_parsed_formal(const DUniqueString * sym,
+                                  TypeDescr td,
+                                  ParserStateMachine * p_psm);
+
             /** update state on parsed expression emitted by nested ssm
              *  with overall parser state in @p p_psm
              **/
@@ -151,11 +159,6 @@ namespace xo {
 
             /** formal parameter name **/
             const DUniqueString * name_ = nullptr;
-
-#ifdef NOT_YET
-            /** formal parameter type (if specified) **/
-            TypeDescr td_ = nullptr;
-#endif
         };
     } /*namespace scm*/
 } /*namespace xo*/
