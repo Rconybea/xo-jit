@@ -64,6 +64,7 @@ namespace scm {
         [[noreturn]] void on_parsed_symbol(Opaque, std::string_view, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_typedescr(Opaque, TypeDescr, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_formal(Opaque, const DUniqueString *, TypeDescr, ParserStateMachine *)  override;
+        [[noreturn]] void on_parsed_formal_arglist(Opaque, DArray *, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_expression(Opaque, obj<AExpression>, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_expression_with_semicolon(Opaque, obj<AExpression>, ParserStateMachine *)  override;
 

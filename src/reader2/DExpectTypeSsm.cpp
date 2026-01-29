@@ -286,6 +286,15 @@ namespace xo {
         }
 
         void
+        DExpectTypeSsm::on_parsed_formal_arglist(DArray * arglist,
+                                                 ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_formal_arglist("DExpectTypeSsm::on_parsed_formal_arglist",
+                                                 arglist,
+                                                 this->get_expect_str());
+        }
+
+        void
         DExpectTypeSsm::on_parsed_expression(obj<AExpression> expr,
                                              ParserStateMachine * p_psm)
         {

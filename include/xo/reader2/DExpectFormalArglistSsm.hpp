@@ -114,6 +114,12 @@ namespace xo {
                                   TypeDescr param_type,
                                   ParserStateMachine * p_psm);
 
+            /** consume formal params @p arglist from completed nested ssm,
+             *  with overall parser state in @p p_psm.
+             **/
+            void on_parsed_formal_arglist(DArray * arglist,
+                                          ParserStateMachine * p_psm);
+
             /** update state on parsed expression emitted by nested ssm
              *  with overall parser state in @p p_psm
              **/
@@ -144,7 +150,7 @@ namespace xo {
         private:
             /** parsing state-machine state **/
             formalarglstatetype fastate_ = formalarglstatetype::argl_0;
-            /** populate with (parmaeter-name, parameter-type) list
+            /** populate with (parameter-name, parameter-type) list
              *  as they're encountered.
              *
              *  Not using flexible array here since we don't know size at construction time

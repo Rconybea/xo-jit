@@ -391,6 +391,15 @@ namespace xo {
 
         }
 
+        void
+        DIfElseSsm::on_parsed_formal_arglist(DArray * arglist,
+                                             ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_formal_arglist("DIfElseSsm::on_parsed_formal_arglist",
+                                                 arglist,
+                                                 this->get_expect_str());
+        }
+
 #ifdef NOT_YET
         void
         if_else_xs::on_expr(bp<Expression> expr,

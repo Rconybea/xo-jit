@@ -9,6 +9,7 @@
 #include <xo/expression2/DVariable.hpp>
 #include <xo/expression2/StringTable.hpp>
 #include <xo/tokenizer2/Token.hpp>
+#include <xo/object2/DArray.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/arena/DArena.hpp>
 
@@ -103,10 +104,15 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td);
 
             /** update state to consume param (name, value) emitted by
-             *  nested (but not popped) parsing state
+             *  nested (expired) parsing state
              **/
             void on_parsed_formal(const DUniqueString * param_name,
                                   TypeDescr param_type);
+
+            /** update state to consume formal arugment list
+             *  emitted by nested (expired) parsing state
+             **/
+            void on_parsed_formal_arglist(DArray * arglist);
 
             /** update state to respond to parsed expression @p expr
              *  (from nested parsing state)
@@ -177,6 +183,12 @@ namespace xo {
                                        const DUniqueString * param_name,
                                        TypeDescr param_type,
                                        std::string_view expect_str);
+
+            /** @p arglist stores obj<AGCObject,DVariable> pointers.
+             **/
+            void illegal_parsed_formal_arglist(std::string_view ssm_name,
+                                               DArray * arglist,
+                                               std::string_view expect_str);
 
             /** report illegal parsed expression from nested ssm.
              *  Introducing as placeholder; not clear if this will be reachable

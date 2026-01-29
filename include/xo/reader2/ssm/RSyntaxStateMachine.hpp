@@ -68,6 +68,9 @@ public:
     void on_parsed_formal(const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_formal(O::data(), param_name, param_type, p_psm);
     }
+    void on_parsed_formal_arglist(DArray * arglist, ParserStateMachine * p_psm)  {
+        return O::iface()->on_parsed_formal_arglist(O::data(), arglist, p_psm);
+    }
     void on_parsed_expression(obj<AExpression> expr, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_expression(O::data(), expr, p_psm);
     }

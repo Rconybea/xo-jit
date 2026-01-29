@@ -48,6 +48,11 @@ namespace xo {
             self.on_parsed_formal(param_name, param_type, p_psm);
         }
         auto
+        ISyntaxStateMachine_DExpectExprSsm::on_parsed_formal_arglist(DExpectExprSsm & self, DArray * arglist, ParserStateMachine * p_psm) -> void
+        {
+            self.on_parsed_formal_arglist(arglist, p_psm);
+        }
+        auto
         ISyntaxStateMachine_DExpectExprSsm::on_parsed_expression(DExpectExprSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm) -> void
         {
             self.on_parsed_expression(expr, p_psm);

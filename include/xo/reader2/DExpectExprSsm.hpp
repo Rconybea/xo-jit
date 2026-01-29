@@ -142,6 +142,12 @@ namespace xo {
                                   TypeDescr param_type,
                                   ParserStateMachine * p_psm);
 
+            /** consume formal params @p arglist from completed nested ssm,
+             *  with overall parser state in @p p_psm.
+             **/
+            void on_parsed_formal_arglist(DArray * arglist,
+                                          ParserStateMachine * p_psm);
+
             /** update state for this syntax after parsing an expression @p expr,
              *  overall parser state in @p p_psm
              **/

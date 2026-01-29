@@ -567,6 +567,15 @@ namespace xo {
         }
 
         void
+        DProgressSsm::on_parsed_formal_arglist(DArray * arglist,
+                                               ParserStateMachine * p_psm)
+        {
+            p_psm->illegal_parsed_formal_arglist("DProgressSsm::on_parsed_formal_arglist",
+                                                 arglist,
+                                                 this->get_expect_str());
+        }
+
+        void
         DProgressSsm::on_parsed_expression(obj<AExpression> expr,
                                            ParserStateMachine * p_psm)
         {

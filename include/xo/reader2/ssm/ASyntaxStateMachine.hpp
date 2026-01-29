@@ -65,6 +65,8 @@ public:
     virtual void on_parsed_typedescr(Opaque data, TypeDescr td, ParserStateMachine * p_psm)  = 0;
     /** operate state machine for formal emitted by nested ssm **/
     virtual void on_parsed_formal(Opaque data, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm)  = 0;
+    /** consume formal arglist emitted by nested ssm **/
+    virtual void on_parsed_formal_arglist(Opaque data, DArray * arglist, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming parsed expression @p expr **/
     virtual void on_parsed_expression(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming parsed expression @p expr followed by semicolon **/

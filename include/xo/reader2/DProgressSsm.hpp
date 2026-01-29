@@ -173,6 +173,8 @@ namespace xo {
             void on_parsed_formal(const DUniqueString * param_name,
                                   TypeDescr param_type,
                                   ParserStateMachine * p_psm);
+            void on_parsed_formal_arglist(DArray * arglist,
+                                          ParserStateMachine * p_psm);
             void on_parsed_expression(obj<AExpression>,
                                       ParserStateMachine * p_psm);
             void on_parsed_expression_with_semicolon(obj<AExpression> expr,

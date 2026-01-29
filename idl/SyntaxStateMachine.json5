@@ -83,6 +83,15 @@
             ],
         },
         {
+            name: "on_parsed_formal_arglist",
+            doc: ["consume formal arglist emitted by nested ssm"],
+            return_type: "void",
+            args: [
+                {type: "DArray *", name: "arglist"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
+        {
             name: "on_parsed_expression",
             doc: ["update state machine for incoming parsed expression @p expr"],
             return_type: "void",

@@ -62,6 +62,8 @@ namespace xo {
             static void on_parsed_typedescr(DProgressSsm & self, TypeDescr td, ParserStateMachine * p_psm);
             /** operate state machine for formal emitted by nested ssm **/
             static void on_parsed_formal(DProgressSsm & self, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm);
+            /** consume formal arglist emitted by nested ssm **/
+            static void on_parsed_formal_arglist(DProgressSsm & self, DArray * arglist, ParserStateMachine * p_psm);
             /** update state machine for incoming parsed expression @p expr **/
             static void on_parsed_expression(DProgressSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm);
             /** update state machine for incoming parsed expression @p expr followed by semicolon **/

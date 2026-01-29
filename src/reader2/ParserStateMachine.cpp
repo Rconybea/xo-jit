@@ -6,6 +6,8 @@
 #include "ParserStateMachine.hpp"
 #include "ParserStack.hpp"
 #include "SyntaxStateMachine.hpp"
+#include <xo/object2/array/IPrintable_DArray.hpp>
+#include <xo/printable2/Printable.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
 #include <xo/indentlog/scope.hpp>
 #include <xo/indentlog/print/tostr.hpp>
@@ -13,6 +15,7 @@
 #include <stdexcept>
 
 namespace xo {
+    using xo::print::APrintable;
     using xo::facet::with_facet;
 
     namespace scm {
@@ -138,6 +141,17 @@ namespace xo {
             assert(stack_);
 
             this->stack_->top().on_parsed_formal(sym, td, this);
+        }
+
+        void
+        ParserStateMachine::on_parsed_formal_arglist(DArray * arglist)
+        {
+            scope log(XO_DEBUG(debug_flag_),
+                      xtag("arglist", obj<APrintable,DArray>(arglist)));
+
+            assert(stack_);
+
+            this->stack_->top().on_parsed_formal_arglist(arglist, this);
         }
 
         void
@@ -269,7 +283,7 @@ namespace xo {
             // - want to write error message using DArena
             // - need something like log_streambuf and/or tostr() that's arena-aware
 
-            auto errmsg_string = tostr("Unexpected expression",
+            auto errmsg_string = tostr("Unexpected formal",
                                        xtag("param_name", std::string_view(*param_name)),
                                        xtag("param_type", param_type),
                                        xtag("expecting", expect_str),
@@ -282,6 +296,20 @@ namespace xo {
                                              std::string_view(errmsg_string));
 
             this->capture_error(ssm_name, errmsg);
+        }
+
+        void
+        ParserStateMachine::illegal_parsed_formal_arglist(std::string_view ssm_name,
+                                                          DArray * arglist,
+                                                          std::string_view expect_str)
+        {
+            obj<APrintable,DArray> arglist_pr(arglist);
+
+            auto errmsg_string = tostr("Unexpected formal arglist",
+                                       xtag("arglist", arglist_pr),
+                                       xtag("expecting", expect_str),
+                                       xtag("ssm", ssm_name),
+                                       xtag("via", "ParserStateMachine::illegal_parsed_formal_arglist"));
         }
 
         void
