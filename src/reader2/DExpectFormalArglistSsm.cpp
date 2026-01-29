@@ -7,6 +7,8 @@
 #include "ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp"
 #include "DExpectFormalArgSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp"
+#include <xo/expression2/DVariable.hpp>
+#include <xo/expression2/detail/IGCObject_DVariable.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -191,11 +193,64 @@ namespace xo {
                                                   TypeDescr param_type,
                                                   ParserStateMachine * p_psm)
         {
+            if (fastate_ == formalarglstatetype::argl_1a) {
+                this->fastate_ = formalarglstatetype::argl_1b;
+
+                TypeRef typeref = TypeRef::dwim(TypeRef::prefix_type::from_chars("formal"), param_type);
+
+                DVariable * var = DVariable::make(p_psm->expr_alloc(),
+                                                  param_name,
+                                                  typeref);
+
+                // need AGCObject facet to use DArray here.
+                // May want to have gc feature that allows it to use
+                // FacetRegistry on memory that stores obj<AExpression,..>
+                //
+                // In this case doesn't matter since DExpectFormalArglistSsm not actually collected!
+
+                obj<AGCObject,DVariable> var_o(var);
+
+                if (argl_->size() == argl_->capacity()) {
+                    // need to expand argl_ capacity.
+                    // If DArena were to allow it (i.e. offer a realloc() feature,
+                    // could do this in place since this SSM is at the top of the parser stack.
+
+                    obj<AAllocator,DArena> mm(&(p_psm->parser_alloc()));
+
+                    DArray * argl_2x = DArray::empty(mm, 2 * argl_->capacity());
+
+                    for (DArray::size_type i = 0, n = argl_->size(); i < n; ++i) {
+                        // TODO: prefer non-bounds-checked access here
+                        argl_2x->push_back(argl_->at(i));
+                    }
+
+                    // update in place
+                    this->argl_ = argl_2x;
+                }
+
+                this->argl_->push_back(var_o);
+                return;
+            }
+
             p_psm->illegal_parsed_formal("DExpectFormalArglistSsm::on_parsed_formal",
                                          param_name,
                                          param_type,
                                          this->get_expect_str());
         }
+
+#ifdef NOT_YET
+        void
+        expect_formal_arglist_xs::on_formal(const rp<Variable> & formal,
+                                            parserstatemachine * p_psm)
+        {
+            if (farglxs_type_ == formalarglstatetype::argl_1a) {
+                this->farglxs_type_ = formalarglstatetype::argl_1b;
+                this->argl_.push_back(formal);
+            } else {
+                exprstate::on_formal(formal, p_psm);
+            }
+        }
+#endif
 
         void
         DExpectFormalArglistSsm::on_parsed_expression(obj<AExpression> expr,
@@ -239,18 +294,6 @@ namespace xo {
         }
 
 #ifdef NOT_YET
-        void
-        expect_formal_arglist_xs::on_formal(const rp<Variable> & formal,
-                                            parserstatemachine * p_psm)
-        {
-            if (farglxs_type_ == formalarglstatetype::argl_1a) {
-                this->farglxs_type_ = formalarglstatetype::argl_1b;
-                this->argl_.push_back(formal);
-            } else {
-                exprstate::on_formal(formal, p_psm);
-            }
-        }
-
         void
         expect_formal_arglist_xs::on_comma_token(const token_type & tk,
                                                  parserstatemachine * p_psm)

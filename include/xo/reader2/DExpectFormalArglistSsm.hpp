@@ -147,7 +147,7 @@ namespace xo {
             /** populate with (parmaeter-name, parameter-type) list
              *  as they're encountered.
              *
-             *  Not using flexible array here since we don't know size
+             *  Not using flexible array here since we don't know size at construction time
              **/
             DArray * argl_ = nullptr;
         };
