@@ -131,14 +131,6 @@ namespace xo {
                 this->on_if_token(tk, p_psm);
                 return;
 
-            case tokentype::tk_colon:
-                this->on_colon_token(tk, p_psm);
-                return;
-
-            case tokentype::tk_singleassign:
-                this->on_singleassign_token(tk, p_psm);
-                return;
-
             case tokentype::tk_string:
                 this->on_string_token(tk, p_psm);
                 return;
@@ -155,10 +147,6 @@ namespace xo {
                 this->on_bool_token(tk, p_psm);
                 return;
 
-            case tokentype::tk_semicolon:
-                this->on_semicolon_token(tk, p_psm);
-                return;
-
             // all the not-yet handled cases
             case tokentype::tk_invalid:
             case tokentype::tk_leftparen:
@@ -173,7 +161,10 @@ namespace xo {
             case tokentype::tk_greatequal:
             case tokentype::tk_dot:
             case tokentype::tk_comma:
+            case tokentype::tk_colon:
+            case tokentype::tk_semicolon:
             case tokentype::tk_doublecolon:
+            case tokentype::tk_singleassign:
             case tokentype::tk_assign:
             case tokentype::tk_yields:
             case tokentype::tk_plus:
@@ -225,9 +216,7 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DExprSeqState::on_symbol_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -264,9 +253,7 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DExprSeqState::on_lambda_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -286,27 +273,7 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DExprSeqState::on_if_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExprSeqState::on_colon_token(const Token & tk,
-                                      ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExprSeqState::on_colon_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExprSeqState::on_singleassign_token(const Token & tk,
-                                             ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExprSeqState::on_singleassign_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -333,9 +300,7 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DExprSeqState::on_string_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -361,9 +326,7 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DExprSeqState::on_f64_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -389,9 +352,7 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DExprSeqState::on_i64_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -417,56 +378,7 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DExprSeqState::on_bool_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExprSeqState::on_semicolon_token(const Token & tk,
-                                          ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExprSeqState::on_semicolon_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExprSeqState::on_parsed_symbol(std::string_view sym,
-                                        ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_symbol("DExprSeqState::on_parsed_symbol",
-                                           sym,
-                                           this->get_expect_str());
-        }
-
-        void
-        DExprSeqState::on_parsed_typedescr(TypeDescr td,
-                                           ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_typedescr("DExprSeqState::on_parsed_typedescr",
-                                              td,
-                                              this->get_expect_str());
-        }
-
-        void
-        DExprSeqState::on_parsed_formal(const DUniqueString * param_name,
-                                        TypeDescr param_type,
-                                        ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal("DExprSeqState::on_parsed_formal",
-                                         param_name,
-                                         param_type,
-                                         this->get_expect_str());
-        }
-
-        void
-        DExprSeqState::on_parsed_formal_arglist(DArray * arglist,
-                                                ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal_arglist("DExprSeqState::on_parsed_formal_arglist",
-                                                 arglist,
-                                                 this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
