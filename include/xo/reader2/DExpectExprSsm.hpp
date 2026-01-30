@@ -5,17 +5,18 @@
 
 #pragma once
 
-#include "ParserStateMachine.hpp"
+#include "DSyntaxStateMachine.hpp"
+//#include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
-//#include <xo/arena/DArena.hpp>
 #include <xo/facet/obj.hpp>
 #include <xo/indentlog/print/ppindentinfo.hpp>
 
 namespace xo {
     namespace scm {
 
-        class DExpectExprSsm {
+        class DExpectExprSsm : public DSyntaxStateMachine<DExpectExprSsm> {
         public:
+            using Super = DSyntaxStateMachine<DExpectExprSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -37,6 +38,7 @@ namespace xo {
             /** @defgroup scm-expectexpr-access-methods access methods **/
             ///@{
 
+            const char * ssm_classname() const noexcept { return "DExpectExprSsm"; }
             bool allow_defs() const noexcept { return allow_defs_; }
             bool cxl_on_rightbrace() const noexcept { return cxl_on_rightbrace_; }
 
@@ -97,55 +99,6 @@ namespace xo {
              **/
             void on_def_token(const Token & tk,
                               ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_if_token(const Token & tk,
-                             ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming colon token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_colon_token(const Token & tk,
-                                ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming singleassign token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_singleassign_token(const Token & tk,
-                                       ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming semicolon token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_semicolon_token(const Token & tk,
-                                    ParserStateMachine * p_psm);
-
-            /** update state for this syntax after parsing a symbol @p sym;
-             *  overall parser state in @p p_psm
-             **/
-            void on_parsed_symbol(std::string_view sym,
-                                  ParserStateMachine * p_psm);
-
-            /** update state for this syntax after parsing a type-description @p td,
-             *  overall parser state in @p p_psm
-             **/
-            void on_parsed_typedescr(TypeDescr td,
-                                     ParserStateMachine * p_psm);
-
-            /** update state to consume parsed formal (name, value) from nested ssm,
-             *  with overall parser state in @p p_psm
-             **/
-            void on_parsed_formal(const DUniqueString * param_name,
-                                  TypeDescr param_type,
-                                  ParserStateMachine * p_psm);
-
-            /** consume formal params @p arglist from completed nested ssm,
-             *  with overall parser state in @p p_psm.
-             **/
-            void on_parsed_formal_arglist(DArray * arglist,
-                                          ParserStateMachine * p_psm);
 
             /** update state for this syntax after parsing an expression @p expr,
              *  overall parser state in @p p_psm

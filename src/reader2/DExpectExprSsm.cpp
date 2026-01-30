@@ -116,46 +116,34 @@ namespace xo {
             switch (tk.tk_type()) {
             case tokentype::tk_symbol:
                 this->on_symbol_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_def:
                 this->on_def_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_if:
-                this->on_if_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_colon:
-                this->on_colon_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_singleassign:
-                this->on_singleassign_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_string:
                 this->on_string_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_f64:
                 this->on_f64_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_i64:
                 this->on_i64_token(tk, p_psm);
-                break;
+                return;
 
             case tokentype::tk_bool:
                 this->on_bool_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_semicolon:
-                this->on_semicolon_token(tk, p_psm);
-                break;
+                return;
 
             // all the not-yet handled cases
             case tokentype::tk_invalid:
+            case tokentype::tk_if:
+            case tokentype::tk_singleassign:
+            case tokentype::tk_colon:
+            case tokentype::tk_semicolon:
             case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
@@ -185,11 +173,10 @@ namespace xo {
             case tokentype::tk_in:
             case tokentype::tk_end:
             case tokentype::N:
-                p_psm->illegal_input_on_token("DExpectExprSsm::on_token",
-                                              tk,
-                                              this->get_expect_str());
                 break;
             }
+
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -201,40 +188,80 @@ namespace xo {
                                           this->get_expect_str());
         }
 
+#ifdef NOT_YET
+        void
+        expect_expr_xs::on_symbol_token(const token_type & tk,
+                                        parserstatemachine * p_psm)
+        {
+            scope log(XO_DEBUG(p_psm->debug_flag()));
+
+            log && log(xtag("tk", tk));
+
+            constexpr const char * c_self_name = "expect_expr_xs::on_symbol_token";
+
+            /* various possibilities when looking for rhs expression:
+             *
+             *   x := y       // (1)
+             *   x := f(a)    // (2)
+             *   x := f(a,b)  // (3)
+             *
+             * need lookahead token following symbol to distinguish
+             * between (1) (symbol completes rhs expression)
+             * and {(2), (3)} (symbol is function call)
+             */
+
+            bp<Variable> var = p_psm->lookup_var(tk.text());
+
+            if (!var) {
+                this->unknown_variable_error(c_self_name, tk, p_psm);
+                return;
+            }
+
+            /* e.g.
+             *   def pi = 3.14159265;
+             *   def mypi = pi;
+             *              ^
+             *   def pi2 = pi * 2;
+             *             ^
+             *   def y = foo(pi2);
+             *           ^
+             */
+            progress_xs::start(var.promote(), p_psm);
+
+ #ifdef NOT_YET
+            p_stack->push_exprstate(exprstate(exprstatetype::expr_progress,
+                                              Variable::make(name, type)));
+#endif
+
+#ifdef LATER
+            p_psm->pop_exprstate();
+            p_psm->top_exprstate().on_symbol(tk.text(),
+                                               p_stack, p_emit_expr);
+#endif
+            return;
+        }
+#endif
+
+#ifdef NOT_YET
+        void
+        expect_expr_xs::on_def_token(const token_type & tk,
+                                     parserstatemachine * p_psm)
+        {
+            scope log(XO_DEBUG(p_psm->debug_flag()));
+
+            if (allow_defs_) {
+                define_xs::start(p_psm);
+            } else {
+                exprstate::on_def_token(tk, p_psm);
+            }
+        }
+#endif
+
         void
         DExpectExprSsm::on_def_token(const Token & tk,
                                      ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DExpectExprSsm",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectExprSsm::on_if_token(const Token & tk,
-                                     ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectExprSsm",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectExprSsm::on_colon_token(const Token & tk,
-                                     ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectExprSsm",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectExprSsm::on_singleassign_token(const Token & tk,
-                                              ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectExprSsm",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -327,53 +354,6 @@ namespace xo {
         }
 
         void
-        DExpectExprSsm::on_semicolon_token(const Token & tk,
-                                           ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectExprSsm::on_semicolon_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectExprSsm::on_parsed_symbol(std::string_view sym,
-                                         ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_symbol("DExpectExprSsm::on_parsed_symbol",
-                                           sym,
-                                           this->get_expect_str());
-        }
-
-        void
-        DExpectExprSsm::on_parsed_typedescr(TypeDescr td,
-                                            ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_typedescr("DExpectExprSsm::on_parsed_typedescr",
-                                              td,
-                                              this->get_expect_str());
-        }
-
-        void
-        DExpectExprSsm::on_parsed_formal(const DUniqueString * param_name,
-                                         TypeDescr param_type,
-                                         ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal("DExpectExprSsm::on_parsed_formal",
-                                         param_name,
-                                         param_type,
-                                         this->get_expect_str());
-        }
-
-        void
-        DExpectExprSsm::on_parsed_formal_arglist(DArray * arglist,
-                                                 ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal_arglist("DExpectExprSsm::on_parsed_formal_arglist",
-                                                 arglist,
-                                                 this->get_expect_str());
-        }
-
-        void
         DExpectExprSsm::on_parsed_expression(obj<AExpression> expr,
                                              ParserStateMachine * p_psm)
         {
@@ -404,19 +384,6 @@ namespace xo {
         }
 
 #ifdef NOT_YET
-        void
-        expect_expr_xs::on_def_token(const token_type & tk,
-                                     parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            if (allow_defs_) {
-                define_xs::start(p_psm);
-            } else {
-                exprstate::on_def_token(tk, p_psm);
-            }
-        }
-
         void
         expect_expr_xs::on_lambda_token(const token_type & /*tk*/,
                                         parserstatemachine * p_psm)
@@ -473,58 +440,6 @@ namespace xo {
             } else {
                 exprstate::on_rightbrace_token(tk, p_psm);
             }
-        }
-
-        void
-        expect_expr_xs::on_symbol_token(const token_type & tk,
-                                        parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            log && log(xtag("tk", tk));
-
-            constexpr const char * c_self_name = "expect_expr_xs::on_symbol_token";
-
-            /* various possibilities when looking for rhs expression:
-             *
-             *   x := y       // (1)
-             *   x := f(a)    // (2)
-             *   x := f(a,b)  // (3)
-             *
-             * need lookahead token following symbol to distinguish
-             * between (1) (symbol completes rhs expression)
-             * and {(2), (3)} (symbol is function call)
-             */
-
-            bp<Variable> var = p_psm->lookup_var(tk.text());
-
-            if (!var) {
-                this->unknown_variable_error(c_self_name, tk, p_psm);
-                return;
-            }
-
-            /* e.g.
-             *   def pi = 3.14159265;
-             *   def mypi = pi;
-             *              ^
-             *   def pi2 = pi * 2;
-             *             ^
-             *   def y = foo(pi2);
-             *           ^
-             */
-            progress_xs::start(var.promote(), p_psm);
-
- #ifdef NOT_YET
-            p_stack->push_exprstate(exprstate(exprstatetype::expr_progress,
-                                              Variable::make(name, type)));
-#endif
-
-#ifdef LATER
-            p_psm->pop_exprstate();
-            p_psm->top_exprstate().on_symbol(tk.text(),
-                                               p_stack, p_emit_expr);
-#endif
-            return;
         }
 
         void
