@@ -398,7 +398,7 @@ namespace xo {
                 // tk is the operator this instance was waiting for
                 this->op_type_ = tk2op(tk.tk_type());
 
-                DExpectExprSsm::start(p_psm->parser_alloc(), p_psm);
+                DExpectExprSsm::start(p_psm);
                 return;
             } else if (rhs_) {
                 optype op_type2 = tk2op(tk.tk_type());
@@ -441,15 +441,13 @@ namespace xo {
                                         lhs_,
                                         op_type_,
                                         p_psm);
-                    DExpectExprSsm::start(p_psm->parser_alloc(),
-                                          p_psm);
+                    DExpectExprSsm::start(p_psm);
                     /* (b * ..) */
                     DProgressSsm::start(p_psm->parser_alloc(),
                                         rhs_,
                                         op_type2,
                                         p_psm);
-                    DExpectExprSsm::start(p_psm->parser_alloc(),
-                                          p_psm);
+                    DExpectExprSsm::start(p_psm);
                     return;
                 }
             }

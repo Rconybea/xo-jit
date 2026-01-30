@@ -7,6 +7,8 @@
 #include "ssm/ISyntaxStateMachine_DLambdaSsm.hpp"
 #include "DExpectFormalArglistSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp"
+#include "DExpectTypeSsm.hpp"
+#include "DExpectExprSsm.hpp"
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/DVariable.hpp>
@@ -89,11 +91,11 @@ namespace xo {
         DLambdaSsm::get_expect_str() const noexcept
         {
             /*
-             *   lambda (x : f64) : f64 { ... } ;
-             *  ^      ^         ^ ^   ^       ^
-             *  |      |         | |   |       lm_5
-             *  |      |         | |   lm_4:expect_expression
-             *  |      |         | lm_3
+             *   lambda (x : f64) -> f64 { ... } ;
+             *  ^      ^         ^  ^   ^       ^
+             *  |      |         |  |   |       lm_5
+             *  |      |         |  |   lm_4:expect_expression
+             *  |      |         |  lm_3
              *  |      |         lm_2
              *  |      lm_1:
              *  expect_expression
@@ -108,7 +110,7 @@ namespace xo {
              case lambdastatetype::lm_1:
                  return "lambda-params";
              case lambdastatetype::lm_2:
-                 return "colon|lambda-body";
+                 return "yields|lambda-body";
              case lambdastatetype::lm_3:
                  return "type";
              case lambdastatetype::lm_4:
@@ -127,6 +129,10 @@ namespace xo {
             switch (tk.tk_type()) {
             case tokentype::tk_lambda:
                 this->on_lambda_token(tk, p_psm);
+                return;
+
+            case tokentype::tk_yields:
+                this->on_yields_token(tk, p_psm);
                 return;
 
                 // all the not-yet-handled cases
@@ -155,7 +161,6 @@ namespace xo {
             case tokentype::tk_comma:
             case tokentype::tk_doublecolon:
             case tokentype::tk_assign:
-            case tokentype::tk_yields:
             case tokentype::tk_plus:
             case tokentype::tk_minus:
             case tokentype::tk_star:
@@ -194,46 +199,50 @@ namespace xo {
                                           this->get_expect_str());
         }
 
-
-#ifdef NOT_YET
         void
-        lambda_xs::on_formal_arglist(const std::vector<rp<Variable>> & argl,
-                                     parserstatemachine * p_psm)
+        DLambdaSsm::on_yields_token(const Token & tk,
+                                    ParserStateMachine * p_psm)
         {
-            if (lmxs_type_ == lambdastatetype::lm_1) {
-                this->lmxs_type_ = lambdastatetype::lm_2;
-                this->parent_env_ = p_psm->top_envframe().promote();
-                this->local_env_ = LocalSymtab::make(argl, parent_env_);
+            if (lmstate_ == lambdastatetype::lm_2) {
+                this->lmstate_ = lambdastatetype::lm_3;
 
-                p_psm->push_envframe(local_env_);
+                DExpectTypeSsm::start(p_psm);
 
-                //expect_expr_xs::start(p_psm);
-            } else {
-                exprstate::on_formal_arglist(argl, p_psm);
+                /* control reenters via .on_parsed_typedescr() */
+                return;
             }
+
+            p_psm->illegal_input_on_token("DLambdaSsm::on_yields_token",
+                                          tk,
+                                          this->get_expect_str());
         }
 
+
+        void
+        DLambdaSsm::on_parsed_typedescr(TypeDescr td,
+                                        ParserStateMachine * p_psm)
+        {
+            if (lmstate_ == lambdastatetype::lm_3) {
+                this->lmstate_ = lambdastatetype::lm_4;
+                this->explicit_return_td_ = td;
+                this->lambda_td_ = DLambdaExpr::assemble_lambda_td(local_symtab_, td);
+
+                DExpectExprSsm::start(p_psm);
+                return;
+            }
+
+            p_psm->illegal_input_on_typedescr("DLambdaSsm::on_parsed_typedescr",
+                                              td,
+                                              this->get_expect_str());
+        }
+
+#ifdef NOT_YET
         void
         lambda_xs::on_expr_with_semicolon(bp<Expression> expr,
                                           parserstatemachine * p_psm)
         {
             this->on_expr(expr, p_psm);
             this->on_semicolon_token(token_type::semicolon(), p_psm);
-        }
-
-        void
-        lambda_xs::on_colon_token(const token_type & tk,
-                                  parserstatemachine * p_psm)
-        {
-            constexpr const char * c_self_name = "lambda_xs::on_colon_token";
-
-            if (lmxs_type_ == lambdastatetype::lm_2) {
-                this->lmxs_type_ = lambdastatetype::lm_3;
-                expect_type_xs::start(p_psm);
-                /* control reenters via .on_typedescr() */
-            } else {
-                this->illegal_input_on_token(c_self_name, tk, this->get_expect_str(), p_psm);
-            }
         }
 
         void
@@ -251,84 +260,6 @@ namespace xo {
                 p_psm->on_leftbrace_token(token_type::leftbrace());
             } else {
                 this->illegal_input_on_token(c_self_name, tk, this->get_expect_str(), p_psm);
-            }
-        }
-#endif
-
-        void
-        DLambdaSsm::on_parsed_typedescr(TypeDescr td,
-                                        ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_typedescr("DLambdaSsm::on_parsed_typedescr",
-                                              td,
-                                              this->get_expect_str());
-        }
-
-#ifdef NOT_YET
-        void
-        lambda_xs::on_typedescr(TypeDescr td,
-                                parserstatemachine * p_psm)
-        {
-            constexpr const char * c_self_name = "lambda_xs::on_typedescr";
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            assert(td);
-
-            if (lmxs_type_ == lambdastatetype::lm_3) {
-                this->lmxs_type_ = lambdastatetype::lm_4;
-                this->explicit_return_td_ = td;
-
-                this->lambda_td_ = Lambda::assemble_lambda_td(local_env_->argv(),
-                                                              explicit_return_td_);
-
-                /* 1. at this point we know function signature (@ref lambda_td_)
-                 * 2. if this lambda appears on the rhs of a define,
-                 *    propagate function signature to the define.
-                 * 3. this makes recursive function definitions like this work
-                 *    without relying on type inference:
-                 *       def fact = lambda (n : i64) : i64 {
-                 *         if (n == 0) then
-                 *           1
-                 *         else
-                 *           n * fact(n - 1)
-                 *       }
-                 * 4. while parsing the body of the lambda, we want environment
-                 *    to already associate the lambda's signature with variable 'fact',
-                 *    so that when parser encounters 'fact(n - 1)' the expression has
-                 *    known valuetype.
-                 */
-
-                if ((p_psm->exprstate_stack_size() >= 3)
-                    && (p_psm->lookup_exprstate(1).exs_type() == exprstatetype::expect_rhs_expression)
-                    && (p_psm->lookup_exprstate(2).exs_type() == exprstatetype::defexpr)
-                    && (p_psm->env_stack_size() >= 2)
-                    )
-                {
-                    const define_xs * def_xs = dynamic_cast<const define_xs*>(&(p_psm->lookup_exprstate(2)));
-
-                    assert(def_xs);
-
-                    bp<Variable> def_var = def_xs->lhs_variable();
-
-                    if (def_var->valuetype() == nullptr) {
-                        log && log("assign discovered lambda type T to enclosing define",
-                                   xtag("lhs", def_var.get()),
-                                   xtag("T", print::unq(this->lambda_td_->canonical_name())));
-
-                        def_var->assign_valuetype(lambda_td_);
-                    } else {
-                        /* don't need to unify here.  if def already hasa a type,
-                         * that's because it was explicitly specified.
-                         * will discover any conflict after reporting parsed lambda
-                         * to define_xs
-                         */
-                    }
-                }
-
-                expect_expr_xs::start(p_psm);
-                /* control reenters via .on_expr() or .on_expr_with_semicolon() */
-            } else {
-                this->illegal_input_on_type(c_self_name, td, this->get_expect_str(), p_psm);
             }
         }
 #endif
@@ -376,8 +307,9 @@ namespace xo {
                 for (DArray::size_type i = 0, n = arglist->size(); i < n; ++i) {
                     obj<AGCObject> param = arglist->at(i);
 
+                    // TODO:
                     // sad! runtime poly conversion from obj<AGCObject>
-                    // We on need this because of (suboptimally) using DArray to store arglist
+                    // We need this because of (suboptimally) using DArray to store arglist
 
                     obj<AExpression> param_expr
                         = FacetRegistry::instance().variant<AExpression,AGCObject>(param);
@@ -503,12 +435,6 @@ namespace xo {
 
         // TODO: on_i64_token, on_bool token
 
-        void
-        lambda_xs::print(std::ostream & os) const {
-            os << "<lambda_xs"
-               << xtag("lmxs_type", lmxs_type_)
-               << ">";
-        }
 #endif
 
         bool

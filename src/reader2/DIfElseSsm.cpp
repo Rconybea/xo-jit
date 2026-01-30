@@ -215,8 +215,7 @@ namespace xo {
             if (ifstate_ == ifexprstatetype::if_0) {
                 this->ifstate_ = ifexprstatetype::if_1;
 
-                DExpectExprSsm::start(p_psm->parser_alloc(),
-                                      p_psm);
+                DExpectExprSsm::start(p_psm);
                 return;
             }
 
@@ -236,7 +235,7 @@ namespace xo {
             if (ifstate_ == ifexprstatetype::if_2) {
                 this->ifstate_ = ifexprstatetype::if_3;
 
-                DExpectExprSsm::start(p_psm->parser_alloc(), p_psm);
+                DExpectExprSsm::start(p_psm);
                 return;
             }
 
@@ -279,7 +278,7 @@ namespace xo {
             if (ifstate_ == ifexprstatetype::if_4) {
                 this->ifstate_ = ifexprstatetype::if_5;
 
-                DExpectExprSsm::start(p_psm->parser_alloc(), p_psm);
+                DExpectExprSsm::start(p_psm);
                 return;
             }
 

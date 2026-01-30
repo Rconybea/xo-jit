@@ -643,8 +643,7 @@ namespace xo {
             {
                 this->defstate_ = defexprstatetype::def_5;
 
-                DExpectExprSsm::start(p_psm->parser_alloc(),
-                                      p_psm);
+                DExpectExprSsm::start(p_psm);
                 return;
             }
 

@@ -339,7 +339,43 @@ namespace xo {
                 REQUIRE(result.is_incomplete());
             }
 
+            {
+                auto & result = parser.on_token(Token::yields_token());
+
+                log && log("after yields token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
+            {
+                auto & result = parser.on_token(Token::symbol_token("i64"));
+
+                log && log("after symbol(i64) token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
 #ifdef NOT_YET
+            {
+                auto & result = parser.on_token(Token::leftbrace_token());
+
+                log && log("after leftbrace token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
             {
                 auto & result = parser.on_token(Token::string_token("fooey"));
 

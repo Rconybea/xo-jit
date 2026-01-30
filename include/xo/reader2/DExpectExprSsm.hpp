@@ -32,8 +32,7 @@ namespace xo {
                               bool allow_defs,
                               bool cxl_on_rightparen,
                               ParserStateMachine * p_psm);
-            static void start(DArena & parser_mm,
-                              ParserStateMachine * p_psm);
+            static void start(ParserStateMachine * p_psm);
 
             /** @defgroup scm-expectexpr-access-methods access methods **/
             ///@{

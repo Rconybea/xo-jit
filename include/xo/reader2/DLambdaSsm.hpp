@@ -88,6 +88,12 @@ namespace xo {
             void on_lambda_token(const Token & tk,
                                  ParserStateMachine * p_psm);
 
+            /** update ssm on yield token @p tk,
+             *  with overall parser state in @p p_psm
+             **/
+            void on_yields_token(const Token & tk,
+                                 ParserStateMachine * p_psm);
+
             ///@}
             /** @defgroup scm-lambdassm-syntaxstatemachine-facet **/
             ///@{
@@ -174,13 +180,11 @@ namespace xo {
             /** lambda environment (for formal parameters) **/
             DLocalSymtab * local_symtab_ = nullptr;
 
-#ifdef NOT_YET
             /** explicit return type (if supplied) **/
             TypeDescr explicit_return_td_ = nullptr;
 
             /** lambda signature (when known) **/
             TypeDescr lambda_td_ = nullptr;
-#endif
 
             /** body expression **/
             obj<AExpression> body_;

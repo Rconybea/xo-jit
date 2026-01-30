@@ -83,10 +83,9 @@ namespace xo {
         }
 
         void
-        DExpectExprSsm::start(DArena & mm,
-                              ParserStateMachine * p_psm)
+        DExpectExprSsm::start(ParserStateMachine * p_psm)
         {
-            start(mm,
+            start(p_psm->parser_alloc(),
                   false /*!allow_defs*/,
                   false /*!cxl_on_rightbrace*/,
                   p_psm);
