@@ -218,24 +218,13 @@ namespace xo {
             scope log(XO_DEBUG(p_psm->debug_flag()), xtag("tk", tk));
 
             switch (tk.tk_type()) {
+            case tokentype::tk_then:
+            case tokentype::tk_else:
+                this->on_completing_token(tk, p_psm);
+                return;
+
             case tokentype::tk_symbol:
                 this->on_symbol_token(tk, p_psm);
-                return;
-
-            case tokentype::tk_def:
-                this->on_def_token(tk, p_psm);
-                return;
-
-            case tokentype::tk_if:
-                this->on_if_token(tk, p_psm);
-                return;
-
-            case tokentype::tk_then:
-                this->on_then_token(tk, p_psm);
-                return;
-
-            case tokentype::tk_else:
-                this->on_else_token(tk, p_psm);
                 return;
 
             case tokentype::tk_colon:
@@ -268,6 +257,8 @@ namespace xo {
 
             // all the not-yet handled cases
             case tokentype::tk_invalid:
+            case tokentype::tk_def:
+            case tokentype::tk_if:
             case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
@@ -304,61 +295,20 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DProgressSsm::on_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
         DProgressSsm::on_symbol_token(const Token & tk,
                                       ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DProgressSsm::on_symbol_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
-        DProgressSsm::on_def_token(const Token & tk,
-                                   ParserStateMachine * p_psm)
+        DProgressSsm::on_completing_token(const Token & tk,
+                                          ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DProgressSsm::on_def_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DProgressSsm::on_if_token(const Token & tk,
-                                  ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DProgressSsm::on_if_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DProgressSsm::on_then_token(const Token & tk,
-                                    ParserStateMachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            (void)tk;
-
-            obj<AExpression> expr = this->assemble_expr(p_psm);
-
-            p_psm->pop_ssm();  // completes self
-
-            // TODO: perhaps need to generalize on_parsed_expression_with_semicolon() ..?
-            p_psm->on_parsed_expression(expr);
-            p_psm->on_token(tk);
-        }
-
-        void
-        DProgressSsm::on_else_token(const Token & tk,
-                                    ParserStateMachine * p_psm)
-        {
-            // note: common with .on_then_token()
-
             scope log(XO_DEBUG(p_psm->debug_flag()));
 
             (void)tk;
@@ -461,36 +411,28 @@ namespace xo {
         DProgressSsm::on_string_token(const Token & tk,
                                       ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DProgressSsm::on_string_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
         DProgressSsm::on_f64_token(const Token & tk,
                                    ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DProgressSsm::on_f64_token",
-                                         tk,
-                                         this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
         DProgressSsm::on_i64_token(const Token & tk,
                                    ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DProgressSsm::on_i64_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
         DProgressSsm::on_bool_token(const Token & tk,
                                     ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DProgressSsm::on_bool_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -529,57 +471,8 @@ namespace xo {
              */
 
 #ifdef OBSOLETE
-            p_psm->illegal_input_on_token("DProgressSsm::on_semicolon_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
 #endif
-        }
-
-        void
-        DProgressSsm::on_parsed_symbol(std::string_view sym,
-                                       ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_symbol("DProgressSsm::on_parsed_symbol",
-                                          sym,
-                                          this->get_expect_str());
-        }
-
-        void
-        DProgressSsm::on_parsed_typedescr(TypeDescr td,
-                                          ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_typedescr("DProgressSsm::on_parsed_typedescr",
-                                              td,
-                                              this->get_expect_str());
-        }
-
-        void
-        DProgressSsm::on_parsed_formal(const DUniqueString * param_name,
-                                       TypeDescr param_type,
-                                       ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal("DProgressSsm::on_parsed_formal",
-                                         param_name,
-                                         param_type,
-                                         this->get_expect_str());
-        }
-
-        void
-        DProgressSsm::on_parsed_formal_arglist(DArray * arglist,
-                                               ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal_arglist("DProgressSsm::on_parsed_formal_arglist",
-                                                 arglist,
-                                                 this->get_expect_str());
-        }
-
-        void
-        DProgressSsm::on_parsed_expression(obj<AExpression> expr,
-                                           ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_expression("DProgressSsm::on_parsed_expression",
-                                             expr,
-                                             this->get_expect_str());
         }
 
         void
@@ -906,14 +799,6 @@ namespace xo {
         }
 
         void
-        progress_xs::on_typedescr(TypeDescr /*td*/,
-                                  parserstatemachine * /*p_psm*/)
-        {
-            /* unreachable */
-            assert(false);
-        }
-
-        void
         progress_xs::on_semicolon_token(const token_type & /*tk*/,
                                         parserstatemachine * p_psm)
         {
@@ -1116,44 +1001,8 @@ namespace xo {
                 exprstate::on_i64_token(tk, p_psm);
             }
         }
-
-        void
-        progress_xs::print(std::ostream & os) const {
-            os << "<progress_xs"
-               << xtag("this", (void*)this)
-               << xtag("type", exs_type_);
-            if (lhs_)
-                os << xtag("lhs", lhs_);
-            if (op_type_ != optype::invalid)
-                os << xtag("op", op_type_);
-            if (rhs_)
-                os << xtag("rhs", rhs_);
-            os << ">";
-        }
-
-        bool
-        progress_xs::pretty_print(const xo::print::ppindentinfo & ppii) const
-        {
-            if (ppii.upto()) {
-                return (ppii.pps()->print_upto("<progress_xs")
-                        && (lhs_ ? ppii.pps()->print_upto(refrtag("lhs", lhs_)) : true)
-                        && (op_type_ != optype::invalid ? ppii.pps()->print_upto(refrtag("op", op_type_)) : true)
-                        && (rhs_ ? ppii.pps()->print_upto(refrtag("rhs", rhs_)) : true)
-                        && ppii.pps()->print_upto(">"));
-            } else {
-                ppii.pps()->write("<progress_xs ");
-                if (lhs_)
-                    ppii.pps()->pretty(refrtag("lhs", lhs_));
-                if (op_type_ != optype::invalid)
-                    ppii.pps()->pretty(refrtag("op", op_type_));
-                if (rhs_)
-                    ppii.pps()->pretty(refrtag("rhs", rhs_));
-                ppii.pps()->write(">");
-                return false;
-            }
-        }
-
 #endif
+
         bool
         DProgressSsm::pretty(const xo::print::ppindentinfo & ppii) const
         {

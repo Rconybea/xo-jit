@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ParserStateMachine.hpp"
+#include "DSyntaxStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 //#include <xo/expression2/Expression.hpp>
 #include <xo/facet/obj.hpp>
@@ -86,8 +86,9 @@ namespace xo {
          *  To look at but not consume a token T, can push a progress_xs instance P,
          *  then send T to P.
          **/
-        class DProgressSsm {
+        class DProgressSsm : public DSyntaxStateMachine<DProgressSsm> {
         public:
+            using Super = DSyntaxStateMachine<DProgressSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -119,6 +120,8 @@ namespace xo {
                                   parserstatemachine * p_psm) const;
 #endif
 
+            const char * ssm_classname() const noexcept { return "DProgressSsm"; }
+
             std::string_view get_expect_str() const noexcept;
 
             /** assemble expression from collected inputs.
@@ -129,12 +132,11 @@ namespace xo {
             /** @defgroup scm-progressssm-methods general methods **/
             ///@{
 
-            void on_if_token(const Token & tk,
-                             ParserStateMachine * p_psm);
-            void on_then_token(const Token & tk,
-                               ParserStateMachine * p_psm);
-            void on_else_token(const Token & tk,
-                               ParserStateMachine * p_psm);
+            /** token belongs to surrounding syntax,
+             *  -> lock in current progress
+             **/
+            void on_completing_token(const Token & tk,
+                                     ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-progressssm-ssm-facet syntaxstatemachine facet methods **/
@@ -148,8 +150,6 @@ namespace xo {
 
             void on_symbol_token(const Token & tk,
                                  ParserStateMachine * p_psm);
-            void on_def_token(const Token & tk,
-                              ParserStateMachine * p_psm);
             void on_colon_token(const Token & tk,
                                 ParserStateMachine * p_psm);
             void on_singleassign_token(const Token & tk,
@@ -166,17 +166,6 @@ namespace xo {
                                ParserStateMachine * p_psm);
             void on_semicolon_token(const Token & tk,
                                     ParserStateMachine * p_psm);
-            void on_parsed_symbol(std::string_view sym,
-                                  ParserStateMachine * p_psm);
-            void on_parsed_typedescr(TypeDescr td,
-                                     ParserStateMachine * p_psm);
-            void on_parsed_formal(const DUniqueString * param_name,
-                                  TypeDescr param_type,
-                                  ParserStateMachine * p_psm);
-            void on_parsed_formal_arglist(DArray * arglist,
-                                          ParserStateMachine * p_psm);
-            void on_parsed_expression(obj<AExpression>,
-                                      ParserStateMachine * p_psm);
             void on_parsed_expression_with_semicolon(obj<AExpression> expr,
                                                      ParserStateMachine * p_psm);
 
@@ -204,10 +193,6 @@ namespace xo {
                                              parserstatemachine * p_psm) override;
             void on_rightbrace_token(const token_type & tk,
                                              parserstatemachine * p_psm) override;
-            void on_then_token(const token_type & tk,
-                                       parserstatemachine * p_psm) override;
-            void on_else_token(const token_type & tk,
-                                       parserstatemachine * p_psm) override;
 
             /* entry point for an infix operator token */
             void on_operator_token(const token_type & tk,
