@@ -71,13 +71,17 @@ namespace xo {
             /** @defgroup scm-expectformalarglistssm-methods general methods **/
             ///@{
 
-            /** update state on incoming token @p tk, with overall parser state in @p psm **/
+            /** update state on incoming token @p tk, with overall parser state in @p p_psm **/
             void on_leftparen_token(const Token & tk,
                                     ParserStateMachine * p_psm);
 
-            /** update state on incoming token @p tk, with overall parser state in @p psm **/
+            /** update state on incoming token @p tk, with overall parser state in @p p_psm **/
             void on_comma_token(const Token & tk,
                                 ParserStateMachine * p_psm);
+
+            /** update state on incoming rightparen token @p tk, with overall parser state in @p p_psm **/
+            void on_rightparen_token(const Token & tk,
+                                     ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-expectformalarglistssm-ssm-facet syntaxstatemachine facet methods **/

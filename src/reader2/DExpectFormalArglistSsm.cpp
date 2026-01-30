@@ -126,6 +126,10 @@ namespace xo {
                 this->on_comma_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_rightparen:
+                this->on_rightparen_token(tk, p_psm);
+                return;
+
                 // all the not-yet-handled cases
             case tokentype::tk_lambda:
             case tokentype::tk_def:
@@ -139,7 +143,6 @@ namespace xo {
             case tokentype::tk_bool:
             case tokentype::tk_semicolon:
             case tokentype::tk_invalid:
-            case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
@@ -300,20 +303,22 @@ namespace xo {
                                           this->get_expect_str());
         }
 
-#ifdef NOT_YET
         void
-        expect_formal_arglist_xs::on_rightparen_token(const token_type & tk,
-                                                      parserstatemachine * p_psm)
+        DExpectFormalArglistSsm::on_rightparen_token(const Token & tk,
+                                                     ParserStateMachine * p_psm)
         {
-            if (farglxs_type_ == formalarglstatetype::argl_1b) {
-                std::unique_ptr<exprstate> self = p_psm->pop_exprstate();
+            if (fastate_ == formalarglstatetype::argl_1b) {
+                DArray * args = argl_;
 
-                p_psm->top_exprstate().on_formal_arglist(this->argl_, p_psm);
-            } else {
-                exprstate::on_rightparen_token(tk, p_psm);
+                p_psm->pop_ssm();
+                p_psm->on_parsed_formal_arglist(args);
+                return;
             }
+
+            p_psm->illegal_input_on_token("DExpectFormalArglistSsm::on_rightparen_token",
+                                          tk,
+                                          this->get_expect_str());
         }
-#endif
 
         bool
         DExpectFormalArglistSsm::pretty(const ppindentinfo & ppii) const

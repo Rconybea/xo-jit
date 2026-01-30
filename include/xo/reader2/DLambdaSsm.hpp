@@ -144,8 +144,6 @@ namespace xo {
 #ifdef NOT_YET
             virtual const char * get_expect_str() const override;
 
-            virtual void on_formal_arglist(const std::vector<rp<Variable>> & argl,
-                                           parserstatemachine * p_psm) override;
             virtual void on_leftbrace_token(const token_type & tk,
                                             parserstatemachine * p_psm) override;
             virtual void on_colon_token(const token_type & tk,
@@ -173,10 +171,10 @@ namespace xo {
             /** parsing state-machine state **/
             lambdastatetype lmstate_ = lambdastatetype::lm_0;
 
-#ifdef NOT_YET
             /** lambda environment (for formal parameters) **/
             DLocalSymtab * local_symtab_ = nullptr;
 
+#ifdef NOT_YET
             /** explicit return type (if supplied) **/
             TypeDescr explicit_return_td_ = nullptr;
 

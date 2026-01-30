@@ -70,7 +70,7 @@ namespace xo {
             std::size_t i_frame = 0;
 
             while (frame) {
-                char buf[80];
+                char buf[32];
                 snprintf(buf, sizeof(buf), "[%lu]", i_frame);
 
                 auto ssm = (FacetRegistry::instance().variant

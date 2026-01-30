@@ -9,6 +9,9 @@
 #include "ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp"
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
+#include <xo/expression2/DVariable.hpp>
+#include <xo/expression2/detail/IExpression_DVariable.hpp>
+//#include <xo/expression2/symtab/ISymbolTable_DLocalSymtab.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/arena/DArena.hpp>
@@ -28,6 +31,7 @@
 namespace xo {
     using xo::print::APrintable;
     using xo::mm::AAllocator;
+    using xo::mm::AGCObject;
     using xo::facet::FacetRegistry;
     using xo::reflect::typeseq;
 
@@ -353,6 +357,54 @@ namespace xo {
         DLambdaSsm::on_parsed_formal_arglist(DArray * arglist,
                                              ParserStateMachine * p_psm)
         {
+            if (lmstate_ == lambdastatetype::lm_1) {
+                this->lmstate_ = lambdastatetype::lm_2;
+                /// something with top env frame ?
+
+                /// TODO: arena-friendly non-gc-aware vector;
+                //        use instead of DArray for arglist.
+                //        something like DTypedArray<T>
+
+                /// create LocalSymtab from arglist
+
+                DLocalSymtab * symtab
+                    = DLocalSymtab::_make_empty(p_psm->expr_alloc(),
+                                                p_psm->local_symtab(),
+                                                arglist->size());
+                assert(symtab);
+
+                for (DArray::size_type i = 0, n = arglist->size(); i < n; ++i) {
+                    obj<AGCObject> param = arglist->at(i);
+
+                    // sad! runtime poly conversion from obj<AGCObject>
+                    // We on need this because of (suboptimally) using DArray to store arglist
+
+                    obj<AExpression> param_expr
+                        = FacetRegistry::instance().variant<AExpression,AGCObject>(param);
+                    obj<AExpression,DVariable> param_var
+                        = obj<AExpression,DVariable>::from(param_expr);
+
+                    assert(param_expr.data());
+                    assert(param_var.data());
+
+                    Binding b = symtab->append_var(p_psm->expr_alloc(),
+                                                   param_var.data()->name(),
+                                                   param_var.data()->typeref());
+
+                    assert(b.is_local());
+
+                    this->local_symtab_ = symtab;
+                }
+
+                // stash env frame: records local variables while we handle lambda body
+
+                p_psm->push_local_symtab(symtab);
+
+                // control reenters via .on_colon_token() / .on_leftbrace_token()
+
+                return;
+            }
+
             p_psm->illegal_parsed_formal_arglist("DLambdaSsm::on_parsed_formal_arglist",
                                                  arglist,
                                                  this->get_expect_str());

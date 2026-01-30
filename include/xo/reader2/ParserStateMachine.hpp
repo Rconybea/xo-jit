@@ -6,6 +6,8 @@
 #pragma once
 
 #include "ParserResult.hpp"
+#include <xo/expression2/DGlobalSymtab.hpp>
+#include <xo/expression2/DLocalSymtab.hpp>
 #include <xo/expression2/DVariable.hpp>
 #include <xo/expression2/StringTable.hpp>
 #include <xo/tokenizer2/Token.hpp>
@@ -47,6 +49,7 @@ namespace xo {
             bool debug_flag() const noexcept { return debug_flag_; }
             ParserStack * stack() const noexcept { return stack_; }
             obj<AAllocator> expr_alloc() const noexcept { return expr_alloc_; }
+            DLocalSymtab * local_symtab() const noexcept { return local_symtab_; }
             const ParserResult & result() const noexcept { return result_; }
 
             /** true iff state machine is currently idle (at top-level) **/
@@ -78,6 +81,15 @@ namespace xo {
             /** get unique string copy of @p str. Idempotent for each @p str.
              **/
             const DUniqueString * intern_string(std::string_view str);
+
+            /** push nested local symtab while parsing the body of a lambda expression;
+             *  restore previous symtab at the end of lambda-expression definition.
+             *  See @ref pop_local_symtab
+             **/
+            void push_local_symtab(DLocalSymtab * symtab);
+
+            /** pop nested symbol table from symbol-table stack **/
+            void pop_local_symtab();
 
             /** add variable to current local environment (innermost lexical scope) **/
             void upsert_var(DVariable * var);
@@ -219,8 +231,10 @@ namespace xo {
              *  after encountering a parsing error.
              **/
             DArena::Checkpoint parser_alloc_ckp_;
-
-            /** parser stack. Memory from @ref parser_alloc_ **/
+            /** parser stack. Memory always from @ref parser_alloc_;
+             *  elements that should survive parsing allocate from
+             *  @ref expr_alloc_, see below.
+             **/
             ParserStack * stack_ = nullptr;
 
             /** Allocator for parsed expressions.
@@ -238,6 +252,19 @@ namespace xo {
              *  once compiled.
              **/
             obj<AAllocator> expr_alloc_;
+
+            /** symbol table with local bindings.
+             *  non-null during parsing of lambda expressions.
+             *  Always allocated from @p expr_alloc_.
+             *  Push local symbol table here to remember local params
+             *  during the body of a lambda expression.
+             **/
+            DLocalSymtab * local_symtab_ = nullptr;
+
+            /** global symbol table.
+             *  Toplevel definitions go here.
+             **/
+            DGlobalSymtab * global_symtab_ = nullptr;
 
             /** current output from parser **/
             ParserResult result_;

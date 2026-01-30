@@ -327,11 +327,10 @@ namespace xo {
                 REQUIRE(result.is_incomplete());
             }
 
-#ifdef NOT_YET
             {
-                auto & result = parser.on_token(Token::else_token());
+                auto & result = parser.on_token(Token::rightparen_token());
 
-                log && log("after else token:");
+                log && log("after rightparen token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
@@ -340,6 +339,7 @@ namespace xo {
                 REQUIRE(result.is_incomplete());
             }
 
+#ifdef NOT_YET
             {
                 auto & result = parser.on_token(Token::string_token("fooey"));
 

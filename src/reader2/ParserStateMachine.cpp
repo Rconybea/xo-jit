@@ -89,6 +89,20 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::push_local_symtab(DLocalSymtab * symtab)
+        {
+            this->local_symtab_ = symtab;
+        }
+
+        void
+        ParserStateMachine::pop_local_symtab()
+        {
+            assert(local_symtab_);
+
+            this->local_symtab_ = local_symtab_->parent();
+        }
+
+        void
         ParserStateMachine::upsert_var(DVariable * var)
         {
             scope log(XO_DEBUG(true), "stub impl");
@@ -310,6 +324,12 @@ namespace xo {
                                        xtag("expecting", expect_str),
                                        xtag("ssm", ssm_name),
                                        xtag("via", "ParserStateMachine::illegal_parsed_formal_arglist"));
+
+            assert(expr_alloc_);
+
+            auto errmsg = DString::from_str(expr_alloc_, errmsg_string);
+
+            this->capture_error(ssm_name, errmsg);
         }
 
         void
