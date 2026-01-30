@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include "ParserStateMachine.hpp"
-//#include "SyntaxStateMachine.hpp"
+#include "DSyntaxStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/indentlog/print/ppindentinfo.hpp>
 #include <xo/facet/obj.hpp>
@@ -19,8 +18,9 @@ namespace xo {
          *  For example:
          *  -  lhs in a define-expression
          **/
-        class DExpectSymbolSsm {
+        class DExpectSymbolSsm : public DSyntaxStateMachine<DExpectSymbolSsm> {
         public:
+            using Super = DSyntaxStateMachine<DExpectSymbolSsm>;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -46,6 +46,8 @@ namespace xo {
             static void on_symbol_token(const Token & tk,
                                         ParserStateMachine * p_psm);
 
+            const char * ssm_classname() const noexcept { return "DExpectSymbolSsm"; }
+
             /** @defgroup scm-expectsymbol-ssm-facet syntaxstatemachine facet methods **/
             ///@{
 
@@ -57,113 +59,11 @@ namespace xo {
              **/
             std::string_view get_expect_str() const noexcept;
 
-            /** update state for this syntax after parsing a symbol @p sym;
-             *  overall parser state in @p p_psm.
-             *
-             *  NOTE:
-             *  might not be obvious that this is unreachable.
-             *  DExpectSymbolSsm converts a symbol token,
-             *  and delivers it to parent ssm using this entry point.
-             *  This method would only be called if consecutive
-             *  DExpectSymbolSsm instances on parser stack;
-             *  which scenario never occurs in Schematika syntax
-             **/
-            void on_parsed_symbol(std::string_view sym,
-                                  ParserStateMachine * p_psm);
-
-            /** update state for this syntax after parsing a type-description @p td
-             *  in nested state machine.
-             *  (provided to satisfy ASyntaxStateMachine api. not reachable)
-             **/
-            void on_parsed_typedescr(TypeDescr td,
-                                     ParserStateMachine * p_psm);
-
-            /** update state to consume param (name, value) emitted
-             *  by nested ssm
-             **/
-            void on_parsed_formal(const DUniqueString * param_name,
-                                  TypeDescr param_type,
-                                  ParserStateMachine * p_psm);
-
-            /** consume formal params @p arglist from completed nested ssm,
-             *  with overall parser state in @p p_psm.
-             **/
-            void on_parsed_formal_arglist(DArray * arglist,
-                                          ParserStateMachine * p_psm);
-
-            /** update state for this syntax after parsing an expression @p expr
-             *  in nested state machine.
-             *  (provided to satisfy ASyntaxStateMachine api. not reachable)
-             **/
-            void on_parsed_expression(obj<AExpression> expr,
-                                      ParserStateMachine * p_psm);
-
-            /** update state for this syntax after parsing an expression @p expr
-             *  followed by semicolon in nested state machine.
-             *  (provided to satisfy ASyntaxStateMachine api. not reachable)
-             **/
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                     ParserStateMachine * p_psm);
-
             /** operate state machine for this syntax on incoming token @p tk
              *  with overall parser state in @p p_psm
              **/
             void on_token(const Token & tk,
                           ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming token @p tk,
-             *  overall parser state in @p p_psm.
-             **/
-            void on_def_token(const Token & tk,
-                              ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_if_token(const Token & tk,
-                             ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming colon token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_colon_token(const Token & tk,
-                                ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming singleassign token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_singleassign_token(const Token & tk,
-                                       ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming string token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_string_token(const Token & tk,
-                                 ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming f64 token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_f64_token(const Token & tk,
-                              ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming i64 token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_i64_token(const Token & tk,
-                              ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming bool token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_bool_token(const Token & tk,
-                               ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming semicolon token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_semicolon_token(const Token & tk,
-                                    ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-expectsymbol-printable-facet printable facet methods **/

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "SyntaxStateMachine.hpp"
+#include "ParserStateMachine.hpp"
 #include <xo/object2/DArray.hpp>
 
 namespace xo {

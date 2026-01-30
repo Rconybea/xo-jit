@@ -56,62 +56,6 @@ namespace xo {
         }
 
         void
-        DExpectSymbolSsm::on_parsed_symbol(std::string_view sym,
-                                           ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_symbol("DExpectSymbolSsm::on_parsed_symbol",
-                                           sym,
-                                           this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_parsed_typedescr(TypeDescr td,
-                                              ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_typedescr("DExpectSymbolSsm::on_parsed_typedescr",
-                                              td,
-                                              this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_parsed_formal(const DUniqueString * param_name,
-                                           TypeDescr param_type,
-                                           ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal("DExpectSymbolSsm::on_parsed_formal",
-                                         param_name,
-                                         param_type,
-                                         this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_parsed_formal_arglist(DArray * arglist,
-                                                   ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal_arglist("DExpectSymbolSsm::on_parsed_formal_arglist",
-                                                 arglist,
-                                                 this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_parsed_expression(obj<AExpression> expr,
-                                               ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_expression("DExpectSymbolSsm::on_parsed_expression",
-                                             expr,
-                                             this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                              ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_expression("DExpectSymbolSsm::on_parsed_expression_with_semicolon",
-                                             expr,
-                                             this->get_expect_str());
-        }
-
-        void
         DExpectSymbolSsm::on_token(const Token & tk,
                                    ParserStateMachine * p_psm)
         {
@@ -120,46 +64,19 @@ namespace xo {
             switch (tk.tk_type()) {
             case tokentype::tk_symbol:
                 this->on_symbol_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_def:
-                this->on_def_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_if:
-                this->on_if_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_colon:
-                this->on_colon_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_singleassign:
-                this->on_singleassign_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_string:
-                this->on_string_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_f64:
-                this->on_f64_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_i64:
-                this->on_i64_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_bool:
-                this->on_bool_token(tk, p_psm);
-                break;
-
-            case tokentype::tk_semicolon:
-                this->on_semicolon_token(tk, p_psm);
-                break;
+                return;
 
             // all the not-yet handled cases
             case tokentype::tk_invalid:
+            case tokentype::tk_string:
+            case tokentype::tk_f64:
+            case tokentype::tk_i64:
+            case tokentype::tk_bool:
+            case tokentype::tk_def:
+            case tokentype::tk_if:
+            case tokentype::tk_singleassign:
+            case tokentype::tk_colon:
+            case tokentype::tk_semicolon:
             case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
@@ -189,12 +106,10 @@ namespace xo {
             case tokentype::tk_in:
             case tokentype::tk_end:
             case tokentype::N:
-                p_psm->illegal_input_on_token("DExpectSymbolSsm::on_token",
-                                              tk,
-                                              this->get_expect_str());
                 break;
             }
 
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -214,89 +129,7 @@ namespace xo {
              * the o.g. symbol-requester
              */
             p_psm->pop_ssm();
-
             p_psm->on_parsed_symbol(std::string_view(tk.text()));
-        }
-
-        void
-        DExpectSymbolSsm::on_def_token(const Token & tk,
-                                       ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_def_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_if_token(const Token & tk,
-                                      ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_if_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_colon_token(const Token & tk,
-                                         ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_colon_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_singleassign_token(const Token & tk,
-                                                ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_singleassign_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_string_token(const Token & tk,
-                                          ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_string_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_f64_token(const Token & tk,
-                                       ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_f64_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_i64_token(const Token & tk,
-                                       ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_i64_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_bool_token(const Token & tk,
-                                        ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_bool_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectSymbolSsm::on_semicolon_token(const Token & tk,
-                                             ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DExpectSymbolSsm::on_semicolon_token",
-                                          tk,
-                                          this->get_expect_str());
         }
 
         bool
