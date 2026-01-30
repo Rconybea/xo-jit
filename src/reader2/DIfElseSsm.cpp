@@ -189,20 +189,8 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DIfElseSsm::on_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
-
-#ifdef NOT_YET
-        // ----- if_else_xs -----
-
-        if_else_xs::if_else_xs(rp<IfExprAccess> if_expr)
-            : exprstate(exprstatetype::ifexpr),
-              ifxs_type_{ifexprstatetype::if_0},
-              if_expr_{std::move(if_expr)}
-        {}
-#endif
 
         void
         DIfElseSsm::on_if_token(const Token & tk,
@@ -219,9 +207,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DIfElseSsm::on_if_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -239,33 +225,8 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DIfElseSsm::on_then_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
-
-#ifdef NOT_YET
-        void
-        if_else_xs::on_else_token(const token_type & tk,
-                                  parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            log && log("ifxs_type", ifxs_type_);
-
-            if (this->ifxs_type_ == ifexprstatetype::if_4) {
-                this->ifxs_type_ = ifexprstatetype::if_5;
-
-                expect_expr_xs::start(p_psm);
-                return;
-            }
-
-            constexpr const char * c_self_name = "if_else_xs::on_else_token";
-            const char * exp = this->get_expect_str();
-
-            this->illegal_input_on_token(c_self_name, tk, exp, p_psm);
-        }
-#endif
 
         void
         DIfElseSsm::on_else_token(const Token & tk,
@@ -282,9 +243,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DIfElseSsm::on_else_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
 #ifdef NOT_YET
@@ -325,37 +284,6 @@ namespace xo {
             p_psm->on_rightbrace_token(tk);
         }
 
-        void
-        if_else_xs::on_semicolon_token(const token_type & tk,
-                                       parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            log && log("ifxs_type", ifxs_type_);
-
-            const char * c_self_name = "if_else_xs::on_semicolon_token";
-
-            switch (this->ifxs_type_) {
-            case ifexprstatetype::invalid:
-            case ifexprstatetype::if_0:
-            case ifexprstatetype::n_ifexprstatetype:
-                // unreachable
-                assert(false);
-                break;
-
-            case ifexprstatetype::if_1:
-            case ifexprstatetype::if_2:
-            case ifexprstatetype::if_3:
-            case ifexprstatetype::if_5:
-                this->illegal_input_on_token(c_self_name, tk, get_expect_str(), p_psm);
-                break;
-            case ifexprstatetype::if_4:
-            case ifexprstatetype::if_6: {
-                this->finish_and_continue(p_psm);
-                break;
-            }
-            }
-        }
 #endif
 
         void
@@ -385,18 +313,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DIfElseSsm::on_semicolon_token",
-                                          tk, this->get_expect_str());
-
-        }
-
-        void
-        DIfElseSsm::on_parsed_formal_arglist(DArray * arglist,
-                                             ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal_arglist("DIfElseSsm::on_parsed_formal_arglist",
-                                                 arglist,
-                                                 this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
 #ifdef NOT_YET
@@ -485,9 +402,7 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_parsed_expression("DIfElseSsm::on_parsed_expression",
-                                             expr,
-                                             this->get_expect_str());
+            Super::on_parsed_expression(expr, p_psm);
         }
 
         void
@@ -498,35 +413,6 @@ namespace xo {
 
             this->on_parsed_expression(expr, p_psm);
             this->on_semicolon_token(Token::semicolon_token(), p_psm);
-        }
-
-        void
-        DIfElseSsm::on_parsed_symbol(std::string_view sym,
-                                     ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_symbol("DIfElseSsm::on_parsed_symbol",
-                                           sym,
-                                           this->get_expect_str());
-        }
-
-        void
-        DIfElseSsm::on_parsed_typedescr(TypeDescr td,
-                                        ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_typedescr("DIfElseSsm::on_parsed_typedescr",
-                                              td,
-                                              this->get_expect_str());
-        }
-
-        void
-        DIfElseSsm::on_parsed_formal(const DUniqueString * param_name,
-                                     TypeDescr param_type,
-                                     ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal("DIfElseSsm::on_parsed_formal",
-                                         param_name,
-                                         param_type,
-                                         this->get_expect_str());
         }
 
         bool

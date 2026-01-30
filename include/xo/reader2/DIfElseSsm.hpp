@@ -5,14 +5,12 @@
 
 #pragma once
 
+#include "DSyntaxStateMachine.hpp"
 #include <xo/expression2/DIfElseExpr.hpp>
-#include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/detail/IExpression_DIfElseExpr.hpp>
 #include <xo/expression2/DIfElseExpr.hpp>
 #include <xo/facet/obj.hpp>
-//#include "exprstate.hpp"
-//#include "xo/indentlog/print/ppdetail_atomic.hpp"
 
 namespace xo {
     namespace scm {
@@ -54,8 +52,9 @@ namespace xo {
         /** @class DIfElseSsm
          *  @brief syntax state machine for parsing a conditional expression
          **/
-        class DIfElseSsm {
+        class DIfElseSsm : public DSyntaxStateMachine<DIfElseExpr> {
         public:
+            using Super = DSyntaxStateMachine<DIfElseExpr>;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
@@ -89,6 +88,9 @@ namespace xo {
             static void start(DArena & parser_mm,
                               obj<AAllocator> expr_mm,
                               ParserStateMachine * p_psm);
+
+            const char * ssm_classname() const noexcept { return "DIfElseSsm"; }
+
             ///@}
             /** @defgroup scm-ifelsessm-expression-methods general methods **/
             ///@{
@@ -140,6 +142,7 @@ namespace xo {
             void on_semicolon_token(const Token & tk,
                                     ParserStateMachine * p_psm);
 
+#ifdef OBSOLETE
             /** update state for this syntax after parsing a symbol @p sym,
              *  with overall parser state in @p p_psm
              **/
@@ -158,12 +161,7 @@ namespace xo {
             void on_parsed_formal(const DUniqueString * param_name,
                                   TypeDescr param_type,
                                   ParserStateMachine * p_psm);
-
-            /** consume formal params @p arglist from completed nested ssm,
-             *  with overall parser state in @p p_psm.
-             **/
-            void on_parsed_formal_arglist(DArray * arglist,
-                                          ParserStateMachine * p_psm);
+#endif
 
             /** update state for this syntax after parsing an expression @p expr,
              *  overall parser state in @p p_psm.
