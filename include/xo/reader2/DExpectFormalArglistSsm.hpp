@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "SyntaxStateMachine.hpp"
+#include "DSyntaxStateMachine.hpp"
 #include <xo/object2/DArray.hpp>
 #include <xo/arena/DArena.hpp>
 
@@ -52,8 +52,9 @@ namespace xo {
         /** @class expect_formal_arglist
          *  @brief parser state-machine for a formal parameter list
          **/
-        class DExpectFormalArglistSsm {
+        class DExpectFormalArglistSsm : public DSyntaxStateMachine<DExpectFormalArglistSsm> {
         public:
+            using Super = DSyntaxStateMachine<DExpectFormalArglistSsm>;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -70,6 +71,8 @@ namespace xo {
 
             /** @defgroup scm-expectformalarglistssm-methods general methods **/
             ///@{
+
+            const char * ssm_classname() const noexcept { return "DExpectFormalArglistSsm"; }
 
             /** update state on incoming token @p tk, with overall parser state in @p p_psm **/
             void on_leftparen_token(const Token & tk,
@@ -99,49 +102,12 @@ namespace xo {
             void on_token(const Token & tk,
                           ParserStateMachine * p_psm);
 
-            /** update state on parsed symbol @p sym emitted by nested ssm,
-             *  with overall parser state in @p p_psm
-             **/
-            void on_parsed_symbol(std::string_view sym,
-                                  ParserStateMachine * p_psm);
-
-            /** update state on parsed typedescr @p td emitted by nested ssm,
-             *  with overall parser state in @p p_psm
-             **/
-            void on_parsed_typedescr(TypeDescr td,
-                                     ParserStateMachine * p_psm);
-
             /** update state to consume parsed param (name,type) emitted by
              *  nested ssm, with overall parser state in @p p_psm
              **/
             void on_parsed_formal(const DUniqueString * param_name,
                                   TypeDescr param_type,
                                   ParserStateMachine * p_psm);
-
-            /** consume formal params @p arglist from completed nested ssm,
-             *  with overall parser state in @p p_psm.
-             **/
-            void on_parsed_formal_arglist(DArray * arglist,
-                                          ParserStateMachine * p_psm);
-
-            /** update state on parsed expression emitted by nested ssm
-             *  with overall parser state in @p p_psm
-             **/
-            void on_parsed_expression(obj<AExpression> expr,
-                                      ParserStateMachine * p_psm);
-
-            /** update state on parsed expression, along with following semicolon,
-             *  emitted by nested ssm with overall parser state in @p p_psm
-             **/
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                     ParserStateMachine * p_psm);
-
-#ifdef NOT_YET
-            virtual void on_comma_token(const token_type & tk,
-                                        parserstatemachine * p_psm) override;
-            virtual void on_rightparen_token(const token_type & tk,
-                                             parserstatemachine * p_psm) override;
-#endif
 
             ///@}
             /** @defgroup scm-expectformalarglistssm-printable-facet printable facet methods **/

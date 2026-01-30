@@ -171,27 +171,7 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DExpectFormalArglistSsm::on_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DExpectFormalArglistSsm::on_parsed_symbol(std::string_view sym,
-                                                  ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_symbol("DExpectFormalArglistSsm::on_parsed_symbol",
-                                           sym,
-                                           this->get_expect_str());
-        }
-
-        void
-        DExpectFormalArglistSsm::on_parsed_typedescr(TypeDescr td,
-                                                     ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_typedescr("DExpectFormalArglistSsm::on_parsed_typedescr",
-                                              td,
-                                              this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -238,37 +218,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_parsed_formal("DExpectFormalArglistSsm::on_parsed_formal",
-                                         param_name,
-                                         param_type,
-                                         this->get_expect_str());
-        }
-
-        void
-        DExpectFormalArglistSsm::on_parsed_formal_arglist(DArray * arglist,
-                                                          ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal_arglist("DExpectFormalArglistSsm::on_parsed_formal_arglist",
-                                                 arglist,
-                                                 this->get_expect_str());
-        }
-
-        void
-        DExpectFormalArglistSsm::on_parsed_expression(obj<AExpression> expr,
-                                                     ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_expression("DExpectFormalArglistSsm::on_parsed_expression",
-                                               expr,
-                                               this->get_expect_str());
-        }
-
-        void
-        DExpectFormalArglistSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                                     ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_expression("DExpectFormalArglistSsm::on_parsed_expression_with_semicolon",
-                                             expr,
-                                             this->get_expect_str());
+            Super::on_parsed_formal(param_name, param_type, p_psm);
         }
 
         void
@@ -282,9 +232,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DExpectFormalArglistSsm::on_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -298,9 +246,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DExpectFormalArglistSsm::on_comma_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -315,9 +261,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DExpectFormalArglistSsm::on_rightparen_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         bool
