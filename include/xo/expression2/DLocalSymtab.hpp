@@ -45,20 +45,23 @@ namespace xo {
             /** @defgroup scm-lambdaexpr-constructors **/
             ///@{
 
-            /** empty instance with capacity for n slots.
+            /** empty instance with parent @p p and capacity for @p n slots.
              *  Caller must ensure that slots_[0..n) are actually addressable
              **/
-            DLocalSymtab(size_type n);
+            DLocalSymtab(DLocalSymtab * p, size_type n);
 
             /** scaffold empty symtab instance,
              *  with capacity for @p n slots, using memory from allocator @p mm
              **/
-            static DLocalSymtab * _make_empty(obj<AAllocator> mm, size_type n);
+            static DLocalSymtab * _make_empty(obj<AAllocator> mm,
+                                              DLocalSymtab * p,
+                                              size_type n);
 
             ///@}
             /** @defgroup scm-lambdaexpr-methods **/
             ///@{
 
+            DLocalSymtab * parent() const noexcept { return parent_; }
             size_type capacity() const noexcept { return capacity_; }
             size_type size() const noexcept { return size_; }
 
@@ -96,6 +99,8 @@ namespace xo {
             ///@}
 
         private:
+            /** parent symbol table from scoping surrounding this one **/
+            DLocalSymtab * parent_ = nullptr;
             /** actual range of slots_[] array.  Can use inices in [0,..,n) **/
             size_type capacity_ = 0;
             /** number of slots in use **/

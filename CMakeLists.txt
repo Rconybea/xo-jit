@@ -34,6 +34,30 @@ xo_add_genfacet(
 
 # ----------------------------------------------------------------
 
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-symboltable-localsymtab
+    FACET_PKG xo_expression2
+    FACET SymbolTable
+    REPR LocalSymtab
+    INPUT idl/ISymbolTable_DLocalSymtab.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR symtab
+    OUTPUT_CPP_DIR src/expression2
+)
+
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-printable-localsymtab
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR LocalSymtab
+    INPUT idl/IPrintable_DLocalSymtab.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR symtab
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# ----------------------------------------------------------------
+
 # note: manual target; generated code committed to git
 xo_add_genfacet(
     TARGET xo-expression2-facet-expression

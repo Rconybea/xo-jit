@@ -1,0 +1,12 @@
+{
+    mode: "implementation",
+    includes: [ ],
+    local_types: [ ],
+    namespace1: "xo",
+    namespace2: "scm",
+    facet_idl: "idl/SymbolTable.json5",
+    brief: "provide ASymbolTable interface for DLocalSymtab",
+    using_doxygen: true,
+    repr: "DLocalSymtab",
+    doc: [ "implement ASymbolTable for DLocalSymtab" ],
+}

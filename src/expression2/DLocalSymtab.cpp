@@ -5,14 +5,21 @@
 
 #include "DLocalSymtab.hpp"
 #include "DUniqueString.hpp"
+#include <xo/expression2/detail/IPrintable_DVariable.hpp>
+#include <xo/printable2/Printable.hpp>
 #include <xo/indentlog/scope.hpp>
 
 namespace xo {
+    using xo::print::APrintable;
     using xo::facet::typeseq;
+    using xo::print::ppstate;
 
     namespace scm {
 
-        DLocalSymtab::DLocalSymtab(size_type n) : capacity_{n}, size_{0}
+        DLocalSymtab::DLocalSymtab(DLocalSymtab * p,
+                                   size_type n) : parent_{p},
+                                                  capacity_{n},
+                                                  size_{0}
         {
             for (size_type i = 0; i < n; ++i) {
                 void * mem = &slots_[i];
@@ -21,12 +28,14 @@ namespace xo {
         }
 
         DLocalSymtab *
-        DLocalSymtab::_make_empty(obj<AAllocator> mm, size_type n)
+        DLocalSymtab::_make_empty(obj<AAllocator> mm,
+                                  DLocalSymtab * p,
+                                  size_type n)
         {
             void * mem = mm.alloc(typeseq::id<DLocalSymtab>(),
                                   sizeof(DLocalSymtab) + (n * sizeof(Slot)));
 
-            return new (mem) DLocalSymtab(n);
+            return new (mem) DLocalSymtab(p, n);
         }
 
         Binding
@@ -68,6 +77,53 @@ namespace xo {
             return Binding();
         }
 
+        bool
+        DLocalSymtab::pretty(const ppindentinfo & ppii) const
+        {
+            ppstate * pps = ppii.pps();
+
+            if (ppii.upto()) {
+                /* perhaps print on one line */
+                if (!pps->print_upto("<LocalSymtab"))
+                    return false;
+                if (!pps->print_upto(xrefrtag("size", size_)))
+                    return false;
+
+                for (size_type i = 0; i < size_; ++i) {
+                    char buf[32];
+                    snprintf(buf, sizeof(buf), "[%u]", i);
+
+                    assert(slots_[i].var_);
+
+                    obj<APrintable,DVariable> arg_pr(const_cast<DVariable*>(slots_[i].var_));
+
+                    if (!pps->print_upto(xrefrtag(buf, arg_pr)))
+                        return false;
+                }
+
+                pps->write(">");
+                return true;
+            } else {
+                /* with line breaks */
+
+                pps->write("<LocalSymtab");
+                pps->newline_pretty_tag(ppii.ci1(), "size", size_);
+
+                for (size_type i = 0; i < size_; ++i) {
+                    char buf[32];
+                    snprintf(buf, sizeof(buf), "[%u]", i);
+
+                    assert(slots_[i].var_);
+
+                    obj<APrintable,DVariable> arg_pr(const_cast<DVariable *>(slots_[i].var_));
+
+                    pps->newline_pretty_tag(ppii.ci1(), buf, arg_pr);
+                }
+
+                pps->write(">");
+                return false;
+            }
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

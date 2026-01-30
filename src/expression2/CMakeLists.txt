@@ -39,6 +39,9 @@ set(SELF_SRCS
 
     ISymbolTable_Any.cpp
 
+    ISymbolTable_DLocalSymtab.cpp
+    IPrintable_DLocalSymtab.cpp
+
     StringTable.cpp
 
     DUniqueString.cpp
