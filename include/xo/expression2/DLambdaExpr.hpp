@@ -47,6 +47,14 @@ namespace xo {
                                        const DUniqueString * name,
                                        DLocalSymtab * local_symtab,
                                        obj<AExpression> body);
+
+            /** create type description for lambda with arguments described by @p symtab
+             *  and return type @p return_td.
+             *  Load-bearing for DLambdaSsm in xo-reader2/
+             **/
+            static TypeDescr assemble_lambda_td(DLocalSymtab * symtab,
+                                                TypeDescr return_td);
+
             ///@}
             /** @defgroup scm-lambdaexpr-methods **/
             ///@{

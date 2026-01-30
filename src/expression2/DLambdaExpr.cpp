@@ -14,6 +14,8 @@ namespace xo {
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
     using xo::reflect::TypeDescr;
+    using xo::reflect::TypeDescrBase;
+    using xo::reflect::FunctionTdxInfo;
     using xo::reflect::typeseq;
 
     namespace scm {
@@ -80,6 +82,33 @@ namespace xo {
                                          name,
                                          local_symtab,
                                          body);
+        }
+
+        TypeDescr
+        DLambdaExpr::assemble_lambda_td(DLocalSymtab * symtab,
+                                        TypeDescr return_td)
+        {
+            assert(return_td);
+
+            std::vector<TypeDescr> arg_td_v;
+            {
+                DLocalSymtab::size_type z = symtab->size();
+
+                arg_td_v.reserve(z);
+
+                for (DLocalSymtab::size_type i = 0; i < z; ++i) {
+                    auto param = symtab->lookup_var(Binding::local(i));
+
+                    assert(param);
+                    arg_td_v.push_back(param->valuetype());
+                }
+            }
+
+            auto function_tdx = FunctionTdxInfo(return_td, arg_td_v, false /*!is_noexcept*/);
+
+            TypeDescr lambda_td = TypeDescrBase::require_by_fn_info(function_tdx);
+
+            return lambda_td;
         }
 
         exprtype
