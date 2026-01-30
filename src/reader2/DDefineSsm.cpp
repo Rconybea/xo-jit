@@ -506,10 +506,6 @@ namespace xo {
                 this->on_def_token(tk, p_psm);
                 return;
 
-            case tokentype::tk_if:
-                this->on_if_token(tk, p_psm);
-                return;
-
             case tokentype::tk_colon:
                 this->on_colon_token(tk, p_psm);
                 return;
@@ -518,28 +514,17 @@ namespace xo {
                 this->on_singleassign_token(tk, p_psm);
                 return;
 
-            case tokentype::tk_string:
-                this->on_string_token(tk, p_psm);
-                return;
-
-            case tokentype::tk_f64:
-                this->on_f64_token(tk, p_psm);
-                return;
-
-            case tokentype::tk_i64:
-                this->on_i64_token(tk, p_psm);
-                return;
-
-            case tokentype::tk_bool:
-                this->on_bool_token(tk, p_psm);
-                return;
-
             case tokentype::tk_semicolon:
                 this->on_semicolon_token(tk, p_psm);
                 return;
 
             // all the not-yet handled cases
             case tokentype::tk_invalid:
+            case tokentype::tk_string:
+            case tokentype::tk_f64:
+            case tokentype::tk_i64:
+            case tokentype::tk_bool:
+            case tokentype::tk_if:
             case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
@@ -569,11 +554,11 @@ namespace xo {
             case tokentype::tk_in:
             case tokentype::tk_end:
             case tokentype::N:
-                p_psm->illegal_input_on_token("DDefineSsm::on_token",
-                                              tk,
-                                              this->get_expect_str());
+                break;
                 return;
             }
+
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -585,9 +570,7 @@ namespace xo {
             // symbol token arriving here means encountered symbol while
             // in some other, which can't happen for valid Schematika input
 
-            p_psm->illegal_input_on_token("DDefineSssm::on_symbol_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -601,18 +584,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DDefineSsm::on_define_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DDefineSsm::on_if_token(const Token & tk,
-                                ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DDefineSsm::on_if_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -627,9 +599,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DDefineSsm::on_colon_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -647,45 +617,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DDefineSsm::on_singleassign_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DDefineSsm::on_string_token(const Token & tk,
-                                    ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DDefineSsm::on_string_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DDefineSsm::on_f64_token(const Token & tk,
-                                 ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DDefineSsm::on_f64_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DDefineSsm::on_i64_token(const Token & tk,
-                                 ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DDefineSsm::on_i64_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DDefineSsm::on_bool_token(const Token & tk,
-                                  ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_token("DDefineSsm::on_bool_token",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -698,29 +630,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_token("DDefineSsm::on_semicolon_token",
-                                          tk,
-                                          this->get_expect_str());
-        }
-
-        void
-        DDefineSsm::on_parsed_formal(const DUniqueString * param_name,
-                                     TypeDescr param_type,
-                                     ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal("DDefineSsm::on_parsed_formal",
-                                         param_name,
-                                         param_type,
-                                         this->get_expect_str());
-        }
-
-        void
-        DDefineSsm::on_parsed_formal_arglist(DArray * arglist,
-                                             ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal_arglist("DDefineSsm::on_parsed_formal_arglist",
-                                                 arglist,
-                                                 this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -735,9 +645,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_parsed_expression("DDefineSsm::on_parsed_expression",
-                                             expr,
-                                             this->get_expect_str());
+            Super::on_parsed_expression(expr, p_psm);
         }
 
         void

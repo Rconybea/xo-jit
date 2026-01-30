@@ -5,12 +5,13 @@
 
 #pragma once
 
-#include "ParserStateMachine.hpp"
+#include "DSyntaxStateMachine.hpp"
 //#include "SyntaxStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/detail/IExpression_DDefineExpr.hpp>
 #include <xo/expression2/DDefineExpr.hpp>
 #include <xo/facet/obj.hpp>
+#include <string_view>
 
 namespace xo {
     namespace scm {
@@ -69,8 +70,9 @@ namespace xo {
         /** @class DDefineSsm
          *  @brief state machine for parsing a define expression
          **/
-        class DDefineSsm {
+        class DDefineSsm : public DSyntaxStateMachine<DDefineSsm> {
         public:
+            using Super = DSyntaxStateMachine<DDefineSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
@@ -101,6 +103,8 @@ namespace xo {
             ///@}
             /** @defgroup scm-definessm-access-methods **/
             ///@{
+
+            const char * ssm_classname() const noexcept { return "DDefineSsm"; }
 
             /** identify this nested state machine **/
             defexprstatetype defstate() const noexcept { return defstate_; }
@@ -135,12 +139,6 @@ namespace xo {
             void on_def_token(const Token & tk,
                               ParserStateMachine * p_psm);
 
-            /** update state for this syntax on incoming token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_if_token(const Token & tk,
-                             ParserStateMachine * p_psm);
-
             /** update state for this syntax on incoming colon token @p tk,
              *  overall parser state in @p p_psm
              **/
@@ -152,30 +150,6 @@ namespace xo {
              **/
             void on_singleassign_token(const Token & tk,
                                        ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming string tokne @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_string_token(const Token & tk,
-                                 ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming f64 token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_f64_token(const Token & tk,
-                              ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming i64 token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_i64_token(const Token & tk,
-                              ParserStateMachine * p_psm);
-
-            /** update state for this syntax on incoming bool token @p tk,
-             *  overall parser state in @p p_psm
-             **/
-            void on_bool_token(const Token & tk,
-                               ParserStateMachine * p_psm);
 
             /** update state for this syntax on incoming semicolon token @p tk,
              *  overall parser state in @p p_psm
@@ -195,6 +169,7 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
+#ifdef OBSOLETE
             /** update state for this ssm to consume param (name,value)
              *  emitted by nested @p_psm
              **/
@@ -207,6 +182,7 @@ namespace xo {
              **/
             void on_parsed_formal_arglist(DArray * arglist,
                                           ParserStateMachine * p_psm);
+#endif
 
             /** update state for this syntax after parsing an expression @p expr,
              *  overall parser state in @p p_psm
