@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "SyntaxStateMachine.hpp"
+#include "DSyntaxStateMachine.hpp"
 #include <xo/expression2/DLambdaExpr.hpp>
 #include <xo/expression2/SymbolTable.hpp>
 //#include <xo/expression2/DLocalSymtab.hpp>
@@ -55,9 +55,9 @@ namespace xo {
         /** @class DLambdaSsm
          *  @brief parsing state-machine for a lambda-expression
          **/
-        class DLambdaSsm {
+        class DLambdaSsm : public DSyntaxStateMachine<DLambdaSsm> {
         public:
-            //using DSymbolTable = xo::scm::DSymbolTable;
+            using Super = DSyntaxStateMachine<DLambdaSsm>;
             using DLocalSymtab = xo::scm::DLocalSymtab;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
@@ -79,6 +79,8 @@ namespace xo {
             ///@}
             /** @defgroup scm-lambdassm-methods **/
             ///@{
+
+            const char * ssm_classname() const noexcept { return "DLambdaSsm"; }
 
             static void start(ParserStateMachine * p_psm);
 
@@ -110,11 +112,13 @@ namespace xo {
             void on_token(const Token & tk,
                           ParserStateMachine * p_psm);
 
+#ifdef OBSOLETE
             /** update this ssm when nested parser
              *  emits @p td.
              **/
             void on_parsed_symbol(std::string_view sym,
                                   ParserStateMachine * p_psm);
+#endif
 
             /** update this ssm when nested parser
              *  emits @p td.
@@ -122,12 +126,14 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
+#ifdef OBSOLETE
             /** update this ssm to consume parsed formal (name,value)
              *  from nested (and now expired) ssm
              **/
             void on_parsed_formal(const DUniqueString * sym,
                                   TypeDescr td,
                                   ParserStateMachine * p_psm);
+#endif
 
             /** consume formal params @p arglist from completed nested ssm,
              *  with overall parser state in @p p_psm.

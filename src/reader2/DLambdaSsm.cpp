@@ -177,9 +177,12 @@ namespace xo {
                 break;
             }
 
+            Super::on_token(tk, p_psm);
+#ifdef OBSOLETE
             p_psm->illegal_input_on_token("DLambdaSsm::on_token",
                                           tk,
                                           this->get_expect_str());
+#endif
         }
 
         void
@@ -194,9 +197,12 @@ namespace xo {
                 return;
             }
 
+            Super::on_token(tk, p_psm);
+#ifdef OBSOLETE
             p_psm->illegal_input_on_token("DLambdaSsm::on_lambda_token",
                                           tk,
                                           this->get_expect_str());
+#endif
         }
 
         void
@@ -212,9 +218,12 @@ namespace xo {
                 return;
             }
 
+            Super::on_token(tk, p_psm);
+#ifdef OBSOLETE
             p_psm->illegal_input_on_token("DLambdaSsm::on_yields_token",
                                           tk,
                                           this->get_expect_str());
+#endif
         }
 
 
@@ -231,9 +240,7 @@ namespace xo {
                 return;
             }
 
-            p_psm->illegal_input_on_typedescr("DLambdaSsm::on_parsed_typedescr",
-                                              td,
-                                              this->get_expect_str());
+            Super::on_parsed_typedescr(td, p_psm);
         }
 
 #ifdef NOT_YET
@@ -263,26 +270,6 @@ namespace xo {
             }
         }
 #endif
-
-        void
-        DLambdaSsm::on_parsed_symbol(std::string_view sym,
-                                     ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_input_on_symbol("DLambdaSsm::on_parsed_sybol",
-                                           sym,
-                                           this->get_expect_str());
-        }
-
-        void
-        DLambdaSsm::on_parsed_formal(const DUniqueString * param_name,
-                                     TypeDescr param_type,
-                                     ParserStateMachine * p_psm)
-        {
-            p_psm->illegal_parsed_formal("DLambdaSsm::on_parsed_formal",
-                                         param_name,
-                                         param_type,
-                                         this->get_expect_str());
-        }
 
         void
         DLambdaSsm::on_parsed_formal_arglist(DArray * arglist,
@@ -337,28 +324,26 @@ namespace xo {
                 return;
             }
 
+            Super::on_parsed_formal_arglist(arglist, p_psm);
+#ifdef OBSOLETE
             p_psm->illegal_parsed_formal_arglist("DLambdaSsm::on_parsed_formal_arglist",
                                                  arglist,
                                                  this->get_expect_str());
+#endif
         }
 
         void
         DLambdaSsm::on_parsed_expression(obj<AExpression> expr,
                                          ParserStateMachine * p_psm)
         {
-            p_psm->illegal_parsed_expression("DLambdaSsm::on_parsed_expression",
-                                             expr,
-                                             this->get_expect_str());
+            Super::on_parsed_expression(expr, p_psm);
         }
 
         void
         DLambdaSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
                                                         ParserStateMachine * p_psm)
         {
-            p_psm->illegal_parsed_expression
-                ("DLambdaSsm::on_parsed_expression_with_semicolon",
-                 expr,
-                 this->get_expect_str());
+            Super::on_parsed_expression_with_semicolon(expr, p_psm);
         }
 
 #ifdef NOT_YET
