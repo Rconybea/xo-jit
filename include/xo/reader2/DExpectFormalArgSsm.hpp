@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "SyntaxStateMachine.hpp"
+#include "DSyntaxStateMachine.hpp"
 //#include <xo/arena/DArena.hpp>
 //#include "exprstate.hpp"
 
@@ -44,8 +44,9 @@ namespace xo {
         /** @class expect_formal_xs
          *  @brief parser state-machine for a typed formal parameter
          **/
-        class DExpectFormalArgSsm {
+        class DExpectFormalArgSsm : public DSyntaxStateMachine<DExpectFormalArgSsm> {
         public:
+            using Super = DSyntaxStateMachine<DExpectFormalArgSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -69,6 +70,8 @@ namespace xo {
 
             /** @defgroup scm-expectformalargssm-methods general methods **/
             ///@{
+
+            const char * ssm_classname() const noexcept { return "DExpectFormalArgSsm"; }
 
             /** update state on incoming colon token @p tk;
              *  with overall parser state in @p p_psm
@@ -104,32 +107,6 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
-            /** consume parsed formal (name,type) = (@p sym, @p td) from nested ssm
-             *  with overall parser state in @p p_psm.
-             *  (In practice not reachable)
-             **/
-            void on_parsed_formal(const DUniqueString * sym,
-                                  TypeDescr td,
-                                  ParserStateMachine * p_psm);
-
-            /** consume formal params @p arglist from completed nested ssm,
-             *  with overall parser state in @p p_psm.
-             **/
-            void on_parsed_formal_arglist(DArray * arglist,
-                                          ParserStateMachine * p_psm);
-
-            /** update state on parsed expression emitted by nested ssm
-             *  with overall parser state in @p p_psm
-             **/
-            void on_parsed_expression(obj<AExpression> expr,
-                                      ParserStateMachine * p_psm);
-
-            /** update state on parsed expression, along with following semicolon,
-             *  emitted by nested ssm with overall parser state in @p p_psm
-             **/
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                     ParserStateMachine * p_psm);
-
             ///@}
             /** @defgroup scm-expectformalargssm-printable-facet printable facet methods **/
             ///@{
@@ -139,24 +116,10 @@ namespace xo {
 
             ///@}
 
-#ifdef NOT_YET
-
-            virtual void on_symbol(const std::string & symbol_name,
-                                   parserstatemachine * p_psm) override;
-
-            // virtual void on_comma_token(...) override;
-
 #ifdef PROBABLY_NOT
             virtual void on_rightparen_token(const token_type & tk,
                                              exprstatestack * p_stack,
                                              rp<Expression> * p_emit_expr) override;
-#endif
-
-            virtual void on_typedescr(TypeDescr td,
-                                      parserstatemachine * p_psm) override;
-
-        private:
-            static std::unique_ptr<expect_formal_xs> make();
 #endif
 
         private:
