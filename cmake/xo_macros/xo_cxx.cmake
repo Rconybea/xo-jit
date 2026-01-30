@@ -670,7 +670,7 @@ macro(xo_toplevel_compile_options)
     )
 
     if(NOT DEFINED CMAKE_CXX_STANDARD)
-        set(CMAKE_CXX_STANDARD 20)
+        set(CMAKE_CXX_STANDARD 23)
     endif()
     if(NOT DEFINED CMAKE_CXX_STANDARD_REQUIRED)
         set(CMAKE_CXX_STANDARD_REQUIRED True)
