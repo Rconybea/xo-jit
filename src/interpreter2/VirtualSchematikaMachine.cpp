@@ -60,6 +60,9 @@ namespace xo {
             case exprtype::ifexpr:
                 _do_eval_if_else_op();
                 break;
+            case exprtype::sequence:
+                _do_eval_sequence_op();
+                break;
             }
         }
 
@@ -103,6 +106,13 @@ namespace xo {
 
         void
         VirtualSchematikaMachine::_do_eval_if_else_op()
+        {
+            // not implemented
+            assert(false);
+        }
+
+        void
+        VirtualSchematikaMachine::_do_eval_sequence_op()
         {
             // not implemented
             assert(false);

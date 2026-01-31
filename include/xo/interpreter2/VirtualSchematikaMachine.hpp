@@ -75,6 +75,12 @@ namespace xo {
              **/
             void _do_eval_if_else_op();
 
+            /** evaluate a sequence expression
+             *  Require:
+             * - expression in @ref expr_
+             **/
+            void _do_eval_sequence_op();
+
         private:
             /*
              * Some registers are preserved by evaluation:
