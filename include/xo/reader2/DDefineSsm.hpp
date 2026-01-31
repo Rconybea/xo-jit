@@ -104,7 +104,7 @@ namespace xo {
             /** @defgroup scm-definessm-access-methods **/
             ///@{
 
-            const char * ssm_classname() const noexcept { return "DDefineSsm"; }
+            static const char * ssm_classname() { return "DDefineSsm"; }
 
             /** identify this nested state machine **/
             defexprstatetype defstate() const noexcept { return defstate_; }

@@ -72,7 +72,7 @@ namespace xo {
             /** @defgroup scm-expectformalarglistssm-methods general methods **/
             ///@{
 
-            const char * ssm_classname() const noexcept { return "DExpectFormalArglistSsm"; }
+            static const char * ssm_classname() { return "DExpectFormalArglistSsm"; }
 
             /** update state on incoming token @p tk, with overall parser state in @p p_psm **/
             void on_leftparen_token(const Token & tk,

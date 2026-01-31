@@ -261,10 +261,12 @@ namespace xo {
              **/
             DLocalSymtab * local_symtab_ = nullptr;
 
+#ifdef NOT_YET
             /** global symbol table.
              *  Toplevel definitions go here.
              **/
             DGlobalSymtab * global_symtab_ = nullptr;
+#endif
 
             /** current output from parser **/
             ParserResult result_;

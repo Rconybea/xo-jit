@@ -54,7 +54,7 @@ namespace xo {
                                         ParserStateMachine * p_psm);
 
         public:
-            const char * ssm_classname() const noexcept { return "DExprSeqState"; }
+            static const char * ssm_classname() { return "DExprSeqState"; }
 
             /** @defgroup scm-exprseq-ssm-facet syntaxstatemachine facet methods **/
             ///@{

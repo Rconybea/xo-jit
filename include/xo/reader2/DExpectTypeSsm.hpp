@@ -35,7 +35,7 @@ namespace xo {
 
             static void start(ParserStateMachine * p_psm);
 
-            const char * ssm_classname() const noexcept { return "DExpectTypeSsm"; }
+            static const char * ssm_classname() { return "DExpectTypeSsm"; }
 
             /** @defgroup scm-expecttype-ssm-facet syntaxstatemachine facet methods **/
             ///@{

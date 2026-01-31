@@ -46,7 +46,7 @@ namespace xo {
             static void on_symbol_token(const Token & tk,
                                         ParserStateMachine * p_psm);
 
-            const char * ssm_classname() const noexcept { return "DExpectSymbolSsm"; }
+            static const char * ssm_classname() { return "DExpectSymbolSsm"; }
 
             /** @defgroup scm-expectsymbol-ssm-facet syntaxstatemachine facet methods **/
             ///@{

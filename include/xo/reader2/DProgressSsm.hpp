@@ -120,7 +120,7 @@ namespace xo {
                                   parserstatemachine * p_psm) const;
 #endif
 
-            const char * ssm_classname() const noexcept { return "DProgressSsm"; }
+            static const char * ssm_classname() { return "DProgressSsm"; }
 
             std::string_view get_expect_str() const noexcept;
 

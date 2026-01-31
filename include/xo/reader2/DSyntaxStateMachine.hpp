@@ -33,43 +33,51 @@ namespace xo {
 
             /** Default implementation for required SyntaxStateMachine facet method
              **/
-            void on_token(this auto&& self,
-                          const Token & tk,
+            void on_token(const Token & tk,
                           ParserStateMachine * p_psm)
             {
-                p_psm->illegal_input_on_token(self.ssm_classname(),
+                // starting with c++23 can use "this auto&& self" instead
+                Derived & self = reinterpret_cast<Derived&>(*this);
+
+                p_psm->illegal_input_on_token(Derived::ssm_classname(),
                                               tk,
                                               self.get_expect_str());
             }
 
-            void on_parsed_symbol(this auto&& self,
-                                  std::string_view sym,
+            void on_parsed_symbol(std::string_view sym,
                                   ParserStateMachine * p_psm)
             {
-                p_psm->illegal_input_on_symbol(self.ssm_classname(),
+                // starting with c++23 can use "this auto&& self" instead
+                Derived & self = reinterpret_cast<Derived&>(*this);
+
+                p_psm->illegal_input_on_symbol(Derived::ssm_classname(),
                                                sym,
                                                self.get_expect_str());
             }
 
             /** Default implementation for required SyntaxStateMachine facet method
              **/
-            void on_parsed_typedescr(this auto&& self,
-                                     TypeDescr td,
+            void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm)
             {
-                p_psm->illegal_input_on_typedescr(self.ssm_classname(),
+                // starting with c++23 can use "this auto&& self" instead
+                Derived & self = reinterpret_cast<Derived&>(*this);
+
+                p_psm->illegal_input_on_typedescr(Derived::ssm_classname(),
                                                   td,
                                                   self.get_expect_str());
             }
 
             /** Default implementation for required SyntaxStateMachine facet method
              **/
-            void on_parsed_formal(this auto&& self,
-                                  const DUniqueString * param_name,
+            void on_parsed_formal(const DUniqueString * param_name,
                                   TypeDescr param_type,
                                   ParserStateMachine * p_psm)
             {
-                p_psm->illegal_parsed_formal(self.ssm_classname(),
+                // starting with c++23 can use "this auto&& self" instead
+                Derived & self = reinterpret_cast<Derived&>(*this);
+
+                p_psm->illegal_parsed_formal(Derived::ssm_classname(),
                                              param_name,
                                              param_type,
                                              self.get_expect_str());
@@ -79,22 +87,26 @@ namespace xo {
              *
              *  arglist is DArray of obj<AGCObejct,DVariable>
              **/
-            void on_parsed_formal_arglist(this auto&& self,
-                                          DArray * arglist,
+            void on_parsed_formal_arglist(DArray * arglist,
                                           ParserStateMachine * p_psm)
             {
-                p_psm->illegal_parsed_formal_arglist(self.ssm_classname(),
+                // starting with c++23 can use "this auto&& self" instead
+                Derived & self = static_cast<Derived&>(*this);
+
+                p_psm->illegal_parsed_formal_arglist(Derived::ssm_classname(),
                                                      arglist,
                                                      self.get_expect_str());
             }
 
             /** Default implementation for required SyntaxStateMachine facet method
              **/
-            void on_parsed_expression(this auto&& self,
-                                      obj<AExpression> expr,
+            void on_parsed_expression(obj<AExpression> expr,
                                       ParserStateMachine * p_psm)
             {
-                p_psm->illegal_parsed_expression(self.ssm_classname(),
+                // starting with c++23 can use "this auto&& self" instead
+                Derived & self = static_cast<Derived&>(*this);
+
+                p_psm->illegal_parsed_expression(Derived::ssm_classname(),
                                                  expr,
                                                  self.get_expect_str());
 
@@ -102,15 +114,17 @@ namespace xo {
 
             /** Default implementation for required SyntaxStateMachine facet method
              **/
-            void on_parsed_expression_with_semicolon(this auto&& self,
-                                                     obj<AExpression> expr,
+            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
                                                      ParserStateMachine * p_psm)
             {
+                // starting with c++23 can use "this auto&& self" instead
+                Derived & self = static_cast<Derived&>(*this);
+
                 // We don't need a separate entry point,
                 // since the semicolon isn't relevant to problem with syntax
                 //
 
-                p_psm->illegal_parsed_expression(self.ssm_classname(),
+                p_psm->illegal_parsed_expression(Derived::ssm_classname(),
                                                  expr,
                                                  self.get_expect_str());
 

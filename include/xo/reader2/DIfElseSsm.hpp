@@ -52,7 +52,7 @@ namespace xo {
         /** @class DIfElseSsm
          *  @brief syntax state machine for parsing a conditional expression
          **/
-        class DIfElseSsm : public DSyntaxStateMachine<DIfElseExpr> {
+        class DIfElseSsm : public DSyntaxStateMachine<DIfElseSsm> {
         public:
             using Super = DSyntaxStateMachine<DIfElseExpr>;
             using AAllocator = xo::mm::AAllocator;
@@ -89,7 +89,9 @@ namespace xo {
                               obj<AAllocator> expr_mm,
                               ParserStateMachine * p_psm);
 
-            const char * ssm_classname() const noexcept { return "DIfElseSsm"; }
+            static const char * ssm_classname() { return "DIfElseSsm"; }
+
+            DSyntaxStateMachine<DIfElseSsm> * super() { return this; }
 
             ///@}
             /** @defgroup scm-ifelsessm-expression-methods general methods **/
@@ -141,27 +143,6 @@ namespace xo {
              **/
             void on_semicolon_token(const Token & tk,
                                     ParserStateMachine * p_psm);
-
-#ifdef OBSOLETE
-            /** update state for this syntax after parsing a symbol @p sym,
-             *  with overall parser state in @p p_psm
-             **/
-            void on_parsed_symbol(std::string_view sym,
-                                  ParserStateMachine * p_psm);
-
-            /** update state for this syntax after parsing a type description @p td;
-             *  overall parser state in @p p_psm
-             **/
-            void on_parsed_typedescr(TypeDescr td,
-                                     ParserStateMachine * p_psm);
-
-            /** update state to consume formal param (name,value)
-             *  from nested ssm
-             **/
-            void on_parsed_formal(const DUniqueString * param_name,
-                                  TypeDescr param_type,
-                                  ParserStateMachine * p_psm);
-#endif
 
             /** update state for this syntax after parsing an expression @p expr,
              *  overall parser state in @p p_psm.

@@ -38,7 +38,7 @@ namespace xo {
             /** @defgroup scm-expectexpr-access-methods access methods **/
             ///@{
 
-            const char * ssm_classname() const noexcept { return "DExpectExprSsm"; }
+            static const char * ssm_classname() { return "DExpectExprSsm"; }
             bool allow_defs() const noexcept { return allow_defs_; }
             bool cxl_on_rightbrace() const noexcept { return cxl_on_rightbrace_; }
 

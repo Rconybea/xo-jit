@@ -189,7 +189,7 @@ namespace xo {
                 break;
             }
 
-            Super::on_token(tk, p_psm);
+            DSyntaxStateMachine<DIfElseSsm>::on_token(tk, p_psm);
         }
 
         void
@@ -207,7 +207,7 @@ namespace xo {
                 return;
             }
 
-            Super::on_token(tk, p_psm);
+            DSyntaxStateMachine<DIfElseSsm>::on_token(tk, p_psm);
         }
 
         void
@@ -225,7 +225,7 @@ namespace xo {
                 return;
             }
 
-            Super::on_token(tk, p_psm);
+            DSyntaxStateMachine<DIfElseSsm>::on_token(tk, p_psm);
         }
 
         void
@@ -243,7 +243,7 @@ namespace xo {
                 return;
             }
 
-            Super::on_token(tk, p_psm);
+            DSyntaxStateMachine<DIfElseSsm>::on_token(tk, p_psm);
         }
 
 #ifdef NOT_YET
@@ -313,7 +313,7 @@ namespace xo {
                 return;
             }
 
-            Super::on_token(tk, p_psm);
+            DSyntaxStateMachine<DIfElseSsm>::on_token(tk, p_psm);
         }
 
 #ifdef NOT_YET
@@ -402,7 +402,7 @@ namespace xo {
                 break;
             }
 
-            Super::on_parsed_expression(expr, p_psm);
+            DSyntaxStateMachine<DIfElseSsm>::on_parsed_expression(expr, p_psm);
         }
 
         void

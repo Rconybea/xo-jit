@@ -71,7 +71,7 @@ namespace xo {
             /** @defgroup scm-expectformalargssm-methods general methods **/
             ///@{
 
-            const char * ssm_classname() const noexcept { return "DExpectFormalArgSsm"; }
+            static const char * ssm_classname() { return "DExpectFormalArgSsm"; }
 
             /** update state on incoming colon token @p tk;
              *  with overall parser state in @p p_psm

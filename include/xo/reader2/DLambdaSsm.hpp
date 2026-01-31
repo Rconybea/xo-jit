@@ -80,7 +80,7 @@ namespace xo {
             /** @defgroup scm-lambdassm-methods **/
             ///@{
 
-            const char * ssm_classname() const noexcept { return "DLambdaSsm"; }
+            static const char * ssm_classname() { return "DLambdaSsm"; }
 
             static void start(ParserStateMachine * p_psm);
 
