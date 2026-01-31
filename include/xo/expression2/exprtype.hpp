@@ -40,10 +40,10 @@ namespace xo {
             variable,
             /** if-then-else **/
             ifexpr,
-#ifdef NOT_YET
             /** sequence **/
             sequence,
-            /** type conversion **/
+#ifdef NOT_YET
+            )            /** type conversion **/
             convert,
 #endif
 
