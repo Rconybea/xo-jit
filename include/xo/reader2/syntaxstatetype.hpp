@@ -18,6 +18,21 @@ namespace xo {
         enum class syntaxstatetype {
             invalid = -1,
 
+            /** handle define-expression. See @ref DDefineSsm **/
+            defexpr,
+
+            /** handle lambda-expression. See @ref DLambdaSsm **/
+            lambdaexpr,
+
+            /** handle ifelse-expression. See @ref DIfElseSsm **/
+            ifelseexpr,
+
+            /** handle sequence-expression. See @ref DSequenceSsm **/
+            sequence,
+
+            /** rhs expression.  state exists to achieve 1-token lookahead **/
+            progress,
+
             /** toplevel of some translation unit. See @ref DExprSeqState **/
             expect_toplevel_expression_sequence,
 
@@ -35,18 +50,6 @@ namespace xo {
 
             /** expecting a rhs expression. See @ref DExpectExprSsm **/
             expect_rhs_expression,
-
-            /** handle define-expression. See @ref DDefineSsm **/
-            defexpr,
-
-            /** handle lambda-expression. See @ref DLambdaSsm **/
-            lambdaexpr,
-
-            /** handle ifelse-expression. See @ref DIfElseSsm **/
-            ifelseexpr,
-
-            /** rhs expression.  state exists to achieve 1-token lookahead **/
-            progress,
 
             /** comes lasts, counts number of valid enums **/
             N

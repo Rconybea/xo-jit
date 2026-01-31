@@ -46,6 +46,12 @@ namespace xo {
             /** @defgroup scm-expectexpr-methods general methods **/
             ///@{
 
+            /** update state for this syntax on incoming leftbrace token @p tk,
+             *  with overall parser state in @p p_psm
+             **/
+            void on_leftbrace_token(const Token & tk,
+                                    ParserStateMachine * p_psm);
+
             /** step state machine for this syntax on incoming boolean literal token @p tkk
              *  with overall parser state in @p p_psm
              **/

@@ -13,6 +13,16 @@ namespace xo {
             switch (x) {
             case syntaxstatetype::invalid:
                 break;
+            case syntaxstatetype::defexpr:
+                return "defexpr";
+            case syntaxstatetype::lambdaexpr:
+                return "lambdaexpr";
+            case syntaxstatetype::ifelseexpr:
+                return "ifelseexpr";
+            case syntaxstatetype::sequence:
+                return "sequence";
+            case syntaxstatetype::progress:
+                return "progress";
             case syntaxstatetype::expect_toplevel_expression_sequence:
                 return "expect-toplevel-expression-sequence";
             case syntaxstatetype::expect_formal_arglist:
@@ -25,14 +35,6 @@ namespace xo {
                 return "expect-type";
             case syntaxstatetype::expect_rhs_expression:
                 return "expect-rhs-expression";
-            case syntaxstatetype::defexpr:
-                return "defexpr";
-            case syntaxstatetype::lambdaexpr:
-                return "lambdaexpr";
-            case syntaxstatetype::ifelseexpr:
-                return "ifelseexpr";
-            case syntaxstatetype::progress:
-                return "progress";
             case syntaxstatetype::N:
                 break;
             }

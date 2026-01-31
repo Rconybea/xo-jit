@@ -17,6 +17,8 @@
 #include <xo/reader2/ssm/ISyntaxStateMachine_DIfElseSsm.hpp>
 #include <xo/reader2/ssm/IPrintable_DIfElseSsm.hpp>
 
+#include <xo/reader2/ssm/IPrintable_DSequenceSsm.hpp>
+
 #include <xo/reader2/ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp>
 #include <xo/reader2/ssm/IPrintable_DExpectFormalArglistSsm.hpp>
 
@@ -62,6 +64,8 @@ namespace xo {
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DIfElseSsm>();
             FacetRegistry::register_impl<APrintable, DIfElseSsm>();
+
+            FacetRegistry::register_impl<APrintable, DSequenceSsm>();
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectFormalArglistSsm>();
             FacetRegistry::register_impl<APrintable, DExpectFormalArglistSsm>();

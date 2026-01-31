@@ -1,4 +1,4 @@
-/** @file lambda_xs.cpp
+/** @file DLambdaSsm.cpp
  *
  *  @author Roland Conybeare, Jan 2026
  **/

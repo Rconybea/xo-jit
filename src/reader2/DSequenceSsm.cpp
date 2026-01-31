@@ -1,6 +1,8 @@
 /* @file DSequenceSsm.cpp */
 
 #include "DSequenceSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DSequenceSsm.hpp"
+#include "DExpectExprSsm.hpp"
 
 #ifdef NOT_YET
 #include "expect_expr_xs.hpp"
@@ -11,31 +13,67 @@
 #endif
 
 namespace xo {
-    using xo::scm::DefineExpr;
+#ifdef NOT_YET
+    using xo::scm::DDefineExpr;
+#endif
+    using xo::facet::typeseq;
 
     namespace scm {
-#ifdef NOT_YET
-        std::unique_ptr<sequence_xs>
-        sequence_xs::make() {
-            return std::make_unique<sequence_xs>(sequence_xs());
-        }
-#endif
-
         void
-        sequence_xs::start(parserstatemachine * p_psm) {
-            p_psm->push_exprstate(sequence_xs::make());
+        DSequenceSsm::start(ParserStateMachine * p_psm)
+        {
+            p_psm->push_ssm(DSequenceSsm::make(p_psm->parser_alloc(),
+                                               p_psm->expr_alloc()));
             /* want to accept anything that starts an expression,
-             * except that } ends it
+             * except that rightbrace '}' ends it
              */
-            expect_expr_xs::start(true /*allow_defs*/,
+            DExpectExprSsm::start(p_psm->parser_alloc(),
+                                  true /*allow_defs*/,
                                   true /*cxl_on_rightbrace*/,
                                   p_psm);
         }
 
+        obj<ASyntaxStateMachine,DSequenceSsm>
+        DSequenceSsm::make(DArena & mm,
+                           obj<AAllocator> expr_mm)
+        {
+            return obj<ASyntaxStateMachine,DSequenceSsm>(_make(mm, expr_mm));
+        }
+
+        DSequenceSsm *
+        DSequenceSsm::_make(DArena & mm,
+                            obj<AAllocator> expr_mm)
+        {
+            void * mem = mm.alloc(typeseq::id<DSequenceSsm>(),
+                                  sizeof(DSequenceSsm));
+
+            DSequenceExpr * seq_expr = DSequenceExpr::_make_empty(expr_mm);
+
+            return new (mem) DSequenceSsm(seq_expr);
+        }
+
+        DSequenceSsm::DSequenceSsm(DSequenceExpr * seq_expr) : seq_expr_{seq_expr}
+        {}
+
+#ifdef NOT_YET
         sequence_xs::sequence_xs()
             : exprstate(exprstatetype::sequenceexpr)
         {}
+#endif
 
+        syntaxstatetype
+        DSequenceSsm::ssm_type() const noexcept
+        {
+            return syntaxstatetype::sequence;
+        }
+
+        std::string_view
+        DSequenceSsm::get_expect_str() const noexcept
+        {
+            return "expr|semicolon|rightbrace";
+        }
+
+#ifdef NOT_YET
         void
         sequence_xs::on_expr(bp<Expression> expr,
                              parserstatemachine * p_psm)
@@ -122,12 +160,16 @@ namespace xo {
         sequence_xs::print(std::ostream & os) const {
             os << "<sequence_xs" << xtag("expr_v.size", expr_v_.size()) << ">";
         }
+#endif
 
         bool
-        sequence_xs::pretty_print(const xo::print::ppindentinfo & ppii) const
+        DSequenceSsm::pretty(const xo::print::ppindentinfo & ppii) const
         {
-            return ppii.pps()->pretty_struct(ppii, "sequence_xs",
-                                             xrefrtag("expr_v.size", expr_v_.size()));
+            return ppii.pps()->pretty_struct
+                       (ppii,
+                        "SequenceSsm",
+                        xrefrtag("seq_expr.size", seq_expr_->size()),
+                        xrefrtag("expect", this->get_expect_str()));
         }
 
     } /*namespace scm*/

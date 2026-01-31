@@ -363,7 +363,6 @@ namespace xo {
                 REQUIRE(result.is_incomplete());
             }
 
-#ifdef NOT_YET
             {
                 auto & result = parser.on_token(Token::leftbrace_token());
 
@@ -376,6 +375,7 @@ namespace xo {
                 REQUIRE(result.is_incomplete());
             }
 
+#ifdef NOT_YET
             {
                 auto & result = parser.on_token(Token::string_token("fooey"));
 

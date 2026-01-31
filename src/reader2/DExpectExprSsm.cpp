@@ -8,6 +8,7 @@
 #include "SyntaxStateMachine.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectExprSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DProgressSsm.hpp"
+#include "DSequenceSsm.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/DConstant.hpp>
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
@@ -114,6 +115,10 @@ namespace xo {
             scope log(XO_DEBUG(p_psm->debug_flag()), xtag("tk", tk));
 
             switch (tk.tk_type()) {
+            case tokentype::tk_leftbrace:
+                this->on_leftbrace_token(tk, p_psm);
+                return;
+
             case tokentype::tk_symbol:
                 this->on_symbol_token(tk, p_psm);
                 return;
@@ -148,7 +153,6 @@ namespace xo {
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
-            case tokentype::tk_leftbrace:
             case tokentype::tk_rightbrace:
             case tokentype::tk_leftangle:
             case tokentype::tk_rightangle:
@@ -177,6 +181,15 @@ namespace xo {
             }
 
             Super::on_token(tk, p_psm);
+        }
+
+        void
+        DExpectExprSsm::on_leftbrace_token(const Token & tk,
+                                           ParserStateMachine * p_psm)
+        {
+            (void)tk;
+
+            DSequenceSsm::start(p_psm);
         }
 
         void
@@ -377,7 +390,8 @@ namespace xo {
                 (ppii,
                  "DExpectExprSsm",
                  refrtag("allow_defs", allow_defs_),
-                 refrtag("cxl_on_rightbrace", cxl_on_rightbrace_)
+                 refrtag("cxl_on_rightbrace", cxl_on_rightbrace_),
+                 refrtag("expect", this->get_expect_str())
                     );
         }
 
@@ -410,16 +424,6 @@ namespace xo {
 
             /* push lparen_0 to remember to look for subsequent rightparen. */
             paren_xs::start(p_psm);
-        }
-
-        void
-        expect_expr_xs::on_leftbrace_token(const token_type & /*tk*/,
-                                           parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            /* push lparen_0 to remember to look for subsequent rightparen. */
-            sequence_xs::start(p_psm);
         }
 
         void

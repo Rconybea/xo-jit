@@ -29,6 +29,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DIfElseSsm.cpp
     IPrintable_DIfElseSsm.cpp
 
+    DSequenceSsm.cpp
+    ISyntaxStateMachine_DSequenceSsm.cpp
+    IPrintable_DSequenceSsm.cpp
+
     DLambdaSsm.cpp
     ISyntaxStateMachine_DLambdaSsm.cpp
     IPrintable_DLambdaSsm.cpp

@@ -166,27 +166,8 @@ namespace xo {
             ///@}
 
 #ifdef NOT_YET
-            // ----- inherited from exprstate -----
-
-            virtual const char * get_expect_str() const override;
-
-            virtual void on_if_token(const token_type & tk,
-                                     parserstatemachine * p_psm) override;
-            virtual void on_then_token(const token_type & tk,
-                                       parserstatemachine * p_psm) override;
-            virtual void on_else_token(const token_type & tk,
-                                       parserstatemachine * p_psm) override;
-            virtual void on_semicolon_token(const token_type & tk,
-                                            parserstatemachine * p_psm) override;
             virtual void on_rightbrace_token(const token_type & tk,
                                              parserstatemachine * p_psm) override;
-
-            virtual void on_expr(bp<Expression> expr,
-                                 parserstatemachine * p_psm) override;
-            virtual void on_expr_with_semicolon(bp<Expression> expr,
-                                                parserstatemachine * p_psm) override;
-
-            virtual void print(std::ostream & os) const override;
 #endif
 
         private:
@@ -203,6 +184,8 @@ namespace xo {
             ifexprstatetype ifstate_ = ifexprstatetype::invalid;
             /** scaffold ifelse-expression here.
              *  This will eventually be the output of this ssm
+             *
+             *  TODO: can use DIfElseExpr* here.  See xo-object2//DList
              **/
             obj<AExpression,DIfElseExpr> if_expr_;
 
