@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "Expression.hpp"
 #include "TypeRef.hpp"
 #include <xo/object2/DArray.hpp>
 
@@ -21,6 +22,8 @@ namespace xo {
          **/
         class DSequenceExpr {
         public:
+            using AAllocator = xo::mm::AAllocator;
+            using TypeDescr = xo::reflect::TypeDescr;
             using size_type = DArray::size_type;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -37,8 +40,11 @@ namespace xo {
             size_type size() const noexcept;
             obj<AExpression> operator[](std::size_t i) const;
 
-            /** append @p expr to the end of this sequence **/
-            void push_back(obj<AExpression> expr);
+            /** append @p expr to the end of this sequence;
+             *  use memory from @p mm if need to expand storage
+             **/
+            void push_back(obj<AAllocator> mm,
+                           obj<AExpression> expr);
 
             // get_free_variables();
             // visit_preorder();

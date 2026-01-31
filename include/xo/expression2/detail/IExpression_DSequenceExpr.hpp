@@ -1,62 +1,62 @@
-/** @file IExpression_DIfElseExpr.hpp
+/** @file IExpression_DSequenceExpr.hpp
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
  *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
  *     arguments:
- *       --input [idl/IExpression_DIfElseExpr.json5]
+ *       --input [idl/IExpression_DSequenceExpr.json5]
  *  2. jinja2 template for abstract facet .hpp file:
  *       [iface_facet_repr.hpp.j2]
  *  3. idl for facet methods
- *       [idl/IExpression_DIfElseExpr.json5]
+ *       [idl/IExpression_DSequenceExpr.json5]
  **/
 
 #pragma once
 
 #include "Expression.hpp"
 #include "Expression.hpp"
-#include "DIfElseExpr.hpp"
+#include "DSequenceExpr.hpp"
 
-namespace xo { namespace scm { class IExpression_DIfElseExpr; } }
+namespace xo { namespace scm { class IExpression_DSequenceExpr; } }
 
 namespace xo {
     namespace facet {
         template <>
         struct FacetImplementation<xo::scm::AExpression,
-                                   xo::scm::DIfElseExpr>
+                                   xo::scm::DSequenceExpr>
         {
             using ImplType = xo::scm::IExpression_Xfer
-              <xo::scm::DIfElseExpr,
-               xo::scm::IExpression_DIfElseExpr>;
+              <xo::scm::DSequenceExpr,
+               xo::scm::IExpression_DSequenceExpr>;
         };
     }
 }
 
 namespace xo {
     namespace scm {
-        /** @class IExpression_DIfElseExpr
+        /** @class IExpression_DSequenceExpr
          **/
-        class IExpression_DIfElseExpr {
+        class IExpression_DSequenceExpr {
         public:
-            /** @defgroup scm-expression-difelseexpr-type-traits **/
+            /** @defgroup scm-expression-dsequenceexpr-type-traits **/
             ///@{
             using TypeDescr = xo::scm::AExpression::TypeDescr;
             using Copaque = xo::scm::AExpression::Copaque;
             using Opaque = xo::scm::AExpression::Opaque;
             ///@}
-            /** @defgroup scm-expression-difelseexpr-methods **/
+            /** @defgroup scm-expression-dsequenceexpr-methods **/
             ///@{
             // const methods
             /** expression type (constant | apply | ..) **/
-            static exprtype extype(const DIfElseExpr & self) noexcept;
+            static exprtype extype(const DSequenceExpr & self) noexcept;
             /** placeholder for type giving possible values for this expression **/
-            static TypeRef typeref(const DIfElseExpr & self) noexcept;
+            static TypeRef typeref(const DSequenceExpr & self) noexcept;
             /** type giving possible values for this expression. Maybe null before typecheck **/
-            static TypeDescr valuetype(const DIfElseExpr & self) noexcept;
+            static TypeDescr valuetype(const DSequenceExpr & self) noexcept;
 
             // non-const methods
             /** assing to valuetype member. Useful when scaffolding expressions **/
-            static void assign_valuetype(DIfElseExpr & self, TypeDescr td) noexcept;
+            static void assign_valuetype(DSequenceExpr & self, TypeDescr td) noexcept;
             ///@}
         };
 

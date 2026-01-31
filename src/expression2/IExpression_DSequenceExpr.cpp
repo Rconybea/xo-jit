@@ -1,40 +1,40 @@
-/** @file IExpression_DConstant.cpp
+/** @file IExpression_DSequenceExpr.cpp
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
  *       [/Users/roland/proj/xo-umbrella2/xo-facet/codegen/genfacet]
  *     arguments:
- *       --input [idl/IExpression_DConstant.json5]
+ *       --input [idl/IExpression_DSequenceExpr.json5]
  *  2. jinja2 template for abstract facet .hpp file:
  *       [iface_facet_any.hpp.j2]
  *  3. idl for facet methods
- *       [idl/IExpression_DConstant.json5]
+ *       [idl/IExpression_DSequenceExpr.json5]
 **/
 
-#include "detail/IExpression_DConstant.hpp"
+#include "detail/IExpression_DSequenceExpr.hpp"
 
 namespace xo {
     namespace scm {
         auto
-        IExpression_DConstant::extype(const DConstant & self) noexcept -> exprtype
+        IExpression_DSequenceExpr::extype(const DSequenceExpr & self) noexcept -> exprtype
         {
             return self.extype();
         }
 
         auto
-        IExpression_DConstant::typeref(const DConstant & self) noexcept -> TypeRef
+        IExpression_DSequenceExpr::typeref(const DSequenceExpr & self) noexcept -> TypeRef
         {
             return self.typeref();
         }
 
         auto
-        IExpression_DConstant::valuetype(const DConstant & self) noexcept -> TypeDescr
+        IExpression_DSequenceExpr::valuetype(const DSequenceExpr & self) noexcept -> TypeDescr
         {
             return self.valuetype();
         }
 
         auto
-        IExpression_DConstant::assign_valuetype(DConstant & self, TypeDescr td) noexcept -> void
+        IExpression_DSequenceExpr::assign_valuetype(DSequenceExpr & self, TypeDescr td) noexcept -> void
         {
             self.assign_valuetype(td);
         }
@@ -42,4 +42,4 @@ namespace xo {
     } /*namespace scm*/
 } /*namespace xo*/
 
-/* end IExpression_DConstant.cpp */
+/* end IExpression_DSequenceExpr.cpp */

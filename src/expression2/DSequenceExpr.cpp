@@ -4,8 +4,19 @@
  **/
 
 #include "DSequenceExpr.hpp"
+#include "detail/IExpression_DSequenceExpr.hpp"
+#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/Allocator.hpp>
+#include <xo/printable2/Printable.hpp>
+#include <xo/facet/FacetRegistry.hpp>
+#include <xo/facet/obj.hpp>
+#include <xo/reflectutil/typeseq.hpp>
 
 namespace xo {
+    using xo::mm::AGCObject;
+    using xo::facet::FacetRegistry;
+    using xo::reflect::typeseq;
+
     namespace scm {
 
         obj<AExpression,DSequenceExpr>
@@ -35,8 +46,8 @@ namespace xo {
             return expr;
         }
 
-        size_type
-        DSequenceExpr::size() const noexcept
+        auto
+        DSequenceExpr::size() const noexcept -> size_type
         {
             return expr_v_->size();
         }
@@ -44,7 +55,9 @@ namespace xo {
         obj<AExpression>
         DSequenceExpr::operator[](std::size_t i) const
         {
-            return (*expr_v_)[i];
+            obj<AGCObject> gco = (*expr_v_)[i];
+
+            return FacetRegistry::instance().variant<AExpression,AGCObject>(gco);
         }
 
         void
@@ -64,7 +77,10 @@ namespace xo {
                 this->expr_v_ = expr_2x_v;
             }
 
-            this->expr_v_->push_back(expr);
+            obj<AGCObject> expr_gco
+                = FacetRegistry::instance().variant<AGCObject,AExpression>(expr);
+
+            this->expr_v_->push_back(expr_gco);
         }
 
         void
@@ -73,15 +89,16 @@ namespace xo {
             typeref_.resolve(td);
         }
 
-        void
+        bool
         DSequenceExpr::pretty(const ppindentinfo & ppii) const
         {
             using xo::print::ppstate;
 
-            ppstate * pps = ppii.pps();
-
-                        xxx;
+            return ppii.pps()->pretty_struct
+                (ppii,
+                 "DSequenceExpr");
         }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

@@ -240,6 +240,20 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-expression-sequenceexpr
+    FACET_PKG xo_expression2
+    FACET Expression
+    REPR SequenceExpr
+    INPUT idl/IExpression_DSequenceExpr.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-uniquestring
     FACET_PKG xo_gc
     FACET GCObject

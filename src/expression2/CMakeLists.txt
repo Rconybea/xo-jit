@@ -10,6 +10,7 @@ set(SELF_SRCS
     DLambdaExpr.cpp
     DApplyExpr.cpp
     DIfElseExpr.cpp
+    DSequenceExpr.cpp
 
     TypeRef.cpp
 
@@ -33,6 +34,8 @@ set(SELF_SRCS
 
     IExpression_DIfElseExpr.cpp
     IPrintable_DIfElseExpr.cpp
+
+    IExpression_DSequenceExpr.cpp
 
     DLocalSymtab.cpp
     DGlobalSymtab.cpp
