@@ -8,6 +8,7 @@
 #include "Expression.hpp"
 #include "TypeRef.hpp"
 #include "exprtype.hpp"
+#include <xo/gc/Collector.hpp>
 #include <xo/alloc2/Allocator.hpp>
 //#include <vector>
 #include <string>
@@ -21,6 +22,7 @@ namespace xo {
          **/
         class DIfElseExpr {
         public:
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -91,6 +93,14 @@ namespace xo {
             ///@{
 
             bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
+            /** @defgroup scm-ifelseexpr-gcobject-facet **/
+            ///@{
+
+            std::size_t shallow_size() const noexcept;
+            DIfElseExpr * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
 

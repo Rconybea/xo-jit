@@ -5,11 +5,13 @@
 
 #include "DIfElseExpr.hpp"
 #include "detail/IExpression_DIfElseExpr.hpp"
+#include <xo/gc/GCObject.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/reflectutil/typeseq.hpp>
 
 namespace xo {
+    using xo::mm::AGCObject;
     using xo::print::APrintable;
     using xo::reflect::typeseq;
     using xo::facet::FacetRegistry;
@@ -118,6 +120,45 @@ namespace xo {
                             "DIfElseExpr",
                             refrtag("typeref", typeref_));
             }
+        }
+
+        // GCObject facet
+
+        std::size_t
+        DIfElseExpr::shallow_size() const noexcept
+        {
+            return sizeof(DIfElseExpr);
+        }
+
+        DIfElseExpr *
+        DIfElseExpr::shallow_copy(obj<AAllocator> mm) const noexcept
+        {
+            DIfElseExpr * copy = (DIfElseExpr *)mm.alloc_copy((std::byte *)this);
+
+            if (copy)
+                *copy = *this;
+
+            return copy;
+        }
+
+        std::size_t
+        DIfElseExpr::forward_children(obj<ACollector> gc) noexcept
+        {
+            // GC needs to locate AGCObject iface for each member.
+            {
+                auto gco = FacetRegistry::instance().variant<AGCObject,AExpression>(test_);
+                gc.forward_inplace(gco.iface(), (void **)&(test_.data_));
+            }
+            {
+                auto gco = FacetRegistry::instance().variant<AGCObject,AExpression>(when_true_);
+                gc.forward_inplace(gco.iface(), (void **)&(when_true_.data_));
+            }
+            {
+                auto gco = FacetRegistry::instance().variant<AGCObject,AExpression>(when_false_);
+                gc.forward_inplace(gco.iface(), (void **)&(when_false_.data_));
+            }
+
+            return shallow_size();
         }
 
         // ----------------------------------------------------------------

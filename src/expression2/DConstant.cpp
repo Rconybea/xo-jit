@@ -71,6 +71,31 @@ namespace xo {
             return nullptr;
         }
 
+        std::size_t
+        DConstant::shallow_size() const noexcept
+        {
+            return sizeof(DConstant);
+        }
+
+        DConstant *
+        DConstant::shallow_copy(obj<AAllocator> mm) const noexcept
+        {
+            DConstant * copy = (DConstant *)mm.alloc_copy((std::byte *)this);
+
+            if (copy)
+                *copy = *this;
+
+            return copy;
+        }
+
+        std::size_t
+        DConstant::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_inplace(value_.iface(), (void **)&(value_.data_));
+
+            return shallow_size();
+        }
+
         bool
         DConstant::pretty(const ppindentinfo & ppii) const
         {

@@ -17,6 +17,7 @@ set(SELF_SRCS
     IExpression_Any.cpp
 
     IExpression_DConstant.cpp
+    IGCObject_DConstant.cpp
     IPrintable_DConstant.cpp
 
     IExpression_DVariable.cpp
@@ -33,6 +34,7 @@ set(SELF_SRCS
     IPrintable_DLambdaExpr.cpp
 
     IExpression_DIfElseExpr.cpp
+    IGCObject_DIfElseExpr.cpp
     IPrintable_DIfElseExpr.cpp
 
     IExpression_DSequenceExpr.cpp

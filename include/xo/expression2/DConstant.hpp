@@ -8,8 +8,9 @@
 #include "Expression.hpp"
 #include "TypeRef.hpp"
 #include "exprtype.hpp"
-#include <xo/reflect/TaggedPtr.hpp>
+#include <xo/gc/Collector.hpp>
 #include <xo/gc/GCObject.hpp>
+#include <xo/reflect/TaggedPtr.hpp>
 
 namespace xo {
     namespace scm {
@@ -20,6 +21,7 @@ namespace xo {
         public:
             using TaggedPtr = xo::reflect::TaggedPtr;
             using TypeDescr = xo::reflect::TypeDescr;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
             using typeseq = xo::reflect::typeseq;
@@ -55,6 +57,14 @@ namespace xo {
             TypeRef typeref() const noexcept { return typeref_; }
             TypeDescr valuetype() const noexcept { return typeref_.td(); }
             void assign_valuetype(TypeDescr td) noexcept { typeref_.resolve(td); }
+
+            ///@}
+            /** @defgroup scm-constant-gcobject-facet **/
+            ///@{
+
+            size_t shallow_size() const noexcept;
+            DConstant * shallow_copy(obj<AAllocator> mm) const noexcept;
+            size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
             /** @defgroup scm-constant-printable-facet **/

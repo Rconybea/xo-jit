@@ -5,11 +5,18 @@
 
 #include "expression2_register_types.hpp"
 
+#include "detail/IGCObject_DConstant.hpp"
+#include "detail/IGCObject_DVariable.hpp"
+//#include "detail/IGCObject_DDefineExpr.hpp"   // when avail
+//#include "detail/IGCObject_DApplyExpr.hpp"    // when avail
+//#include "detail/IGCObject_DLambdaExpr.hpp"   // when avail
+#include "detail/IGCObject_DIfElseExpr.hpp"
+#include "detail/IGCObject_DSequenceExpr.hpp"
+//#include "detail/IGCObject_DLocalSymtab.hpp"  // when avail
 #include "detail/IGCObject_DUniqueString.hpp"
 
-//#include "detail/IPrintable_DUniqueString.hpp"
+//#include "detail/IPrintable_DUniqueString.hpp" // when avail
 
-//#include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>
 
 namespace xo {
@@ -26,6 +33,16 @@ namespace xo {
             scope log(XO_DEBUG(true));
 
             bool ok = true;
+
+            ok &= gc.install_type(impl_for<AGCObject, DConstant>());
+            ok &= gc.install_type(impl_for<AGCObject, DVariable>());
+            //ok &= gc.install_type(impl_for<AGCObject, DDefineExpr>());  // when avail
+            //ok &= gc.install_type(impl_for<AGCObject, DApplyExpr>());   // when avail
+            //ok &= gc.install_type(impl_for<AGCObject, DLambdaExpr>());  // when avail
+            ok &= gc.install_type(impl_for<AGCObject, DIfElseExpr>());
+            ok &= gc.install_type(impl_for<AGCObject, DSequenceExpr>());
+
+            //ok &= gc.install_type(impl_for<AGCObject, DLocalSymtab>()); // when avail
 
             ok &= gc.install_type(impl_for<AGCObject, DUniqueString>());
 

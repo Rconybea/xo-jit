@@ -9,6 +9,7 @@
 #include <xo/expression2/detail/IPrintable_DUniqueString.hpp>
 
 #include <xo/expression2/detail/IExpression_DDefineExpr.hpp>
+//#include <xo/expression2/detail/IGCObject_DDefineExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DDefineExpr.hpp>
 
 #include <xo/expression2/detail/IExpression_DVariable.hpp>
@@ -16,15 +17,19 @@
 #include <xo/expression2/detail/IPrintable_DVariable.hpp>
 
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
+#include <xo/expression2/detail/IGCObject_DConstant.hpp>
 #include <xo/expression2/detail/IPrintable_DConstant.hpp>
 
 #include <xo/expression2/detail/IExpression_DApplyExpr.hpp>
+//#include <xo/expression2/detail/IGCObject_DApplyExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DApplyExpr.hpp>
 
 #include <xo/expression2/detail/IExpression_DLambdaExpr.hpp>
+//#include <xo/expression2/detail/IGCObject_DLambdaExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DLambdaExpr.hpp>
 
 #include <xo/expression2/detail/IExpression_DIfElseExpr.hpp>
+#include <xo/expression2/detail/IGCObject_DIfElseExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DIfElseExpr.hpp>
 
 #include <xo/expression2/detail/IExpression_DSequenceExpr.hpp>
@@ -32,6 +37,7 @@
 #include <xo/expression2/detail/IPrintable_DSequenceExpr.hpp>
 
 #include <xo/expression2/symtab/ISymbolTable_DLocalSymtab.hpp>
+//#include <xo/expression2/detail/IGCObject_DLocalSymtab.hpp>
 #include <xo/expression2/symtab/IPrintable_DLocalSymtab.hpp>
 
 #include <xo/gc/detail/AGCObject.hpp>
@@ -60,9 +66,11 @@ namespace xo {
             // +- DefineExpr
             // +- ApplyExpr
             // +- LambdaExpr
-            // \- IfElseExpr
+            // +- IfElseExpr
+            // \- SequenceExpr
 
             FacetRegistry::register_impl<AExpression, DConstant>();
+            FacetRegistry::register_impl<AGCObject, DConstant>();
             FacetRegistry::register_impl<APrintable, DConstant>();
 
             FacetRegistry::register_impl<AExpression, DVariable>();
@@ -79,6 +87,7 @@ namespace xo {
             FacetRegistry::register_impl<APrintable, DLambdaExpr>();
 
             FacetRegistry::register_impl<AExpression, DIfElseExpr>();
+            FacetRegistry::register_impl<AGCObject, DIfElseExpr>();
             FacetRegistry::register_impl<APrintable, DIfElseExpr>();
 
             FacetRegistry::register_impl<AExpression, DSequenceExpr>();
