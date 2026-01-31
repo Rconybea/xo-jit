@@ -183,9 +183,7 @@ namespace xo {
         DExpectExprSsm::on_symbol_token(const Token & tk,
                                         ParserStateMachine * p_psm)
         {
-            p_psm->illegal_input_on_token("DExpectExprSsm",
-                                          tk,
-                                          this->get_expect_str());
+            Super::on_token(tk, p_psm);
         }
 
 #ifdef NOT_YET

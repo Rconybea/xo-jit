@@ -169,21 +169,6 @@ namespace xo {
             void on_parsed_typedescr(TypeDescr td,
                                      ParserStateMachine * p_psm);
 
-#ifdef OBSOLETE
-            /** update state for this ssm to consume param (name,value)
-             *  emitted by nested @p_psm
-             **/
-            void on_parsed_formal(const DUniqueString * param_name,
-                                  TypeDescr param_type,
-                                  ParserStateMachine * p_psm);
-
-            /** consume formal params @p arglist from completed nested ssm,
-             *  with overall parser state in @p p_psm.
-             **/
-            void on_parsed_formal_arglist(DArray * arglist,
-                                          ParserStateMachine * p_psm);
-#endif
-
             /** update state for this syntax after parsing an expression @p expr,
              *  overall parser state in @p p_psm
              **/
