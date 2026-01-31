@@ -1,0 +1,13 @@
+{
+    mode: "implementation",
+    includes: [ "<xo/printable2/Printable.hpp>",
+                "<xo/printable2/detail/IPrintable_Xfer.hpp>" ],
+    local_types: [ ],
+    namespace1: "xo",
+    namespace2: "scm",
+    facet_idl: "idl/Printable.json5",
+    brief: "provide APrintable interface for DSequenceExpr",
+    using_doxygen: true,
+    repr: "DSequenceExpr",
+    doc: [ "implement APrintable for DSequenceExpr" ],
+}

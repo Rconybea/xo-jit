@@ -22,6 +22,7 @@ namespace xo {
          **/
         class DSequenceExpr {
         public:
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
             using size_type = DArray::size_type;
@@ -66,6 +67,14 @@ namespace xo {
 
             /** pretty-printing driver; combine layout+printing **/
             bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
+            /** @defgroup scm-sequenceexpr-gcobject-facet gcobject facet methods **/
+            ///@{
+
+            std::size_t shallow_size() const noexcept;
+            DSequenceExpr * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
 

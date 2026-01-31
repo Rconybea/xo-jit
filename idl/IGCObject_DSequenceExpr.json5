@@ -1,0 +1,15 @@
+{
+    mode: "implementation",
+    includes: [
+        "<xo/gc/GCObject.hpp>",
+        "<xo/alloc2/Allocator.hpp>"
+    ],
+    local_types: [ ],
+    namespace1: "xo",
+    namespace2: "scm",
+    facet_idl: "idl/GCObject.json5",
+    brief: "provide AGCObject interface for DSequenceExpr",
+    using_doxygen: true,
+    repr: "DSequenceExpr",
+    doc: [ "implement AGCObject for DSequenceExpr" ],
+}

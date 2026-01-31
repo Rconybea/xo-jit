@@ -36,6 +36,8 @@ set(SELF_SRCS
     IPrintable_DIfElseExpr.cpp
 
     IExpression_DSequenceExpr.cpp
+    IGCObject_DSequenceExpr.cpp
+    IPrintable_DSequenceExpr.cpp
 
     DLocalSymtab.cpp
     DGlobalSymtab.cpp

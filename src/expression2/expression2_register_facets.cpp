@@ -27,6 +27,10 @@
 #include <xo/expression2/detail/IExpression_DIfElseExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DIfElseExpr.hpp>
 
+#include <xo/expression2/detail/IExpression_DSequenceExpr.hpp>
+#include <xo/expression2/detail/IGCObject_DSequenceExpr.hpp>
+#include <xo/expression2/detail/IPrintable_DSequenceExpr.hpp>
+
 #include <xo/expression2/symtab/ISymbolTable_DLocalSymtab.hpp>
 #include <xo/expression2/symtab/IPrintable_DLocalSymtab.hpp>
 
@@ -77,6 +81,10 @@ namespace xo {
             FacetRegistry::register_impl<AExpression, DIfElseExpr>();
             FacetRegistry::register_impl<APrintable, DIfElseExpr>();
 
+            FacetRegistry::register_impl<AExpression, DSequenceExpr>();
+            FacetRegistry::register_impl<AGCObject, DSequenceExpr>();
+            FacetRegistry::register_impl<APrintable, DSequenceExpr>();
+
             FacetRegistry::register_impl<ASymbolTable, DLocalSymtab>();
             FacetRegistry::register_impl<APrintable, DLocalSymtab>();
 
@@ -87,6 +95,7 @@ namespace xo {
             log && log(xtag("DApplyExpr.tseq", typeseq::id<DApplyExpr>()));
             log && log(xtag("DLambdaExpr.tseq", typeseq::id<DLambdaExpr>()));
             log && log(xtag("DIfElseExpr.tseq", typeseq::id<DIfElseExpr>()));
+            log && log(xtag("DSequenceExpr.tseq", typeseq::id<DSequenceExpr>()));
 
             log && log(xtag("DLocalSymtab.tseq", typeseq::id<DLocalSymtab>()));
 

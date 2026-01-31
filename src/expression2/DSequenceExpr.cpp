@@ -5,6 +5,7 @@
 
 #include "DSequenceExpr.hpp"
 #include "detail/IExpression_DSequenceExpr.hpp"
+#include <xo/object2/array/IGCObject_DArray.hpp>
 #include <xo/gc/GCObject.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/printable2/Printable.hpp>
@@ -97,6 +98,39 @@ namespace xo {
             return ppii.pps()->pretty_struct
                 (ppii,
                  "DSequenceExpr");
+        }
+
+        // gc hooks for IGCObject_DSequenceExpr
+
+        std::size_t
+        DSequenceExpr::shallow_size() const noexcept
+        {
+            return sizeof(DSequenceExpr);
+        }
+
+        DSequenceExpr *
+        DSequenceExpr::shallow_copy(obj<AAllocator> mm) const noexcept
+        {
+            DSequenceExpr * copy = (DSequenceExpr *)mm.alloc_copy((std::byte *)this);
+
+            if (copy)
+                *copy = *this;
+
+            return copy;
+        }
+
+        std::size_t
+        DSequenceExpr::forward_children(obj<ACollector> gc) noexcept
+        {
+            // WARNING.
+            //   if this proves problematic,
+            //   may resort to obj<AGCObject,DArray> for expr_v_ member
+
+            auto iface = facet::impl_for<AGCObject,DArray>();
+
+            gc.forward_inplace(&iface, (void**)&expr_v_);
+
+            return shallow_size();
         }
 
     } /*namespace scm*/

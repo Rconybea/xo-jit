@@ -1,14 +1,14 @@
-/** @file IGCObject_DVariable.hpp
+/** @file IGCObject_DSequenceExpr.hpp
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
  *       [/home/roland/proj/xo-umbrella2-claude1/xo-facet/codegen/genfacet]
  *     arguments:
- *       --input [idl/IGCObject_DVariable.json5]
+ *       --input [idl/IGCObject_DSequenceExpr.json5]
  *  2. jinja2 template for abstract facet .hpp file:
  *       [iface_facet_repr.hpp.j2]
  *  3. idl for facet methods
- *       [idl/IGCObject_DVariable.json5]
+ *       [idl/IGCObject_DSequenceExpr.json5]
  **/
 
 #pragma once
@@ -16,30 +16,30 @@
 #include "GCObject.hpp"
 #include <xo/gc/GCObject.hpp>
 #include <xo/alloc2/Allocator.hpp>
-#include "DVariable.hpp"
+#include "DSequenceExpr.hpp"
 
-namespace xo { namespace scm { class IGCObject_DVariable; } }
+namespace xo { namespace scm { class IGCObject_DSequenceExpr; } }
 
 namespace xo {
     namespace facet {
         template <>
         struct FacetImplementation<xo::mm::AGCObject,
-                                   xo::scm::DVariable>
+                                   xo::scm::DSequenceExpr>
         {
             using ImplType = xo::mm::IGCObject_Xfer
-              <xo::scm::DVariable,
-               xo::scm::IGCObject_DVariable>;
+              <xo::scm::DSequenceExpr,
+               xo::scm::IGCObject_DSequenceExpr>;
         };
     }
 }
 
 namespace xo {
     namespace scm {
-        /** @class IGCObject_DVariable
+        /** @class IGCObject_DSequenceExpr
          **/
-        class IGCObject_DVariable {
+        class IGCObject_DSequenceExpr {
         public:
-            /** @defgroup scm-gcobject-dvariable-type-traits **/
+            /** @defgroup scm-gcobject-dsequenceexpr-type-traits **/
             ///@{
             using size_type = xo::mm::AGCObject::size_type;
             using AAllocator = xo::mm::AGCObject::AAllocator;
@@ -47,17 +47,17 @@ namespace xo {
             using Copaque = xo::mm::AGCObject::Copaque;
             using Opaque = xo::mm::AGCObject::Opaque;
             ///@}
-            /** @defgroup scm-gcobject-dvariable-methods **/
+            /** @defgroup scm-gcobject-dsequenceexpr-methods **/
             ///@{
             // const methods
             /** memory consumption for this instance **/
-            static size_type shallow_size(const DVariable & self) noexcept;
+            static size_type shallow_size(const DSequenceExpr & self) noexcept;
             /** copy instance using allocator **/
-            static Opaque shallow_copy(const DVariable & self, obj<AAllocator> mm) noexcept;
+            static Opaque shallow_copy(const DSequenceExpr & self, obj<AAllocator> mm) noexcept;
 
             // non-const methods
             /** during GC: forward immdiate children **/
-            static size_type forward_children(DVariable & self, obj<ACollector> gc) noexcept;
+            static size_type forward_children(DSequenceExpr & self, obj<ACollector> gc) noexcept;
             ///@}
         };
 
