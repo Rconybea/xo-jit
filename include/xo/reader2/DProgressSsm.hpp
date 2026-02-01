@@ -166,6 +166,8 @@ namespace xo {
                                ParserStateMachine * p_psm);
             void on_semicolon_token(const Token & tk,
                                     ParserStateMachine * p_psm);
+            void on_rightbrace_token(const Token & tk,
+                                     ParserStateMachine * p_psm);
             void on_parsed_expression_with_semicolon(obj<AExpression> expr,
                                                      ParserStateMachine * p_psm);
 
@@ -183,27 +185,12 @@ namespace xo {
             void on_typedescr(TypeDescr td,
                                       parserstatemachine * p_psm) override;
 
-            void on_semicolon_token(const token_type & tk,
-                                            parserstatemachine * p_psm) override;
             void on_assign_token(const token_type & tk,
                                          parserstatemachine * p_psm) final override;
             void on_leftparen_token(const token_type & tk,
                                             parserstatemachine * p_psm) override;
             void on_rightparen_token(const token_type & tk,
                                              parserstatemachine * p_psm) override;
-            void on_rightbrace_token(const token_type & tk,
-                                             parserstatemachine * p_psm) override;
-
-            /* entry point for an infix operator token */
-            void on_operator_token(const token_type & tk,
-                                           parserstatemachine * p_psm) final override;
-
-            void on_bool_token(const token_type & tk,
-                                       parserstatemachine * p_psm) override;
-
-            void on_i64_token(const token_type & tk,
-                                      parserstatemachine * p_psm) override;
-
 
             void print(std::ostream & os) const override;
 #endif

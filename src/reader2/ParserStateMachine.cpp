@@ -9,6 +9,7 @@
 #include <xo/object2/array/IPrintable_DArray.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
+#include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>
 #include <xo/indentlog/print/tostr.hpp>
 #include <xo/indentlog/print/tag.hpp>
@@ -16,6 +17,7 @@
 
 namespace xo {
     using xo::print::APrintable;
+    using xo::facet::FacetRegistry;
     using xo::facet::with_facet;
 
     namespace scm {
@@ -189,6 +191,21 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::on_parsed_expression_with_token(obj<AExpression> expr,
+                                                            const Token & tk)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("expr", expr), xtag("tk", tk));
+
+            assert(stack_);
+
+            this->top_ssm().on_parsed_expression(expr, this);
+
+            assert(stack_);
+
+            this->top_ssm().on_token(tk, this);
+        }
+
+        void
         ParserStateMachine::on_token(const Token & tk)
         {
             scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
@@ -215,7 +232,11 @@ namespace xo {
         ParserStateMachine::capture_error(std::string_view ssm_name,
                                           const DString * errmsg)
         {
-            this->result_ = ParserResult::error(ssm_name, errmsg);
+            if (result_.is_error()) {
+                /* in case one error triggers another, remmber just the first one */
+            } else {
+                this->result_ = ParserResult::error(ssm_name, errmsg);
+            }
         }
 
         void
@@ -302,7 +323,7 @@ namespace xo {
                                        xtag("param_type", param_type),
                                        xtag("expecting", expect_str),
                                        xtag("ssm", ssm_name),
-                                       xtag("via", "ParserStateMachine::illegal_parsed_expression"));
+                                       xtag("via", "ParserStateMachine::illegal_parsed_formal"));
 
             assert(expr_alloc_);
 
@@ -341,8 +362,16 @@ namespace xo {
             // - want to write error message using DArena
             // - need something like log_streambuf and/or tostr() that's arena-aware
 
+            obj<APrintable> expr_pr
+                = FacetRegistry::instance().variant<APrintable,AExpression>(expr);
+            assert(expr_pr);
+
+            /** TODO
+             *  problem here: we have pretty() support for obj<AExpression>,
+             *  but not "ordinary printing" support.  So expression doesn't get printed
+             **/
             auto errmsg_string = tostr("Unexpected expression",
-                                       xtag("expr", expr),
+                                       xtag("expr", expr_pr),
                                        xtag("expecting", expect_str),
                                        xtag("ssm", ssm_name),
                                        xtag("via", "ParserStateMachine::illegal_parsed_expression"));

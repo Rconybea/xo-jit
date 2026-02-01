@@ -336,6 +336,23 @@ namespace xo {
         DLambdaSsm::on_parsed_expression(obj<AExpression> expr,
                                          ParserStateMachine * p_psm)
         {
+            if (lm_state_ == lambdastatetype::lm_4) {
+                this->lmstate_ = lambdastatetype::lm_5;
+                this->body_ = expr;
+
+                // assemble lambda
+
+                obj<AExpression,DLambda> lm_expr = DLambda::make(p_psm->expr_alloc(),
+                                                                 xxx typeref,
+                                                                 xxx name,
+                                                                 local_symtab_,
+                                                                 body_);
+
+                p_psm->pop_ssm(); // this lambda
+                p_psm->on_parsed_expression(lm_expr);
+                return;
+            }
+
             Super::on_parsed_expression(expr, p_psm);
         }
 

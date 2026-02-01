@@ -55,12 +55,6 @@ namespace xo {
         DSequenceSsm::DSequenceSsm(DSequenceExpr * seq_expr) : seq_expr_{seq_expr}
         {}
 
-#ifdef NOT_YET
-        sequence_xs::sequence_xs()
-            : exprstate(exprstatetype::sequenceexpr)
-        {}
-#endif
-
         syntaxstatetype
         DSequenceSsm::ssm_type() const noexcept
         {
@@ -73,15 +67,93 @@ namespace xo {
             return "expr|semicolon|rightbrace";
         }
 
-#ifdef NOT_YET
         void
-        sequence_xs::on_expr(bp<Expression> expr,
-                             parserstatemachine * p_psm)
+        DSequenceSsm::on_token(const Token & tk,
+                               ParserStateMachine * p_psm)
+        {
+            scope log(XO_DEBUG(p_psm->debug_flag()), xtag("tk", tk));
+
+            switch (tk.tk_type()) {
+            case tokentype::tk_rightbrace:
+                this->on_rightbrace_token(tk, p_psm);
+                return;
+            case tokentype::tk_symbol:
+            case tokentype::tk_def:
+            case tokentype::tk_if:
+            case tokentype::tk_then:
+            case tokentype::tk_else:
+            case tokentype::tk_colon:
+            case tokentype::tk_singleassign:
+            case tokentype::tk_string:
+            case tokentype::tk_f64:
+            case tokentype::tk_i64:
+            case tokentype::tk_bool:
+            case tokentype::tk_semicolon:
+            case tokentype::tk_invalid:
+            case tokentype::tk_leftparen:
+            case tokentype::tk_rightparen:
+            case tokentype::tk_leftbracket:
+            case tokentype::tk_rightbracket:
+            case tokentype::tk_leftbrace:
+            case tokentype::tk_leftangle:
+            case tokentype::tk_rightangle:
+            case tokentype::tk_lessequal:
+            case tokentype::tk_greatequal:
+            case tokentype::tk_dot:
+            case tokentype::tk_comma:
+            case tokentype::tk_doublecolon:
+            case tokentype::tk_assign:
+            case tokentype::tk_yields:
+            case tokentype::tk_plus:
+            case tokentype::tk_minus:
+            case tokentype::tk_star:
+            case tokentype::tk_slash:
+            case tokentype::tk_cmpeq:
+            case tokentype::tk_cmpne:
+            case tokentype::tk_type:
+            case tokentype::tk_lambda:
+            case tokentype::tk_let:
+            case tokentype::tk_in:
+            case tokentype::tk_end:
+            case tokentype::N:
+                break;
+            }
+
+            // default = illegal token error
+            DSyntaxStateMachine<DSequenceSsm>::on_token(tk, p_psm);
+        }
+
+        void
+        DSequenceSsm::on_rightbrace_token(const Token & tk,
+                                          ParserStateMachine * p_psm)
+        {
+            (void)tk;
+
+            /** rightbrace ends DSequenceSsm **/
+
+            obj<AExpression,DSequenceExpr> expr(seq_expr_);
+
+            p_psm->pop_ssm();
+
+            /* make sequence from expressions seen at this level,
+             * and report it to parent
+             */
+            p_psm->top_ssm().on_parsed_expression(expr, p_psm);
+        }
+
+        void
+        DSequenceSsm::on_parsed_expression(obj<AExpression> expr,
+                                           ParserStateMachine * p_psm)
         {
              scope log(XO_DEBUG(p_psm->debug_flag()));
 
-             log && log(xtag("expr", expr.promote()));
+             // TODO: stream inserter that sets up pretty-printing.
+             //       Or integrate with indentlog.
+             //       Maybe trouble is that indentlog doesn't #include Printable ?
+             //
+             log && log(xtag("expr", expr));
 
+#ifdef NOT_YET
             /* TODO: if expr is a DefineExpr,
              *       then need to rewrite...
              *
@@ -132,33 +204,19 @@ namespace xo {
                                       true /*cxl_on_rightbrace*/,
                                       p_psm);
             }
+#endif
+
+            this->seq_expr_->push_back(p_psm->expr_alloc(),
+                                       expr);
         }
 
+#ifdef NOT_YET
         void
         sequence_xs::on_expr_with_semicolon(bp<Expression> expr,
                                             parserstatemachine * p_psm)
         {
             /* sequence continues until right brace */
             this->on_expr(expr, p_psm);
-        }
-
-        void
-        sequence_xs::on_rightbrace_token(const token_type & /*tk*/,
-                                         parserstatemachine * p_psm)
-        {
-            auto self = p_psm->pop_exprstate();
-
-            /* make sequence from expressions seen at this level,
-             * and report it to parent
-             */
-            auto expr = Sequence::make(this->expr_v_);
-
-            p_psm->top_exprstate().on_expr(expr, p_psm);
-        }
-
-        void
-        sequence_xs::print(std::ostream & os) const {
-            os << "<sequence_xs" << xtag("expr_v.size", expr_v_.size()) << ">";
         }
 #endif
 
@@ -167,9 +225,9 @@ namespace xo {
         {
             return ppii.pps()->pretty_struct
                        (ppii,
-                        "SequenceSsm",
-                        xrefrtag("seq_expr.size", seq_expr_->size()),
-                        xrefrtag("expect", this->get_expect_str()));
+                        "DSequenceSsm",
+                        refrtag("seq_expr.size", seq_expr_->size()),
+                        refrtag("expect", this->get_expect_str()));
         }
 
     } /*namespace scm*/

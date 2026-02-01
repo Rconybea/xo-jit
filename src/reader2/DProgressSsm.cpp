@@ -205,7 +205,7 @@ namespace xo {
         std::string_view
         DProgressSsm::get_expect_str() const noexcept {
             if (op_type_ == optype::invalid) {
-                return "oper|semicolon|rightparen";
+                return "oper|semicolon|rightparen|righbrace";
             } else {
                 return "expr|leftparen";
             }
@@ -255,6 +255,10 @@ namespace xo {
                 this->on_semicolon_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_rightbrace:
+                this->on_rightbrace_token(tk, p_psm);
+                return;
+
             // all the not-yet handled cases
             case tokentype::tk_invalid:
             case tokentype::tk_def:
@@ -264,7 +268,6 @@ namespace xo {
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
-            case tokentype::tk_rightbrace:
             case tokentype::tk_leftangle:
             case tokentype::tk_rightangle:
             case tokentype::tk_lessequal:
@@ -448,7 +451,8 @@ namespace xo {
             obj<AExpression> expr = this->assemble_expr(p_psm);
 
             {
-                obj<APrintable> expr_pr = FacetRegistry::instance().variant<APrintable,AExpression>(expr);
+                obj<APrintable> expr_pr
+                    = FacetRegistry::instance().variant<APrintable,AExpression>(expr);
                 assert(expr_pr);
                 log && log(xtag("expr", expr_pr));
             }
@@ -473,6 +477,27 @@ namespace xo {
 #ifdef OBSOLETE
             Super::on_token(tk, p_psm);
 #endif
+        }
+
+        void
+        DProgressSsm::on_rightbrace_token(const Token & tk,
+                                          ParserStateMachine * p_psm)
+        {
+            scope log(XO_DEBUG(p_psm->debug_flag()));
+
+            (void)tk;
+
+            obj<AExpression> expr = this->assemble_expr(p_psm);
+
+            {
+                obj<APrintable> expr_pr
+                    = FacetRegistry::instance().variant<APrintable,AExpression>(expr);
+                assert(expr_pr);
+                log && log(xtag("expr", expr_pr));
+            }
+
+            p_psm->pop_ssm();
+            p_psm->on_parsed_expression_with_token(expr, tk);
         }
 
         void
@@ -1024,7 +1049,8 @@ namespace xo {
                         "DProgressSsm",
                         refrtag("lhs", lhs),
                         refrtag("op", op_type_),
-                        cond(rhs, refrtag("rhs", rhs), "nullptr")
+                        cond(rhs, refrtag("rhs", rhs), "nullptr"),
+                        refrtag("expect", this->get_expect_str())
                            );
 
         }
@@ -1048,6 +1074,7 @@ namespace xo {
                                                  std::string_view(errmsg_string));
 
                 p_psm->capture_error(c_self_name, errmsg);
+                return obj<AExpression>();
             }
 
             /* consecutive expressions not legal, e.g:

@@ -142,6 +142,18 @@ namespace xo {
              **/
             void on_parsed_expression_with_semicolon(obj<AExpression> expr);
 
+            /** update state to respond to parsed expression @p expr
+             *  (from nested parsing state), with trailing token @p tk.
+             *
+             *  Need to distinguish cases like:
+             *    6    // ) ?          ; allowed    } ?
+             *    f(6  // ) allowed    ; forbidden  } forbidden
+             *    6 +  // ) forbidden  ; forbidden  } forbidden
+             *
+             **/
+            void on_parsed_expression_with_token(obj<AExpression> expr,
+                                                 const Token & tk);
+
             /** update state to respond to input token @p tk.
              *  record output (if any) in @ref result_
              **/

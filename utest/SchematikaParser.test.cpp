@@ -215,7 +215,7 @@ namespace xo {
 
             /** Walkthrough parsing input equivalent to:
              *
-             *    lambda (n : i64,
+             *    lambda (n : i64, r : i64) -> i64 { 123 }
              *
              **/
 
@@ -375,11 +375,10 @@ namespace xo {
                 REQUIRE(result.is_incomplete());
             }
 
-#ifdef NOT_YET
             {
-                auto & result = parser.on_token(Token::string_token("fooey"));
+                auto & result = parser.on_token(Token::i64_token("123"));
 
-                log && log("after string token:");
+                log && log("after f64(123) token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
@@ -389,17 +388,16 @@ namespace xo {
             }
 
             {
-                auto & result = parser.on_token(Token::semicolon_token());
+                auto & result = parser.on_token(Token::rightbrace_token());
 
-                log && log("after semicolon token:");
+                log && log("after rightbrace token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
-                REQUIRE(parser.has_incomplete_expr() == false);
+                REQUIRE(parser.has_incomplete_expr() == true);
                 REQUIRE(!result.is_error());
-                REQUIRE(!result.is_incomplete());
+                REQUIRE(result.is_incomplete());
             }
-#endif
 
             //REQUIRE(result.is_error());
             //// illegal input on token
