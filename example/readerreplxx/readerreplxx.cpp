@@ -134,6 +134,43 @@ namespace {
     }
 }
 
+struct AppConfig {
+    using ReaderConfig = xo::scm::ReaderConfig;
+    using CollectorConfig = xo::mm::CollectorConfig;
+
+    AppConfig() {
+        rdr_config_.reader_debug_flag_ = true;
+        //rdr_config.parser_debug_flag_ = true;
+        //rdr_config.tk_debug_flag_ = true;
+    }
+
+    std::size_t max_history_size_ = 1000;
+    std::string repl_history_fname_ = "repl_history.txt";;
+    CollectorConfig x1_config_ = (CollectorConfig().with_size(4*1024*1024));
+    ReaderConfig rdr_config_;
+};
+
+struct AppContext {
+    using DX1Collector = xo::mm::DX1Collector;
+    using CollectorConfig = xo::mm::CollectorConfig;
+    using Replxx = replxx::Replxx;
+
+    AppContext(const AppConfig & cfg = AppConfig()) : config_{cfg},
+                                                      x1_{CollectorConfig().with_size(4*1024*1024)},
+                                                      rdr_{config_.rdr_config_, x1_.ref()}
+    {
+        rx_.set_max_history_size(config_.max_history_size_);
+        rx_.history_load(config_.repl_history_fname_);
+        //    rx.bind_key_internal(Replxx::KEY::control('p'), "history_previous");
+        //    rx.bind_key_internal(Replxx::KEY::control('n'), "history_next");
+    }
+
+    AppConfig config_;
+    Replxx rx_;
+    DX1Collector x1_;
+    SchematikaReader rdr_;
+}; 
+
 int
 main()
 {
@@ -143,7 +180,6 @@ main()
     using xo::scm::ReaderConfig;
     using xo::mm::AAllocator;
     using xo::mm::DX1Collector;
-    using xo::mm::CollectorConfig;
     using xo::mm::DArena;
     using xo::facet::with_facet;
     using xo::facet::obj;
@@ -158,45 +194,28 @@ main()
     InitSubsys<S_reader2_tag>::require();
     Subsystem::initialize_all();
 
-    Replxx rx;
-    rx.set_max_history_size(1000);
-    rx.history_load("repl_history.txt");
-//    rx.bind_key_internal(Replxx::KEY::control('p'), "history_previous");
-//    rx.bind_key_internal(Replxx::KEY::control('n'), "history_next");
+    AppConfig cfg;
+    AppContext cx(cfg);
 
     constexpr bool c_debug_flag = false;
     scope log(XO_DEBUG(c_debug_flag));
 
-    CollectorConfig x1_config = (CollectorConfig()
-                                 .with_size(4*1024*1024));
-    DX1Collector x1(x1_config);
-    obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&x1);
-
-    // accepting defaults too
-    ReaderConfig rdr_config;
-    {
-        rdr_config.reader_debug_flag_ = true;
-        //rdr_config.parser_debug_flag_ = true;
-        //rdr_config.tk_debug_flag_ = true;
-    }
-
-    SchematikaReader rdr(rdr_config, expr_alloc);
     using span_type = SchematikaReader::span_type;
 
     welcome(cerr);
 
-    rdr.begin_interactive_session();
+    cx.rdr_.begin_interactive_session();
 
     bool eof = false;
     const char * input_str = nullptr;
     span_type input;
 
-    while (replxx_getline(interactive, rdr.is_at_toplevel(), rx, &input_str)) {
+    while (replxx_getline(interactive, cx.rdr_.is_at_toplevel(), cx.rx_, &input_str)) {
         if (input_str && *input_str) {
             input = span_type::from_cstr(input_str);
 
             while (!input.empty()
-                   && reader_seq(&rdr, &input, false /*eof*/, c_debug_flag))
+                   && reader_seq(&cx.rdr_, &input, false /*eof*/, c_debug_flag))
                 {
                     ;
                 }
@@ -209,9 +228,9 @@ main()
     }
 
     /* reminder: eof can complete at most one token */
-    reader_seq(&rdr, &input, true /*eof*/, c_debug_flag);
+    reader_seq(&cx.rdr_, &input, true /*eof*/, c_debug_flag);
 
-    rx.history_save("repl_history.txt");
+    cx.rx_.history_save(cx.config_.repl_history_fname_);
 }
 
 /* end readerreplxx.cpp */
