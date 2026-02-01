@@ -1,10 +1,12 @@
-/** @file DLambda.cpp
+/** @file DLambdaExpr.cpp
  *
  *  @author Roland Conybeare, Jan 2026
  **/
 
 #include "DLambdaExpr.hpp"
 #include "detail/IExpression_DLambdaExpr.hpp"
+#include "DLocalSymtab.hpp"
+#include "symtab/IPrintable_DLocalSymtab.hpp"
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -17,6 +19,7 @@ namespace xo {
     using xo::reflect::TypeDescrBase;
     using xo::reflect::FunctionTdxInfo;
     using xo::reflect::typeseq;
+    using xo::print::quot;
 
     namespace scm {
 
@@ -139,9 +142,14 @@ namespace xo {
                                                         AExpression>(body_expr_);
 
             if (name_ && body) {
+                auto local_symtab_pr
+                    = obj<APrintable,DLocalSymtab>(local_symtab_);
+
                 return ppii.pps()->pretty_struct(ppii,
                                                  "LambdaExpr",
-                                                 refrtag("name", name_),
+                                                 refrtag("tref", typeref_),
+                                                 refrtag("name", quot(std::string_view(*name_))),
+                                                 refrtag("local_symtab", local_symtab_pr),
                                                  //refrtag("argv", local_env_->argv()),
                                                  refrtag("body", body));
             } else {

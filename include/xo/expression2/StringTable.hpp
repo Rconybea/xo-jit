@@ -35,6 +35,11 @@ namespace xo {
             /** return unique string with contents @p key. Idempotent! **/
             const DUniqueString * intern(std::string_view key);
 
+            /** generate unique symbol -- guaranteed not to collide
+             *  with existing symbol in this table.
+             **/
+            const DUniqueString * gensym(std::string_view prefix);
+
             /** verify StringTable invariants.
              *  Act on failure according to policy @p p
              **/

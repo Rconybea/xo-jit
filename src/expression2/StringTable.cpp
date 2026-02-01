@@ -72,6 +72,36 @@ namespace xo {
             return nullptr;
         }
 
+        const DUniqueString *
+        StringTable::gensym(std::string_view prefix)
+        {
+            static std::size_t s_counter = 0;
+
+            while (true) {
+                ++s_counter;
+
+                char buf[80];
+                assert(prefix.size() + 20 < sizeof(buf));
+
+                int n = snprintf(buf, sizeof(buf),
+                                 "%s:%lu",
+                                 prefix.data(), s_counter);
+
+                if ((0 < n) && (std::size_t(n) < sizeof(buf)))
+                    buf[n] = '\0';
+                else
+                    buf[sizeof(buf)-1] = '\0';
+
+                std::string_view sv(buf);
+                const DUniqueString * retval = this->lookup(sv);
+                if (!retval) {
+                    /* not already in string view -> we have viable candidate */
+                    retval = this->intern(sv);
+                    return retval;
+                }
+            }
+        }
+
         bool
         StringTable::verify_ok(verify_policy policy) const
         {

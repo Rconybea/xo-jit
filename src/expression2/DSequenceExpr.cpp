@@ -6,6 +6,7 @@
 #include "DSequenceExpr.hpp"
 #include "detail/IExpression_DSequenceExpr.hpp"
 #include <xo/object2/array/IGCObject_DArray.hpp>
+#include <xo/object2/array/IPrintable_DArray.hpp>
 #include <xo/gc/GCObject.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/printable2/Printable.hpp>
@@ -15,6 +16,7 @@
 
 namespace xo {
     using xo::mm::AGCObject;
+    using xo::print::APrintable;
     using xo::facet::FacetRegistry;
     using xo::reflect::typeseq;
 
@@ -95,9 +97,12 @@ namespace xo {
         {
             using xo::print::ppstate;
 
+            auto expr_v_pr = obj<APrintable,DArray>(expr_v_);
+
             return ppii.pps()->pretty_struct
                 (ppii,
-                 "DSequenceExpr");
+                 "DSequenceExpr",
+                 refrtag("expr_v", expr_v_pr));
         }
 
         // gc hooks for IGCObject_DSequenceExpr
