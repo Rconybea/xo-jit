@@ -102,7 +102,7 @@ namespace xo {
             /** token representing left brace @c "{" **/
             static Token leftbrace_token() { return Token(tokentype::tk_leftbrace); }
             /** token representing right brace @c "}" **/
-            static Token rightbrace() { return Token(tokentype::tk_rightbrace); }
+            static Token rightbrace_token() { return Token(tokentype::tk_rightbrace); }
             /** token representing period @c "." **/
             static Token dot() { return Token(tokentype::tk_dot); }
             /** token representing comma @c "," **/
