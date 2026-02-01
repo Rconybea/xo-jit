@@ -394,9 +394,10 @@ namespace xo {
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
-                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(parser.has_incomplete_expr() == false);
                 REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
+                REQUIRE(result.is_expression());
+                REQUIRE(result.result_expr());
             }
 
             //REQUIRE(result.is_error());

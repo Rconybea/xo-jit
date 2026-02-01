@@ -90,6 +90,12 @@ namespace xo {
             return stringtable_.intern(str);
         }
 
+        const DUniqueString *
+        ParserStateMachine::gensym(std::string_view str)
+        {
+            return stringtable_.gensym(str);
+        }
+
         void
         ParserStateMachine::push_local_symtab(DLocalSymtab * symtab)
         {

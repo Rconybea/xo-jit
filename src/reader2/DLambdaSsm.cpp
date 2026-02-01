@@ -11,6 +11,7 @@
 #include "DExpectExprSsm.hpp"
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
+#include <xo/expression2/detail/IExpression_DLambdaExpr.hpp>
 #include <xo/expression2/DVariable.hpp>
 #include <xo/expression2/detail/IExpression_DVariable.hpp>
 //#include <xo/expression2/symtab/ISymbolTable_DLocalSymtab.hpp>
@@ -336,17 +337,23 @@ namespace xo {
         DLambdaSsm::on_parsed_expression(obj<AExpression> expr,
                                          ParserStateMachine * p_psm)
         {
-            if (lm_state_ == lambdastatetype::lm_4) {
+            if (lmstate_ == lambdastatetype::lm_4) {
                 this->lmstate_ = lambdastatetype::lm_5;
                 this->body_ = expr;
 
                 // assemble lambda
 
-                obj<AExpression,DLambda> lm_expr = DLambda::make(p_psm->expr_alloc(),
-                                                                 xxx typeref,
-                                                                 xxx name,
-                                                                 local_symtab_,
-                                                                 body_);
+                auto prefix = TypeRef::prefix_type::from_chars("lm");
+                TypeRef tref = TypeRef::dwim(prefix, nullptr);
+
+                const DUniqueString * name = p_psm->gensym("lambda");
+
+                auto lm_expr = obj<AExpression,DLambdaExpr>
+                    (DLambdaExpr::make(p_psm->expr_alloc(),
+                                       tref,
+                                       name,
+                                       local_symtab_,
+                                       body_));
 
                 p_psm->pop_ssm(); // this lambda
                 p_psm->on_parsed_expression(lm_expr);

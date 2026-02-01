@@ -82,6 +82,9 @@ namespace xo {
              **/
             const DUniqueString * intern_string(std::string_view str);
 
+            /** get unique (within stringtable) string, beginning with @p prefix **/
+            const DUniqueString * gensym(std::string_view prefix);
+
             /** push nested local symtab while parsing the body of a lambda expression;
              *  restore previous symtab at the end of lambda-expression definition.
              *  See @ref pop_local_symtab
