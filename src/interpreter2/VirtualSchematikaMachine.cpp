@@ -6,12 +6,19 @@
 #include "VirtualSchematikaMachine.hpp"
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
 #include <xo/expression2/DConstant.hpp>
+#include <xo/gc/DX1Collector.hpp>
+#include <xo/gc/detail/IAllocator_DX1Collector.hpp>
 #include <cassert>
 
 namespace xo {
+    using xo::mm::DX1Collector;
+
     namespace scm {
 
-        VirtualSchematikaMachine::VirtualSchematikaMachine()
+        VirtualSchematikaMachine::VirtualSchematikaMachine(const VsmConfig & config)
+        : config_{config},
+          mm_(box<AAllocator,DX1Collector>(new DX1Collector(config.x1_config_))),
+          reader_{config.rdr_config_, mm_.to_op()}
         {}
 
         void

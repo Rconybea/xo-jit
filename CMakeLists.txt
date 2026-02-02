@@ -21,7 +21,7 @@ add_definitions(${PROJECT_CXX_FLAGS})
 # output targets
 
 add_subdirectory(src/interpreter2)
-#add_subdirectory(utest)
+add_subdirectory(utest)
 
 xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets)
 

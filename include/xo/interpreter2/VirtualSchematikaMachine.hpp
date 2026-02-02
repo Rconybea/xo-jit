@@ -5,9 +5,12 @@
 
 #pragma once
 
+#include "VsmConfig.hpp"
 #include "VsmInstr.hpp"
+#include <xo/reader2/SchematikaReader.hpp>
 #include <xo/expression2/Expression.hpp>
 #include <xo/gc/GCObject.hpp>
+#include <xo/facet/box.hpp>
 
 namespace xo {
     namespace scm {
@@ -18,10 +21,11 @@ namespace xo {
         public:
             // will be DArenaVector<obj<StackFrame>> probably
             using Stack = void *;
+            using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
 
         public:
-            VirtualSchematikaMachine();
+            VirtualSchematikaMachine(const VsmConfig & config);
 
             /** borrow calling thread to run indefinitely,
              *  until halt instruction
@@ -92,6 +96,14 @@ namespace xo {
              *   expr_
              *   value_
              */
+
+            /** configuration **/
+            VsmConfig config_;
+
+            box<AAllocator> mm_;
+
+            /** reader: text -> expression **/
+            SchematikaReader reader_;
 
             /** program counter **/
             VsmInstr pc_ = VsmInstr::halt();
