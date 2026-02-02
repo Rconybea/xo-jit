@@ -44,7 +44,7 @@ namespace ut {
     using xo::mm::ACollector;
     using xo::mm::AGCObject;
     using xo::mm::DX1Collector;
-    using xo::mm::CollectorConfig;
+    using xo::mm::X1CollectorConfig;
     using xo::mm::ArenaConfig;
     using xo::print::APrintable;
     using xo::print::ppstate_standalone;
@@ -68,7 +68,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "ddefineexpr_make_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -103,7 +103,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "ddefineexpr_lhs_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -138,7 +138,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "ddefineexpr_rhs_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -174,7 +174,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "ddefineexpr_name_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -207,7 +207,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "ddefineexpr_extype_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -239,7 +239,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "ddefineexpr_valuetype_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -273,7 +273,7 @@ namespace ut {
 
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "ddefineexpr_pretty_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,

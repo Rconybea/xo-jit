@@ -37,7 +37,7 @@ namespace ut {
     using xo::mm::AAllocator;
     using xo::mm::ACollector;
     using xo::mm::DX1Collector;
-    using xo::mm::CollectorConfig;
+    using xo::mm::X1CollectorConfig;
     using xo::mm::ArenaConfig;
     using xo::print::APrintable;
     using xo::print::ppstate_standalone;
@@ -61,7 +61,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "dvariable_make_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -92,7 +92,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "dvariable_extype_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -122,7 +122,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "dvariable_valuetype_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -152,7 +152,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "dvariable_name_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -185,7 +185,7 @@ namespace ut {
 
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "dvariable_pretty_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,

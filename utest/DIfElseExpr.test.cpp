@@ -42,15 +42,15 @@ namespace ut {
     using xo::mm::ACollector;
     using xo::mm::AGCObject;
     using xo::mm::DX1Collector;
-    using xo::mm::CollectorConfig;
+    using xo::mm::X1CollectorConfig;
     using xo::mm::ArenaConfig;
     using xo::print::APrintable;
     using xo::print::ppstate_standalone;
     using xo::print::ppconfig;
-    using xo::facet::FacetRegistry;
+    //using xo::facet::FacetRegistry;
     using xo::facet::with_facet;
     using xo::facet::obj;
-    using xo::reflect::Reflect;
+    //using xo::reflect::Reflect;
     using xo::InitEvidence;
     using xo::InitSubsys;
     using xo::scope;
@@ -66,7 +66,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "difelseexpr_make_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -107,7 +107,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "difelseexpr_test_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -145,7 +145,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "difelseexpr_when_true_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -183,7 +183,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "difelseexpr_when_false_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -221,7 +221,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "difelseexpr_extype_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -256,7 +256,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "difelseexpr_valuetype_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -296,7 +296,7 @@ namespace ut {
 
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "difelseexpr_pretty_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,

@@ -39,7 +39,7 @@ namespace ut {
     using xo::mm::ACollector;
     using xo::mm::AGCObject;
     using xo::mm::DX1Collector;
-    using xo::mm::CollectorConfig;
+    using xo::mm::X1CollectorConfig;
     using xo::mm::ArenaConfig;
     using xo::print::APrintable;
     using xo::print::ppstate_standalone;
@@ -66,7 +66,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "dconstant_float_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -105,7 +105,7 @@ namespace ut {
     {
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "dconstant_int_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -146,7 +146,7 @@ namespace ut {
 
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "dconstant_pp_float_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
@@ -190,7 +190,7 @@ namespace ut {
 
         REQUIRE(s_init.evidence());
 
-        CollectorConfig cfg{
+        X1CollectorConfig cfg{
             .name_ = "dconstant_pp_int_test",
             .arena_config_ = ArenaConfig{
                 .size_ = 8192,
