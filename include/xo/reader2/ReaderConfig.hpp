@@ -41,7 +41,7 @@ namespace xo {
             size_t max_stringtable_cap_ = 64*1024;
 
             /** debug flag for schematika_reader **/
-            bool reader_debug_flag_ = false;;
+            bool reader_debug_flag_ = false;
         };
 
     } /*namespace scm*/
