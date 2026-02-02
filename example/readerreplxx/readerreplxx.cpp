@@ -136,7 +136,7 @@ namespace {
 
 struct AppConfig {
     using ReaderConfig = xo::scm::ReaderConfig;
-    using CollectorConfig = xo::mm::CollectorConfig;
+    using X1CollectorConfig = xo::mm::X1CollectorConfig;
 
     AppConfig() {
         rdr_config_.reader_debug_flag_ = true;
@@ -146,17 +146,17 @@ struct AppConfig {
 
     std::size_t max_history_size_ = 1000;
     std::string repl_history_fname_ = "repl_history.txt";;
-    CollectorConfig x1_config_ = (CollectorConfig().with_size(4*1024*1024));
     ReaderConfig rdr_config_;
+    X1CollectorConfig x1_config_ = (X1CollectorConfig().with_size(4*1024*1024));
 };
 
 struct AppContext {
     using DX1Collector = xo::mm::DX1Collector;
-    using CollectorConfig = xo::mm::CollectorConfig;
+    using X1CollectorConfig = xo::mm::X1CollectorConfig;
     using Replxx = replxx::Replxx;
 
     AppContext(const AppConfig & cfg = AppConfig()) : config_{cfg},
-                                                      x1_{CollectorConfig().with_size(4*1024*1024)},
+                                                      x1_{X1CollectorConfig().with_size(4*1024*1024)},
                                                       rdr_{config_.rdr_config_, x1_.ref()}
     {
         rx_.set_max_history_size(config_.max_history_size_);
