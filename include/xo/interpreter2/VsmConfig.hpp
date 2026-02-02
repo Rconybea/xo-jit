@@ -10,10 +10,12 @@
 
 namespace xo {
     namespace scm {
-        /** Configuration for virtual schematika machine 
+        /** Configuration for virtual schematika machine
          **/
         struct VsmConfig {
             using X1CollectorConfig = xo::mm::X1CollectorConfig;
+
+            VsmConfig() = default;
 
             /** reader configuration **/
             ReaderConfig rdr_config_;

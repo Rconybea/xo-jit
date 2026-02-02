@@ -14,6 +14,23 @@
 
 namespace xo {
     namespace scm {
+        /** similar to @ref xo::scm::ReaderResult **/
+        struct VsmResult {
+            using AGCObject = xo::mm::AGCObject;
+            using span_type = xo::mm::span<const char>;
+
+            bool is_tk_error() const { return tk_error_.is_error(); }
+
+            /** result of evaluating first expression encountered in input **/
+            obj<AGCObject> value_;
+
+            /** unconsumed portion of input span **/
+            span_type remaining_input_;
+
+            /** {src_function, error_description, input_state, error_pos} **/
+            TokenizerError tk_error_;
+        };
+
         /** @class VirtualSchematikaMachine
          *  @brief virtual machine for schematika
          **/
@@ -23,9 +40,16 @@ namespace xo {
             using Stack = void *;
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
+            using span_type = xo::mm::span<const char>;
 
         public:
             VirtualSchematikaMachine(const VsmConfig & config);
+
+            /** consume input @p input_cstr **/
+            VsmResult read_eval_print(span_type input_span, bool eof);
+
+            /** evaluate expression @p expr **/
+            std::pair<obj<AGCObject>, TokenizerError> eval(obj<AExpression> expr);
 
             /** borrow calling thread to run indefinitely,
              *  until halt instruction

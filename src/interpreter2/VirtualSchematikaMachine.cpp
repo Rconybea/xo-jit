@@ -8,10 +8,18 @@
 #include <xo/expression2/DConstant.hpp>
 #include <xo/gc/DX1Collector.hpp>
 #include <xo/gc/detail/IAllocator_DX1Collector.hpp>
+#include <xo/printable2/Printable.hpp>
+#include <xo/facet/FacetRegistry.hpp>
 #include <cassert>
 
 namespace xo {
+    using xo::print::APrintable;
+    using xo::print::ppconfig;
+    using xo::print::ppstate_standalone;
+    using xo::mm::AGCObject;
     using xo::mm::DX1Collector;
+    using xo::facet::FacetRegistry;
+    using std::cout;
 
     namespace scm {
 
@@ -20,6 +28,52 @@ namespace xo {
           mm_(box<AAllocator,DX1Collector>(new DX1Collector(config.x1_config_))),
           reader_{config.rdr_config_, mm_.to_op()}
         {}
+
+        VsmResult
+        VirtualSchematikaMachine::read_eval_print(span_type input, bool eof)
+        {
+            if (input.empty()) {
+                return VsmResult();
+            }
+
+            auto [expr, remaining, error1]
+                = reader_.read_expr(input, eof);
+
+            if (!expr) {
+                return {
+                    .remaining_input_ = remaining,
+                    .tk_error_ = error1
+                };
+            }
+
+            auto [value, error2] = this->eval(expr);
+
+            if (!value) {
+                return {
+                    .remaining_input_ = remaining,
+                    .tk_error_ = error2
+                };
+            }
+
+            obj<APrintable> value_pr
+                = FacetRegistry::instance().variant<APrintable,AGCObject>(value);
+
+            // pretty_toplevel(value_pr, &cout, ppconfig());
+            ppconfig ppc;
+            ppstate_standalone pps(&cout, 0, &ppc);
+            pps.prettyn(value_pr);
+
+            return { .remaining_input_ = remaining };
+        }
+
+        std::pair<obj<AGCObject>, TokenizerError>
+        VirtualSchematikaMachine::eval(obj<AExpression> expr)
+        {
+            (void)expr;
+
+            assert(false);
+            return std::make_pair(obj<AGCObject>(), TokenizerError());
+        }
 
         void
         VirtualSchematikaMachine::run()

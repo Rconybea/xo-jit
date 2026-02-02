@@ -20,6 +20,9 @@
 #include <catch2/catch.hpp>
 
 namespace xo {
+    using xo::scm::VirtualSchematikaMachine;
+    using xo::scm::VsmConfig;
+
 #ifdef NOT_YET
     using xo::scm::SchematikaParser;
     using xo::scm::ASyntaxStateMachine;
@@ -42,6 +45,8 @@ namespace xo {
     namespace ut {
         TEST_CASE("VirtualSchematikaMachine-ctor", "[interpreter2][VSM]")
         {
+            VirtualSchematikaMachine vsm(VsmConfig);
+
 #ifdef NOT_YET
             ArenaConfig config;
             config.name_ = "test-arena";
