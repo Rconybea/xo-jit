@@ -39,7 +39,7 @@ namespace ut {
     using xo::mm::ACollector;
     using xo::mm::AGCObject;
     using xo::mm::DX1Collector;
-    using xo::mm::CollectorConfig;
+    using xo::mm::X1CollectorConfig;
     using xo::mm::ArenaConfig;
     using xo::facet::with_facet;
     using xo::facet::typeseq;
@@ -54,14 +54,13 @@ namespace ut {
         REQUIRE(s_init.evidence());
 
         // Create collector
-        CollectorConfig cfg{
-            .name_ = "x1_duniquestring_test",
-            .arena_config_ = ArenaConfig{
-                .size_ = 8192,
-                .store_header_flag_ = true},
-            .object_types_z_ = 16384,
-            .gc_trigger_v_{{1024, 1024}},
-            .debug_flag_ = false,
+        X1CollectorConfig cfg{ .name_ = "x1_duniquestring_test",
+                               .arena_config_ = ArenaConfig{
+                                   .size_ = 8192,
+                                   .store_header_flag_ = true},
+                               .object_types_z_ = 16384,
+                               .gc_trigger_v_{{1024, 1024}},
+                               .debug_flag_ = false,
         };
 
         DX1Collector gc(cfg);
