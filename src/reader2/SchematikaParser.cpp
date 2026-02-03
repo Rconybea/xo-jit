@@ -47,16 +47,10 @@ namespace xo {
             return psm_.top_ssm();
         }
 
-        std::size_t
-        SchematikaParser::_n_store() const noexcept
+        void
+        SchematikaParser::visit_pools(const MemorySizeVisitor & visitor) const
         {
-            return psm_._n_store();
-        }
-
-        MemorySizeInfo
-        SchematikaParser::_store_info(std::size_t i) const noexcept
-        {
-            return psm_._store_info(i);
+            return psm_.visit_pools(visitor);
         }
 
         void

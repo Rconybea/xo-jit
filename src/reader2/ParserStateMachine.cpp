@@ -54,27 +54,14 @@ namespace xo {
             return this->stack_->top();
         }
 
-        std::size_t
-        ParserStateMachine::_n_store() const noexcept
+        void
+        ParserStateMachine::visit_pools(const MemorySizeVisitor & visitor) const
         {
-            return stringtable_._n_store() + 1;
-        }
-
-        MemorySizeInfo
-        ParserStateMachine::_store_info(std::size_t i) const noexcept
-        {
-            size_t n0 = stringtable_._n_store();
-
-            if (i < n0) 
-                return stringtable_._store_info(i);
-
-            if (i == n0)
-                return parser_alloc_._store_info();
+            stringtable_.visit_pools(visitor);
+            parser_alloc_.visit_pools(visitor);
 
             // not counting expr_alloc_. We don't consider
             // that to be owned by ParserStateMachine
-
-            return MemorySizeInfo::sentinel();
         }
 
         void

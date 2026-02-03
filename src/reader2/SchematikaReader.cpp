@@ -21,27 +21,11 @@ namespace xo {
         {
         }
 
-        std::size_t
-        SchematikaReader::_n_store() const noexcept
+        void
+        SchematikaReader::visit_pools(const MemorySizeVisitor & visitor) const
         {
-            return tokenizer_._n_store() + parser_._n_store();
-        }
-        
-        MemorySizeInfo
-        SchematikaReader::_store_info(std::size_t i) const noexcept
-        {
-            size_t n_tk = tokenizer_._n_store();
-
-            if (i < n_tk) {
-                return tokenizer_._store_info(i);
-            }
-
-            size_t n_pr = parser_._n_store();
-
-            if (i < n_tk + n_pr)
-                return parser_._store_info(i - n_tk);
-
-            return MemorySizeInfo::sentinel();
+            tokenizer_.visit_pools(visitor);
+            parser_.visit_pools(visitor);
         }
 
         bool

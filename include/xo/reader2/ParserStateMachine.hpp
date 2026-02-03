@@ -36,7 +36,7 @@ namespace xo {
             using AAllocator = xo::mm::AAllocator;
             using ArenaConfig = xo::mm::ArenaConfig;
             using DArena = xo::mm::DArena;
-            using MemorySizeInfo = xo::mm::MemorySizeInfo;
+            using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using size_type = std::size_t;
 
         public:
@@ -62,10 +62,8 @@ namespace xo {
             /** top of parser stack **/
             obj<ASyntaxStateMachine> top_ssm() const;
 
-            /** number of distinct memory pools owned by PS **/
-            std::size_t _n_store() const noexcept;
-            /** memory consumption for i'th memory pool **/
-            MemorySizeInfo _store_info(std::size_t i) const noexcept;
+            /** visit psm-owned memory pools; call visitor(info) for each **/
+            void visit_pools(const MemorySizeVisitor & visitor) const;
 
             ///@}
 

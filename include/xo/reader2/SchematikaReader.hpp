@@ -36,7 +36,7 @@ namespace xo {
         class SchematikaReader {
         public:
             using AAllocator = xo::mm::AAllocator;
-            using MemorySizeInfo = xo::mm::MemorySizeInfo;
+            using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using span_type = xo::mm::span<const char>;
             using size_type = std::size_t;
 
@@ -44,8 +44,11 @@ namespace xo {
             SchematikaReader(const ReaderConfig & config,
                              obj<AAllocator> expr_alloc);
 
-            std::size_t _n_store() const noexcept;
-            MemorySizeInfo _store_info(std::size_t i) const noexcept;
+            /** visit reader-owned memory pools; call visitor(info) for each.
+             *  Specifically exclude expr_alloc, since we don't consider
+             *  that reader-owned
+             **/
+            void visit_pools(const MemorySizeVisitor & visitor) const;
 
             /** true iff parser is at top-level.
              *  false iff parser is working on incomplete expression
