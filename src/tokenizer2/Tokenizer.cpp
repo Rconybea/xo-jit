@@ -6,6 +6,7 @@
 #include "Tokenizer.hpp"
 
 namespace xo {
+    using xo::mm::MemorySizeInfo;
     using std::byte;
 
     namespace scm {
@@ -19,6 +20,18 @@ namespace xo {
         Tokenizer::discard_current_line()
         {
             this->input_state_.discard_current_line();
+        }
+
+        std::size_t
+        Tokenizer::_n_store() const noexcept
+        {
+            return input_buffer_._n_store();
+        }
+
+        MemorySizeInfo
+        Tokenizer::_store_info(std::size_t i) const noexcept
+        {
+            return input_buffer_._store_info(i);
         }
 
         bool
