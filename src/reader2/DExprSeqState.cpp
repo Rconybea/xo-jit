@@ -12,14 +12,19 @@
 
 #include <xo/expression2/DConstant.hpp>
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
+
 #include <xo/object2/DString.hpp>
 #include <xo/object2/string/IGCObject_DString.hpp>
+
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/number/IGCObject_DFloat.hpp>
-#include <xo/object2/DBoolean.hpp>
-#include <xo/object2/number/IGCObject_DInteger.hpp>
+
 #include <xo/object2/DInteger.hpp>
+#include <xo/object2/number/IGCObject_DInteger.hpp>
+
+#include <xo/object2/DBoolean.hpp>
 #include <xo/object2/boolean/IGCObject_DBoolean.hpp>
+
 #include <xo/gc/GCObject.hpp>
 
 namespace xo {
@@ -336,8 +341,8 @@ namespace xo {
             switch (seqtype_) {
             case exprseqtype::toplevel_interactive:
                 {
-                    auto i64o = DFloat::box<AGCObject>(p_psm->expr_alloc(),
-                                                       tk.i64_value());
+                    auto i64o = DInteger::box<AGCObject>(p_psm->expr_alloc(),
+                                                         tk.i64_value());
                     auto expr = DConstant::make(p_psm->expr_alloc(), i64o);
 
                     DProgressSsm::start(p_psm->parser_alloc(),

@@ -197,6 +197,60 @@ namespace xo {
             //REQUIRE(result.error_description());
         }
 
+        TEST_CASE("SchematikaParser-interactive-integer", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ArenaConfig config;
+            config.name_ = "test-arena";
+            config.size_ = 16 * 1024;
+
+            DArena expr_arena = DArena::map(config);
+            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
+
+            SchematikaParser parser(config, 4096, expr_alloc, false /*debug_flag*/);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    1011 ;
+             *
+             **/
+
+            {
+                auto & result = parser.on_token(Token::i64_token("1011"));
+
+                log && log("after integer token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
+            {
+                auto & result = parser.on_token(Token::semicolon_token());
+
+                log && log("after semicolon token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == false);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_expression());
+                REQUIRE(result.result_expr());
+            }
+
+            //REQUIRE(result.is_error());
+            //// illegal input on token
+            //REQUIRE(result.error_description());
+        }
+
         TEST_CASE("SchematikaParser-interactive-lambda", "[reader2][SchematikaParser]")
         {
             constexpr bool c_debug_flag = true;
