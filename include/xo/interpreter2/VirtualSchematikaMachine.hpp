@@ -61,14 +61,14 @@ namespace xo {
             using Stack = void *;
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
-            using MemorySizeInfo = xo::mm::MemorySizeInfo;
+            using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using span_type = xo::mm::span<const char>;
 
         public:
             VirtualSchematikaMachine(const VsmConfig & config);
 
-            size_t _n_store() const noexcept;
-            MemorySizeInfo _store_info(std::size_t i) const noexcept;
+            /** visit vsm-owned memory pools; call visitor(info) for each **/
+            void visit_pools(const MemorySizeVisitor & visitor) const;
 
             /** begin interactive session. **/
             void begin_interactive_session();

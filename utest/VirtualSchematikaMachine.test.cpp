@@ -28,6 +28,7 @@ namespace xo {
     using xo::scm::VsmResultExt;
     using xo::scm::DFloat;
     using xo::mm::AGCObject;
+    using xo::mm::MemorySizeInfo;
     using span_type = xo::scm::VirtualSchematikaMachine::span_type;
     using Catch::Matchers::WithinAbs;
 
@@ -55,6 +56,8 @@ namespace xo {
     namespace ut {
         TEST_CASE("VirtualSchematikaMachine-ctor", "[interpreter2][VSM]")
         {
+            scope log(XO_DEBUG(true));
+
             VsmConfig cfg;
             VirtualSchematikaMachine vsm(cfg);
 
@@ -73,6 +76,15 @@ namespace xo {
 
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
+
+            auto visitor = [&log](const MemorySizeInfo & info) {
+                log && log(xtag("resource", info.resource_name_),
+                           xtag("alloc", info.allocated_),
+                           xtag("commit", info.committed_),
+                           xtag("resv", info.reserved_));
+            };
+
+            vsm.visit_pools(visitor);
         }
 
     } /*namespace ut*/

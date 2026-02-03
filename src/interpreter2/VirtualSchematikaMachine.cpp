@@ -30,20 +30,11 @@ namespace xo {
           reader_{config.rdr_config_, mm_.to_op()}
         {}
 
-        std::size_t
-        VirtualSchematikaMachine::_n_store() const noexcept
+        void
+        VirtualSchematikaMachine::visit_pools(const MemorySizeVisitor & visitor) const
         {
-            // oops. need something that goes through AAllocator api
-
-            return reader_._n_store();
-        }
-
-        MemorySizeInfo
-        VirtualSchematikaMachine::_store_info(std::size_t i) const noexcept
-        {
-            // oops. need something poly that goes through AAllocator api
-
-            return reader_._store_info(i);
+            mm_.visit_pools(visitor);
+            reader_.visit_pools(visitor);
         }
 
         void
