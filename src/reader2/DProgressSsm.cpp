@@ -1038,21 +1038,27 @@ namespace xo {
             obj<APrintable> lhs
                 = FacetRegistry::instance().variant<APrintable,AExpression>(lhs_);
 
-            obj<APrintable> rhs;
-            if (rhs_)
-                rhs = FacetRegistry::instance().variant<APrintable,AExpression>(rhs_);
+            obj<APrintable> rhs
+                = FacetRegistry::instance().try_variant<APrintable,AExpression>(rhs_);
 
-            (void)lhs;
-
-            return ppii.pps()->pretty_struct
-                       (ppii,
-                        "DProgressSsm",
-                        refrtag("lhs", lhs),
-                        refrtag("op", op_type_),
-                        cond(rhs, refrtag("rhs", rhs), "nullptr"),
-                        refrtag("expect", this->get_expect_str())
-                           );
-
+            if (rhs) {
+                return ppii.pps()->pretty_struct
+                           (ppii,
+                            "DProgressSsm",
+                            refrtag("lhs", lhs),
+                            refrtag("op", op_type_),
+                            refrtag("rhs", rhs),
+                            refrtag("expect", this->get_expect_str())
+                            );
+            } else {
+                return ppii.pps()->pretty_struct
+                           (ppii,
+                            "DProgressSsm",
+                            refrtag("lhs", lhs),
+                            refrtag("op", op_type_),
+                            refrtag("expect", this->get_expect_str())
+                            );
+            }
         }
 
         obj<AExpression>
@@ -1065,7 +1071,7 @@ namespace xo {
 
             constexpr const char * c_self_name = "DProgressSsm::assemble_expr";
 
-            if ((op_type_ != optype::invalid) && rhs_) {
+            if ((op_type_ != optype::invalid) && !rhs_) {
                 std::string errmsg_string = tostr("expected expression on rhs of operator op",
                                                   xtag("lhs", lhs_),
                                                   xtag("op", op_type_));

@@ -10,7 +10,9 @@
 #include <xo/reader2/ssm/ISyntaxStateMachine_DDefineSsm.hpp>
 #include <xo/reader2/init_reader2.hpp>
 #include <xo/expression2/DefineExpr.hpp>
+#include <xo/expression2/ApplyExpr.hpp>
 #include <xo/expression2/Constant.hpp>
+#include <xo/procedure2/Primitive_gco_2_gco_gco.hpp>
 #include <xo/object2/Float.hpp>
 #include <xo/object2/Integer.hpp>
 #include <xo/object2/String.hpp>
@@ -26,11 +28,13 @@ namespace xo {
 
     using xo::scm::AExpression;
     using xo::scm::DDefineExpr;
+    using xo::scm::DApplyExpr;
     using xo::scm::DConstant;
 
     //using xo::scm::ParserResult;
     using xo::scm::Token;
     using xo::mm::AGCObject;
+    using xo::scm::DPrimitive_gco_2_gco_gco;
     using xo::scm::DString;
     using xo::scm::DFloat;
     using xo::scm::DInteger;
@@ -400,6 +404,110 @@ namespace xo {
                 REQUIRE(value_str);
 
                 REQUIRE(strcmp(value_str->chars(), "hello world") == 0);
+            }
+
+            //REQUIRE(result.is_error());
+            //// illegal input on token
+            //REQUIRE(result.error_description());
+        }
+
+        TEST_CASE("SchematikaParser-interactive-arith", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ArenaConfig config;
+            config.name_ = "test-arena";
+            config.size_ = 16 * 1024;
+
+            DArena expr_arena = DArena::map(config);
+            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
+
+            SchematikaParser parser(config, 4096, expr_alloc, false /*debug_flag*/);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    3.14159265 * 0.5 ;
+             *
+             **/
+
+            {
+                auto & result = parser.on_token(Token::f64_token("3.14159265"));
+
+                log && log("after float(3.14159265) token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
+            {
+                auto & result = parser.on_token(Token::star_token());
+
+                log && log("after star token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
+            {
+                auto & result = parser.on_token(Token::f64_token("0.5"));
+
+                log && log("after float(0.5) token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
+            {
+                auto & result = parser.on_token(Token::semicolon_token());
+
+                log && log("after semicolon token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == false);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_expression());
+                REQUIRE(result.result_expr());
+
+                auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
+                REQUIRE(expr);
+
+                REQUIRE(expr->n_args() == 2);
+
+                auto fn = obj<AExpression,DConstant>::from(expr->fn());
+                REQUIRE(fn);
+
+                auto pm = obj<AGCObject,DPrimitive_gco_2_gco_gco>::from(fn->value());
+                REQUIRE(pm);
+                REQUIRE(pm->name() == "_mul");
+
+                auto lhs = obj<AExpression,DConstant>::from(expr->arg(0));
+                REQUIRE(lhs);
+
+                auto lhs_f64 = obj<AGCObject,DFloat>::from(lhs->value());
+                REQUIRE(lhs_f64);
+                REQUIRE(lhs_f64->value() == 3.14159265);
+
+                auto rhs = obj<AExpression,DConstant>::from(expr->arg(1));
+                REQUIRE(rhs);
+
+                auto rhs_f64 = obj<AGCObject,DFloat>::from(rhs->value());
+                REQUIRE(rhs_f64);
+                REQUIRE(rhs_f64->value() == 0.5);
             }
 
             //REQUIRE(result.is_error());
