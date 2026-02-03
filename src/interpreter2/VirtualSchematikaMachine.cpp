@@ -17,6 +17,7 @@ namespace xo {
     using xo::print::ppconfig;
     using xo::print::ppstate_standalone;
     using xo::mm::AGCObject;
+    using xo::mm::MemorySizeInfo;
     using xo::mm::DX1Collector;
     using xo::facet::FacetRegistry;
     using std::cout;
@@ -29,50 +30,84 @@ namespace xo {
           reader_{config.rdr_config_, mm_.to_op()}
         {}
 
-        VsmResult
+        std::size_t
+        VirtualSchematikaMachine::_n_store() const noexcept
+        {
+            // oops. need something that goes through AAllocator api
+
+            return reader_._n_store();
+        }
+
+        MemorySizeInfo
+        VirtualSchematikaMachine::_store_info(std::size_t i) const noexcept
+        {
+            // oops. need something poly that goes through AAllocator api
+
+            return reader_._store_info(i);
+        }
+
+        void
+        VirtualSchematikaMachine::begin_interactive_session()
+        {
+            reader_.begin_interactive_session();
+        }
+
+        void
+        VirtualSchematikaMachine::begin_batch_session()
+        {
+            reader_.begin_batch_session();
+        }
+
+        VsmResultExt
         VirtualSchematikaMachine::read_eval_print(span_type input, bool eof)
         {
             if (input.empty()) {
-                return VsmResult();
+                return VsmResultExt();
             }
 
             auto [expr, remaining, error1]
                 = reader_.read_expr(input, eof);
 
             if (!expr) {
-                return {
-                    .remaining_input_ = remaining,
-                    .tk_error_ = error1
-                };
+                /* tokenizer error */
+
+                return VsmResultExt(VsmResult(error1), remaining);
             }
 
-            auto [value, error2] = this->eval(expr);
+            VsmResult evalresult = this->start_eval(expr);
 
-            if (!value) {
-                return {
-                    .remaining_input_ = remaining,
-                    .tk_error_ = error2
-                };
+            if (evalresult.is_eval_error() || evalresult.is_tk_error()) {
+                return VsmResultExt(evalresult, remaining);
             }
+
+            assert(evalresult.is_value());
+
+            obj<AGCObject> * p_value = std::get_if<obj<AGCObject>>(&(evalresult.result_));
+
+            assert(p_value);
 
             obj<APrintable> value_pr
-                = FacetRegistry::instance().variant<APrintable,AGCObject>(value);
+                = FacetRegistry::instance().variant<APrintable,AGCObject>(*p_value);
 
             // pretty_toplevel(value_pr, &cout, ppconfig());
             ppconfig ppc;
             ppstate_standalone pps(&cout, 0, &ppc);
             pps.prettyn(value_pr);
 
-            return { .remaining_input_ = remaining };
+            return VsmResultExt(VsmResult(*p_value), remaining);
         }
 
-        std::pair<obj<AGCObject>, TokenizerError>
-        VirtualSchematikaMachine::eval(obj<AExpression> expr)
+        VsmResult
+        VirtualSchematikaMachine::start_eval(obj<AExpression> expr)
         {
-            (void)expr;
+            this->pc_ = VsmInstr::c_eval;
+            this->expr_ = expr;
+            this->value_ = obj<AGCObject>();
+            this->cont_ = VsmInstr::c_halt;
 
-            assert(false);
-            return std::make_pair(obj<AGCObject>(), TokenizerError());
+            this->run();
+
+            return value_;
         }
 
         void

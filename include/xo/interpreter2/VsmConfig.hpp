@@ -17,6 +17,9 @@ namespace xo {
 
             VsmConfig() = default;
 
+            /** true for interactive parser session; false for batch session **/
+            bool interactive_flag_ = true;
+
             /** reader configuration **/
             ReaderConfig rdr_config_;
             /** Configuration for allocator/collector.

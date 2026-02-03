@@ -4,6 +4,8 @@
  **/
 
 #include <xo/interpreter2/VirtualSchematikaMachine.hpp>
+#include <xo/object2/DFloat.hpp>
+#include <xo/object2/number/IGCObject_DFloat.hpp>
 
 #ifdef NOT_YET
 #include <xo/reader2/SchematikaParser.hpp>
@@ -16,12 +18,18 @@
 #ifdef NOT_YET
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
 #endif
+#include <xo/indentlog/print/hex.hpp>
 
 #include <catch2/catch.hpp>
 
 namespace xo {
     using xo::scm::VirtualSchematikaMachine;
     using xo::scm::VsmConfig;
+    using xo::scm::VsmResultExt;
+    using xo::scm::DFloat;
+    using xo::mm::AGCObject;
+    using span_type = xo::scm::VirtualSchematikaMachine::span_type;
+    using Catch::Matchers::WithinAbs;
 
 #ifdef NOT_YET
     using xo::scm::SchematikaParser;
@@ -39,27 +47,32 @@ namespace xo {
     using xo::mm::DArena;
     using xo::facet::with_facet;
 #endif
+    using std::cout;
+    using std::endl;
 
     static InitEvidence s_init = (InitSubsys<S_interpreter2_tag>::require());
 
     namespace ut {
         TEST_CASE("VirtualSchematikaMachine-ctor", "[interpreter2][VSM]")
         {
-            VirtualSchematikaMachine vsm(VsmConfig);
+            VsmConfig cfg;
+            VirtualSchematikaMachine vsm(cfg);
 
-#ifdef NOT_YET
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
+            bool eof_flag = false;
 
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
+            vsm.begin_interactive_session();
+            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("3.141592635;"), eof_flag);
 
-            SchematikaParser parser(config, 4096, expr_alloc, false /*debug_flag*/);
+            REQUIRE(res.is_value());
+            REQUIRE(res.value());
 
-            REQUIRE(parser.debug_flag() == false);
-            REQUIRE(parser.is_at_toplevel() == true);
-#endif
+            auto x = obj<AGCObject,DFloat>::from(*res.value());
+
+            REQUIRE(x);
+            REQUIRE_THAT(x.data()->value(), WithinAbs(3.141592635, 1e-6));
+
+            REQUIRE(res.remaining_.size() == 1);
+            REQUIRE(*res.remaining_.lo() == '\n');
         }
 
     } /*namespace ut*/

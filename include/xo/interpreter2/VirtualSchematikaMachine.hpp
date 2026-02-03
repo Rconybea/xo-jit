@@ -14,21 +14,42 @@
 
 namespace xo {
     namespace scm {
+        struct EvaluationError {
+            /** source location (in vsm implementation) at which error identified **/
+            std::string_view src_function_;
+            /** error description (allocated from ErrorArena) **/
+            std::string_view error_description_;
+            // TODO: info about location in schematika source
+        };
+
         /** similar to @ref xo::scm::ReaderResult **/
         struct VsmResult {
             using AGCObject = xo::mm::AGCObject;
             using span_type = xo::mm::span<const char>;
 
-            bool is_tk_error() const { return tk_error_.is_error(); }
+            VsmResult() = default;
+            VsmResult(obj<AGCObject> value) : result_{value} {}
+            VsmResult(TokenizerError err) : result_{err} {}
+
+            bool is_value() const { return std::holds_alternative<obj<AGCObject>>(result_); }
+            bool is_tk_error() const { return std::holds_alternative<TokenizerError>(result_); }
+            bool is_eval_error() const { return std::holds_alternative<EvaluationError>(result_); }
+
+            const obj<AGCObject> * value() const { return std::get_if<obj<AGCObject>>(&result_); }
 
             /** result of evaluating first expression encountered in input **/
-            obj<AGCObject> value_;
+            std::variant<obj<AGCObject>, TokenizerError, EvaluationError> result_;
+        };
 
-            /** unconsumed portion of input span **/
-            span_type remaining_input_;
+        /** vsm result + reamining span **/
+        struct VsmResultExt : public VsmResult {
+            using span_type = VsmResult::span_type;
 
-            /** {src_function, error_description, input_state, error_pos} **/
-            TokenizerError tk_error_;
+            VsmResultExt() = default;
+            VsmResultExt(const VsmResult & result, span_type rem) : VsmResult{result}, remaining_{rem} {}
+
+            /** unconsumed portion of input **/
+            VsmResult::span_type remaining_;
         };
 
         /** @class VirtualSchematikaMachine
@@ -40,16 +61,29 @@ namespace xo {
             using Stack = void *;
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
+            using MemorySizeInfo = xo::mm::MemorySizeInfo;
             using span_type = xo::mm::span<const char>;
 
         public:
             VirtualSchematikaMachine(const VsmConfig & config);
 
-            /** consume input @p input_cstr **/
-            VsmResult read_eval_print(span_type input_span, bool eof);
+            size_t _n_store() const noexcept;
+            MemorySizeInfo _store_info(std::size_t i) const noexcept;
 
-            /** evaluate expression @p expr **/
-            std::pair<obj<AGCObject>, TokenizerError> eval(obj<AExpression> expr);
+            /** begin interactive session. **/
+            void begin_interactive_session();
+            /** begin batch session **/
+            void begin_batch_session();
+
+            /** consume input @p input_cstr.
+             *  Require: must first start interactive/batch session
+             **/
+            VsmResultExt read_eval_print(span_type input_span, bool eof);
+
+            /** evaluate expression @p expr
+             *  Require: must first start interactive/batch session
+             **/
+            VsmResult start_eval(obj<AExpression> expr);
 
             /** borrow calling thread to run indefinitely,
              *  until halt instruction
@@ -124,13 +158,16 @@ namespace xo {
             /** configuration **/
             VsmConfig config_;
 
+            /** allocator (likely collector) for
+             *  expressions and values
+             **/
             box<AAllocator> mm_;
 
             /** reader: text -> expression **/
             SchematikaReader reader_;
 
             /** program counter **/
-            VsmInstr pc_ = VsmInstr::halt();
+            VsmInstr pc_ = VsmInstr::c_halt;
 
 #ifdef NOT_YET
             /** stack pointer **/
@@ -141,10 +178,10 @@ namespace xo {
             obj<AExpression> expr_;
 
             /** result register **/
-            obj<AGCObject> value_;
+            VsmResult value_;
 
             /** continuation register **/
-            VsmInstr cont_ = VsmInstr::halt();
+            VsmInstr cont_ = VsmInstr::c_halt;
         };
     } /*namespace scm*/
 } /*namespace xo*/

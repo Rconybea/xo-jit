@@ -13,8 +13,8 @@ namespace xo {
         public:
             explicit VsmInstr(vsm_opcode oc) : opcode_{oc} {}
 
-            static VsmInstr halt() { return VsmInstr{vsm_opcode::halt}; }
-            static VsmInstr eval() { return VsmInstr{vsm_opcode::eval}; }
+            static VsmInstr c_halt;
+            static VsmInstr c_eval;
 
             vsm_opcode opcode() const noexcept { return opcode_; }
 
