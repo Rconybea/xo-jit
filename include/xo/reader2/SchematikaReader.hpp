@@ -36,12 +36,16 @@ namespace xo {
         class SchematikaReader {
         public:
             using AAllocator = xo::mm::AAllocator;
+            using MemorySizeInfo = xo::mm::MemorySizeInfo;
             using span_type = xo::mm::span<const char>;
             using size_type = std::size_t;
 
         public:
             SchematikaReader(const ReaderConfig & config,
                              obj<AAllocator> expr_alloc);
+
+            std::size_t _n_store() const noexcept;
+            MemorySizeInfo _store_info(std::size_t i) const noexcept;
 
             /** true iff parser is at top-level.
              *  false iff parser is working on incomplete expression
@@ -52,6 +56,11 @@ namespace xo {
              *  (allows rvalue expressions at toplevel)
              **/
             void begin_interactive_session();
+
+            /** prepare batch session
+             *  (limits expression types at toplevel)
+             **/
+            void begin_batch_session();
 
             /** consume input @p input_cstr **/
             const ReaderResult & read_expr(span_type input_span, bool eof);

@@ -156,6 +156,7 @@ namespace xo {
             using token_type = Token;
             using ArenaConfig = xo::mm::ArenaConfig;
             using AAllocator = xo::mm::AAllocator;
+            using MemorySizeInfo = xo::mm::MemorySizeInfo;
             using ppindentinfo = xo::print::ppindentinfo;
             using size_type = std::size_t;
 
@@ -191,6 +192,11 @@ namespace xo {
 
             /** top of parser stack **/
             obj<ASyntaxStateMachine> top_ssm() const;
+
+            /** number of distinct memory pools owned by PS **/
+            std::size_t _n_store() const noexcept;
+            /** memory consumption for i'th memory pool **/
+            MemorySizeInfo _store_info(std::size_t i) const noexcept;
 
             ///@}
             /** scm-schematikaparser-general-methods **/

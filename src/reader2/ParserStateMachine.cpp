@@ -16,6 +16,7 @@
 #include <stdexcept>
 
 namespace xo {
+    using xo::mm::MemorySizeInfo;
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
     using xo::facet::with_facet;
@@ -51,6 +52,29 @@ namespace xo {
         ParserStateMachine::top_ssm() const
         {
             return this->stack_->top();
+        }
+
+        std::size_t
+        ParserStateMachine::_n_store() const noexcept
+        {
+            return stringtable_._n_store() + 1;
+        }
+
+        MemorySizeInfo
+        ParserStateMachine::_store_info(std::size_t i) const noexcept
+        {
+            size_t n0 = stringtable_._n_store();
+
+            if (i < n0) 
+                return stringtable_._store_info(i);
+
+            if (i == n0)
+                return parser_alloc_._store_info();
+
+            // not counting expr_alloc_. We don't consider
+            // that to be owned by ParserStateMachine
+
+            return MemorySizeInfo::sentinel();
         }
 
         void

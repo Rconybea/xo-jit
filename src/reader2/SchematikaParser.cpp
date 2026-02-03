@@ -13,6 +13,7 @@
 
 namespace xo {
     using xo::mm::AAllocator;
+    using xo::mm::MemorySizeInfo;
     using xo::tostr;
     using xo::xtag;
 
@@ -44,6 +45,18 @@ namespace xo {
         SchematikaParser::top_ssm() const
         {
             return psm_.top_ssm();
+        }
+
+        std::size_t
+        SchematikaParser::_n_store() const noexcept
+        {
+            return psm_._n_store();
+        }
+
+        MemorySizeInfo
+        SchematikaParser::_store_info(std::size_t i) const noexcept
+        {
+            return psm_._store_info(i);
         }
 
         void

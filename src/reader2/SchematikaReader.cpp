@@ -6,6 +6,8 @@
 #include "SchematikaReader.hpp"
 
 namespace xo {
+    using xo::mm::MemorySizeInfo;
+
     namespace scm {
         SchematikaReader::SchematikaReader(const ReaderConfig & config,
                                            obj<AAllocator> expr_alloc)
@@ -19,6 +21,29 @@ namespace xo {
         {
         }
 
+        std::size_t
+        SchematikaReader::_n_store() const noexcept
+        {
+            return tokenizer_._n_store() + parser_._n_store();
+        }
+        
+        MemorySizeInfo
+        SchematikaReader::_store_info(std::size_t i) const noexcept
+        {
+            size_t n_tk = tokenizer_._n_store();
+
+            if (i < n_tk) {
+                return tokenizer_._store_info(i);
+            }
+
+            size_t n_pr = parser_._n_store();
+
+            if (i < n_tk + n_pr)
+                return parser_._store_info(i - n_tk);
+
+            return MemorySizeInfo::sentinel();
+        }
+
         bool
         SchematikaReader::is_at_toplevel() const noexcept
         {
@@ -29,6 +54,12 @@ namespace xo {
         SchematikaReader::begin_interactive_session()
         {
             parser_.begin_interactive_session();
+        }
+
+        void
+        SchematikaReader::begin_batch_session()
+        {
+            parser_.begin_batch_session();
         }
 
         // TODO:
