@@ -61,7 +61,7 @@ namespace xo {
             using error_type = TokenizerError;
             using DCircularBuffer = xo::mm::DCircularBuffer;
             using CircularBufferConfig = xo::mm::CircularBufferConfig;
-            using MemorySizeInfo = xo::mm::MemorySizeInfo;
+            using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using span_type = xo::mm::span<const CharT>;
             //using input_state_type = TkInputState;
             using result_type = scan_result;
@@ -91,10 +91,8 @@ namespace xo {
             const TkInputState & input_state() const { return input_state_; }
 #pragma GCC diagnostic pop
 
-            /** number of distinct memory pools owned by tokenizer **/
-            std::size_t _n_store() const noexcept;
-            /** memory consumption for i'th memory pool **/
-            MemorySizeInfo _store_info(std::size_t i) const noexcept;
+            /** visit tokenizer-owned memory pools; invoke visitor(info) for each one **/
+            void visit_pools(const MemorySizeVisitor & visitor) const;
 
             ///@}
 

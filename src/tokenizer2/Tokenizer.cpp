@@ -22,16 +22,10 @@ namespace xo {
             this->input_state_.discard_current_line();
         }
 
-        std::size_t
-        Tokenizer::_n_store() const noexcept
+        void
+        Tokenizer::visit_pools(const MemorySizeVisitor & visitor) const
         {
-            return input_buffer_._n_store();
-        }
-
-        MemorySizeInfo
-        Tokenizer::_store_info(std::size_t i) const noexcept
-        {
-            return input_buffer_._store_info(i);
+            input_buffer_.visit_pools(visitor);
         }
 
         bool
