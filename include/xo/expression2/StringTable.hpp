@@ -21,6 +21,7 @@ namespace xo {
         class StringTable {
         public:
             using DArena = xo::mm::DArena;
+            using MemorySizeInfo = xo::mm::MemorySizeInfo;
             using StringMap = xo::map::DArenaHashMap<std::string_view,
                                                      DUniqueString*>;
             using size_type = StringMap::size_type;
@@ -44,6 +45,9 @@ namespace xo {
              *  Act on failure according to policy @p p
              **/
             bool verify_ok(verify_policy p = verify_policy::throw_only()) const;
+
+            std::size_t _n_store() const noexcept;
+            MemorySizeInfo _store_info(std::size_t i) const noexcept;
 
         private:
             /** allocate string storage in this arena; use DString to represent each string.

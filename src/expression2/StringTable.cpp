@@ -10,6 +10,7 @@
 namespace xo {
     using xo::mm::ArenaConfig;
     using xo::mm::AAllocator;
+    using xo::mm::MemorySizeInfo;
     using xo::facet::with_facet;
     using xo::facet::obj;
 
@@ -157,6 +158,24 @@ namespace xo {
             }
 
             return true;
+        }
+
+        std::size_t
+        StringTable::_n_store() const noexcept
+        {
+            return 1 + map_._n_store();
+        }
+
+        MemorySizeInfo
+        StringTable::_store_info(std::size_t i) const noexcept
+        {
+            if (i == 0) 
+                return strings_._store_info();
+                
+            if (i+1 < map_._n_store())
+                return map_._store_info(i-1);
+
+            return MemorySizeInfo::sentinel();
         }
 
     } /*namespace scm*/
