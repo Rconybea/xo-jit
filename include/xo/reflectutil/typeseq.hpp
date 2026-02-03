@@ -16,6 +16,10 @@ namespace xo {
          */
         template<typename Tag = class typeseq_tag>
         struct typeseq_impl {
+            /** create sentinel value **/
+            typeseq_impl() = default;
+
+            /** typeseq with specific unique id **/
             explicit typeseq_impl(int32_t s) : seqno_{s} {}
 
             /** Can't have this be constexpr.
@@ -56,7 +60,7 @@ namespace xo {
         private:
             static int32_t s_next_id;
 
-            int32_t seqno_;
+            int32_t seqno_ = 0;
         };
 
         template <typename Tag>
