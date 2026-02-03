@@ -9,6 +9,8 @@
 #include <xo/reader2/ssm/ISyntaxStateMachine_DExpectExprSsm.hpp>
 #include <xo/reader2/ssm/ISyntaxStateMachine_DDefineSsm.hpp>
 #include <xo/reader2/init_reader2.hpp>
+#include <xo/expression2/Constant.hpp>
+#include <xo/object2/Integer.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
 #include <catch2/catch.hpp>
 
@@ -18,11 +20,15 @@ namespace xo {
     using xo::scm::syntaxstatetype;
 //    using xo::scm::DDefineSsm;
     using xo::scm::DExpectExprSsm;
+    using xo::scm::AExpression;
+    using xo::scm::DConstant;
 //    using xo::scm::defexprstatetype;
     //using xo::scm::ParserResult;
     //using xo::scm::parser_result_type;
     using xo::scm::Token;
     using xo::scm::DString;
+    using xo::scm::DInteger;
+    using xo::mm::AGCObject;
     using xo::mm::ArenaConfig;
     using xo::mm::AAllocator;
     using xo::mm::DArena;
@@ -244,6 +250,17 @@ namespace xo {
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_expression());
                 REQUIRE(result.result_expr());
+
+                auto expr = obj<AExpression,DConstant>::from(result.result_expr());
+                REQUIRE(expr);
+
+                REQUIRE(expr->value());
+
+                auto value_i64 = obj<AGCObject,DInteger>::from(expr->value());
+
+                REQUIRE(value_i64);
+
+                REQUIRE(value_i64->value() == 1011);
             }
 
             //REQUIRE(result.is_error());
