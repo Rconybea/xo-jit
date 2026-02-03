@@ -19,7 +19,7 @@ namespace xo {
                                  bool debug_flag)
         : strings_{DArena::map(ArenaConfig{.name_ = "strings",
                                            .size_ = hint_max_capacity})},
-          map_{hint_max_capacity}
+          map_{"stringkeys", hint_max_capacity}
         {
             (void)debug_flag;
         }
