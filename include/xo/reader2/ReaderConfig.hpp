@@ -28,7 +28,7 @@ namespace xo {
             bool tk_debug_flag_ = false;
 
             /** arena configuration for parser stack **/
-            ArenaConfig parser_arena_config_ { .name_ = "parer-arena",
+            ArenaConfig parser_arena_config_ { .name_ = "parser-arena",
                                                .size_ = 2*1024*1024,
                                                .hugepage_z_ = 2*1024*1024,
                                                .store_header_flag_ = false,
