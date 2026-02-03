@@ -29,6 +29,7 @@ namespace xo {
     using xo::scm::DFloat;
     using xo::mm::AGCObject;
     using xo::mm::MemorySizeInfo;
+    using xo::facet::FacetRegistry;
     using span_type = xo::scm::VirtualSchematikaMachine::span_type;
     using Catch::Matchers::WithinAbs;
 
@@ -84,6 +85,7 @@ namespace xo {
                            xtag("resv", info.reserved_));
             };
 
+            FacetRegistry::instance().visit_pools(visitor);
             vsm.visit_pools(visitor);
         }
 
