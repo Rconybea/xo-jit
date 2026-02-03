@@ -21,7 +21,7 @@ namespace xo {
         class StringTable {
         public:
             using DArena = xo::mm::DArena;
-            using MemorySizeInfo = xo::mm::MemorySizeInfo;
+            using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using StringMap = xo::map::DArenaHashMap<std::string_view,
                                                      DUniqueString*>;
             using size_type = StringMap::size_type;
@@ -46,8 +46,8 @@ namespace xo {
              **/
             bool verify_ok(verify_policy p = verify_policy::throw_only()) const;
 
-            std::size_t _n_store() const noexcept;
-            MemorySizeInfo _store_info(std::size_t i) const noexcept;
+            /** visit string-table memory pools, call visitor(info) for each **/
+            void visit_pools(const MemorySizeVisitor & visitor) const;
 
         private:
             /** allocate string storage in this arena; use DString to represent each string.
