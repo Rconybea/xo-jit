@@ -80,6 +80,7 @@ namespace xo {
 
             auto visitor = [&log](const MemorySizeInfo & info) {
                 log && log(xtag("resource", info.resource_name_),
+                           xtag("used", info.used_),
                            xtag("alloc", info.allocated_),
                            xtag("commit", info.committed_),
                            xtag("resv", info.reserved_));
