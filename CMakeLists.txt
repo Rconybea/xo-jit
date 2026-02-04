@@ -23,6 +23,65 @@ add_definitions(${PROJECT_CXX_FLAGS})
 add_subdirectory(src/interpreter2)
 add_subdirectory(utest)
 
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-gcobject-vsmapplyframe
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR VsmApplyFrame
+    INPUT idl/IGCObject_DVsmApplyFrame.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-printable-vsmapplyframe
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR VsmApplyFrame
+    INPUT idl/IPrintable_DVsmApplyFrame.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-gcobject-vsmevalargsframe
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR VsmEvalArgsFrame
+    INPUT idl/IGCObject_DVsmEvalArgsFrame.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-printable-vsmevalargsframe
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR DVsmEvalArgsFrame
+    INPUT idl/IPrintable_DVsmEvalArgsFrame.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# ----------------------------------------------------------------
+
+xo_add_genfacet_all(xo-interpreter2-genfacet-all)
+
+# ----------------------------------------------------------------
+# cmake helper (for external xo-interpreter2 users)
+
 xo_export_cmake_config(${PROJECT_NAME} ${PROJECT_VERSION} ${PROJECT_NAME}Targets)
 
 # ----------------------------------------------------------------

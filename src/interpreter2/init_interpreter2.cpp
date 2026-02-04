@@ -5,31 +5,23 @@
 
 #include "init_interpreter2.hpp"
 
-#ifdef NOT_YET
 #include "interpreter2_register_facets.hpp"
 #include "interpreter2_register_types.hpp"
-#endif
 
 #include <xo/reader2/init_reader2.hpp>
-#ifdef NOT_YET
 #include <xo/gc/CollectorTypeRegistry.hpp>
-#endif
 
 namespace xo {
-#ifdef NOT_YET
     using xo::scm::interpreter2_register_facets;
     using xo::scm::interpreter2_register_types;
     using xo::mm::CollectorTypeRegistry;
-#endif
 
     void
     InitSubsys<S_interpreter2_tag>::init()
     {
-#ifdef NOT_YET
         interpreter2_register_facets();
 
         CollectorTypeRegistry::instance().register_types(&interpreter2_register_types);
-#endif
     }
 
     InitEvidence

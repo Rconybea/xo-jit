@@ -181,7 +181,7 @@ namespace xo {
             VsmInstr pc_ = VsmInstr::c_halt;
 
             /** stack pointer **/
-            VsmFrame * stack_ = nullptr;
+            obj<AGCObject> stack_;
 
             /** expression register **/
             obj<AExpression> expr_;

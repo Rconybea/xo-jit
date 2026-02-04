@@ -7,6 +7,21 @@
 
 namespace xo {
     namespace scm {
+        const char *
+        vsm_opcode_descr(vsm_opcode x)
+        {
+            switch (x) {
+            case vsm_opcode::halt: return "halt";
+            case vsm_opcode::eval: return "eval";
+            case vsm_opcode::apply: return "apply";
+            case vsm_opcode::evalargs: return "evalargs";
+            case vsm_opcode::N:
+                break;
+            }
+
+            return "opcode?";
+        }
+
         VsmInstr
         VsmInstr::c_halt = VsmInstr(vsm_opcode::halt);
 

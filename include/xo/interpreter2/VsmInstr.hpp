@@ -24,6 +24,12 @@ namespace xo {
         private:
             vsm_opcode opcode_;
         };
+
+        inline std::ostream &
+        operator<<(std::ostream & os, VsmInstr x) {
+            os << x.opcode();
+            return os;
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

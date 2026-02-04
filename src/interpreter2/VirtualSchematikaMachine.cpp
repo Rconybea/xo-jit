@@ -4,6 +4,8 @@
  **/
 
 #include "VirtualSchematikaMachine.hpp"
+#include "VsmApplyFrame.hpp"
+#include "VsmEvalArgsFrame.hpp"
 #include <xo/expression2/ApplyExpr.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/gc/DX1Collector.hpp>
@@ -111,6 +113,17 @@ namespace xo {
         bool
         VirtualSchematikaMachine::execute_one()
         {
+            scope log(XO_DEBUG(true));
+            log && log(xtag("pc", pc_),
+                       xtag("cont", cont_));
+
+            obj<APrintable> stack_pr
+                = (FacetRegistry::instance()
+                   .try_variant<APrintable,AGCObject>(stack_));
+
+            if (stack_pr)
+                log && log(xtag("stack", stack_pr));
+
             switch (pc_.opcode()) {
             case vsm_opcode::halt:
             case vsm_opcode::N:
@@ -222,11 +235,13 @@ namespace xo {
 
             // TODO: check function signature
 
-            VsmApplyFrame * apply_frame
-                = VsmApplyFrame::make(mm_.to_op(), stack_, cont_, args);
+            auto apply_frame
+                = obj<AGCObject,DVsmApplyFrame>
+                (DVsmApplyFrame::make(mm_.to_op(), stack_, cont_, args));
 
-            VsmEvalArgsFrame * evalargs_frame
-                = VsmEvalArgsFrame::make(mm_.to_op(), apply_frame, VsmInstr::c_apply);
+            auto evalargs_frame
+                = obj<AGCObject,DVsmEvalArgsFrame>
+                (DVsmEvalArgsFrame::make(mm_.to_op(), apply_frame, VsmInstr::c_apply));
 
             this->stack_ = evalargs_frame;
 

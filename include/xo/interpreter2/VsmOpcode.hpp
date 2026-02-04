@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <ostream>
 #include <cstdint>
 
 namespace xo {
@@ -32,6 +33,16 @@ namespace xo {
         };
 
         static constexpr uint32_t n_opcode = static_cast<uint32_t>(vsm_opcode::N);
+
+        /** stringified enum value **/
+        const char *
+        vsm_opcode_descr(vsm_opcode x);
+
+        inline std::ostream &
+        operator<<(std::ostream & os, vsm_opcode x) {
+            os << vsm_opcode_descr(x);
+            return os;
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

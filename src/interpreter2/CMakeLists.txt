@@ -3,11 +3,21 @@
 set(SELF_LIB xo_interpreter2)
 set(SELF_SRCS
     init_interpreter2.cpp
+    interpreter2_register_facets.cpp
+    interpreter2_register_types.cpp
+
     VirtualSchematikaMachine.cpp
-    VsmFrame.cpp
+
+    DVsmEvalArgsFrame.cpp
+    IGCObject_DVsmEvalArgsFrame.cpp
+    IPrintable_DVsmEvalArgsFrame.cpp
+
+    DVsmApplyFrame.cpp
+    IGCObject_DVsmApplyFrame.cpp
+    IPrintable_DVsmApplyFrame.cpp
+
     VsmInstr.cpp
     #IExpression_Any.cpp
-    #interpreter2_register_facets.cpp
     )
 
 xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 ${SELF_SRCS})
