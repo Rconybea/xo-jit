@@ -93,33 +93,17 @@ namespace xo {
                 = FacetRegistry::instance().try_variant<APrintable,
                                                         AExpression>(when_false_);
 
-            if (when_false) {
-                return ppii.pps()->pretty_struct
-                           (ppii,
-                            "DIfElseExpr",
-                            refrtag("typeref", typeref_),
-                            refrtag("test", test),
-                            refrtag("when_true", when_true),
-                            refrtag("when_false", when_false));
-            } else if (when_true) {
-                return ppii.pps()->pretty_struct
-                           (ppii,
-                            "DIfElseExpr",
-                            refrtag("typeref", typeref_),
-                            refrtag("test", test),
-                            refrtag("when_true", when_true));
-            } else if (test) {
-                return ppii.pps()->pretty_struct
-                           (ppii,
-                            "DIfElseExpr",
-                            refrtag("typeref", typeref_),
-                            refrtag("test", test));
-            } else {
-                return ppii.pps()->pretty_struct
-                           (ppii,
-                            "DIfElseExpr",
-                            refrtag("typeref", typeref_));
-            }
+            bool test_present = test;
+            bool when_true_present = when_true;
+            bool when_false_present = when_false;
+
+            return ppii.pps()->pretty_struct
+                       (ppii,
+                        "DIfElseExpr",
+                        refrtag("typeref", typeref_),
+                        refrtag("test", test, test_present),
+                        refrtag("when_true", when_true, when_true_present),
+                        refrtag("when_false", when_false, when_false_present));
         }
 
         // GCObject facet
