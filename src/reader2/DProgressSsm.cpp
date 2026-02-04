@@ -1041,24 +1041,16 @@ namespace xo {
             obj<APrintable> rhs
                 = FacetRegistry::instance().try_variant<APrintable,AExpression>(rhs_);
 
-            if (rhs) {
-                return ppii.pps()->pretty_struct
-                           (ppii,
-                            "DProgressSsm",
-                            refrtag("lhs", lhs),
-                            refrtag("op", op_type_),
-                            refrtag("rhs", rhs),
-                            refrtag("expect", this->get_expect_str())
-                            );
-            } else {
-                return ppii.pps()->pretty_struct
-                           (ppii,
-                            "DProgressSsm",
-                            refrtag("lhs", lhs),
-                            refrtag("op", op_type_),
-                            refrtag("expect", this->get_expect_str())
-                            );
-            }
+            bool rhs_present = rhs;
+
+            return ppii.pps()->pretty_struct
+                       (ppii,
+                        "DProgressSsm",
+                        refrtag("lhs", lhs),
+                        refrtag("op", op_type_),
+                        refrtag("rhs", rhs, rhs_present),
+                        refrtag("expect", this->get_expect_str())
+                        );
         }
 
         obj<AExpression>
