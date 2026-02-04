@@ -317,7 +317,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-uniquestring
     FACET_PKG xo_printable2
     FACET Printable
-    REPR DUniqueString
+    REPR UniqueString
     INPUT idl/IPrintable_DUniqueString.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
