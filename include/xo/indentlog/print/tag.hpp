@@ -6,6 +6,7 @@
 #include "concat.hpp"
 #include "quoted.hpp"
 #include "color.hpp"
+#include <concepts>
 #include <iostream>
 
 // STRINGIFY(xyz) -> "xyz"
@@ -20,6 +21,12 @@
 #define XTAG(x) xo::xtag(STRINGIFY(x), x)
 
 namespace xo {
+    /** concept: true if T has a .present() method returning something bool-like **/
+    template <typename T>
+    concept has_present = requires(const T& t) {
+        { t.present() } -> std::convertible_to<bool>;
+    };
+
     enum class tagstyle {
         /** print with automatic escapes for embedded special characters
          *  (any of ' ','"','\','\n','\r','\t').
@@ -79,10 +86,13 @@ namespace xo {
      **/
     template <bool PrefixSpace, tagstyle TagStyle, typename Name, typename Value>
     struct ref_tag_impl {
-        ref_tag_impl(Name const & n, Value const & v) : name_{n}, value_{v} {}
-        ref_tag_impl(Name && n, Value && v) : name_{std::forward<Name>(n)}, value_{std::forward<Value>(v)} {}
+        ref_tag_impl(Name const & n, Value const & v, bool present = true)
+            : name_{n}, value_{v}, present_{present} {}
+        ref_tag_impl(Name && n, Value && v, bool present = true)
+            : name_{std::forward<Name>(n)}, value_{std::forward<Value>(v)}, present_{present} {}
 
         constexpr bool prefix_space() const { return PrefixSpace; }
+        bool present() const { return present_; }
 
         Name const & name() const { return name_; }
         Value const & value() const { return value_; }
@@ -90,6 +100,7 @@ namespace xo {
     private:
         Name name_;
         const Value& value_;
+        bool present_ = true;
     };
 
     // ----- xtag -----
@@ -150,12 +161,14 @@ namespace xo {
     /** 'reference raw tag'.
      *  1. @p v must survive until refrtag is used (i.e. until tag inserted into some stream)
      *  2. don't escape whitespace when printing value (pretty-printing with parseable structure)
+     *
+     *  Print nothing if @p present is false
      **/
     template <typename Name, typename Value>
     auto
-    refrtag(Name && n, Value && v)
+    refrtag(Name && n, Value && v, bool present = true)
     {
-        return ref_tag_impl<false, tagstyle::raw, std::decay_t<Name>, std::decay_t<Value>>(n, v);
+        return ref_tag_impl<false, tagstyle::raw, std::decay_t<Name>, std::decay_t<Value>>(n, v, present);
     }
 
     // ----- xrefrtag -----
@@ -164,9 +177,9 @@ namespace xo {
      **/
     template <typename Name, typename Value>
     auto
-    xrefrtag(Name && n, Value && v)
+    xrefrtag(Name && n, Value && v, bool present = true)
     {
-        return ref_tag_impl<true, tagstyle::raw, std::decay_t<Name>, std::decay_t<Value>>(n, v);
+        return ref_tag_impl<true, tagstyle::raw, std::decay_t<Name>, std::decay_t<Value>>(n, v, present);
     }
 
     // ----- operator<< on tag_impl -----
@@ -199,6 +212,9 @@ namespace xo {
     operator<<(std::ostream &s,
                ref_tag_impl<PrefixSpace, TagStyle, Name, Value> const & tag)
     {
+        if (!tag.present())
+            return s;
+
         using xo::print::unq;
 
         if (PrefixSpace)

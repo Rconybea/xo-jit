@@ -256,6 +256,11 @@ namespace xo {
                                            Member && member,
                                            Rest&&... rest)
         {
+            if constexpr (has_present<std::decay_t<Member>>) {
+                if (!member.present())
+                    return this->print_upto_struct_members(ppii, rest...);
+            }
+
             if (this->print_upto(" ") && this->print_upto(member))
                 return this->print_upto_struct_members(ppii, rest...);
 
@@ -268,6 +273,13 @@ namespace xo {
                                        Member && member,
                                        Rest&&... rest)
         {
+            if constexpr (has_present<std::decay_t<Member>>) {
+                if (!member.present()) {
+                    this->pretty_struct_members(ppii, rest...);
+                    return;
+                }
+            }
+
             newline_indent(ppii.ci1());
             this->pretty(member);
             this->pretty_struct_members(ppii, rest...);
@@ -381,6 +393,11 @@ namespace xo {
                 static bool print_pretty(const ppindentinfo & ppii,
                                          const Tag & tag)
                     {
+                        if constexpr (has_present<Tag>) {
+                            if (!tag.present())
+                                return true;
+                        }
+
                         if (ppii.upto()) {
                             if (tag.prefix_space())
                                 ppii.pps()->write(" ");
