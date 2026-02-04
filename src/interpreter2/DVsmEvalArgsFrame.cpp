@@ -14,22 +14,26 @@ namespace xo {
 
         // ----- VsmEvalArgsFrame -----
 
-        DVsmEvalArgsFrame::DVsmEvalArgsFrame(obj<AGCObject> old_parent,
-                                             VsmInstr old_cont)
-        : VsmFrame(old_parent, old_cont)
+        DVsmEvalArgsFrame::DVsmEvalArgsFrame(DVsmApplyFrame * parent,
+                                             VsmInstr cont,
+                                             const DApplyExpr * apply_expr)
+        : parent_{parent},
+          cont_{cont},
+          apply_expr_{apply_expr}
         {}
 
         DVsmEvalArgsFrame *
         DVsmEvalArgsFrame::make(obj<AAllocator> mm,
-                                obj<AGCObject> apply_frame,
-                                VsmInstr cont)
+                                DVsmApplyFrame * apply_frame,
+                                VsmInstr cont,
+                                const DApplyExpr * apply_expr)
         {
             DVsmEvalArgsFrame * result = nullptr;
 
             void * mem = mm.alloc(typeseq::id<DVsmEvalArgsFrame>(),
                                   sizeof(DVsmEvalArgsFrame));
 
-            result = new (mem) DVsmEvalArgsFrame(apply_frame, cont);
+            result = new (mem) DVsmEvalArgsFrame(apply_frame, cont, apply_expr);
 
             assert(result);
 

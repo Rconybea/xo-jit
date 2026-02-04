@@ -5,16 +5,18 @@
 
 #pragma once
 
-#include "DVsmApplyFrame.hpp"
+#include "VsmApplyFrame.hpp"
+#include <xo/expression2/DApplyExpr.hpp>
 
 namespace xo {
     namespace scm {
 
         /** frame for executing an apply expression **/
-        class DVsmEvalArgsFrame : public VsmFrame {
+        class DVsmEvalArgsFrame {
         public:
             using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
+            using AGCObject = xo::mm::AGCObject;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
@@ -24,12 +26,21 @@ namespace xo {
              * old_cont   = [xfer to called function]
              *
              **/
-            DVsmEvalArgsFrame(obj<AGCObject> old_parent,
-                              VsmInstr old_cont);
+            DVsmEvalArgsFrame(DVsmApplyFrame * parent,
+                              VsmInstr cont,
+                              const DApplyExpr * apply_expr);
 
             static DVsmEvalArgsFrame * make(obj<AAllocator> mm,
-                                            obj<AGCObject> apply_frame,
-                                            VsmInstr old_cont);
+                                            DVsmApplyFrame * apply_frame,
+                                            VsmInstr old_cont,
+                                            const DApplyExpr * apply_expr);
+
+            DVsmApplyFrame * parent() const noexcept { return parent_; }
+            VsmInstr cont() const noexcept { return cont_; }
+            const DApplyExpr * apply_expr() const noexcept { return apply_expr_;  }
+            int32_t i_arg() const noexcept { return i_arg_; }
+
+            int32_t increment_arg() { return ++i_arg_; }
 
             std::size_t shallow_size() const noexcept;
             DVsmEvalArgsFrame * shallow_copy(obj<AAllocator> mm) const noexcept;
@@ -38,6 +49,14 @@ namespace xo {
             bool pretty(const ppindentinfo & ppii) const;
 
         protected:
+            /** parent stack frame **/
+            DVsmApplyFrame * parent_ = nullptr;
+            /** continuation after eval args completed (always VsmInstr::c_apply) **/
+            VsmInstr cont_;
+
+            /** expression being evaluated **/
+            const DApplyExpr * apply_expr_ = nullptr;
+
             /** next argument to be evaluated. -1 means function head **/
             int32_t i_arg_ = -1;
         };

@@ -20,9 +20,7 @@ namespace xo {
                      VsmInstr cont) : parent_{parent}, cont_{cont} {}
 
             //obj<AGCObject> parent() const noexcept { return parent_; }
-            VsmFrame * parent() const noexcept {
-                return reinterpret_cast<VsmFrame *>(parent_.data());
-            }
+            obj<AGCObject> parent() const noexcept { return parent_; }
             VsmInstr cont() const noexcept { return cont_; }
 
         protected:

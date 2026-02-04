@@ -147,7 +147,14 @@ namespace xo {
             /** apply a function to evaluated arguments **/
             void _do_apply_op();
 
-            /** evaluate arguments on behalf of a function call **/
+            /** evaluate arguments on behalf of a function call
+             *  Require:
+             * - expression value in @ref value_
+             * - stack:
+             *    [0] VsmEvalArgsFrame
+             *    [1] VsmApplyFrame
+             *    ...
+             **/
             void _do_evalargs_op();
 
         private:
@@ -159,6 +166,8 @@ namespace xo {
              * Other registers are not preserved
              *   pc_
              *   expr_
+             *   fn_
+             *   args_
              *   value_
              */
 
@@ -169,6 +178,11 @@ namespace xo {
              *  expressions and values
              **/
             box<AAllocator> mm_;
+
+            /** runtime context for this vsm.
+             *  For example, provides allocator to primitives
+             **/
+            box<ARuntimeContext> rcx_;
 
             // consider separate allocator (which _may_ turn out to be the same)
             // for VM stack. Only works for code that doesn't rely on fancy
@@ -185,6 +199,11 @@ namespace xo {
 
             /** expression register **/
             obj<AExpression> expr_;
+
+            /** function to call **/
+            obj<AProcedure> fn_;
+            /** evaluated argument list **/
+            DArray * args_;
 
             /** result register **/
             VsmResult value_;

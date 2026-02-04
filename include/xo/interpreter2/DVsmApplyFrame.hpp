@@ -29,6 +29,8 @@ namespace xo {
             obj<AProcedure> fn() const noexcept { return fn_; }
             DArray * args() const noexcept { return args_; }
 
+            void assign_fn(obj<AProcedure> x) { this->fn_ = x; }
+
             std::size_t shallow_size() const noexcept;
             DVsmApplyFrame * shallow_copy(obj<AAllocator> mm) const noexcept;
             std::size_t forward_children(obj<ACollector> gc) noexcept;

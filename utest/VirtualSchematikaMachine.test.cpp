@@ -166,10 +166,10 @@ namespace xo {
 
             log && log(xtag("res.tseq", res.value()->_typeseq()));
 
-            auto x = obj<AGCObject,DInteger>::from(*res.value());
+            auto x = obj<AGCObject,DFloat>::from(*res.value());
 
             REQUIRE(x);
-            REQUIRE(x.data()->value() == 1011);
+            REQUIRE(x.data()->value() == 1.570796325);
 
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
