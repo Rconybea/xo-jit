@@ -18,6 +18,15 @@ namespace xo {
             /** Evaluate expression in expr register **/
             eval,
 
+            /** Apply function in stack frame
+             *  See diagram in VirtualSchematikaMachine::_do_eval_apply_op
+             **/
+            apply,
+            /** Eval arguments to function.
+             *  See diagram in VirtualSchematikaMachine::_do_eval_apply_op
+             **/
+            evalargs,
+
             /** sentinel, counts number of opcodes **/
             N,
         };

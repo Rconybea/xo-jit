@@ -4,6 +4,7 @@ set(SELF_LIB xo_interpreter2)
 set(SELF_SRCS
     init_interpreter2.cpp
     VirtualSchematikaMachine.cpp
+    VsmFrame.cpp
     VsmInstr.cpp
     #IExpression_Any.cpp
     #interpreter2_register_facets.cpp

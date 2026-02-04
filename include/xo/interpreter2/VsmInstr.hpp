@@ -16,6 +16,9 @@ namespace xo {
             static VsmInstr c_halt;
             static VsmInstr c_eval;
 
+            static VsmInstr c_apply;
+            static VsmInstr c_evalargs;
+
             vsm_opcode opcode() const noexcept { return opcode_; }
 
         private:

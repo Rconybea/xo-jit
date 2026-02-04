@@ -4,8 +4,8 @@
  **/
 
 #include "VirtualSchematikaMachine.hpp"
-#include <xo/expression2/detail/IExpression_DConstant.hpp>
-#include <xo/expression2/DConstant.hpp>
+#include <xo/expression2/ApplyExpr.hpp>
+#include <xo/expression2/Constant.hpp>
 #include <xo/gc/DX1Collector.hpp>
 #include <xo/gc/detail/IAllocator_DX1Collector.hpp>
 #include <xo/printable2/Printable.hpp>
@@ -117,6 +117,13 @@ namespace xo {
                 return false;
             case vsm_opcode::eval:
                 _do_eval_op();
+                break;
+            case vsm_opcode::apply:
+                _do_apply_op();
+                break;
+            case vsm_opcode::evalargs:
+                _do_evalargs_op();
+                break;
             }
 
             return true;
@@ -187,8 +194,47 @@ namespace xo {
         void
         VirtualSchematikaMachine::_do_eval_apply_op()
         {
-            // not implemented
-            assert(false);
+            // ApplyExpr in expr_ register
+
+            // assuming bump allocator:
+            //
+            //   DArray                 VsmApplyFrame                VsmEvalArgsFrame
+            //   v                      v                            v
+            //   +----------------------+-------+------+----+--------+-------+------+-------+
+            //   | argument expressions | par x | cont | fn | args x | par x | cont | i_arg |
+            //   +----------------------+-----|-+------+----+------|-+-----|-+------+-------+
+            //   ^                      ^     |                    |       |
+            //   |                      \----------------------------------/
+            //   \                            |                    /
+            //    \-----------------------------------------------/
+            //                                /
+            //   <---------------------------/
+            //
+            // - VsmEvalArgsFrame: owned by VSM, state for evalargs loop
+            // - VsmApplyFrame:    owned by VSM, state for transferring control to called function
+            // - DArray:           contains evaluated args; owned by called primitive
+
+            auto apply = obj<AExpression,DApplyExpr>::from(expr_);
+
+            // evaluated arguments
+            DArray * args = DArray::empty(mm_.to_op(),
+                                          apply->n_args());
+
+            // TODO: check function signature
+
+            VsmApplyFrame * apply_frame
+                = VsmApplyFrame::make(mm_.to_op(), stack_, cont_, args);
+
+            VsmEvalArgsFrame * evalargs_frame
+                = VsmEvalArgsFrame::make(mm_.to_op(), apply_frame, VsmInstr::c_apply);
+
+            this->stack_ = evalargs_frame;
+
+            // Setup evaluation of first argument.  No new stack for this.
+
+            this->cont_ = VsmInstr::c_evalargs;
+            this->expr_ = apply->fn();
+            this->pc_   = VsmInstr::c_eval;
         }
 
         void
@@ -204,6 +250,21 @@ namespace xo {
             // not implemented
             assert(false);
         }
+
+        void
+        VirtualSchematikaMachine::_do_apply_op()
+        {
+            // not implemented
+            assert(false);
+        }
+
+        void
+        VirtualSchematikaMachine::_do_evalargs_op()
+        {
+            // not implemented
+            assert(false);
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

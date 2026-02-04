@@ -7,6 +7,7 @@
 
 #include "VsmConfig.hpp"
 #include "VsmInstr.hpp"
+#include "VsmFrame.hpp"
 #include <xo/reader2/SchematikaReader.hpp>
 #include <xo/expression2/Expression.hpp>
 #include <xo/gc/GCObject.hpp>
@@ -143,6 +144,12 @@ namespace xo {
              **/
             void _do_eval_sequence_op();
 
+            /** apply a function to evaluated arguments **/
+            void _do_apply_op();
+
+            /** evaluate arguments on behalf of a function call **/
+            void _do_evalargs_op();
+
         private:
             /*
              * Some registers are preserved by evaluation:
@@ -163,16 +170,18 @@ namespace xo {
              **/
             box<AAllocator> mm_;
 
+            // consider separate allocator (which _may_ turn out to be the same)
+            // for VM stack. Only works for code that doesn't rely on fancy
+            // lexical scoping
+
             /** reader: text -> expression **/
             SchematikaReader reader_;
 
             /** program counter **/
             VsmInstr pc_ = VsmInstr::c_halt;
 
-#ifdef NOT_YET
             /** stack pointer **/
-            Stack stack_;
-#endif
+            VsmFrame * stack_ = nullptr;
 
             /** expression register **/
             obj<AExpression> expr_;
