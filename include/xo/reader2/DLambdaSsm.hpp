@@ -150,8 +150,9 @@ namespace xo {
             /** update this ssm when nested parser
              *  emits expression @p expr
              **/
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                     ParserStateMachine * p_psm);
+            void on_parsed_expression_with_token(obj<AExpression> expr,
+                                                 const Token & tk,
+                                                 ParserStateMachine * p_psm);
 
 #ifdef NOT_YET
             virtual const char * get_expect_str() const override;

@@ -150,13 +150,15 @@ namespace xo {
             case tokentype::tk_else:
                 this->on_else_token(tk, p_psm);
                 return;
+            case tokentype::tk_semicolon:
+                this->on_semicolon_token(tk, p_psm);
+                return;
             case tokentype::tk_colon:
             case tokentype::tk_singleassign:
             case tokentype::tk_string:
             case tokentype::tk_f64:
             case tokentype::tk_i64:
             case tokentype::tk_bool:
-            case tokentype::tk_semicolon:
             case tokentype::tk_invalid:
             case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
@@ -405,13 +407,25 @@ namespace xo {
         }
 
         void
-        DIfElseSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                        ParserStateMachine * p_psm)
+        DIfElseSsm::on_parsed_expression_with_token(obj<AExpression> expr,
+                                                    const Token & tk,
+                                                    ParserStateMachine * p_psm)
         {
             scope log(XO_DEBUG(p_psm->debug_flag()));
 
-            this->on_parsed_expression(expr, p_psm);
-            this->on_semicolon_token(Token::semicolon_token(), p_psm);
+            // TODO: may consider allowing if-else to terminate on other particular tokens
+            //       e.g. ')'
+
+            if ((tk.tk_type() == tokentype::tk_then)
+                || (tk.tk_type() == tokentype::tk_else)
+                || (tk.tk_type() == tokentype::tk_semicolon))
+                {
+                    this->on_parsed_expression(expr, p_psm);
+                    this->on_token(tk, p_psm);
+                    return;
+                }
+
+            Super::on_parsed_expression_with_token(expr, tk, p_psm);
         }
 
         bool

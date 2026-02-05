@@ -168,8 +168,9 @@ namespace xo {
                                     ParserStateMachine * p_psm);
             void on_rightbrace_token(const Token & tk,
                                      ParserStateMachine * p_psm);
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                     ParserStateMachine * p_psm);
+            void on_parsed_expression_with_token(obj<AExpression> expr,
+                                                 const Token & tk,
+                                                 ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-progressssm-printable-facet printable facet methods **/

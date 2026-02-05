@@ -147,10 +147,8 @@ namespace xo {
         {
              scope log(XO_DEBUG(p_psm->debug_flag()));
 
-             // TODO: stream inserter that sets up pretty-printing.
-             //       Or integrate with indentlog.
-             //       Maybe trouble is that indentlog doesn't #include Printable ?
-             //
+             // TODO: switch to printable facet
+
              log && log(xtag("expr", expr));
 
 #ifdef NOT_YET
@@ -206,8 +204,31 @@ namespace xo {
             }
 #endif
 
-            this->seq_expr_->push_back(p_psm->expr_alloc(),
-                                       expr);
+            this->seq_expr_->push_back(p_psm->expr_alloc(), expr);
+        }
+
+        void
+        DSequenceSsm::on_parsed_expression_with_token(obj<AExpression> expr,
+                                                      const Token & tk,
+                                                      ParserStateMachine * p_psm)
+        {
+            scope log(XO_DEBUG(p_psm->debug_flag()));
+
+            if (tk.tk_type() == tokentype::tk_semicolon) {
+                // keep sequence on stack, consuming semicolon
+
+                this->seq_expr_->push_back(p_psm->expr_alloc(),
+                                           expr);
+                return;
+            } else if (tk.tk_type() == tokentype::tk_rightbrace) {
+                // rightbrace ends sequence
+
+                this->seq_expr_->push_back(p_psm->expr_alloc(), expr);
+                this->on_rightbrace_token(tk, p_psm);
+                return;
+            }
+
+            Super::on_parsed_expression_with_token(expr, tk, p_psm);
         }
 
 #ifdef NOT_YET

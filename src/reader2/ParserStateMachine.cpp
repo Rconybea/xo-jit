@@ -107,38 +107,57 @@ namespace xo {
             return stringtable_.gensym(str);
         }
 
-        Binding
-        ParserStateMachine::lookup_binding(std::string_view symbolname)
+        DVarRef *
+        ParserStateMachine::lookup_varref(std::string_view symbolname)
         {
             scope log(XO_DEBUG(debug_flag_));
 
-            if (!local_symtab_)
-                return Binding::null();
-
-            const DUniqueString * ustr = stringtable_.lookup(symbolname);
-
-            if (!ustr) {
-                // if not in string table, then can't be a variable either
-                return Binding::null();
-            }
-
-            DLocalSymtab * symtab = local_symtab_;
-
-            // count #of nested scopes to cross, to reach symbol
+            // TODO:
+            // 1. check global symtab
+            // 2. combine local+global symtab into indept struct
+            // 3. move lookup_varref implementation there.
             //
-            int32_t link_count = 0;
 
-            while (symtab) {
-                Binding b = symtab->lookup_binding(ustr);
+            if (local_symtab_) {
+                const DUniqueString * ustr = stringtable_.lookup(symbolname);
 
-                if (b.is_local()) {
-                    assert(b.i_link() == 0);
+                if (ustr) {
+                    DLocalSymtab * symtab = local_symtab_;
 
-                    return Binding(link_count, b.j_slot());
+                    // count #of nested scopes to cross, to reach symbol
+                    //
+                    int32_t link_count = 0;
+
+                    while (symtab) {
+                        Binding b = symtab->lookup_binding(ustr);
+
+                        if (b.is_local()) {
+                            assert(b.i_link() == 0);
+
+                            DVariable * vardef = symtab->lookup_var(b);
+                            assert(vardef);
+
+
+                            /** ascii diagram here
+                             **/
+
+                            return DVarRef::make(expr_alloc_,
+                                                 vardef,
+                                                 link_count);
+                        } else {
+                            assert(b.is_null());
+                        }
+
+                        ++link_count;
+                        symtab = symtab->parent();
+                    }
+                } else {
+                    // if we don't already know the symbol,
+                    //  -> can't be a valid variable reference
+                    //     (whether global or local)
+
+                    return nullptr;
                 }
-
-                ++link_count;
-                symtab = symtab->parent();
             }
 
             // TODO: check global symtab also
@@ -146,7 +165,7 @@ namespace xo {
             log.retroactively_enable();
             log("STUB: check global symtab");
 
-            return Binding::null();
+            return nullptr;
         }
 
         void
@@ -240,16 +259,6 @@ namespace xo {
         }
 
         void
-        ParserStateMachine::on_parsed_expression_with_semicolon(obj<AExpression> expr)
-        {
-            scope log(XO_DEBUG(debug_flag_), xtag("expr", expr));
-
-            assert(stack_);
-
-            this->top_ssm().on_parsed_expression_with_semicolon(expr, this);
-        }
-
-        void
         ParserStateMachine::on_parsed_expression_with_token(obj<AExpression> expr,
                                                             const Token & tk)
         {
@@ -257,11 +266,7 @@ namespace xo {
 
             assert(stack_);
 
-            this->top_ssm().on_parsed_expression(expr, this);
-
-            assert(stack_);
-
-            this->top_ssm().on_token(tk, this);
+            this->top_ssm().on_parsed_expression_with_token(expr, tk, this);
         }
 
         void
@@ -431,6 +436,39 @@ namespace xo {
              **/
             auto errmsg_string = tostr("Unexpected expression",
                                        xtag("expr", expr_pr),
+                                       xtag("expecting", expect_str),
+                                       xtag("ssm", ssm_name),
+                                       xtag("via", "ParserStateMachine::illegal_parsed_expression"));
+
+            assert(expr_alloc_);
+
+            auto errmsg = DString::from_view(expr_alloc_,
+                                             std::string_view(errmsg_string));
+
+            this->capture_error(ssm_name, errmsg);
+        }
+
+        void
+        ParserStateMachine::illegal_parsed_expression_with_token(std::string_view ssm_name,
+                                                                 obj<AExpression> expr,
+                                                                 const Token & tk,
+                                                                 std::string_view expect_str)
+        {
+            // TODO:
+            // - want to write error message using DArena
+            // - need something like log_streambuf and/or tostr() that's arena-aware
+
+            obj<APrintable> expr_pr
+                = FacetRegistry::instance().variant<APrintable,AExpression>(expr);
+            assert(expr_pr);
+
+            /** TODO
+             *  problem here: we have pretty() support for obj<AExpression>,
+             *  but not "ordinary printing" support.  So expression doesn't get printed
+             **/
+            auto errmsg_string = tostr("Unexpected expression",
+                                       xtag("expr", expr_pr),
+                                       xtag("tk", tk),
                                        xtag("expecting", expect_str),
                                        xtag("ssm", ssm_name),
                                        xtag("via", "ParserStateMachine::illegal_parsed_expression"));

@@ -51,6 +51,8 @@ public:
     // const methods
     /** RTTI: unique id# for actual runtime data representation **/
     virtual typeseq _typeseq() const noexcept = 0;
+    /** destroy instance @p d; calls c++ dtor only for actual runtime type; does not recover memory **/
+    virtual void _drop(Opaque d) const noexcept = 0;
     /** identify a type of syntax state machine **/
     virtual syntaxstatetype ssm_type(Copaque data)  const  noexcept = 0;
     /** text describing expected/allowed input to this ssm in current state **/
@@ -69,8 +71,8 @@ public:
     virtual void on_parsed_formal_arglist(Opaque data, DArray * arglist, ParserStateMachine * p_psm)  = 0;
     /** update state machine for incoming parsed expression @p expr **/
     virtual void on_parsed_expression(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  = 0;
-    /** update state machine for incoming parsed expression @p expr followed by semicolon **/
-    virtual void on_parsed_expression_with_semicolon(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  = 0;
+    /** update state machine @p p_psm for incoming parsed expression @p expr followed by token @p tk **/
+    virtual void on_parsed_expression_with_token(Opaque data, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm)  = 0;
     ///@}
 }; /*ASyntaxStateMachine*/
 

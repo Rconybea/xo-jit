@@ -120,10 +120,12 @@ namespace xo {
             void on_parsed_expression(obj<AExpression> expr, ParserStateMachine * p_psm);
 
             /** update state for this syntax on parsed expression @p expr
-             *  followed by semicolon from nested ssm.
+             *  followed by token @p tk from nested ssm.
              *  overall parser state in @p p_psm
              **/
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr, ParserStateMachine * p_psm);
+            void on_parsed_expression_with_token(obj<AExpression> expr,
+                                                 const Token & tk,
+                                                 ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-exprseq-printable-facet printable facet methods **/

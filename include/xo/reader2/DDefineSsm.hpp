@@ -176,11 +176,12 @@ namespace xo {
                                       ParserStateMachine * p_psm);
 
             /** update state for this syntax after parsing an expression @p expr
-             *  followed by semicolon,
-             *  overall parser state in @p p_psm
+             *  followed by token @p tk,
+             *  with overall parser state in @p p_psm
              **/
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                     ParserStateMachine * p_psm);
+            void on_parsed_expression_with_token(obj<AExpression> expr,
+                                                 const Token & tk,
+                                                 ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-define-printable-facet printable facet methods **/

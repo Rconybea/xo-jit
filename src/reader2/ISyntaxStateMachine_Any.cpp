@@ -71,7 +71,7 @@ ISyntaxStateMachine_Any::on_parsed_expression(Opaque, obj<AExpression>, ParserSt
 }
 
 auto
-ISyntaxStateMachine_Any::on_parsed_expression_with_semicolon(Opaque, obj<AExpression>, ParserStateMachine *)  -> void
+ISyntaxStateMachine_Any::on_parsed_expression_with_token(Opaque, obj<AExpression>, const Token &, ParserStateMachine *)  -> void
 {
     _fatal();
 }

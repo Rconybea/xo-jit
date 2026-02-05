@@ -167,7 +167,10 @@ namespace xo {
             case tokentype::tk_dot:
             case tokentype::tk_comma:
             case tokentype::tk_colon:
+                break;
             case tokentype::tk_semicolon:
+                assert(false);
+                break;
             case tokentype::tk_doublecolon:
             case tokentype::tk_singleassign:
             case tokentype::tk_assign:
@@ -396,10 +399,16 @@ namespace xo {
         }
 
         void
-        DExprSeqState::on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                           ParserStateMachine * p_psm)
+        DExprSeqState::on_parsed_expression_with_token(obj<AExpression> expr,
+                                                       const Token & tk,
+                                                       ParserStateMachine * p_psm)
         {
-            p_psm->capture_result("DExprSeqState::on_parsed_expression_with_semicolon", expr);
+            if (tk.tk_type() == tokentype::tk_semicolon) {
+                p_psm->capture_result("DExprSeqState::on_parsed_expression_with_token", expr);
+                return;
+            }
+
+            Super::on_parsed_expression_with_token(expr, tk, p_psm);
         }
 
         bool

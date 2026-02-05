@@ -976,11 +976,34 @@ namespace xo {
                 REQUIRE(result.is_incomplete());
             }
 
-#ifdef NOPE
+            {
+                auto & result = parser.on_token(Token::star_token());
+
+                log && log("after star(*) token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
+            {
+                auto & result = parser.on_token(Token::symbol_token("x"));
+
+                log && log("after symbol(x) token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
             {
                 auto & result = parser.on_token(Token::rightbrace_token());
 
-                log && log("after rightbrace token:");
+                log && log("after rightbrace(}) token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
@@ -990,11 +1013,6 @@ namespace xo {
                 REQUIRE(result.result_expr());
             }
 
-            //REQUIRE(result.is_error());
-            //// illegal input on token
-            //REQUIRE(result.error_description());
-#endif
-            REQUIRE(false);
         }
     } /*namespace ut*/
 } /*namespace xo*/

@@ -114,8 +114,9 @@ namespace xo {
 
             /** Default implementation for required SyntaxStateMachine facet method
              **/
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                     ParserStateMachine * p_psm)
+            void on_parsed_expression_with_token(obj<AExpression> expr,
+                                                 const Token & tk,
+                                                 ParserStateMachine * p_psm)
             {
                 // starting with c++23 can use "this auto&& self" instead
                 Derived & self = static_cast<Derived&>(*this);
@@ -124,9 +125,10 @@ namespace xo {
                 // since the semicolon isn't relevant to problem with syntax
                 //
 
-                p_psm->illegal_parsed_expression(Derived::ssm_classname(),
-                                                 expr,
-                                                 self.get_expect_str());
+                p_psm->illegal_parsed_expression_with_token(Derived::ssm_classname(),
+                                                            expr,
+                                                            tk,
+                                                            self.get_expect_str());
 
             }
         };

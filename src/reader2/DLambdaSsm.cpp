@@ -364,10 +364,11 @@ namespace xo {
         }
 
         void
-        DLambdaSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                        ParserStateMachine * p_psm)
+        DLambdaSsm::on_parsed_expression_with_token(obj<AExpression> expr,
+                                                    const Token & tk,
+                                                    ParserStateMachine * p_psm)
         {
-            Super::on_parsed_expression_with_semicolon(expr, p_psm);
+            Super::on_parsed_expression_with_token(expr, tk, p_psm);
         }
 
 #ifdef NOT_YET

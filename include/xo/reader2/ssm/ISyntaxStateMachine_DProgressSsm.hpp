@@ -66,8 +66,8 @@ namespace xo {
             static void on_parsed_formal_arglist(DProgressSsm & self, DArray * arglist, ParserStateMachine * p_psm);
             /** update state machine for incoming parsed expression @p expr **/
             static void on_parsed_expression(DProgressSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm);
-            /** update state machine for incoming parsed expression @p expr followed by semicolon **/
-            static void on_parsed_expression_with_semicolon(DProgressSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm);
+            /** update state machine @p p_psm for incoming parsed expression @p expr followed by token @p tk **/
+            static void on_parsed_expression_with_token(DProgressSsm & self, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm);
             ///@}
         };
 

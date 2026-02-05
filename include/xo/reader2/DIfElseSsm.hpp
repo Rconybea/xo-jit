@@ -54,7 +54,7 @@ namespace xo {
          **/
         class DIfElseSsm : public DSyntaxStateMachine<DIfElseSsm> {
         public:
-            using Super = DSyntaxStateMachine<DIfElseExpr>;
+            using Super = DSyntaxStateMachine<DIfElseSsm>;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
@@ -154,8 +154,9 @@ namespace xo {
              *  followed by semicolon,
              *  with overall parser state in @p p_psm.
              **/
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                     ParserStateMachine * p_psm);
+            void on_parsed_expression_with_token(obj<AExpression> expr,
+                                                 const Token & tk,
+                                                 ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-ifelsessm-printable-facet printable facet methods **/

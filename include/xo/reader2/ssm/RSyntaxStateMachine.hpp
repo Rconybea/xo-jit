@@ -46,8 +46,13 @@ public:
     /** @defgroup scm-syntaxstatemachine-router-methods **/
     ///@{
 
-    // const methods
+    // explicit injected content
+
+    // builtin methods
     typeseq _typeseq() const noexcept { return O::iface()->_typeseq(); }
+    void _drop() const noexcept { O::iface()->_drop(O::data()); }
+
+    // const methods
     syntaxstatetype ssm_type()  const  noexcept {
         return O::iface()->ssm_type(O::data());
     }
@@ -74,8 +79,8 @@ public:
     void on_parsed_expression(obj<AExpression> expr, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_expression(O::data(), expr, p_psm);
     }
-    void on_parsed_expression_with_semicolon(obj<AExpression> expr, ParserStateMachine * p_psm)  {
-        return O::iface()->on_parsed_expression_with_semicolon(O::data(), expr, p_psm);
+    void on_parsed_expression_with_token(obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm)  {
+        return O::iface()->on_parsed_expression_with_token(O::data(), expr, tk, p_psm);
     }
 
     ///@}

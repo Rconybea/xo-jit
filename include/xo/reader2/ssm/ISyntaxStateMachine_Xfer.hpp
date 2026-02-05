@@ -42,8 +42,11 @@ namespace scm {
 
         // from ASyntaxStateMachine
 
-        // const methods
+        // builtin methods
         typeseq _typeseq() const noexcept override { return s_typeseq; }
+        void _drop(Opaque d) const noexcept override { _dcast(d).~DRepr(); }
+
+        // const methods
         syntaxstatetype ssm_type(Copaque data)  const  noexcept override {
             return I::ssm_type(_dcast(data));
         }
@@ -70,8 +73,8 @@ namespace scm {
         void on_parsed_expression(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  override {
             return I::on_parsed_expression(_dcast(data), expr, p_psm);
         }
-        void on_parsed_expression_with_semicolon(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  override {
-            return I::on_parsed_expression_with_semicolon(_dcast(data), expr, p_psm);
+        void on_parsed_expression_with_token(Opaque data, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm)  override {
+            return I::on_parsed_expression_with_token(_dcast(data), expr, tk, p_psm);
         }
 
         ///@}

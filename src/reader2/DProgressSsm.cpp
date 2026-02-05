@@ -319,10 +319,7 @@ namespace xo {
             obj<AExpression> expr = this->assemble_expr(p_psm);
 
             p_psm->pop_ssm();  // completes self
-
-            // TODO: perhaps need to generalize on_parsed_expression_with_semicolon() ..?
-            p_psm->on_parsed_expression(expr);
-            p_psm->on_token(tk);
+            p_psm->on_parsed_expression_with_token(expr, tk);
         }
 
         void
@@ -458,25 +455,7 @@ namespace xo {
             }
 
             p_psm->pop_ssm();
-            p_psm->on_parsed_expression_with_semicolon(expr);
-
-            /* control here on input like:
-             *   (1.234;
-             *
-             * a. '(' sets up stack [lparen_0:expect_rhs_expression]
-             *     (see exprstate::on_leftparen())
-             * b. 1.234 pushes (in case operators) [lparen_0:expect_rhs_expression:expr_progress]
-             *     (see exprstate::on_f64())
-             * c. semicolon completes expr_progress [lparen_0:expect_rhs_expression]
-             *     deliver expresssion to expect_rhs_expression.on_expr_with_semicolon()
-             *     (see exprstate::on_expr_with_semicolon())
-             * d. expr_rhs_expression forwards expression to [lparen_0]
-             * e. lparen_0 would advance to [lparen_1],  but rejects semicolon
-             */
-
-#ifdef OBSOLETE
-            Super::on_token(tk, p_psm);
-#endif
+            p_psm->on_parsed_expression_with_token(expr, tk);
         }
 
         void
@@ -489,11 +468,15 @@ namespace xo {
 
             obj<AExpression> expr = this->assemble_expr(p_psm);
 
-            {
+            if (expr) {
                 obj<APrintable> expr_pr
-                    = FacetRegistry::instance().variant<APrintable,AExpression>(expr);
+                    = FacetRegistry::instance().try_variant<APrintable,AExpression>(expr);
                 assert(expr_pr);
                 log && log(xtag("expr", expr_pr));
+            } else {
+                // illegal token if assemble failed
+                Super::on_token(tk, p_psm);
+                return;
             }
 
             p_psm->pop_ssm();
@@ -501,15 +484,19 @@ namespace xo {
         }
 
         void
-        DProgressSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                          ParserStateMachine * p_psm)
+        DProgressSsm::on_parsed_expression_with_token(obj<AExpression> expr,
+                                                      const Token & tk,
+                                                      ParserStateMachine * p_psm)
         {
             scope log(XO_DEBUG(p_psm->debug_flag()),
                       xtag("expr", expr));
 
             if (op_type_ == optype::invalid) {
+                // e.g. control here on input like
+                //   x : = 4 4
+
                 p_psm->illegal_parsed_expression
-                    ("DProgressSsm::on_parsed_expression_with_semicolon",
+                    ("DProgressSsm::on_parsed_expression_with_token",
                      expr,
                      this->get_expect_str());
                 return;
@@ -521,7 +508,7 @@ namespace xo {
 
             if (expr2) {
                 p_psm->pop_ssm();
-                p_psm->on_parsed_expression_with_semicolon(expr2);
+                p_psm->on_parsed_expression_with_token(expr2, tk);
             }
         }
 

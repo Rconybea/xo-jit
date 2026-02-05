@@ -58,9 +58,9 @@ namespace xo {
             self.on_parsed_expression(expr, p_psm);
         }
         auto
-        ISyntaxStateMachine_DProgressSsm::on_parsed_expression_with_semicolon(DProgressSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm) -> void
+        ISyntaxStateMachine_DProgressSsm::on_parsed_expression_with_token(DProgressSsm & self, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm) -> void
         {
-            self.on_parsed_expression_with_semicolon(expr, p_psm);
+            self.on_parsed_expression_with_token(expr, tk, p_psm);
         }
 
     } /*namespace scm*/

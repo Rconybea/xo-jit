@@ -28,6 +28,7 @@ namespace xo {
 
         class DSequenceSsm : public DSyntaxStateMachine<DSequenceSsm> {
         public:
+            using Super = DSyntaxStateMachine<DSequenceSsm>;
             //using Sequence = xo::scm::Sequence;
             //using Lambda = xo::scm::Lambda;
             using AAllocator = xo::mm::AAllocator;
@@ -77,6 +78,13 @@ namespace xo {
             /** consume expression @p expr produced by nested ssm; overall parser state in @p p_psm **/
             void on_parsed_expression(obj<AExpression> expr,
                                       ParserStateMachine * p_psm);
+
+            /** consume expression @p expr produced by nested ssm followed by token @p tk;
+             *  overall parser state in @p p_psm
+             **/
+            void on_parsed_expression_with_token(obj<AExpression> expr,
+                                                 const Token & tk,
+                                                 ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-sequencessm-printable-facet printable facet **/

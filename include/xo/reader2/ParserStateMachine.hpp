@@ -9,6 +9,7 @@
 #include <xo/expression2/DGlobalSymtab.hpp>
 #include <xo/expression2/DLocalSymtab.hpp>
 #include <xo/expression2/DVariable.hpp>
+#include <xo/expression2/VarRef.hpp>
 #include <xo/expression2/StringTable.hpp>
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/object2/DArray.hpp>
@@ -89,8 +90,8 @@ namespace xo {
             /** get unique (within stringtable) string, beginning with @p prefix **/
             const DUniqueString * gensym(std::string_view prefix);
 
-            /** get variable defn for @p symbolname, or else nullptr **/
-            Binding lookup_binding(std::string_view symbolname);
+            /** get variable reference for @p symbolname in current context, or else nullptr **/
+            DVarRef * lookup_varref(std::string_view symbolname);
 
             /** push nested local symtab while parsing the body of a lambda expression;
              *  restore previous symtab at the end of lambda-expression definition.
@@ -140,17 +141,6 @@ namespace xo {
              *  (from nested parsing state)
              **/
             void on_parsed_expression(obj<AExpression> expr);
-
-            /** update state to respond to parsed expression @p expr
-             *  (from nested parsing state), with trailing semicolon.
-             *
-             *  Need to distinguish cases like:
-             *    6    // ; allowed
-             *    f(6  // ) allowed    ; forbidden
-             *    6 +  // ) forbidden  ; forbidden
-             *
-             **/
-            void on_parsed_expression_with_semicolon(obj<AExpression> expr);
 
             /** update state to respond to parsed expression @p expr
              *  (from nested parsing state), with trailing token @p tk.
@@ -231,6 +221,16 @@ namespace xo {
             void illegal_parsed_expression(std::string_view ssm_name,
                                            obj<AExpression>,
                                            std::string_view expect_str);
+
+            /** report illegal parsed expression @p expr from nested ssm @p ssm_name,
+             *  presented with immediately-following input token @p tk
+             *  Introducing as placeholder; not clear if this will be reachable
+             *  in full parser
+             **/
+            void illegal_parsed_expression_with_token(std::string_view ssm_name,
+                                                      obj<AExpression> expr,
+                                                      const Token & tk,
+                                                      std::string_view expect_str);
 
             /** report error - no binding for variable @p sym
              **/

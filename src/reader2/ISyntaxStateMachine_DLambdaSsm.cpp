@@ -58,9 +58,9 @@ namespace xo {
             self.on_parsed_expression(expr, p_psm);
         }
         auto
-        ISyntaxStateMachine_DLambdaSsm::on_parsed_expression_with_semicolon(DLambdaSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm) -> void
+        ISyntaxStateMachine_DLambdaSsm::on_parsed_expression_with_token(DLambdaSsm & self, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm) -> void
         {
-            self.on_parsed_expression_with_semicolon(expr, p_psm);
+            self.on_parsed_expression_with_token(expr, tk, p_psm);
         }
 
     } /*namespace scm*/

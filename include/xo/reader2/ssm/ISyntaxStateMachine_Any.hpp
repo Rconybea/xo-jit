@@ -54,8 +54,11 @@ namespace scm {
 
         // from ASyntaxStateMachine
 
-        // const methods
+        // builtin methods
         typeseq _typeseq() const noexcept override { return s_typeseq; }
+        [[noreturn]] void _drop(Opaque) const noexcept override { _fatal(); }
+
+        // const methods
         [[noreturn]] syntaxstatetype ssm_type(Copaque)  const  noexcept override { _fatal(); }
         [[noreturn]] std::string_view get_expect_str(Copaque)  const  noexcept override { _fatal(); }
 
@@ -66,7 +69,7 @@ namespace scm {
         [[noreturn]] void on_parsed_formal(Opaque, const DUniqueString *, TypeDescr, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_formal_arglist(Opaque, DArray *, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_expression(Opaque, obj<AExpression>, ParserStateMachine *)  override;
-        [[noreturn]] void on_parsed_expression_with_semicolon(Opaque, obj<AExpression>, ParserStateMachine *)  override;
+        [[noreturn]] void on_parsed_expression_with_token(Opaque, obj<AExpression>, const Token &, ParserStateMachine *)  override;
 
         ///@}
 

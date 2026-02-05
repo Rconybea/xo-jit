@@ -626,7 +626,7 @@ namespace xo {
         {
             if (defstate_ == defexprstatetype::def_6) {
                 p_psm->pop_ssm();
-                p_psm->on_parsed_expression_with_semicolon(def_expr_);
+                p_psm->on_parsed_expression_with_token(def_expr_, tk);
                 return;
             }
 
@@ -649,11 +649,28 @@ namespace xo {
         }
 
         void
-        DDefineSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                        ParserStateMachine * p_psm)
+        DDefineSsm::on_parsed_expression_with_token(obj<AExpression> expr,
+                                                    const Token & tk,
+                                                    ParserStateMachine * p_psm)
         {
-            this->on_parsed_expression(expr, p_psm);
-            this->on_semicolon_token(Token::semicolon_token(), p_psm);
+            /* must end with semicolon */
+
+            if (tk.tk_type() == tokentype::tk_semicolon) {
+                if (defstate_ == defexprstatetype::def_5)
+                    {
+                        this->defstate_ = defexprstatetype::def_6;
+
+                        def_expr_.data()->assign_rhs(expr);
+
+                        // completes this definition syntax
+                        this->on_semicolon_token(tk, p_psm);
+
+                        return;
+                    }
+            }
+
+            // error in all other cases
+            Super::on_parsed_expression_with_token(expr, tk, p_psm);
         }
 
         bool

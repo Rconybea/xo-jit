@@ -195,7 +195,7 @@ namespace xo {
 
             log && log(xtag("tk", tk));
 
-            const DVariable * var = p_psm->lookup_variable(tk.text());
+            DVarRef * var = p_psm->lookup_varref(tk.text());
 
             if (!var) {
                 p_psm->error_unbound_variable(ssm_classname(),
@@ -210,7 +210,7 @@ namespace xo {
             //
 
             DProgressSsm::start(p_psm->parser_alloc(),
-                                obj<AExpression,DVariable>(const_cast<DVariable *>(var)),
+                                obj<AExpression,DVarRef>(var),
                                 p_psm);
         }
 
@@ -388,14 +388,15 @@ namespace xo {
         }
 
         void
-        DExpectExprSsm::on_parsed_expression_with_semicolon(obj<AExpression> expr,
-                                                            ParserStateMachine * p_psm)
+        DExpectExprSsm::on_parsed_expression_with_token(obj<AExpression> expr,
+                                                        const Token & tk,
+                                                        ParserStateMachine * p_psm)
         {
             // expression (reported by nested ProgressSsm)
             // completes this DExpectExprSsm's assignment
 
             p_psm->pop_ssm();
-            p_psm->on_parsed_expression_with_semicolon(expr);
+            p_psm->on_parsed_expression_with_token(expr, tk);
         }
 
         bool
