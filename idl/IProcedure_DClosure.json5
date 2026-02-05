@@ -1,0 +1,17 @@
+{
+    mode: "implementation",
+    includes: [
+        "<xo/procedure2/RuntimeContext.hpp>",
+        "<xo/procedure2/detail/IRuntimeContext_Xfer.hpp>",
+        "<xo/procedure2/Procedure.hpp>",
+        "<xo/procedure2/detail/IProcedure_Xfer.hpp>",
+    ],
+    local_types: [ ],
+    namespace1: "xo",
+    namespace2: "scm",
+    facet_idl: "idl/Procedure.json5",
+    brief: "provide AProcedure interface for DClosure",
+    using_doxygen: true,
+    repr: "DClosure",
+    doc: [ "implement AProcedure for DClosure" ],
+}

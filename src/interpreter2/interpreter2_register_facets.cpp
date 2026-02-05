@@ -8,6 +8,8 @@
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
 
+#include "Closure.hpp"
+
 #include <xo/printable2/detail/APrintable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/reflectutil/typeseq.hpp>
@@ -36,8 +38,15 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DVsmEvalArgsFrame>();
             FacetRegistry::register_impl<APrintable, DVsmEvalArgsFrame>();
 
+            // Procedure
+            // +- Primitive_gco_2_gco_gco
+            // \- Closure
+
+            FacetRegistry::register_impl<AProcedure, DClosure>();
+
             log && log(xtag("DVsmApplyFrame.tseq", typeseq::id<DVsmApplyFrame>()));
             log && log(xtag("DVsmEvalArgsFrame.tseq", typeseq::id<DVsmEvalArgsFrame>()));
+            log && log(xtag("DClosure.tseq", typeseq::id<DClosure>()));
 
             return true;
         }

@@ -77,6 +77,20 @@ xo_add_genfacetimpl(
 
 # ----------------------------------------------------------------
 
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-procedure-closure
+    FACET_PKG xo_procedure2
+    FACET Printable
+    REPR DClosure
+    INPUT idl/IProcedure_DClosure.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# ----------------------------------------------------------------
+
 xo_add_genfacet_all(xo-interpreter2-genfacet-all)
 
 # ----------------------------------------------------------------

@@ -6,6 +6,8 @@
 #include "DClosure.hpp"
 
 namespace xo {
+    using xo::mm::AGCObject;
+
     namespace scm {
 
         DClosure::DClosure(const DLambdaExpr * lm,
@@ -21,6 +23,16 @@ namespace xo {
             void * mem = mm.alloc_for<DClosure>();
 
             return new (mem) DClosure(lm, env);
+        }
+
+        obj<AGCObject>
+        DClosure::apply_nocheck(obj<ARuntimeContext> rcx,
+                                const DArray * args)
+        {
+            (void)rcx;
+            (void)args;
+
+            assert(false);
         }
 
     } /*namespace scm*/
