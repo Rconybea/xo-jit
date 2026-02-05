@@ -24,6 +24,9 @@ namespace xo {
             static Binding global() { return Binding(s_link_global, 0); }
             static Binding local(int32_t j_slot) { return Binding(0, j_slot); }
 
+            bool is_null() const {
+                return (i_link_ == s_link_sentinel) && (j_slot_ == -1);
+            }
             bool is_global() const { return i_link_ == s_link_global; }
             bool is_local() const { return (i_link_ == 0) && (j_slot_ >= 0); }
 
