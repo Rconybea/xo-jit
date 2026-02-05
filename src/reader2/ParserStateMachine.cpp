@@ -107,6 +107,48 @@ namespace xo {
             return stringtable_.gensym(str);
         }
 
+        Binding
+        ParserStateMachine::lookup_binding(std::string_view symbolname)
+        {
+            scope log(XO_DEBUG(debug_flag_));
+
+            if (!local_symtab_)
+                return Binding::null();
+
+            const DUniqueString * ustr = stringtable_.lookup(symbolname);
+
+            if (!ustr) {
+                // if not in string table, then can't be a variable either
+                return Binding::null();
+            }
+
+            DLocalSymtab * symtab = local_symtab_;
+
+            // count #of nested scopes to cross, to reach symbol
+            //
+            int32_t link_count = 0;
+
+            while (symtab) {
+                Binding b = symtab->lookup_binding(ustr);
+
+                if (b.is_local()) {
+                    assert(b.i_link() == 0);
+
+                    return Binding(link_count, b.j_slot());
+                }
+
+                ++link_count;
+                symtab = symtab->parent();
+            }
+
+            // TODO: check global symtab also
+
+            log.retroactively_enable();
+            log("STUB: check global symtab");
+
+            return Binding::null();
+        }
+
         void
         ParserStateMachine::push_local_symtab(DLocalSymtab * symtab)
         {
@@ -400,6 +442,21 @@ namespace xo {
 
             this->capture_error(ssm_name, errmsg);
         }
+
+        void
+        ParserStateMachine::error_unbound_variable(std::string_view ssm_name,
+                                                   std::string_view sym)
+        {
+            auto errmsg_string = tostr("No binding for symbol",
+                                       xtag("symbol", sym),
+                                       xtag("ssm", ssm_name));
+
+            auto errmsg = DString::from_view(expr_alloc_,
+                                             std::string_view(errmsg_string));
+
+            this->capture_error(ssm_name, errmsg);
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

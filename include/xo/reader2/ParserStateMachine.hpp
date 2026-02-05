@@ -89,6 +89,9 @@ namespace xo {
             /** get unique (within stringtable) string, beginning with @p prefix **/
             const DUniqueString * gensym(std::string_view prefix);
 
+            /** get variable defn for @p symbolname, or else nullptr **/
+            Binding lookup_binding(std::string_view symbolname);
+
             /** push nested local symtab while parsing the body of a lambda expression;
              *  restore previous symtab at the end of lambda-expression definition.
              *  See @ref pop_local_symtab
@@ -228,6 +231,11 @@ namespace xo {
             void illegal_parsed_expression(std::string_view ssm_name,
                                            obj<AExpression>,
                                            std::string_view expect_str);
+
+            /** report error - no binding for variable @p sym
+             **/
+            void error_unbound_variable(std::string_view ssm_name,
+                                        std::string_view sym);
 
             ///@}
 

@@ -68,8 +68,7 @@ namespace xo {
                           obj<AAllocator> expr_mm,
                           ParserStateMachine * p_psm)
         {
-            constexpr bool c_debug_flag = true;
-            scope log(XO_DEBUG(c_debug_flag));
+            scope log(XO_DEBUG(p_psm->debug_flag()));
 
             DIfElseExpr * if_expr = DIfElseExpr::_make_empty(expr_mm);
             DIfElseSsm * if_ssm = DIfElseSsm::_make(parser_mm, if_expr);

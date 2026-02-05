@@ -3,23 +3,18 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "DExpectExprSsm.hpp"
+#include "ExpectExprSsm.hpp"
 #include "ParserStateMachine.hpp"
 #include "SyntaxStateMachine.hpp"
-#include "ssm/ISyntaxStateMachine_DExpectExprSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DProgressSsm.hpp"
 #include "DSequenceSsm.hpp"
 #include "syntaxstatetype.hpp"
-#include <xo/expression2/DConstant.hpp>
-#include <xo/expression2/detail/IExpression_DConstant.hpp>
-#include <xo/object2/DBoolean.hpp>
-#include <xo/object2/boolean/IGCObject_DBoolean.hpp>
-#include <xo/object2/DInteger.hpp>
-#include <xo/object2/number/IGCObject_DInteger.hpp>
-#include <xo/object2/DFloat.hpp>
-#include <xo/object2/number/IGCObject_DFloat.hpp>
-#include <xo/object2/DString.hpp>
-#include <xo/object2/string/IGCObject_DString.hpp>
+#include <xo/expression2/Variable.hpp>
+#include <xo/expression2/Constant.hpp>
+#include <xo/object2/Boolean.hpp>
+#include <xo/object2/Integer.hpp>
+#include <xo/object2/Float.hpp>
+#include <xo/object2/String.hpp>
 #include <xo/gc/GCObject.hpp>
 #include <xo/facet/facet_implementation.hpp>
 
@@ -196,7 +191,27 @@ namespace xo {
         DExpectExprSsm::on_symbol_token(const Token & tk,
                                         ParserStateMachine * p_psm)
         {
-            Super::on_token(tk, p_psm);
+            scope log(XO_DEBUG(p_psm->debug_flag()));
+
+            log && log(xtag("tk", tk));
+
+            const DVariable * var = p_psm->lookup_variable(tk.text());
+
+            if (!var) {
+                p_psm->error_unbound_variable(ssm_classname(),
+                                              tk.text());
+            }
+
+            // examples of possible continuations from symbol foo
+            //   foo ;      // (1) foo is entire rvalue expression
+            //   foo + ...  // (2) foo begin operator expression
+            //   foo(..);   // (3) foo begin apply function
+            //
+            //
+
+            DProgressSsm::start(p_psm->parser_alloc(),
+                                obj<AExpression,DVariable>(const_cast<DVariable *>(var)),
+                                p_psm);
         }
 
 #ifdef NOT_YET
