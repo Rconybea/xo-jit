@@ -102,6 +102,48 @@ namespace xo {
             typeref_.resolve(td);
         }
 
+        // ----- gcobject facet -----
+
+        std::size_t
+        DApplyExpr::shallow_size() const noexcept {
+            return sizeof(DApplyExpr) + (n_args_ * sizeof(obj<AExpression>));
+        }
+
+        DApplyExpr *
+        DApplyExpr::shallow_copy(obj<AAllocator> mm) const noexcept {
+            DApplyExpr * copy = (DApplyExpr *)mm.alloc_copy((std::byte *)this);
+
+            if (copy) {
+                copy->typeref_ = typeref_;
+                copy->fn_ = fn_;
+                copy->n_args_ = n_args_;
+
+                constexpr auto c_obj_z = sizeof(obj<AExpression>);
+
+                ::memcpy((void*)&(copy->args_[0]), (void*)&(args_[0]), n_args_ * c_obj_z);
+            }
+
+            return copy;
+        }
+
+        std::size_t
+        DApplyExpr::forward_children(obj<ACollector> gc) noexcept
+        {
+            for (size_type i = 0; i < n_args_; ++i) {
+                obj<AExpression> & arg = args_[i];
+
+                // runtime poly here
+                obj<AGCObject> arg_gco = arg.to_facet<AGCObject>();
+
+                // need the data address within *this
+                gc.forward_inplace(arg_gco.iface(), (void **)(&arg.data_));
+            }
+
+            return shallow_size();
+        }
+
+        // ----- printable facet -----
+
         bool
         DApplyExpr::pretty(const ppindentinfo & ppii) const {
             using xo::print::ppstate;

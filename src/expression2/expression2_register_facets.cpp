@@ -16,13 +16,13 @@
 #include <xo/expression2/detail/IGCObject_DVariable.hpp>
 #include <xo/expression2/detail/IPrintable_DVariable.hpp>
 
+#include <xo/expression2/VarRef.hpp>
+
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
 #include <xo/expression2/detail/IGCObject_DConstant.hpp>
 #include <xo/expression2/detail/IPrintable_DConstant.hpp>
 
-#include <xo/expression2/detail/IExpression_DApplyExpr.hpp>
-//#include <xo/expression2/detail/IGCObject_DApplyExpr.hpp>
-#include <xo/expression2/detail/IPrintable_DApplyExpr.hpp>
+#include <xo/expression2/ApplyExpr.hpp>
 
 #include <xo/expression2/detail/IExpression_DLambdaExpr.hpp>
 //#include <xo/expression2/detail/IGCObject_DLambdaExpr.hpp>
@@ -63,6 +63,7 @@ namespace xo {
             // Expression
             // +- Constant
             // +- Variable
+            // +- VarRef
             // +- DefineExpr
             // +- ApplyExpr
             // +- LambdaExpr
@@ -77,13 +78,20 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DVariable>();
             FacetRegistry::register_impl<APrintable, DVariable>();
 
+            FacetRegistry::register_impl<AExpression, DVarRef>();
+            FacetRegistry::register_impl<AGCObject, DVarRef>();
+            FacetRegistry::register_impl<APrintable, DVarRef>();
+
             FacetRegistry::register_impl<AExpression, DDefineExpr>();
+            //FacetRegistry::register_impl<AGCObject, DDefineExpr>();
             FacetRegistry::register_impl<APrintable, DDefineExpr>();
 
             FacetRegistry::register_impl<AExpression, DApplyExpr>();
+            FacetRegistry::register_impl<AGCObject, DApplyExpr>();
             FacetRegistry::register_impl<APrintable, DApplyExpr>();
 
             FacetRegistry::register_impl<AExpression, DLambdaExpr>();
+            //FacetRegistry::register_impl<AGCObject, DLambdaExpr>();
             FacetRegistry::register_impl<APrintable, DLambdaExpr>();
 
             FacetRegistry::register_impl<AExpression, DIfElseExpr>();
@@ -95,11 +103,13 @@ namespace xo {
             FacetRegistry::register_impl<APrintable, DSequenceExpr>();
 
             FacetRegistry::register_impl<ASymbolTable, DLocalSymtab>();
+            //FacetRegistry::register_impl<AGCObject, DLocalSymtab>();
             FacetRegistry::register_impl<APrintable, DLocalSymtab>();
 
             log && log(xtag("DUniqueString.tseq", typeseq::id<DUniqueString>()));
             log && log(xtag("DDefineExpr.tseq", typeseq::id<DDefineExpr>()));
             log && log(xtag("DVariable.tseq", typeseq::id<DVariable>()));
+            log && log(xtag("DVarRef.tseq", typeseq::id<DVarRef>()));
             log && log(xtag("DConstant.tseq", typeseq::id<DConstant>()));
             log && log(xtag("DApplyExpr.tseq", typeseq::id<DApplyExpr>()));
             log && log(xtag("DLambdaExpr.tseq", typeseq::id<DLambdaExpr>()));
@@ -108,7 +118,7 @@ namespace xo {
 
             log && log(xtag("DLocalSymtab.tseq", typeseq::id<DLocalSymtab>()));
 
-            log && log(xtag("AExpression.tqseq", typeseq::id<AExpression>()));
+            log && log(xtag("AExpression.tseq", typeseq::id<AExpression>()));
             log && log(xtag("ASymbolTable.tseq", typeseq::id<ASymbolTable>()));
 
             return true;

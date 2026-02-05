@@ -148,6 +148,44 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-expression-varref
+    FACET_PKG xo_expression2
+    FACET Expression
+    REPR VarRef
+    INPUT idl/IExpression_DVarRef.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-gcobject-varref
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR VarRef
+    INPUT idl/IGCObject_DVarRef.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-printable-varref
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR VarRef
+    INPUT idl/IPrintable_DVarRef.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-defineexpr
     FACET_PKG xo_expression2
     FACET Expression
@@ -179,6 +217,18 @@ xo_add_genfacetimpl(
     FACET Expression
     REPR ApplyExpr
     INPUT idl/IExpression_DApplyExpr.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-gcobject-applyexpr
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR ApplyExpr
+    INPUT idl/IGCObject_DApplyExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
     OUTPUT_CPP_DIR src/expression2

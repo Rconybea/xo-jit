@@ -3,9 +3,12 @@
 set(SELF_LIB xo_expression2)
 set(SELF_SRCS
     init_expression2.cpp
+    expression2_register_facets.cpp
+    expression2_register_types.cpp
 
     DConstant.cpp
     DVariable.cpp
+    DVarRef.cpp
     DDefineExpr.cpp
     DLambdaExpr.cpp
     DApplyExpr.cpp
@@ -13,6 +16,7 @@ set(SELF_SRCS
     DSequenceExpr.cpp
 
     TypeRef.cpp
+    Binding.cpp
 
     IExpression_Any.cpp
 
@@ -24,10 +28,15 @@ set(SELF_SRCS
     IGCObject_DVariable.cpp
     IPrintable_DVariable.cpp
 
+    IExpression_DVarRef.cpp
+    IGCObject_DVarRef.cpp
+    IPrintable_DVarRef.cpp
+
     IExpression_DDefineExpr.cpp
     IPrintable_DDefineExpr.cpp
 
     IExpression_DApplyExpr.cpp
+    IGCObject_DApplyExpr.cpp
     IPrintable_DApplyExpr.cpp
 
     IExpression_DLambdaExpr.cpp
@@ -55,8 +64,6 @@ set(SELF_SRCS
     IGCObject_DUniqueString.cpp
     IPrintable_DUniqueString.cpp
 
-    expression2_register_facets.cpp
-    expression2_register_types.cpp
     )
 
 xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 ${SELF_SRCS})

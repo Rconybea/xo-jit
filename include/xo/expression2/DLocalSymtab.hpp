@@ -31,14 +31,14 @@ namespace xo {
 
             struct Slot {
                 Slot() = default;
-                explicit Slot(const DVariable * var) : var_{var} {}
+                explicit Slot(DVariable * var) : var_{var} {}
 
                 /** variable representing a formal argument.
                  *  binding will be correct only within the same layer
                  *  as top-level lambda body
                  *  (i.e. up to the doorstep of each and every nested lambda)
                  **/
-                const DVariable * var_ = nullptr;
+                DVariable * var_ = nullptr;
             };
 
         public:
@@ -65,7 +65,7 @@ namespace xo {
             size_type capacity() const noexcept { return capacity_; }
             size_type size() const noexcept { return size_; }
 
-            const DVariable * lookup_var(Binding ix) const noexcept {
+             DVariable * lookup_var(Binding ix) noexcept {
                 assert(ix.i_link() == 0);
                 assert(ix.j_slot() < static_cast<int32_t>(size_));
 

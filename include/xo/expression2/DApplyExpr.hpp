@@ -20,6 +20,7 @@ namespace xo {
          **/
         class DApplyExpr {
         public:
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -81,7 +82,9 @@ namespace xo {
             /** @defgroup scm-applyexpr-gcobject-facet **/
             ///@{
 
-            // shallow_copy() etc.
+            std::size_t shallow_size() const noexcept;
+            DApplyExpr * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
             /** @defgroup scm-applyexpr-printable-facet **/

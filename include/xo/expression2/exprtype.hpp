@@ -36,8 +36,10 @@ namespace xo {
             /** function definition **/
             lambda,
 
-            /** variable reference **/
+            /** variable definition **/
             variable,
+            /** variabele reference (possibly non-local) **/
+            varref,
             /** if-then-else **/
             ifexpr,
             /** sequence **/
@@ -65,14 +67,16 @@ namespace xo {
             case exprtype::assign: return "assign";
 #endif
             case exprtype::apply: return "apply";
-#ifdef NOT_YET
             case exprtype::lambda: return "lambda";
             case exprtype::variable: return "variable";
+            case exprtype::varref: return "varref";
             case exprtype::ifexpr: return "if_expr";
             case exprtype::sequence: return "sequence";
+#ifdef NOT_YET
             case exprtype::convert: return "convert";
 #endif
-            default: break;
+            case exprtype::N: break;
+            //default: break;
             }
 
             return "???exprtype???";

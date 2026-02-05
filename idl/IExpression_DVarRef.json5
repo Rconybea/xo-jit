@@ -1,0 +1,12 @@
+{
+    mode: "implementation",
+    includes: [ "\"Expression.hpp\"" ],
+    local_types: [ ],
+    namespace1: "xo",
+    namespace2: "scm",
+    facet_idl: "idl/Expression.json5",
+    brief: "provide AExpression interface for DVarRef state",
+    using_doxygen: true,
+    repr: "DVarRef",
+    doc: ["doc for IExpression+DVarRef" ],
+}
