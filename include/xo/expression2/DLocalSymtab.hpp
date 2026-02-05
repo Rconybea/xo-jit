@@ -101,7 +101,7 @@ namespace xo {
         private:
             /** parent symbol table from scoping surrounding this one **/
             DLocalSymtab * parent_ = nullptr;
-            /** actual range of slots_[] array.  Can use inices in [0,..,n) **/
+            /** actual range of slots_[] array.  Can use indices in [0,..,n) **/
             size_type capacity_ = 0;
             /** number of slots in use **/
             size_type size_ = 0;

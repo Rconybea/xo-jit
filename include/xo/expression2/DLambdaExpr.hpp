@@ -23,6 +23,7 @@ namespace xo {
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
+            using size_type = DLocalSymtab::size_type;
 
         public:
 
@@ -60,6 +61,7 @@ namespace xo {
             ///@{
 
             DLocalSymtab * local_symtab() const noexcept { return local_symtab_; }
+            size_type n_args() const noexcept { return local_symtab_->size(); }
 
             // get_free_variables()
             // visit_preorder()
