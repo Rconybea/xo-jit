@@ -21,6 +21,7 @@ namespace xo {
                            VsmInstr old_cont,
                            DArray * args);
 
+            /** create instance using memory from @p mm **/
             static DVsmApplyFrame * make(obj<AAllocator> mm,
                                          obj<AGCObject> old_parent,
                                          VsmInstr old_cont,

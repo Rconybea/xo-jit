@@ -17,6 +17,10 @@ set(SELF_SRCS
     IPrintable_DVsmApplyFrame.cpp
 
     VsmInstr.cpp
+
+    DClosure.cpp
+    DLocalEnv.cpp
+
     #IExpression_Any.cpp
     )
 
