@@ -167,6 +167,9 @@ namespace xo {
             case exprtype::variable:
                 _do_eval_variable_op();
                 break;
+            case exprtype::varref:
+                _do_eval_varref_op();
+                break;
             case exprtype::apply:
                 _do_eval_apply_op();
                 break;
@@ -205,6 +208,13 @@ namespace xo {
 
         void
         VirtualSchematikaMachine::_do_eval_variable_op()
+        {
+            // not implemented
+            assert(false);
+        }
+
+        void
+        VirtualSchematikaMachine::_do_eval_varref_op()
         {
             // not implemented
             assert(false);

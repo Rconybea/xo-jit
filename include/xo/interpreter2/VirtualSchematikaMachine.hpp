@@ -120,11 +120,17 @@ namespace xo {
              **/
             void _do_eval_lambda_op();
 
-            /** evaluate a variable expression
+            /** evaluate variable expression (definition)
              *  Require:
              *  - expression in @ref expr_
              **/
             void _do_eval_variable_op();
+
+            /** evaluate a variable reference (use after definition)
+             *  Require:
+             *  - expression in @ref expr_
+             **/
+            void _do_eval_varref_op();
 
             /** evaluate an apply expression
              *  Require:
