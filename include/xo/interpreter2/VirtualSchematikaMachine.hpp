@@ -8,6 +8,8 @@
 #include "VsmConfig.hpp"
 #include "VsmInstr.hpp"
 #include "VsmFrame.hpp"
+#include "DLocalEnv.hpp"
+#include "DGlobalEnv.hpp"
 #include <xo/reader2/SchematikaReader.hpp>
 #include <xo/expression2/Expression.hpp>
 #include <xo/gc/GCObject.hpp>
@@ -214,11 +216,13 @@ namespace xo {
              *  in execution
              **/
             DLocalEnv * local_env_ = nullptr;
+        protected:  // temporarily, to appease compiler
             /** environment pointer.  Maintains bindings
              *  for global variables.
              **/
             DGlobalEnv * global_env_ = nullptr;
 
+        private:
             /** function to call **/
             obj<AProcedure> fn_;
             /** evaluated argument list **/

@@ -16,6 +16,7 @@ namespace xo {
         class DLocalEnv {
         public:
             using DArray = xo::scm::DArray;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -49,6 +50,14 @@ namespace xo {
             void assign_value(Binding ix, obj<AGCObject> x);
 
             ///@}
+            /** @defgroup scm-localenv-gcobject-facet **/
+            ///@{
+
+            std::size_t shallow_size() const noexcept;
+            DLocalEnv * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
+
+            ///@}
 
         private:
             /** parent environment (from closure) **/
@@ -58,7 +67,7 @@ namespace xo {
             /** bindings.
              *  (*args)[i] associates a value with symtab->slots_[i]
              **/
-            DArray * args_ = nullptr;;
+            DArray * args_ = nullptr;
         };
 
     } /*namespace scm*/

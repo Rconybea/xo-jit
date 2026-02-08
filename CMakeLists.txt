@@ -81,9 +81,47 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-procedure-closure
     FACET_PKG xo_procedure2
-    FACET Printable
-    REPR DClosure
+    FACET Procedure
+    REPR Closure
     INPUT idl/IProcedure_DClosure.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-gcobject-closure
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR Closure
+    INPUT idl/IGCObject_DClosure.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-printable-closure
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR Closure
+    INPUT idl/IPrintable_DClosure.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-gcobject-localenv
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR LocalEnv
+    INPUT idl/IGCObject_DLocalEnv.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
     OUTPUT_CPP_DIR src/interpreter2

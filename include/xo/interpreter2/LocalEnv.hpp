@@ -6,7 +6,7 @@
 #pragma once
 
 #include "DLocalEnv.hpp"
-//#include "detail/IGCObject_DLocalEnv.hpp"
+#include "detail/IGCObject_DLocalEnv.hpp"
 //#include "detail/IPrintable_DLocalEnv.hpp"
 
 /* end LocalEnv.hpp */

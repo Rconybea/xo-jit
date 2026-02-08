@@ -7,7 +7,6 @@
 
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
-
 #include "Closure.hpp"
 
 #include <xo/printable2/detail/APrintable.hpp>
@@ -37,6 +36,9 @@ namespace xo {
 
             FacetRegistry::register_impl<AGCObject, DVsmEvalArgsFrame>();
             FacetRegistry::register_impl<APrintable, DVsmEvalArgsFrame>();
+
+            FacetRegistry::register_impl<AGCObject, DClosure>();
+            FacetRegistry::register_impl<APrintable, DClosure>();
 
             // Procedure
             // +- Primitive_gco_2_gco_gco

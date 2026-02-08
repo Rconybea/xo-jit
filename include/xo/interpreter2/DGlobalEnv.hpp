@@ -7,6 +7,7 @@
 
 #include <xo/expression2/DGlobalSymtab.hpp>
 #include <xo/object2/DList.hpp>
+#include <xo/object2/DArray.hpp>
 
 namespace xo {
     namespace scm {
@@ -16,9 +17,10 @@ namespace xo {
          **/
         class DGlobalEnv {
         public:
-            DGLobalEnv() = default;
+            DGlobalEnv() = default;
 
-        private:
+        protected: // temporary, to appease compiler
+
             // absurd O(n) implementation for now
             // replace with gc-aware hashtable, when available.
 

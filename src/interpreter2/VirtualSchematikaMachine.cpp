@@ -6,7 +6,9 @@
 #include "VirtualSchematikaMachine.hpp"
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
+#include "Closure.hpp"
 #include <xo/expression2/ApplyExpr.hpp>
+#include <xo/expression2/LambdaExpr.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/procedure2/RuntimeContext.hpp>
 #include <xo/procedure2/SimpleRcx.hpp>
@@ -21,7 +23,7 @@ namespace xo {
     using xo::print::ppconfig;
     using xo::print::ppstate_standalone;
     using xo::mm::AGCObject;
-    using xo::mm::MemorySizeInfo;
+    //using xo::mm::MemorySizeInfo;  // not used yet
     using xo::mm::DX1Collector;
     using xo::facet::FacetRegistry;
     using std::cout;
@@ -217,7 +219,7 @@ namespace xo {
             //    <--------------------------------------/           |                       |
             //                                                       |                       |
             //                                                       v                       v
-            //                                                  DLocalSymtab            DLambdaExpr
+            //                                                 DLocalSymtab             DLambdaExpr
             //
             //    DClosure      runtime procedure (created below)
             //    DArray        bound non-local variables (established by VSM)
@@ -225,8 +227,21 @@ namespace xo {
             //    h             alloc header
             //    DLocalSymtab  local symbol table (created by parser)
             //    DLambdaExpr   lambda expression (created by parser)
+            //
 
-            DArray * args =
+            // will create DClosure with local_env_
+
+            // local_env_
+            // global_env_
+
+            auto lambda
+                = obj<AExpression,DLambdaExpr>::from(expr_);
+
+            DClosure * closure = DClosure::make(mm_.to_op(),
+                                                lambda.data(),
+                                                local_env_);
+
+            this->value_ = obj<AGCObject>(obj<AGCObject,DClosure>(closure));
 
             // not implemented
             assert(false);

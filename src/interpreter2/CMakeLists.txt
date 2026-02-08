@@ -16,12 +16,15 @@ set(SELF_SRCS
     IGCObject_DVsmApplyFrame.cpp
     IPrintable_DVsmApplyFrame.cpp
 
+    DClosure.cpp
+    IGCObject_DClosure.cpp
     IProcedure_DClosure.cpp
+
+    IGCObject_DLocalEnv.cpp
+    DLocalEnv.cpp
 
     VsmInstr.cpp
 
-    DClosure.cpp
-    DLocalEnv.cpp
 
     #IExpression_Any.cpp
     )

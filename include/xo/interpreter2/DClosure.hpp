@@ -19,6 +19,7 @@ namespace xo {
         class DClosure {
         public:
             using ARuntimeContext = xo::scm::ARuntimeContext;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -55,6 +56,10 @@ namespace xo {
             ///@}
             /** @defgroup scm-closure-gcobject-facet **/
             ///@{
+
+            std::size_t shallow_size() const noexcept;
+            DClosure * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
             /** @defgroup scm-closure-printable-facet **/

@@ -3,7 +3,8 @@
  *  @author Roland Conybeare, Feb 2026
  **/
 
-#include "DLocalEnv.hpp"
+#include "LocalEnv.hpp"
+#include <xo/object2/Array.hpp>
 #include <xo/reflectutil/typeseq.hpp>
 
 namespace xo {
@@ -84,6 +85,40 @@ namespace xo {
             }
 
             /* something terribly wrong if control here */
+        }
+
+        std::size_t
+        DLocalEnv::shallow_size() const noexcept {
+            return sizeof(DLocalEnv);
+        }
+
+        DLocalEnv *
+        DLocalEnv::shallow_copy(obj<AAllocator> mm) const noexcept {
+            DLocalEnv * copy = (DLocalEnv *)mm.alloc_copy((std::byte *)this);
+
+            if (copy)
+                *copy = *this;
+
+            return copy;
+        }
+
+        std::size_t
+        DLocalEnv::forward_children(obj<ACollector> gc) noexcept
+        {
+            {
+                auto iface = xo::facet::impl_for<AGCObject,DLocalEnv>();
+                gc.forward_inplace(&iface, (void **)(&parent_));
+            }
+            {
+                auto iface = xo::facet::impl_for<AGCObject,DLocalSymtab>();
+                gc.forward_inplace(&iface, (void **)(&symtab_));
+            }
+            {
+                auto iface = xo::facet::impl_for<AGCObject,DArray>();
+                gc.forward_inplace(&iface, (void **)(&args_));
+            }
+
+            return shallow_size();
         }
 
     } /*namespace scm*/
