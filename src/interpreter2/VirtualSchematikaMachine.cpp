@@ -36,7 +36,9 @@ namespace xo {
           mm_(box<AAllocator,DX1Collector>(new DX1Collector(config.x1_config_))),
           rcx_(box<ARuntimeContext,DSimpleRcx>(new DSimpleRcx(mm_.to_op()))),
           reader_{config.rdr_config_, mm_.to_op()}
-        {}
+        {
+            // TODO: allocate global_env
+        }
 
         void
         VirtualSchematikaMachine::visit_pools(const MemorySizeVisitor & visitor) const
@@ -202,6 +204,30 @@ namespace xo {
         void
         VirtualSchematikaMachine::_do_eval_lambda_op()
         {
+            // assuming bump allocator
+            //
+            //   +----------- DArray---------+ +-------------DLocalEnv-----------+ +-----DClosure-------+
+            //   | .cap |.size | .elts_[]... |h| .parent x | .symtab x | .args x |h| .lambda x | .env x |
+            //   +------+------+-------------+ +---------|-+---------|-+-------|-+ +---------|-+------|-+
+            //   ^                             ^         |           |         |             |        |
+            //   \-----------------------------|---------|-----------|---------/             |        |
+            //                                 |         |           |                       |        |
+            //                                 \---------|-----------|-----------------------|--------/
+            //                                           |           |                       |
+            //    <--------------------------------------/           |                       |
+            //                                                       |                       |
+            //                                                       v                       v
+            //                                                  DLocalSymtab            DLambdaExpr
+            //
+            //    DClosure      runtime procedure (created below)
+            //    DArray        bound non-local variables (established by VSM)
+            //    DLocalEnv     local environment (copy ref from VSM state)
+            //    h             alloc header
+            //    DLocalSymtab  local symbol table (created by parser)
+            //    DLambdaExpr   lambda expression (created by parser)
+
+            DArray * args =
+
             // not implemented
             assert(false);
         }

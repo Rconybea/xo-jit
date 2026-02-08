@@ -194,6 +194,9 @@ namespace xo {
             // for VM stack. Only works for code that doesn't rely on fancy
             // lexical scoping
 
+            // consider separate allocator for reader (i.e. program code)
+            // and data (program execution)
+
             /** reader: text -> expression **/
             SchematikaReader reader_;
 
@@ -205,6 +208,16 @@ namespace xo {
 
             /** expression register **/
             obj<AExpression> expr_;
+
+            /** environment pointer.  Provides bindings
+             *  for surrounding lexical scope at this point
+             *  in execution
+             **/
+            DLocalEnv * local_env_ = nullptr;
+            /** environment pointer.  Maintains bindings
+             *  for global variables.
+             **/
+            DGlobalEnv * global_env_ = nullptr;
 
             /** function to call **/
             obj<AProcedure> fn_;

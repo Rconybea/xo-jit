@@ -11,7 +11,7 @@
 namespace xo {
     namespace scm {
 
-        /** @brief bindings for arguments to a lambda
+        /** @brief runtime bindings for arguments to a lambda
          **/
         class DLocalEnv {
         public:
