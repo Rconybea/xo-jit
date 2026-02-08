@@ -53,8 +53,11 @@ namespace scm {
 
         // from ASymbolTable
 
-        // const methods
+        // builtin methods
         typeseq _typeseq() const noexcept override { return s_typeseq; }
+        [[noreturn]] void _drop(Opaque) const noexcept override { _fatal(); }
+
+        // const methods
         [[noreturn]] bool is_global_symtab(Copaque)  const  noexcept override { _fatal(); }
         [[noreturn]] Binding lookup_binding(Copaque, const DUniqueString *)  const  noexcept override { _fatal(); }
 

@@ -41,8 +41,11 @@ namespace scm {
 
         // from AExpression
 
-        // const methods
+        // builtin methods
         typeseq _typeseq() const noexcept override { return s_typeseq; }
+        void _drop(Opaque d) const noexcept override { _dcast(d).~DRepr(); }
+
+        // const methods
         exprtype extype(Copaque data)  const  noexcept override {
             return I::extype(_dcast(data));
         }

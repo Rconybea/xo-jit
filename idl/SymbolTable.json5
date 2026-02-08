@@ -56,4 +56,5 @@
         // // Variable gives both {name, type}
         // void upsert_local(DVariable * target) = 0;
     ],
+    router_facet_explicit_content: [ ],
 }

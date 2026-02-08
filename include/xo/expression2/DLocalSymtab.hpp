@@ -25,6 +25,7 @@ namespace xo {
 //            using typeseq = xo::reflect::typeseq;
 
             using ppindentinfo = xo::print::ppindentinfo;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             /* note: uint16_t would be fine too */
             using size_type = std::uint32_t;
@@ -89,6 +90,14 @@ namespace xo {
 
             /** lookup binding for variable @p sym **/
             Binding lookup_binding(const DUniqueString * sym) const noexcept;
+
+            ///@}
+            /** @defgroup xo-localsymtab-gcobject-facet gcobject facet **/
+            ///@{
+
+            std::size_t shallow_size() const noexcept;
+            DLocalSymtab * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
             /** @defgroup xo-localsymtab-printable-facet printable facet **/

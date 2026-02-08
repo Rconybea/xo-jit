@@ -34,6 +34,7 @@ xo_add_genfacet(
 
 # ----------------------------------------------------------------
 
+# note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-symboltable-localsymtab
     FACET_PKG xo_expression2
@@ -45,6 +46,19 @@ xo_add_genfacetimpl(
     OUTPUT_CPP_DIR src/expression2
 )
 
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-gcobject-localsymtab
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR LocalSymtab
+    INPUT idl/IGCObject_DLocalSymtab.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR symtab
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-localsymtab
     FACET_PKG xo_printable2
@@ -255,6 +269,18 @@ xo_add_genfacetimpl(
     FACET Expression
     REPR LambdaExpr
     INPUT idl/IExpression_DLambdaExpr.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/expression2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-gcobject-lambdaexpr
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR LambdaExpr
+    INPUT idl/IGCObject_DLambdaExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
     OUTPUT_CPP_DIR src/expression2

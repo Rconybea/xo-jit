@@ -45,8 +45,13 @@ public:
     /** @defgroup scm-symboltable-router-methods **/
     ///@{
 
-    // const methods
+    // explicit injected content
+
+    // builtin methods
     typeseq _typeseq() const noexcept { return O::iface()->_typeseq(); }
+    void _drop() const noexcept { O::iface()->_drop(O::data()); }
+
+    // const methods
     bool is_global_symtab()  const  noexcept {
         return O::iface()->is_global_symtab(O::data());
     }

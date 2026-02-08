@@ -50,6 +50,8 @@ public:
     // const methods
     /** RTTI: unique id# for actual runtime data representation **/
     virtual typeseq _typeseq() const noexcept = 0;
+    /** destroy instance @p d; calls c++ dtor only for actual runtime type; does not recover memory **/
+    virtual void _drop(Opaque d) const noexcept = 0;
     /** expression type (constant | apply | ..) **/
     virtual exprtype extype(Copaque data)  const  noexcept = 0;
     /** placeholder for type giving possible values for this expression **/
