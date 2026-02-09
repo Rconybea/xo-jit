@@ -80,32 +80,6 @@ namespace xo {
             typeref_.resolve(td);
         }
 
-        bool
-        DIfElseExpr::pretty(const ppindentinfo & ppii) const
-        {
-            auto test
-                = FacetRegistry::instance().try_variant<APrintable,
-                                                        AExpression>(test_);
-            auto when_true
-                = FacetRegistry::instance().try_variant<APrintable,
-                                                        AExpression>(when_true_);
-            auto when_false
-                = FacetRegistry::instance().try_variant<APrintable,
-                                                        AExpression>(when_false_);
-
-            bool test_present = test;
-            bool when_true_present = when_true;
-            bool when_false_present = when_false;
-
-            return ppii.pps()->pretty_struct
-                       (ppii,
-                        "DIfElseExpr",
-                        refrtag("typeref", typeref_),
-                        refrtag("test", test, test_present),
-                        refrtag("when_true", when_true, when_true_present),
-                        refrtag("when_false", when_false, when_false_present));
-        }
-
         // GCObject facet
 
         std::size_t
@@ -143,6 +117,34 @@ namespace xo {
             }
 
             return shallow_size();
+        }
+
+        // ----- printable facet -----
+
+        bool
+        DIfElseExpr::pretty(const ppindentinfo & ppii) const
+        {
+            auto test
+                = FacetRegistry::instance().try_variant<APrintable,
+                                                        AExpression>(test_);
+            auto when_true
+                = FacetRegistry::instance().try_variant<APrintable,
+                                                        AExpression>(when_true_);
+            auto when_false
+                = FacetRegistry::instance().try_variant<APrintable,
+                                                        AExpression>(when_false_);
+
+            bool test_present = test;
+            bool when_true_present = when_true;
+            bool when_false_present = when_false;
+
+            return ppii.pps()->pretty_struct
+                       (ppii,
+                        "DIfElseExpr",
+                        refrtag("typeref", typeref_),
+                        refrtag("test", test, test_present),
+                        refrtag("when_true", when_true, when_true_present),
+                        refrtag("when_false", when_false, when_false_present));
         }
 
         // ----------------------------------------------------------------

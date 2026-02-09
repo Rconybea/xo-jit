@@ -3,16 +3,16 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "DLambdaExpr.hpp"
-#include "detail/IExpression_DLambdaExpr.hpp"
-#include "DLocalSymtab.hpp"
-#include "symtab/IPrintable_DLocalSymtab.hpp"
+#include "LambdaExpr.hpp"
+#include "LocalSymtab.hpp"
+#include "UniqueString.hpp"
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/reflectutil/typeseq.hpp>
 
 namespace xo {
+    using xo::mm::AGCObject;
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
     using xo::reflect::TypeDescr;
@@ -132,6 +132,49 @@ namespace xo {
         void
         DLambdaExpr::assign_valuetype(TypeDescr td) noexcept {
             typeref_.resolve(td);
+        }
+
+        std::size_t
+        DLambdaExpr::shallow_size() const noexcept {
+            return sizeof(DLambdaExpr);
+        }
+
+        DLambdaExpr *
+        DLambdaExpr::shallow_copy(obj<AAllocator> mm) const noexcept {
+            DLambdaExpr * copy = (DLambdaExpr *)mm.alloc_copy((std::byte *)this);
+
+            if (copy) {
+                *copy = *this;
+            }
+
+            return copy;
+        }
+
+        std::size_t
+        DLambdaExpr::forward_children(obj<ACollector> gc) noexcept {
+            {
+                auto iface = xo::facet::impl_for<AGCObject,DUniqueString>();
+                gc.forward_inplace(&iface, (void **)(&name_));
+            }
+
+            // type_name_str_
+
+            {
+                auto iface = xo::facet::impl_for<AGCObject,DLocalSymtab>();
+                gc.forward_inplace(&iface, (void **)(&local_symtab_));
+            }
+
+            {
+                auto iface = body_expr_.to_facet<AGCObject>().iface();
+                gc.forward_inplace(iface, (void **)(&body_expr_));
+            }
+
+            // xxx free_var_set
+            // xxx captured_var_set
+            // xxx layer_var_map
+            // xxx nested_lambda_map
+
+            return shallow_size();
         }
 
         bool

@@ -17,28 +17,16 @@
 #include <xo/expression2/detail/IPrintable_DVariable.hpp>
 
 #include <xo/expression2/VarRef.hpp>
-
-#include <xo/expression2/detail/IExpression_DConstant.hpp>
-#include <xo/expression2/detail/IGCObject_DConstant.hpp>
-#include <xo/expression2/detail/IPrintable_DConstant.hpp>
-
+#include <xo/expression2/Constant.hpp>
 #include <xo/expression2/ApplyExpr.hpp>
-
-#include <xo/expression2/detail/IExpression_DLambdaExpr.hpp>
-//#include <xo/expression2/detail/IGCObject_DLambdaExpr.hpp>
-#include <xo/expression2/detail/IPrintable_DLambdaExpr.hpp>
-
-#include <xo/expression2/detail/IExpression_DIfElseExpr.hpp>
-#include <xo/expression2/detail/IGCObject_DIfElseExpr.hpp>
-#include <xo/expression2/detail/IPrintable_DIfElseExpr.hpp>
+#include <xo/expression2/LambdaExpr.hpp>
+#include <xo/expression2/IfElseExpr.hpp>
 
 #include <xo/expression2/detail/IExpression_DSequenceExpr.hpp>
 #include <xo/expression2/detail/IGCObject_DSequenceExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DSequenceExpr.hpp>
 
-#include <xo/expression2/symtab/ISymbolTable_DLocalSymtab.hpp>
-//#include <xo/expression2/detail/IGCObject_DLocalSymtab.hpp>
-#include <xo/expression2/symtab/IPrintable_DLocalSymtab.hpp>
+#include <xo/expression2/LocalSymtab.hpp>
 
 #include <xo/gc/detail/AGCObject.hpp>
 #include <xo/printable2/detail/APrintable.hpp>
@@ -70,6 +58,10 @@ namespace xo {
             // +- IfElseExpr
             // \- SequenceExpr
 
+            // SymbolTable
+            // +- LocalSymtab
+            // \- GlobalSymtab
+
             FacetRegistry::register_impl<AExpression, DConstant>();
             FacetRegistry::register_impl<AGCObject, DConstant>();
             FacetRegistry::register_impl<APrintable, DConstant>();
@@ -91,7 +83,7 @@ namespace xo {
             FacetRegistry::register_impl<APrintable, DApplyExpr>();
 
             FacetRegistry::register_impl<AExpression, DLambdaExpr>();
-            //FacetRegistry::register_impl<AGCObject, DLambdaExpr>();
+            FacetRegistry::register_impl<AGCObject, DLambdaExpr>();
             FacetRegistry::register_impl<APrintable, DLambdaExpr>();
 
             FacetRegistry::register_impl<AExpression, DIfElseExpr>();
@@ -103,7 +95,7 @@ namespace xo {
             FacetRegistry::register_impl<APrintable, DSequenceExpr>();
 
             FacetRegistry::register_impl<ASymbolTable, DLocalSymtab>();
-            //FacetRegistry::register_impl<AGCObject, DLocalSymtab>();
+            FacetRegistry::register_impl<AGCObject, DLocalSymtab>();
             FacetRegistry::register_impl<APrintable, DLocalSymtab>();
 
             log && log(xtag("DUniqueString.tseq", typeseq::id<DUniqueString>()));

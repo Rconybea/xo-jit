@@ -20,6 +20,7 @@ namespace xo {
          **/
         class DLambdaExpr {
         public:
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -79,6 +80,14 @@ namespace xo {
             void assign_valuetype(TypeDescr td) noexcept;
 
             ///@}
+            /** @defgroup scm-lambdaexpr-gcobject-facet **/
+            ///@{
+
+            std::size_t shallow_size() const noexcept;
+            DLambdaExpr * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
+
+            ///@}
             /** @defgroup scm-lambdaexpr-printable-facet **/
             ///@{
 
@@ -95,7 +104,7 @@ namespace xo {
             /** name for this lambda (generated if necessary) **/
             const DUniqueString * name_ = nullptr;
 
-#ifdef NOT_YET
+#ifdef NOT_YET // when enabled, need to visit forward_children()
             /** e.g.
              *    i64(f64,string)
              *  for function of two arguments with types (f64, string) respectively,

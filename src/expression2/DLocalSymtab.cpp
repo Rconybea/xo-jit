@@ -3,13 +3,14 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "DLocalSymtab.hpp"
+#include "LocalSymtab.hpp"
+#include "Variable.hpp"
 #include "DUniqueString.hpp"
-#include <xo/expression2/detail/IPrintable_DVariable.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/indentlog/scope.hpp>
 
 namespace xo {
+    using xo::mm::AGCObject;
     using xo::print::APrintable;
     using xo::facet::typeseq;
     using xo::print::ppstate;
@@ -76,6 +77,50 @@ namespace xo {
 
             return Binding();
         }
+
+        // ----- gcobject facet -----
+
+        std::size_t
+        DLocalSymtab::shallow_size() const noexcept
+        {
+            return (sizeof(DLocalSymtab) + (capacity_ * sizeof(Slot)));
+        }
+
+        DLocalSymtab *
+        DLocalSymtab::shallow_copy(obj<AAllocator> mm) const noexcept
+        {
+            DLocalSymtab * copy = (DLocalSymtab *)mm.alloc_copy((std::byte *)this);
+
+            if (copy) {
+                *copy = *this;
+
+                ::memcpy((void*)&(copy->slots_[0]),
+                         (void*)&(slots_[0]),
+                         capacity_ * sizeof(Slot));
+            }
+
+            return copy;
+        }
+
+        std::size_t
+        DLocalSymtab::forward_children(obj<ACollector> gc) noexcept
+        {
+            {
+                auto iface
+                    = xo::facet::impl_for<AGCObject,DLocalSymtab>();
+                gc.forward_inplace(&iface, (void **)(&parent_));
+            }
+
+            auto iface
+                = xo::facet::impl_for<AGCObject,DVariable>();
+            for (size_type i = 0; i < size_; ++i) {
+                gc.forward_inplace(&iface, (void **)(&(slots_[i].var_)));
+            }
+
+            return shallow_size();
+        }
+
+        // ----- printable facet -----
 
         bool
         DLocalSymtab::pretty(const ppindentinfo & ppii) const

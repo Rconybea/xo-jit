@@ -10,15 +10,13 @@ set(SELF_SRCS
     DVariable.cpp
     DVarRef.cpp
     DDefineExpr.cpp
-    DLambdaExpr.cpp
     DApplyExpr.cpp
-    DIfElseExpr.cpp
-    DSequenceExpr.cpp
 
     TypeRef.cpp
     Binding.cpp
 
     IExpression_Any.cpp
+    ISymbolTable_Any.cpp
 
     IExpression_DConstant.cpp
     IGCObject_DConstant.cpp
@@ -39,24 +37,27 @@ set(SELF_SRCS
     IGCObject_DApplyExpr.cpp
     IPrintable_DApplyExpr.cpp
 
+    DLambdaExpr.cpp
     IExpression_DLambdaExpr.cpp
+    IGCObject_DLambdaExpr.cpp
     IPrintable_DLambdaExpr.cpp
 
+    DIfElseExpr.cpp
     IExpression_DIfElseExpr.cpp
     IGCObject_DIfElseExpr.cpp
     IPrintable_DIfElseExpr.cpp
 
+    DSequenceExpr.cpp
     IExpression_DSequenceExpr.cpp
     IGCObject_DSequenceExpr.cpp
     IPrintable_DSequenceExpr.cpp
 
     DLocalSymtab.cpp
-    DGlobalSymtab.cpp
-
-    ISymbolTable_Any.cpp
-
     ISymbolTable_DLocalSymtab.cpp
+    IGCObject_DLocalSymtab.cpp
     IPrintable_DLocalSymtab.cpp
+
+    DGlobalSymtab.cpp
 
     StringTable.cpp
 
