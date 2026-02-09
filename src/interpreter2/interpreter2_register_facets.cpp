@@ -8,6 +8,7 @@
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
 #include "Closure.hpp"
+#include "LocalEnv.hpp"
 
 #include <xo/printable2/detail/APrintable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -37,8 +38,12 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DVsmEvalArgsFrame>();
             FacetRegistry::register_impl<APrintable, DVsmEvalArgsFrame>();
 
+            FacetRegistry::register_impl<AProcedure, DClosure>();
             FacetRegistry::register_impl<AGCObject, DClosure>();
             FacetRegistry::register_impl<APrintable, DClosure>();
+
+            FacetRegistry::register_impl<AGCObject, DLocalEnv>();
+            FacetRegistry::register_impl<APrintable, DLocalEnv>();
 
             // Procedure
             // +- Primitive_gco_2_gco_gco
@@ -49,6 +54,7 @@ namespace xo {
             log && log(xtag("DVsmApplyFrame.tseq", typeseq::id<DVsmApplyFrame>()));
             log && log(xtag("DVsmEvalArgsFrame.tseq", typeseq::id<DVsmEvalArgsFrame>()));
             log && log(xtag("DClosure.tseq", typeseq::id<DClosure>()));
+            log && log(xtag("DLocalEnv.tseq", typeseq::id<DLocalEnv>()));
 
             return true;
         }

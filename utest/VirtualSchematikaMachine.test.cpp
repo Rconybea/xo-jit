@@ -4,10 +4,11 @@
  **/
 
 #include <xo/interpreter2/VirtualSchematikaMachine.hpp>
-#include <xo/object2/DFloat.hpp>
-#include <xo/object2/number/IGCObject_DFloat.hpp>
-#include <xo/object2/DInteger.hpp>
-#include <xo/object2/number/IGCObject_DInteger.hpp>
+#include <xo/interpreter2/Closure.hpp>
+#include <xo/object2/Float.hpp>
+//#include <xo/object2/number/IGCObject_DFloat.hpp>
+#include <xo/object2/Integer.hpp>
+//#include <xo/object2/number/IGCObject_DInteger.hpp>
 
 #ifdef NOT_YET
 #include <xo/reader2/SchematikaParser.hpp>
@@ -28,6 +29,7 @@ namespace xo {
     using xo::scm::VirtualSchematikaMachine;
     using xo::scm::VsmConfig;
     using xo::scm::VsmResultExt;
+    using xo::scm::DClosure;
     using xo::scm::DFloat;
     using xo::scm::DInteger;
     using xo::mm::AGCObject;
@@ -196,17 +198,17 @@ namespace xo {
             bool eof_flag = false;
 
             vsm.begin_interactive_session();
-            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("lambda (x : i64) -> i64 { x * x; };"), eof_flag);
+            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("lambda (x : i64) -> i64 { x * x; }"), eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
 
             log && log(xtag("res.tseq", res.value()->_typeseq()));
 
-            auto x = obj<AGCObject,DFloat>::from(*res.value());
+            auto x = obj<AGCObject,DClosure>::from(*res.value());
 
             REQUIRE(x);
-            REQUIRE(x.data()->value() == 1.570796325);
+            //REQUIRE(x.data()->value() == 1.570796325);
 
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');

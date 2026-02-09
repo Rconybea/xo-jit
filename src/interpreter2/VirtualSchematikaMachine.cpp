@@ -241,10 +241,9 @@ namespace xo {
                                                 lambda.data(),
                                                 local_env_);
 
-            this->value_ = obj<AGCObject>(obj<AGCObject,DClosure>(closure));
-
-            // not implemented
-            assert(false);
+            this->value_
+                = obj<AGCObject>(obj<AGCObject,DClosure>(closure));
+            this->pc_ = this->cont_;
         }
 
         void

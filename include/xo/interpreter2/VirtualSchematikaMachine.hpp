@@ -216,6 +216,7 @@ namespace xo {
              *  in execution
              **/
             DLocalEnv * local_env_ = nullptr;
+
         protected:  // temporarily, to appease compiler
             /** environment pointer.  Maintains bindings
              *  for global variables.

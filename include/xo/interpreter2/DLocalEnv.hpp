@@ -58,6 +58,12 @@ namespace xo {
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
+            /** @defgroup scm-localenv-printable-facet **/
+            ///@{
+
+            bool pretty(const ppindentinfo & ppii) const noexcept;
+
+            ///@}
 
         private:
             /** parent environment (from closure) **/

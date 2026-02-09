@@ -121,6 +121,22 @@ namespace xo {
             return shallow_size();
         }
 
+        // ----- printable facet -----
+
+        bool
+        DLocalEnv::pretty(const ppindentinfo & ppii) const noexcept
+        {
+            // print local bindings, perhaps
+            //   symtab_
+            //   args_
+
+            return ppii.pps()->pretty_struct
+                (ppii,
+                 "DLocalEnv",
+                 refrtag("n_args", args_->size())
+                    );
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 
