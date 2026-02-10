@@ -8,6 +8,7 @@
 #include "SyntaxStateMachine.hpp"
 #include "ssm/ISyntaxStateMachine_DProgressSsm.hpp"
 #include "DSequenceSsm.hpp"
+#include "LambdaSsm.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/Variable.hpp>
 #include <xo/expression2/Constant.hpp>
@@ -138,6 +139,10 @@ namespace xo {
                 this->on_bool_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_lambda:
+                this->on_lambda_token(tk, p_psm);
+                return;
+
             // all the not-yet handled cases
             case tokentype::tk_invalid:
             case tokentype::tk_if:
@@ -165,7 +170,6 @@ namespace xo {
             case tokentype::tk_cmpeq:
             case tokentype::tk_cmpne:
             case tokentype::tk_type:
-            case tokentype::tk_lambda:
             case tokentype::tk_then:
             case tokentype::tk_else:
             case tokentype::tk_let:
@@ -380,6 +384,15 @@ namespace xo {
         }
 
         void
+        DExpectExprSsm::on_lambda_token(const Token & tk,
+                                        ParserStateMachine * p_psm)
+        {
+            (void)tk;
+
+            DLambdaSsm::start(p_psm);
+        }
+
+        void
         DExpectExprSsm::on_parsed_expression(obj<AExpression> expr,
                                              ParserStateMachine * p_psm)
         {
@@ -412,17 +425,6 @@ namespace xo {
         }
 
 #ifdef NOT_YET
-        void
-        expect_expr_xs::on_lambda_token(const token_type & /*tk*/,
-                                        parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            //constexpr const char * self_name = "exprstate::on_leftparen";
-
-            lambda_xs::start(p_psm);
-        }
-
         void
         expect_expr_xs::on_if_token(const token_type & /*tk*/,
                                     parserstatemachine * p_psm)

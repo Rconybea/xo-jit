@@ -33,6 +33,9 @@ namespace xo {
             /** rhs expression.  state exists to achieve 1-token lookahead **/
             progress,
 
+            /** expression enclosed in parentheses. See @ref DParenSsm **/
+            paren,
+
             /** toplevel of some translation unit. See @ref DExprSeqState **/
             expect_toplevel_expression_sequence,
 

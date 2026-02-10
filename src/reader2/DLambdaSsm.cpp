@@ -136,6 +136,10 @@ namespace xo {
                 this->on_yields_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_leftbrace:
+                this->on_leftbrace_token(tk, p_psm);
+                return;
+
                 // all the not-yet-handled cases
             case tokentype::tk_def:
             case tokentype::tk_if:
@@ -152,7 +156,6 @@ namespace xo {
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
-            case tokentype::tk_leftbrace:
             case tokentype::tk_rightbrace:
             case tokentype::tk_leftangle:
             case tokentype::tk_rightangle:
@@ -179,11 +182,6 @@ namespace xo {
             }
 
             Super::on_token(tk, p_psm);
-#ifdef OBSOLETE
-            p_psm->illegal_input_on_token("DLambdaSsm::on_token",
-                                          tk,
-                                          this->get_expect_str());
-#endif
         }
 
         void
@@ -199,11 +197,6 @@ namespace xo {
             }
 
             Super::on_token(tk, p_psm);
-#ifdef OBSOLETE
-            p_psm->illegal_input_on_token("DLambdaSsm::on_lambda_token",
-                                          tk,
-                                          this->get_expect_str());
-#endif
         }
 
         void
@@ -220,13 +213,28 @@ namespace xo {
             }
 
             Super::on_token(tk, p_psm);
-#ifdef OBSOLETE
-            p_psm->illegal_input_on_token("DLambdaSsm::on_yields_token",
-                                          tk,
-                                          this->get_expect_str());
-#endif
         }
 
+        void
+        DLambdaSsm::on_leftbrace_token(const Token & tk,
+                                       ParserStateMachine * p_psm)
+        {
+            if (lmstate_ == lambdastatetype::lm_2) {
+                // control here when leftbrace immediately follows
+                // formal param list.
+                // Otherwise leftbrace arrives in DExpectExprSsm
+                // pushed via on_parsed_typedescr()
+
+                this->lmstate_ = lambdastatetype::lm_4;
+
+                DExpectExprSsm::start(p_psm);
+                // precharge ssm for body with leftbrace
+                p_psm->on_token(Token::leftbrace_token());
+                return;
+            }
+
+            Super::on_token(tk, p_psm);
+        }
 
         void
         DLambdaSsm::on_parsed_typedescr(TypeDescr td,

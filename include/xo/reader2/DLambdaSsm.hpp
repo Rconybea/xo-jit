@@ -96,6 +96,12 @@ namespace xo {
             void on_yields_token(const Token & tk,
                                  ParserStateMachine * p_psm);
 
+            /** update ssm on leftbrace token @p tk,
+             *  with overall parser state in @p p_psm
+             **/
+            void on_leftbrace_token(const Token & tk,
+                                    ParserStateMachine * p_psm);
+
             ///@}
             /** @defgroup scm-lambdassm-syntaxstatemachine-facet **/
             ///@{

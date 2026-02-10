@@ -555,7 +555,6 @@ namespace xo {
             case tokentype::tk_end:
             case tokentype::N:
                 break;
-                return;
             }
 
             Super::on_token(tk, p_psm);

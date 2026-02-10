@@ -76,6 +76,12 @@ namespace xo {
             void on_string_token(const Token & tk,
                                  ParserStateMachine * p_psm);
 
+            /** update state for this syntax on incoming lambda token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_lambda_token(const Token & tk,
+                                 ParserStateMachine * p_psm);
+
             ///@}
             /** @defgroup scm-expectexpr-ssm-facet syntaxstatemachine facet methods **/
             ///@{

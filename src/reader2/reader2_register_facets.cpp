@@ -19,6 +19,8 @@
 
 #include <xo/reader2/ssm/IPrintable_DSequenceSsm.hpp>
 
+#include "ParenSsm.hpp"
+
 #include <xo/reader2/ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp>
 #include <xo/reader2/ssm/IPrintable_DExpectFormalArglistSsm.hpp>
 
@@ -85,6 +87,9 @@ namespace xo {
             FacetRegistry::register_impl<ASyntaxStateMachine, DProgressSsm>();
             FacetRegistry::register_impl<APrintable, DProgressSsm>();
 
+            FacetRegistry::register_impl<ASyntaxStateMachine, DParenSsm>();
+            FacetRegistry::register_impl<APrintable, DParenSsm>();
+
             log && log(xtag("DExprSeqState.tseq", typeseq::id<DExprSeqState>()));
             log && log(xtag("DDefineSsm.tseq", typeseq::id<DDefineSsm>()));
             log && log(xtag("DLambdaSsm.tseq", typeseq::id<DLambdaSsm>()));
@@ -95,6 +100,7 @@ namespace xo {
             log && log(xtag("DExpectTypeSsm.tseq", typeseq::id<DExpectTypeSsm>()));
             log && log(xtag("DExpectExprSsm.tseq", typeseq::id<DExpectExprSsm>()));
             log && log(xtag("DProgressSsm.tseq", typeseq::id<DProgressSsm>()));
+            log && log(xtag("DParenSsm.tseq", typeseq::id<DParenSsm>()));
             log && log(xtag("ASyntaxStateMachine.tseq", typeseq::id<ASyntaxStateMachine>()));
 
             return true;

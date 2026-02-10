@@ -6,7 +6,6 @@
 #pragma once
 
 #include "DSyntaxStateMachine.hpp"
-//#include "SyntaxStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/detail/IExpression_DDefineExpr.hpp>
 #include <xo/expression2/DDefineExpr.hpp>
@@ -36,7 +35,7 @@ namespace xo {
          *         --on_singleassign_token()--> def_5
          *   def_3 --on_typedescr()--> def_4
          *   def_4 --on_singleassign_token()--> def_5
-         *   def_5 --on_expr()--> def_6
+         *   def_5 --on_parsed_expression()--> def_6
          *   def_6 --on_semicolon_token()--> (done)
          *
          *   def_1:expect_symbol: got 'def' keyword, symbol to follow
@@ -104,9 +103,10 @@ namespace xo {
             /** @defgroup scm-definessm-access-methods **/
             ///@{
 
+            /** identify this nested state machine **/
             static const char * ssm_classname() { return "DDefineSsm"; }
 
-            /** identify this nested state machine **/
+            /** internal state **/
             defexprstatetype defstate() const noexcept { return defstate_; }
 
             ///@}
@@ -193,6 +193,9 @@ namespace xo {
             ///@}
 
         private:
+            /** @defgroup scm-definessm-member-vars **/
+            ///@{
+
             /** identify define-expression state **/
             defexprstatetype defstate_;
 
@@ -200,6 +203,8 @@ namespace xo {
              *  This will eventually be the output of this ssm
              **/
             obj<AExpression,DDefineExpr> def_expr_;
+
+            ///@}
         };
     } /*namespace scm*/
 } /*namespace xo*/

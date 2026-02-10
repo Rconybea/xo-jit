@@ -37,6 +37,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DLambdaSsm.cpp
     IPrintable_DLambdaSsm.cpp
 
+    DParenSsm.cpp
+    ISyntaxStateMachine_DParenSsm.cpp
+    IPrintable_DParenSsm.cpp
+
     DExpectFormalArglistSsm.cpp
     ISyntaxStateMachine_DExpectFormalArglistSsm.cpp
     IPrintable_DExpectFormalArglistSsm.cpp

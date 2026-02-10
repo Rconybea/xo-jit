@@ -113,6 +113,11 @@ namespace xo {
              **/
             void on_bool_token(const Token & tk, ParserStateMachine * p_psm);
 
+            /** update state for this syntax on incoming leftparen token @p tk,
+             *  overall parser state in @p p_psm
+             **/
+            void on_leftparen_token(const Token & tk, ParserStateMachine * p_psm);
+
             /** update state for this syntax on parsed expression @p expr
              *  from nested ssm.
              *  overall parser state in @p p_psm
