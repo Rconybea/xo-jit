@@ -21,6 +21,8 @@ namespace xo {
                 return "ifelseexpr";
             case syntaxstatetype::sequence:
                 return "sequence";
+            case syntaxstatetype::apply:
+                return "apply";
             case syntaxstatetype::progress:
                 return "progress";
             case syntaxstatetype::paren:

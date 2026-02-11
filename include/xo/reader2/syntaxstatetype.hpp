@@ -27,8 +27,11 @@ namespace xo {
             /** handle ifelse-expression. See @ref DIfElseSsm **/
             ifelseexpr,
 
-            /** handle sequence-expression. See @ref DSequenceSsm **/
+            /** handle sequence-expression syntax. See @ref DSequenceSsm **/
             sequence,
+
+            /** handle apply-expression syntax. See @ref DApplySsm **/
+            apply,
 
             /** rhs expression.  state exists to achieve 1-token lookahead **/
             progress,

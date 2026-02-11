@@ -37,6 +37,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DLambdaSsm.cpp
     IPrintable_DLambdaSsm.cpp
 
+    DApplySsm.cpp
+    # ISyntaxStateMachine_DApplySsm.cpp
+    # IPrintable_DApplySsm.cpp
+
     DParenSsm.cpp
     ISyntaxStateMachine_DParenSsm.cpp
     IPrintable_DParenSsm.cpp

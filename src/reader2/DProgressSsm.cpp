@@ -538,7 +538,7 @@ namespace xo {
             }
 #endif
 
-            // here: have lhs_ expression 
+            // here: have lhs_ expression
 
             if (op_type_ == optype::invalid) {
                 // e.g. control here on input like
@@ -911,12 +911,13 @@ namespace xo {
                 return;
             }
 
-            if (optype_ == optype::invalid) {
+            if (op_type_ == optype::invalid) {
                 // leftparen begins function call arguments.
                 // .lhs_ now understood to be expression that evaluates to a
                 // function
 
-                
+
+
             }
 
             Super::on_token(tk, p_psm);

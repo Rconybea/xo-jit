@@ -78,7 +78,7 @@ namespace xo {
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
-            /** @defgroup scm-define-ssm-facet constructors **/
+            /** @defgroup scm-definessm-ctors constructors **/
             ///@{
 
             /** constructor; using @p def_expr for initial expression scaffold **/
@@ -110,7 +110,7 @@ namespace xo {
             defexprstatetype defstate() const noexcept { return defstate_; }
 
             ///@}
-            /** @defgroup scm-define-ssm-facet syntaxstatemachine facet methods **/
+            /** @defgroup scm-definessm-facet syntaxstatemachine facet methods **/
             ///@{
 
             /** identifies the ssm implemented here **/
