@@ -4,6 +4,7 @@
  **/
 
 #include "ParenSsm.hpp"
+#include "ExpectExprSsm.hpp"
 #include "syntaxstatetype.hpp"
 #include <string_view>
 
@@ -70,9 +71,9 @@ namespace xo {
             case parenexprstatetype::invalid:
             case parenexprstatetype::N:
                 break;
-            case parenexprstatetype::lparen_0: return "lparen_0";
-            case parenexprstatetype::lparen_1: return "lparen_1";
-            case parenexprstatetype::lparen_2: return "lparen_2";
+            case parenexprstatetype::lparen_0: return "leftparen";
+            case parenexprstatetype::lparen_1: return "expression";
+            case parenexprstatetype::lparen_2: return "rightparen";
             }
 
             return "???parenexprstatetype";
@@ -83,9 +84,15 @@ namespace xo {
                             ParserStateMachine * p_psm)
         {
             switch (tk.tk_type()) {
+
             case tokentype::tk_leftparen:
                 this->on_leftparen_token(tk, p_psm);
                 return;
+
+            case tokentype::tk_rightparen:
+                this->on_rightparen_token(tk, p_psm);
+                return;
+
             // all the not-yet handled cases
             case tokentype::tk_symbol:
             case tokentype::tk_def:
@@ -98,7 +105,6 @@ namespace xo {
             case tokentype::tk_i64:
             case tokentype::tk_bool:
             case tokentype::tk_if:
-            case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
@@ -136,6 +142,25 @@ namespace xo {
         DParenSsm::on_leftparen_token(const Token & tk,
                                       ParserStateMachine * p_psm)
         {
+            if (parenstate_ == parenexprstatetype::lparen_0) {
+                this->parenstate_ = parenexprstatetype::lparen_1;
+
+                /** 1. allow_defs=false not allowing definitions immediately
+                 *     within a parenthesized expression.
+                 *     e.g.
+                 *       (def y : i64 = 4; x + y)     // nope
+                 *  2. cxl_on_rightparen=false expression _must_ be followed
+                 *     by rightparen. empty parentheses '()'
+                 *     do not denote anything, in expression context
+                 **/
+                DExpectExprSsm::start(p_psm->parser_alloc(),
+                                      false /*!allow_defs*/,
+                                      false /*cx_on_rightbrace*/,
+                                      p_psm);
+
+                return;
+            }
+
             Super::on_token(tk, p_psm);
         }
 
@@ -255,7 +280,24 @@ namespace xo {
 
             this->illegal_input_error(c_self_name, tk);
         }
+#endif
 
+        void
+        DParenSsm::on_rightparen_token(const Token & tk,
+                                       ParserStateMachine * p_psm)
+        {
+            if (this->parenstate_ == parenexprstatetype::lparen_2) {
+                // parenthesized expression successfully parsed
+
+                p_psm->pop_ssm();
+                p_psm->on_parsed_expression(this->expr_);
+                return;
+            }
+
+            Super::on_token(tk, p_psm);
+        }
+
+#ifdef NOT_YET
         void
         paren_xs::on_rightparen_token(const token_type & tk,
                                       parserstatemachine * p_psm)
@@ -302,7 +344,24 @@ namespace xo {
 
             this->illegal_input_error(c_self_name, tk);
         }
+#endif
 
+        void
+        DParenSsm::on_parsed_expression(obj<AExpression> expr,
+                                        ParserStateMachine * p_psm)
+        {
+            if (parenstate_ == parenexprstatetype::lparen_1) {
+                this->parenstate_ = parenexprstatetype::lparen_2;
+                this->expr_ = expr;
+
+                return;
+            }
+
+            Super::on_parsed_expression(expr, p_psm);
+
+        }
+
+#ifdef NOT_YET
         void
         paren_xs::on_expr(bp<Expression> expr,
                           parserstatemachine * p_psm)

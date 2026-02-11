@@ -9,6 +9,8 @@
 #include "DExpectExprSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectExprSsm.hpp"
 
+#include "ParenSsm.hpp"
+
 #include <xo/expression2/DApplyExpr.hpp>
 #include <xo/expression2/detail/IExpression_DApplyExpr.hpp>
 
@@ -185,6 +187,13 @@ namespace xo {
             start(parser_mm, lhs, optype::invalid, p_psm);
         }
 
+        void
+        DProgressSsm::start(DArena & parser_mm,
+                            ParserStateMachine * p_psm)
+        {
+            start(parser_mm, obj<AExpression>(), p_psm);
+        }
+
         DProgressSsm::DProgressSsm(obj<AExpression> valex,
                                    optype op)
           : lhs_{valex},
@@ -204,10 +213,12 @@ namespace xo {
 
         std::string_view
         DProgressSsm::get_expect_str() const noexcept {
-            if (op_type_ == optype::invalid) {
+            if (!lhs_) {
+                return "expr1|leftparen";
+            } else if (op_type_ == optype::invalid) {
                 return "oper|semicolon|rightparen|righbrace";
             } else {
-                return "expr|leftparen";
+                return "expr2|leftparen";
             }
         }
 
@@ -259,11 +270,14 @@ namespace xo {
                 this->on_rightbrace_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_leftparen:
+                this->on_leftparen_token(tk, p_psm);
+                return;
+
             // all the not-yet handled cases
             case tokentype::tk_invalid:
             case tokentype::tk_def:
             case tokentype::tk_if:
-            case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
@@ -484,12 +498,47 @@ namespace xo {
         }
 
         void
+        DProgressSsm::on_parsed_expression(obj<AExpression> expr,
+                                           ParserStateMachine * p_psm)
+        {
+            const bool c_debug_flag = p_psm->debug_flag() || true;
+
+            scope log(XO_DEBUG(c_debug_flag));
+
+            if (!lhs_) {
+                log && log("accepting expr1");
+
+                this->lhs_ = expr;
+                return;
+            }
+
+            Super::on_parsed_expression(expr, p_psm);
+        }
+
+        void
         DProgressSsm::on_parsed_expression_with_token(obj<AExpression> expr,
                                                       const Token & tk,
                                                       ParserStateMachine * p_psm)
         {
-            scope log(XO_DEBUG(p_psm->debug_flag()),
-                      xtag("expr", expr));
+            const bool c_debug_flag = p_psm->debug_flag() || true;
+
+            scope log(XO_DEBUG(c_debug_flag),
+                      xtag("expr", expr),
+                      xtag("tk", tk));
+
+#ifdef NOT_YET
+            if (!lhs_) {
+                log && log("DProgressSsm: accepting expr1");
+
+                this->lhs_ = expr;
+
+                // now we have to handle tk!
+
+                return;
+            }
+#endif
+
+            // here: have lhs_ expression 
 
             if (op_type_ == optype::invalid) {
                 // e.g. control here on input like
@@ -499,6 +548,7 @@ namespace xo {
                     ("DProgressSsm::on_parsed_expression_with_token",
                      expr,
                      this->get_expect_str());
+
                 return;
             }
 
@@ -847,7 +897,32 @@ namespace xo {
         {
             this->on_operator_token(tk, p_psm);
         }
+#endif
 
+        void
+        DProgressSsm::on_leftparen_token(const Token & tk,
+                                         ParserStateMachine * p_psm)
+        {
+            if (!lhs_) {
+                // leftparen begins possible lhs expression
+                DParenSsm::start(p_psm);
+
+                p_psm->on_token(Token::leftparen_token());
+                return;
+            }
+
+            if (optype_ == optype::invalid) {
+                // leftparen begins function call arguments.
+                // .lhs_ now understood to be expression that evaluates to a
+                // function
+
+                
+            }
+
+            Super::on_token(tk, p_psm);
+        }
+
+#ifdef NOT_YET
         /* editor bait: on_lparen */
         void
         progress_xs::on_leftparen_token(const token_type & tk,
@@ -885,8 +960,8 @@ namespace xo {
                 return;
             }
 
-            constexpr const char * c_self_name = "exprstate::on_leftparen";
             const char * exp = get_expect_str();
+            constexpr const char * c_self_name = "exprstate::on_leftparen";
 
             this->illegal_input_on_token(c_self_name, tk, exp, p_psm);
         }
@@ -1023,18 +1098,20 @@ namespace xo {
             log && log(xtag("rhs_.tseq", rhs_._typeseq()));
 
             obj<APrintable> lhs
-                = FacetRegistry::instance().variant<APrintable,AExpression>(lhs_);
+                = FacetRegistry::instance().try_variant<APrintable,AExpression>(lhs_);
 
             obj<APrintable> rhs
                 = FacetRegistry::instance().try_variant<APrintable,AExpression>(rhs_);
 
+            bool lhs_present = lhs;
             bool rhs_present = rhs;
+            bool op_present = (op_type_ != optype::invalid);
 
             return ppii.pps()->pretty_struct
                        (ppii,
                         "DProgressSsm",
-                        refrtag("lhs", lhs),
-                        refrtag("op", op_type_),
+                        refrtag("lhs", lhs, lhs_present),
+                        refrtag("op", op_type_, op_present),
                         refrtag("rhs", rhs, rhs_present),
                         refrtag("expect", this->get_expect_str())
                         );

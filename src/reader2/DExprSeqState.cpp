@@ -7,7 +7,7 @@
 #include "ssm/ISyntaxStateMachine_DExprSeqState.hpp"
 #include "DDefineSsm.hpp"
 #include "DLambdaSsm.hpp"
-#include "DProgressSsm.hpp"
+#include "ProgressSsm.hpp"
 #include "DIfElseSsm.hpp"
 #include "ParenSsm.hpp"
 #include "ExpectExprSsm.hpp"
@@ -400,7 +400,13 @@ namespace xo {
         {
             switch (seqtype_) {
             case exprseqtype::toplevel_interactive: {
-                DParenSsm::start(p_psm);
+                // not sufficient to just start a paren-ssm here.
+                // we want to parse toplevel input like
+                //    (getfunction())();
+                // just as C would.
+                // To wait for token following right paren, use a progress-ssm
+
+                DProgressSsm::start(p_psm->parser_alloc(), p_psm);
                 p_psm->on_token(Token::leftparen_token());
 
                 return;

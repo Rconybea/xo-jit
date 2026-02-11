@@ -87,6 +87,12 @@ namespace xo {
             void on_leftparen_token(const Token & tk,
                                     ParserStateMachine * p_psm);
 
+            /** update ssm state for incoming rightparen token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_rightparen_token(const Token & tk,
+                                     ParserStateMachine * p_psm);
+
             ///@}
             /** @defgroup scm-parenssm-ssm-facet syntaxstatemachine facet methods **/
             ///@{
@@ -100,6 +106,12 @@ namespace xo {
             /** update ssm for token @p tk, with overall state in @p p_psm **/
             void on_token(const Token & tk,
                           ParserStateMachine * p_psm);
+
+            /** update ssm for expression @p expr (emitted by nested ssm),
+             *  with overall parser state in @p p_psm
+             **/
+            void on_parsed_expression(obj<AExpression> expr,
+                                      ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-parenssm-printable-facet printable facet methods **/

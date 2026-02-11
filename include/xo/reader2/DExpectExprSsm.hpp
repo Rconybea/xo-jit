@@ -27,11 +27,11 @@ namespace xo {
 
             static DExpectExprSsm * make(DArena & parser_mm,
                                          bool allow_defs,
-                                         bool cxl_on_rightparen);
+                                         bool cxl_on_rightbrace);
 
             static void start(DArena & parser_mm,
                               bool allow_defs,
-                              bool cxl_on_rightparen,
+                              bool cxl_on_rightbrace,
                               ParserStateMachine * p_psm);
             static void start(ParserStateMachine * p_psm);
 

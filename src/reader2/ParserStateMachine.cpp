@@ -426,8 +426,8 @@ namespace xo {
             // - want to write error message using DArena
             // - need something like log_streambuf and/or tostr() that's arena-aware
 
-            obj<APrintable> expr_pr
-                = FacetRegistry::instance().variant<APrintable,AExpression>(expr);
+            auto expr_pr = expr.to_facet<APrintable>();
+            //= FacetRegistry::instance().variant<APrintable,AExpression>(expr);
             assert(expr_pr);
 
             /** TODO

@@ -101,6 +101,8 @@ namespace xo {
                                        optype op);
 
             static void start(DArena & parser_mm,
+                              ParserStateMachine * p_psm);
+            static void start(DArena & parser_mm,
                               obj<AExpression> lhs,
                               ParserStateMachine * p_psm);
             static void start(DArena & parsermm,
@@ -132,21 +134,9 @@ namespace xo {
             /** @defgroup scm-progressssm-methods general methods **/
             ///@{
 
-            /** token belongs to surrounding syntax,
-             *  -> lock in current progress
-             **/
-            void on_completing_token(const Token & tk,
-                                     ParserStateMachine * p_psm);
-
-            ///@}
-            /** @defgroup scm-progressssm-ssm-facet syntaxstatemachine facet methods **/
-            /// @{
-
-            /** operate state machine for this syntax on incoming token @p tk
-             *  with overall parser state in @p p_psm
-             **/
-            void on_token(const Token & tk,
-                          ParserStateMachine * p_psm);
+            /** handle leftparen token @p tk. Overall parser state in @p p_psm **/
+            void on_leftparen_token(const Token & tk,
+                                    ParserStateMachine * p_psm);
 
             void on_symbol_token(const Token & tk,
                                  ParserStateMachine * p_psm);
@@ -168,6 +158,25 @@ namespace xo {
                                     ParserStateMachine * p_psm);
             void on_rightbrace_token(const Token & tk,
                                      ParserStateMachine * p_psm);
+
+            /** token belongs to surrounding syntax,
+             *  -> lock in current progress
+             **/
+            void on_completing_token(const Token & tk,
+                                     ParserStateMachine * p_psm);
+
+            ///@}
+            /** @defgroup scm-progressssm-ssm-facet syntaxstatemachine facet methods **/
+            /// @{
+
+            /** operate state machine for this syntax on incoming token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_token(const Token & tk,
+                          ParserStateMachine * p_psm);
+
+            void on_parsed_expression(obj<AExpression> expr,
+                                      ParserStateMachine * p_psm);
             void on_parsed_expression_with_token(obj<AExpression> expr,
                                                  const Token & tk,
                                                  ParserStateMachine * p_psm);
