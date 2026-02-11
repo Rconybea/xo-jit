@@ -3,13 +3,14 @@
  *  @author Roland Conybeare, Feb 2026
  **/
 
-#include "DApplySsm.hpp"
+#include "ApplySsm.hpp"
 #include <xo/reflectutil/typeseq.hpp>
 
 //#include "parserstatemachine.hpp"
 //#include "expect_expr_xs.hpp"
 
 namespace xo {
+    using xo::print::APrintable;
     using xo::reflect::typeseq;
 
     namespace scm {
@@ -60,18 +61,21 @@ namespace xo {
             return new (mem) DApplySsm(fn_expr);
         }
 
-#ifdef NOT_YET
         void
-        apply_xs::start(rp<Expression> fn_expr,
-                        parserstatemachine * p_psm)
+        DApplySsm::start(obj<AExpression> fn_expr,
+                         ParserStateMachine * p_psm)
         {
             scope log(XO_DEBUG(p_psm->debug_flag()));
 
-            p_psm->push_exprstate(apply_xs::make());
-            p_psm->top_exprstate().on_expr(fn_expr.get(), p_psm);
-            p_psm->top_exprstate().on_leftparen_token(token_type::leftparen(), p_psm);
+            DApplySsm * apply_ssm
+                = DApplySsm::make(p_psm->parser_alloc(), fn_expr);
+
+            obj<ASyntaxStateMachine,DApplySsm> ssm(apply_ssm);
+
+            p_psm->push_ssm(ssm);
+            //OBSOLETE //p_psm->top_exprstate().on_expr(fn_expr.get(), p_psm);
+            //OBSOLETE //p_psm->on_token(token_type::leftparen(), p_psm);
         }
-#endif
 
         syntaxstatetype
         DApplySsm::ssm_type() const noexcept {
@@ -194,7 +198,23 @@ namespace xo {
 
             this->illegal_input_on_token(c_self_name, tk, exp, p_psm);
         }
+#endif
 
+        bool
+        DApplySsm::pretty(const ppindentinfo & ppii) const
+        {
+            // TODO: const-correct version of obj<> template 
+            auto fn_expr = const_cast<DApplySsm*>(this)->fn_expr_.to_facet<APrintable>();
+            bool fn_expr_present(fn_expr);
+
+            return ppii.pps()->pretty_struct(ppii,
+                                             "DApplySsm",
+                                             refrtag("applystate", applystate_),
+                                             refrtag("expect", this->get_expect_str()),
+                                             refrtag("fn_expr", fn_expr, fn_expr_present));
+        }
+
+#ifdef NOT_YET
         void
         apply_xs::print(std::ostream & os) const
         {

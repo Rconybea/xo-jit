@@ -38,8 +38,8 @@ set(SELF_SRCS
     IPrintable_DLambdaSsm.cpp
 
     DApplySsm.cpp
-    # ISyntaxStateMachine_DApplySsm.cpp
-    # IPrintable_DApplySsm.cpp
+    ISyntaxStateMachine_DApplySsm.cpp
+    IPrintable_DApplySsm.cpp
 
     DParenSsm.cpp
     ISyntaxStateMachine_DParenSsm.cpp

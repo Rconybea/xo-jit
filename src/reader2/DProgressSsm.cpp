@@ -9,6 +9,7 @@
 #include "DExpectExprSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectExprSsm.hpp"
 
+#include "ApplySsm.hpp"
 #include "ParenSsm.hpp"
 
 #include <xo/expression2/DApplyExpr.hpp>
@@ -20,21 +21,13 @@
 #include <xo/procedure2/init_primitives.hpp>  // for xo::scm::Primitives
 #include <xo/procedure2/detail/IGCObject_DPrimitive_gco_2_gco_gco.hpp>
 
-#ifdef NOT_YET
-#include "DApplySsm.hpp"
-#include "ssm/ISyntaxStateMachine_DApplySsm.hpp"
-#endif
-
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/reflectutil/typeseq.hpp>
 #include <xo/indentlog/print/cond.hpp>
 
 #ifdef NOT_YET
-#include "apply_xs.hpp"
-#include "exprstatestack.hpp"
 #include "expect_expr_xs.hpp"
-#include "parserstatemachine.hpp"
 #include "pretty_exprstatestack.hpp"
 #include "xo/expression/AssignExpr.hpp"
 #include "xo/expression/Apply.hpp"
@@ -912,12 +905,39 @@ namespace xo {
             }
 
             if (op_type_ == optype::invalid) {
-                // leftparen begins function call arguments.
-                // .lhs_ now understood to be expression that evaluates to a
-                // function
+                // input:
+                ///  <--- F1 --->
+                //   (..........)(.. )..
+                //   <------ A1 -----> 
+                //   <------- X1 ------>
+                //
+                //   F1: expression evaluating to a function,
+                //       parsed as fn_expr
+                //   A1: expression parsed as a function call (i.e. apply-expression)
+                //   X1: operator expression starting with A1
+                //
+                // before:
+                //   [0] ProgressSsm     responsible for input beginning with F1
+                //         .lhs = fn_expr, .op_type empty, .rhs empty
+                //
+                // after:
+                //   [0] ApplySsm        responsible for function call A1
+                //         .fn_expr = fn_expr
+                //   [1] ProgressSsm     responsible for operator expression X1
+                //         .lhs empty, .op_type empty, .rhs empty
+                //
+                // Remarks:
+                // 1. keep ProgressSsm on the stack in case input continues like:
+                //      fn_expr(args..) + ..
+                //    i.e. to allow for infix operator following apply
+                //     
 
+                obj<AExpression> fn_expr(this->lhs_);
 
+                this->lhs_ = obj<AExpression>();
 
+                DApplySsm::start(fn_expr, p_psm);
+                return;
             }
 
             Super::on_token(tk, p_psm);

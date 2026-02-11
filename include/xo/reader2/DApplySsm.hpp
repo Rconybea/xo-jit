@@ -89,10 +89,11 @@ namespace xo {
             static DApplySsm * make(DArena & parser_mm,
                                     obj<AExpression> fn_expr);
 
-#ifdef NOT_YET
             /**
              * Start apply. Will trigger this after input like
              *   "fn("
+             * or
+             *   "makefn()()"
              *
              * apply_xs remains on expr stack until closing right paren
              *    fn(arg1-expr, arg2-expr, ...)
@@ -100,9 +101,8 @@ namespace xo {
              * @p fnex   expression in function position
              * @p p_psm  parser state machine
              **/
-            static void start(rp<Expression> fnex,
-                              parserstatemachine * p_psm);
-#endif
+            static void start(obj<AExpression> fnex,
+                              ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-applyssm-access methods **/
@@ -124,6 +124,8 @@ namespace xo {
             /** mnemonic for expected remaining syntax for current parsing state **/
             std::string_view get_expect_str() const noexcept;
 
+            ///@}
+
 #ifdef NOT_YET
 
             virtual void on_expr(bp<Expression> expr,
@@ -142,6 +144,14 @@ namespace xo {
         private:
             static std::unique_ptr<apply_xs> make();
 #endif
+
+            /** @defgroup ssm-applyssm-printable-facet printable facet **/
+            ///@{
+
+            /** pretty-printing support **/
+            bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
 
         private:
             /** current state of parser for this apply expression **/
