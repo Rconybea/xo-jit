@@ -7,6 +7,7 @@
 
 #include <xo/reader2/ReaderConfig.hpp>
 #include <xo/gc/X1CollectorConfig.hpp>
+#include <xo/arena/ArenaConfig.hpp>
 
 namespace xo {
     namespace scm {
@@ -14,6 +15,7 @@ namespace xo {
          **/
         struct VsmConfig {
             using X1CollectorConfig = xo::mm::X1CollectorConfig;
+            using ArenaConfig = xo::mm::ArenaConfig;
 
             VsmConfig() = default;
 
@@ -26,6 +28,10 @@ namespace xo {
              *  TODO: may want to make CollectorConfig polymorphic
              **/
             X1CollectorConfig x1_config_ = X1CollectorConfig().with_size(4*1024*1024);
+            /** Configuration for error allocator
+             *  TODO: may want to make ArenaConfig polymorphic
+             **/
+            ArenaConfig error_config_ = ArenaConfig().with_size(64*1024);
         };
     } /*namespace scm*/
 } /*namespace xo*/

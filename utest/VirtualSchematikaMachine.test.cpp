@@ -225,7 +225,6 @@ namespace xo {
             vsm.visit_pools(visitor);
         }
 
-#ifdef NOT_YET
         TEST_CASE("VirtualSchematikaMachine-apply2", "[interpreter2][VSM]")
         {
             scope log(XO_DEBUG(true));
@@ -265,7 +264,6 @@ namespace xo {
             FacetRegistry::instance().visit_pools(visitor);
             vsm.visit_pools(visitor);
         }
-#endif
     } /*namespace ut*/
 } /*namespace xo*/
 

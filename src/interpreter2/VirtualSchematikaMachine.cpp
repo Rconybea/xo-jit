@@ -15,6 +15,7 @@
 //#include <xo/procedure2/SimpleRcx.hpp>
 #include <xo/gc/DX1Collector.hpp>
 #include <xo/gc/detail/IAllocator_DX1Collector.hpp>
+#include <xo/alloc2/Arena.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <cassert>
@@ -27,12 +28,25 @@ namespace xo {
     //using xo::mm::MemorySizeInfo;  // not used yet
     using xo::mm::AAllocator;
     using xo::mm::DX1Collector;
+    using xo::mm::DArena;
     using xo::facet::FacetRegistry;
     using std::cout;
 
     namespace scm {
 
-        // NOTE: using heap here for {DX1Collector, DVsmRcx} instances
+        bool
+        VsmResult::is_eval_error() const
+        {
+            if (std::holds_alternative<obj<AGCObject>>(result_)) {
+                auto err = obj<AGCObject,DRuntimeError>::from(*(this->value()));
+
+                return err;
+            } else {
+                return false;
+            }
+        }
+
+        // NOTE: using heap here for {DX1Collector, DArena, DVsmRcx} instances
         //       (though DX1Collector allocations will be from explictly mmap'd memory)
         //
         VirtualSchematikaMachine::VirtualSchematikaMachine(const VsmConfig & config)
@@ -41,6 +55,14 @@ namespace xo {
           rcx_(box<ARuntimeContext,DVsmRcx>(new DVsmRcx(this))),
           reader_{config.rdr_config_, mm_.to_op()}
         {
+            {
+                DArena * arena = new DArena();
+                assert(arena);
+                *arena = DArena::map(config_.error_config_);
+
+                error_mm_.adopt(obj<AAllocator,DArena>(arena));
+            }
+                
             // TODO: allocate global_env
         }
 
@@ -48,6 +70,12 @@ namespace xo {
         VirtualSchematikaMachine::allocator() const noexcept
         {
             return mm_.to_op();
+        }
+
+        obj<AAllocator>
+        VirtualSchematikaMachine::error_allocator() const noexcept
+        {
+            return error_mm_.to_op();
         }
 
         void
@@ -113,7 +141,7 @@ namespace xo {
         {
             this->pc_ = VsmInstr::c_eval;
             this->expr_ = expr;
-            this->value_ = obj<AGCObject>();
+            this->value_ = VsmResult(obj<AGCObject>());
             this->cont_ = VsmInstr::c_halt;
 
             this->run();
@@ -200,7 +228,7 @@ namespace xo {
             auto expr
                 = obj<AExpression,DConstant>::from(expr_);
 
-            this->value_ = expr.data()->value();
+            this->value_ = VsmResult(expr.data()->value());
             this->pc_ = this->cont_;
         }
 
@@ -250,7 +278,7 @@ namespace xo {
                                                 local_env_);
 
             this->value_
-                = obj<AGCObject>(obj<AGCObject,DClosure>(closure));
+                = VsmResult(obj<AGCObject>(obj<AGCObject,DClosure>(closure)));
             this->pc_ = this->cont_;
         }
 
@@ -341,7 +369,7 @@ namespace xo {
 
             // TODO: check argument types
 
-            this->value_ = fn_.apply_nocheck(rcx_.to_op(), args_);
+            this->value_ = VsmResult(fn_.apply_nocheck(rcx_.to_op(), args_));
             this->pc_ = cont_;
 
             return;

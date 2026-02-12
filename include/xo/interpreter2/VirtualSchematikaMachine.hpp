@@ -10,6 +10,7 @@
 #include "VsmFrame.hpp"
 #include "DLocalEnv.hpp"
 #include "DGlobalEnv.hpp"
+#include <xo/object2/RuntimeError.hpp>
 #include <xo/reader2/SchematikaReader.hpp>
 #include <xo/expression2/Expression.hpp>
 #include <xo/gc/GCObject.hpp>
@@ -17,6 +18,10 @@
 
 namespace xo {
     namespace scm {
+#ifdef OBSOLETE // see DVsmError
+        // TODO: move error to collected space?
+        //       or special arena?
+        // 
         struct EvaluationError {
             /** source location (in vsm implementation) at which error identified **/
             std::string_view src_function_;
@@ -24,6 +29,7 @@ namespace xo {
             std::string_view error_description_;
             // TODO: info about location in schematika source
         };
+#endif
 
         /** similar to @ref xo::scm::ReaderResult **/
         struct VsmResult {
@@ -31,17 +37,17 @@ namespace xo {
             using span_type = xo::mm::span<const char>;
 
             VsmResult() = default;
-            VsmResult(obj<AGCObject> value) : result_{value} {}
-            VsmResult(TokenizerError err) : result_{err} {}
+            explicit VsmResult(obj<AGCObject> value) : result_{value} {}
+            explicit VsmResult(TokenizerError err) : result_{err} {}
 
             bool is_value() const { return std::holds_alternative<obj<AGCObject>>(result_); }
             bool is_tk_error() const { return std::holds_alternative<TokenizerError>(result_); }
-            bool is_eval_error() const { return std::holds_alternative<EvaluationError>(result_); }
+            bool is_eval_error() const;
 
             const obj<AGCObject> * value() const { return std::get_if<obj<AGCObject>>(&result_); }
 
             /** result of evaluating first expression encountered in input **/
-            std::variant<obj<AGCObject>, TokenizerError, EvaluationError> result_;
+            std::variant<obj<AGCObject>, TokenizerError> result_;
         };
 
         /** vsm result + reamining span **/
@@ -72,6 +78,8 @@ namespace xo {
 
             /** allocator for schematika data **/
             obj<AAllocator> allocator() const noexcept;
+            /** allocator for runtime errors **/
+            obj<AAllocator> error_allocator() const noexcept;
 
             /** visit vsm-owned memory pools; call visitor(info) for each **/
             void visit_pools(const MemorySizeVisitor & visitor) const;
@@ -185,10 +193,18 @@ namespace xo {
             /** configuration **/
             VsmConfig config_;
 
-            /** allocator (likely collector) for
+            /** allocator (likely DX1Collector or similar) for
              *  expressions and values
              **/
             box<AAllocator> mm_;
+
+            /** Sidecar allocator for error reporting.
+             *  Separate to mitigate interference with @ref mm_
+             *  (separate memory so we can for example report 
+             *   an out-of-memory error).
+             *  Likely DArena or similar
+             **/
+            box<AAllocator> error_mm_;
 
             /** runtime context for this vsm.
              *  For example, provides allocator to primitives
