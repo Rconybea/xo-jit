@@ -9,6 +9,7 @@
 #include "VsmEvalArgsFrame.hpp"
 #include "Closure.hpp"
 #include "LocalEnv.hpp"
+#include "VsmRcx.hpp"
 
 #include <xo/printable2/detail/APrintable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -51,10 +52,16 @@ namespace xo {
 
             FacetRegistry::register_impl<AProcedure, DClosure>();
 
+            // RuntimeContext
+            // \- VsmRcx
+
+            FacetRegistry::register_impl<ARuntimeContext, DVsmRcx>();
+
             log && log(xtag("DVsmApplyFrame.tseq", typeseq::id<DVsmApplyFrame>()));
             log && log(xtag("DVsmEvalArgsFrame.tseq", typeseq::id<DVsmEvalArgsFrame>()));
             log && log(xtag("DClosure.tseq", typeseq::id<DClosure>()));
             log && log(xtag("DLocalEnv.tseq", typeseq::id<DLocalEnv>()));
+            log && log(xtag("DVsmRcx.tseq", typeseq::id<DVsmRcx>()));
 
             return true;
         }

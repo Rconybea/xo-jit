@@ -26,6 +26,7 @@ set(SELF_SRCS
     DLocalEnv.cpp
 
     DVsmRcx.cpp
+    IRuntimeContext_DVsmRcx.cpp
 
     VsmInstr.cpp
     )

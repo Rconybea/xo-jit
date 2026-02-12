@@ -6,12 +6,13 @@
 #include "VirtualSchematikaMachine.hpp"
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
+#include "VsmRcx.hpp"
 #include "Closure.hpp"
 #include <xo/expression2/ApplyExpr.hpp>
 #include <xo/expression2/LambdaExpr.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/procedure2/RuntimeContext.hpp>
-#include <xo/procedure2/SimpleRcx.hpp>
+//#include <xo/procedure2/SimpleRcx.hpp>
 #include <xo/gc/DX1Collector.hpp>
 #include <xo/gc/detail/IAllocator_DX1Collector.hpp>
 #include <xo/printable2/Printable.hpp>
@@ -31,13 +32,13 @@ namespace xo {
 
     namespace scm {
 
-        // NOTE: using heap for {DX1Collector, DSimpleRcx} instances
-        //       (though allocation from explictly mmap'd memory)
+        // NOTE: using heap here for {DX1Collector, DVsmRcx} instances
+        //       (though DX1Collector allocations will be from explictly mmap'd memory)
         //
         VirtualSchematikaMachine::VirtualSchematikaMachine(const VsmConfig & config)
         : config_{config},
           mm_(box<AAllocator,DX1Collector>(new DX1Collector(config.x1_config_))),
-          rcx_(box<ARuntimeContext,DSimpleRcx>(new DSimpleRcx(mm_.to_op()))),
+          rcx_(box<ARuntimeContext,DVsmRcx>(new DVsmRcx(this))),
           reader_{config.rdr_config_, mm_.to_op()}
         {
             // TODO: allocate global_env
