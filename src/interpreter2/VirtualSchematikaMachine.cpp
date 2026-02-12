@@ -24,6 +24,7 @@ namespace xo {
     using xo::print::ppstate_standalone;
     using xo::mm::AGCObject;
     //using xo::mm::MemorySizeInfo;  // not used yet
+    using xo::mm::AAllocator;
     using xo::mm::DX1Collector;
     using xo::facet::FacetRegistry;
     using std::cout;
@@ -40,6 +41,12 @@ namespace xo {
           reader_{config.rdr_config_, mm_.to_op()}
         {
             // TODO: allocate global_env
+        }
+
+        obj<AAllocator>
+        VirtualSchematikaMachine::allocator() const noexcept
+        {
+            return mm_.to_op();
         }
 
         void

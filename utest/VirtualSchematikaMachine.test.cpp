@@ -225,6 +225,47 @@ namespace xo {
             vsm.visit_pools(visitor);
         }
 
+#ifdef NOT_YET
+        TEST_CASE("VirtualSchematikaMachine-apply2", "[interpreter2][VSM]")
+        {
+            scope log(XO_DEBUG(true));
+
+            VsmConfig cfg;
+            VirtualSchematikaMachine vsm(cfg);
+
+            bool eof_flag = false;
+
+            vsm.begin_interactive_session();
+            VsmResultExt res
+                = vsm.read_eval_print(span_type::from_cstr
+                                          ("(lambda (x : i64, y : i64) { x * y; })(13, 15);"),
+                                      eof_flag);
+
+            REQUIRE(res.is_value());
+            REQUIRE(res.value());
+
+            log && log(xtag("res.tseq", res.value()->_typeseq()));
+
+            auto x = obj<AGCObject,DClosure>::from(*res.value());
+
+            REQUIRE(x);
+            //REQUIRE(x.data()->value() == 1.570796325);
+
+            REQUIRE(res.remaining_.size() == 1);
+            REQUIRE(*res.remaining_.lo() == '\n');
+
+            auto visitor = [&log](const MemorySizeInfo & info) {
+                log && log(xtag("resource", info.resource_name_),
+                           xtag("used", info.used_),
+                           xtag("alloc", info.allocated_),
+                           xtag("commit", info.committed_),
+                           xtag("resv", info.reserved_));
+            };
+
+            FacetRegistry::instance().visit_pools(visitor);
+            vsm.visit_pools(visitor);
+        }
+#endif
     } /*namespace ut*/
 } /*namespace xo*/
 

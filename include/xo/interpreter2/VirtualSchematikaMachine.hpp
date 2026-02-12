@@ -70,6 +70,9 @@ namespace xo {
         public:
             VirtualSchematikaMachine(const VsmConfig & config);
 
+            /** allocator for schematika data **/
+            obj<AAllocator> allocator() const noexcept;
+
             /** visit vsm-owned memory pools; call visitor(info) for each **/
             void visit_pools(const MemorySizeVisitor & visitor) const;
 
