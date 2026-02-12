@@ -1228,6 +1228,19 @@ namespace xo {
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_incomplete());
             }
+
+            {
+                auto & result = parser.on_token(Token::semicolon_token());
+
+                log && log("after semicolon token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == false);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_expression());
+                REQUIRE(result.result_expr());
+            }
         }
     } /*namespace ut*/
 } /*namespace xo*/
