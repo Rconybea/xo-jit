@@ -182,7 +182,8 @@ namespace xo {
             if (fastate_ == formalarglstatetype::argl_1a) {
                 this->fastate_ = formalarglstatetype::argl_1b;
 
-                TypeRef typeref = TypeRef::dwim(TypeRef::prefix_type::from_chars("formal"), param_type);
+                TypeRef typeref
+                    = TypeRef::dwim(TypeRef::prefix_type::from_chars("formal"), param_type);
 
                 DVariable * var = DVariable::make(p_psm->expr_alloc(),
                                                   param_name,

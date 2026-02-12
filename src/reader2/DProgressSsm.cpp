@@ -267,11 +267,14 @@ namespace xo {
                 this->on_leftparen_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_rightparen:
+                this->on_rightparen_token(tk, p_psm);
+                return;
+
             // all the not-yet handled cases
             case tokentype::tk_invalid:
             case tokentype::tk_def:
             case tokentype::tk_if:
-            case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
@@ -937,6 +940,9 @@ namespace xo {
                 this->lhs_ = obj<AExpression>();
 
                 DApplySsm::start(fn_expr, p_psm);
+                // + send leftparen to just-pushed apply
+                p_psm->on_token(tk);
+
                 return;
             }
 
@@ -986,7 +992,40 @@ namespace xo {
 
             this->illegal_input_on_token(c_self_name, tk, exp, p_psm);
         }
+#endif
 
+        void
+        DProgressSsm::on_rightparen_token(const Token & tk,
+                                          ParserStateMachine * p_psm)
+        {
+            /* note: implementation parallels .on_semicolon_token() */
+
+            scope log(XO_DEBUG(p_psm->debug_flag()));
+
+            /* stack may be something like:
+             *
+             *   [0] DProgressSsm
+             *   [1] DExpectExprSsm
+             *   [2] DApplySsm
+             *
+             * where we want rightparen to resolve in [2] DApplySsm,
+             * after triggering completion of [0] and [1]
+             */
+            auto expr = this->assemble_expr(p_psm);
+
+            if (expr) {
+                /* 1. popping self from parser stack.. */
+                p_psm->pop_ssm();
+                /* 2. report parsed subexpr to parent ssm, along with the triggering rightparen **/
+                p_psm->on_parsed_expression_with_token(expr, tk);
+
+                return;
+            }
+
+            Super::on_token(tk, p_psm);
+        }
+
+#ifdef NOT_YET
          void
          progress_xs::on_rightparen_token(const token_type & tk,
                                           parserstatemachine * p_psm)

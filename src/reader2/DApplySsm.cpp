@@ -4,6 +4,7 @@
  **/
 
 #include "ApplySsm.hpp"
+#include "ExpectExprSsm.hpp"
 #include <xo/reflectutil/typeseq.hpp>
 
 //#include "parserstatemachine.hpp"
@@ -39,13 +40,18 @@ namespace xo {
 
         // ----- DApplySsm -----
 
-        DApplySsm::DApplySsm(obj<AExpression> fn_expr)
-            : applystate_{applyexprstatetype::apply_0},
-              fn_expr_{fn_expr}
+        DApplySsm::DApplySsm(applyexprstatetype applystate,
+                             obj<AExpression> fn_expr,
+                             DArray * args)
+        : applystate_{applystate},
+          fn_expr_{fn_expr},
+          arg_expr_v_{args}
         {
             if (fn_expr) {
                 this->applystate_ = applyexprstatetype::apply_1;
             }
+
+            assert(args->empty());
         }
 
         DApplySsm *
@@ -55,10 +61,21 @@ namespace xo {
             void * mem = mm.alloc(typeseq::id<DApplySsm>(),
                                   sizeof(DApplySsm));
 
-            // TODO: revisit if we use flexible array for
-            //   arguments
+            /* allocate room for 8 arguments (during parsing)
+             *  will reallocate to expand if needed.
+             *
+             *  See similar code in DExpectFormalArglistSsm::_make
+             */
+            DArray * args = DArray::empty(mm, 8);
 
-            return new (mem) DApplySsm(fn_expr);
+            applyexprstatetype applystate
+                = (fn_expr
+                   ? applyexprstatetype::apply_1
+                   : applyexprstatetype::apply_0);
+
+            // TODO: revisit if we decide to use flexible array for arguments
+
+            return new (mem) DApplySsm(applystate, fn_expr, args);
         }
 
         void
@@ -96,6 +113,124 @@ namespace xo {
             }
 
             return "?expect";
+        }
+
+        void
+        DApplySsm::on_token(const Token & tk,
+                            ParserStateMachine * p_psm)
+        {
+            scope log(XO_DEBUG(p_psm->debug_flag()), xtag("tk", tk));
+
+            switch (tk.tk_type()) {
+            case tokentype::tk_leftparen:
+                this->on_leftparen_token(tk, p_psm);
+                return;
+            case tokentype::tk_symbol:
+            case tokentype::tk_def:
+            case tokentype::tk_if:
+            case tokentype::tk_then:
+            case tokentype::tk_else:
+            case tokentype::tk_semicolon:
+            case tokentype::tk_colon:
+            case tokentype::tk_singleassign:
+            case tokentype::tk_string:
+            case tokentype::tk_f64:
+            case tokentype::tk_i64:
+            case tokentype::tk_bool:
+            case tokentype::tk_invalid:
+            case tokentype::tk_rightparen:
+            case tokentype::tk_leftbracket:
+            case tokentype::tk_rightbracket:
+            case tokentype::tk_leftbrace:
+            case tokentype::tk_rightbrace:
+            case tokentype::tk_leftangle:
+            case tokentype::tk_rightangle:
+            case tokentype::tk_lessequal:
+            case tokentype::tk_greatequal:
+            case tokentype::tk_dot:
+            case tokentype::tk_comma:
+            case tokentype::tk_doublecolon:
+            case tokentype::tk_assign:
+            case tokentype::tk_yields:
+            case tokentype::tk_plus:
+            case tokentype::tk_minus:
+            case tokentype::tk_star:
+            case tokentype::tk_slash:
+            case tokentype::tk_cmpeq:
+            case tokentype::tk_cmpne:
+            case tokentype::tk_type:
+            case tokentype::tk_lambda:
+            case tokentype::tk_let:
+            case tokentype::tk_in:
+            case tokentype::tk_end:
+            case tokentype::N:
+                break;
+            }
+
+            Super::on_token(tk, p_psm);
+        }
+
+        void
+        DApplySsm::on_leftparen_token(const Token & tk,
+                                      ParserStateMachine * p_psm)
+        {
+            if (applystate_ == applyexprstatetype::apply_1) {
+                this->applystate_ = applyexprstatetype::apply_2;
+
+                DExpectExprSsm::start(p_psm);
+                return;
+            }
+
+            Super::on_token(tk, p_psm);
+        }
+
+        void
+        DApplySsm::on_parsed_expression_with_token(obj<AExpression> expr,
+                                                   const Token & tk)
+        {
+            if (applystate_ == applyexprstatetype::apply_2) {
+                if (args_expr_v_->size() == args_expr_v_->capacity()) {
+                    // need to expand .args_expr_v_ capacity.
+                    // Could use DArena checkpoint to redo this in place,
+                    // since argument array must be on the top of the stack.
+
+                    obj<AAllocator,DArena> mm(&(p_psm->parser_alloc()));
+
+                    DArray * argv_2x = DArray::empty(mm, 2 * args_expr_v_->capacity());
+
+                    for (DArray::size_type i = 0, n = arg_expr_v_->size(); i < n; ++i) {
+                        argv_2x->push_back((*argv_)[i]);
+                    }
+
+                    this->args_expr_v_ = argv_2x;
+                }
+
+                if (args_expr_v_->size() < args_expr_v_->capacity()) {
+                    args_expr_v_->push_back(expr);
+
+                }
+
+                if (tk.tk_type() == tokentype::tk_rightparen) {
+                    // expression completes apply
+
+                    // TODO: assemble apply expression..
+
+                    assert(false);
+                }
+
+                if ((tk.tk_type() == tokentype::tk_comma)
+                    || (tk.tk_type() == tokentype::tk_rightparen)) {
+
+                    // do stuff,
+                    //return;
+                }
+
+                 // complain
+
+                assert(false);
+            }
+
+            Super::on_parsed_expression_with_token(expr, tk);
         }
 
 #ifdef NOT_YET
@@ -155,25 +290,6 @@ namespace xo {
         }
 
         void
-        apply_xs::on_leftparen_token(const token_type & tk,
-                                     parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            log && log("applyxs_type", applyxs_type_);
-
-            if (this->applyxs_type_ == applyexprstatetype::apply_1) {
-                this->applyxs_type_ = applyexprstatetype::apply_2;
-                expect_expr_xs::start(p_psm);
-            } else {
-                constexpr const char * c_self_name = "apply_xs::on_leftparen_token";
-                const char * exp = this->get_expect_str();
-
-                this->illegal_input_on_token(c_self_name, tk, exp, p_psm);
-            }
-        }
-
-        void
         apply_xs::on_rightparen_token(const token_type & tk,
                                       parserstatemachine * p_psm)
         {
@@ -214,26 +330,6 @@ namespace xo {
                                              refrtag("fn_expr", fn_expr, fn_expr_present));
         }
 
-#ifdef NOT_YET
-        void
-        apply_xs::print(std::ostream & os) const
-        {
-            os << "<apply_xs"
-               << xtag("this", (void*)this)
-               << xtag("applyxs_type", applyxs_type_);
-            os << ">";
-        }
-
-        bool
-        apply_xs::pretty_print(const xo::print::ppindentinfo & ppii) const
-        {
-            return ppii.pps()->pretty_struct(ppii, "apply_xs",
-                                             refrtag("applyxs_type", applyxs_type_),
-                                             refrtag("fn_expr", fn_expr_),
-                                             refrtag("args_expr_v", args_expr_v_));
-        }
-
-#endif
     } /*namespace scm*/
 } /*namespace xo*/
 

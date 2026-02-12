@@ -46,8 +46,8 @@ namespace xo {
 
             apply_0,
             apply_1,
-            apply_2,
-            apply_3,
+            apply_2,  // rename -> apply_2a
+            apply_3,  // rename -> apply_2b
 
             N
         };
@@ -81,7 +81,8 @@ namespace xo {
              *  that we parse f before parser knows that it will be
              *  followed by leftparen
              **/
-            explicit DApplySsm(obj<AExpression> fn_expr);
+            explicit DApplySsm(obj<AExpression> fn_expr,
+                               DArray * args);
 
             /** create instance using memory from @p parser_mm.
              *  with function to be called supplied by @p fn_expr.
@@ -103,9 +104,8 @@ namespace xo {
              **/
             static void start(obj<AExpression> fnex,
                               ParserStateMachine * p_psm);
-
             ///@}
-            /** @defgroup scm-applyssm-access methods **/
+            /** @defgroup scm-applyssm-access-methods access methods **/
             ///@{
 
             /** identify this nested state machine **/
@@ -113,6 +113,16 @@ namespace xo {
 
             /** current internal state **/
             applyexprstatetype applystate() const noexcept { return applystate_; }
+
+            ///@}
+            /** @defgroup scm-applyssm-methods general methods **/
+            ///@{
+
+            /** handle leftparen token @p tk for this ssm,
+             *  with overall parser state in @p p_psm
+             **/
+            void on_leftparen_token(const Token & tk,
+                                    ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup ssm-applyssm-facet syntaxstatemachine facet methods **/
@@ -124,6 +134,12 @@ namespace xo {
             /** mnemonic for expected remaining syntax for current parsing state **/
             std::string_view get_expect_str() const noexcept;
 
+            /** update this apply-ssm for incoming token @p tk,
+             *  with overall parsing state in @p p_psm
+             **/
+            void on_token(const Token & tk,
+                          ParserStateMachine * p_psm);
+
             ///@}
 
 #ifdef NOT_YET
@@ -133,13 +149,8 @@ namespace xo {
 
             virtual void on_comma_token(const token_type & tk,
                                         parserstatemachine * p_psm) override;
-            virtual void on_leftparen_token(const token_type & tk,
-                                             parserstatemachine * p_psm) override;
             virtual void on_rightparen_token(const token_type & tk,
                                              parserstatemachine * p_psm) override;
-
-            virtual void print(std::ostream & os) const override;
-            virtual bool pretty_print(const print::ppindentinfo & ppii) const final override;
 
         private:
             static std::unique_ptr<apply_xs> make();
@@ -158,10 +169,14 @@ namespace xo {
             applyexprstatetype applystate_ = applyexprstatetype::apply_0;
             /** evaluates to function to be invoked **/
             obj<AExpression> fn_expr_;
-#ifdef NOT_YET
-            /** evaluates to the arguments to pass to @ref fn_ **/
-            std::vector<rp<Expression>> args_expr_v_;
-#endif
+            /** args_expr_v_[i] evaluates to the i'th argument to call.
+             *  Not using flexible array here since we don't know size at
+             *  construction time
+             *
+             *  (though could revisit +  realloc this DApplySsm instance in
+             *  place to optimize)
+             **/
+            DArray * args_expr_v_ = nullptr;
         };
     } /*namespace scm */
 

@@ -137,6 +137,8 @@ namespace xo {
             /** handle leftparen token @p tk. Overall parser state in @p p_psm **/
             void on_leftparen_token(const Token & tk,
                                     ParserStateMachine * p_psm);
+            void on_rightparen_token(const Token & tk,
+                                     ParserStateMachine * p_psm);
 
             void on_symbol_token(const Token & tk,
                                  ParserStateMachine * p_psm);

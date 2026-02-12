@@ -1204,6 +1204,30 @@ namespace xo {
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_incomplete());
             }
+
+            {
+                auto & result = parser.on_token(Token::i64_token("13"));
+
+                log && log("after i64(13) token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
+            {
+                auto & result = parser.on_token(Token::rightparen_token());
+
+                log && log("after rightparen token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
         }
     } /*namespace ut*/
 } /*namespace xo*/
