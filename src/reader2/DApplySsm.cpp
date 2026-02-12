@@ -5,12 +5,15 @@
 
 #include "ApplySsm.hpp"
 #include "ExpectExprSsm.hpp"
+#include <xo/facet/FacetRegistry.hpp>
+#include <xo/alloc2/Arena.hpp>
 #include <xo/reflectutil/typeseq.hpp>
 
 //#include "parserstatemachine.hpp"
 //#include "expect_expr_xs.hpp"
 
 namespace xo {
+    using xo::mm::AGCObject;
     using xo::print::APrintable;
     using xo::reflect::typeseq;
 
@@ -45,21 +48,23 @@ namespace xo {
                              DArray * args)
         : applystate_{applystate},
           fn_expr_{fn_expr},
-          arg_expr_v_{args}
+          args_expr_v_{args}
         {
             if (fn_expr) {
                 this->applystate_ = applyexprstatetype::apply_1;
             }
 
-            assert(args->empty());
+            assert(args->is_empty());
         }
 
         DApplySsm *
-        DApplySsm::make(DArena & mm,
+        DApplySsm::make(DArena & arena,
                         obj<AExpression> fn_expr)
         {
-            void * mem = mm.alloc(typeseq::id<DApplySsm>(),
-                                  sizeof(DApplySsm));
+            obj<AAllocator,DArena> mm(&arena);
+
+            void * mem = arena.alloc(typeseq::id<DApplySsm>(),
+                                     sizeof(DApplySsm));
 
             /* allocate room for 8 arguments (during parsing)
              *  will reallocate to expand if needed.
@@ -186,51 +191,75 @@ namespace xo {
 
         void
         DApplySsm::on_parsed_expression_with_token(obj<AExpression> expr,
-                                                   const Token & tk)
+                                                   const Token & tk,
+                                                   ParserStateMachine * p_psm)
         {
+            /* maybe we'll find control comes here also on function position?
+             * hasn't come up when applyssm recognized via leftparen
+             */
+
             if (applystate_ == applyexprstatetype::apply_2) {
+                obj<AGCObject> expr_gco = expr.to_facet<AGCObject>();
+                assert(expr_gco);
+
+                obj<AAllocator,DArena> mm(&(p_psm->parser_alloc()));
+
                 if (args_expr_v_->size() == args_expr_v_->capacity()) {
                     // need to expand .args_expr_v_ capacity.
                     // Could use DArena checkpoint to redo this in place,
                     // since argument array must be on the top of the stack.
 
-                    obj<AAllocator,DArena> mm(&(p_psm->parser_alloc()));
-
                     DArray * argv_2x = DArray::empty(mm, 2 * args_expr_v_->capacity());
 
-                    for (DArray::size_type i = 0, n = arg_expr_v_->size(); i < n; ++i) {
-                        argv_2x->push_back((*argv_)[i]);
+                    for (DArray::size_type i = 0, n = args_expr_v_->size(); i < n; ++i) {
+                        argv_2x->push_back((*args_expr_v_)[i]);
                     }
 
                     this->args_expr_v_ = argv_2x;
                 }
 
-                if (args_expr_v_->size() < args_expr_v_->capacity()) {
-                    args_expr_v_->push_back(expr);
-
-                }
+                if (args_expr_v_->size() < args_expr_v_->capacity())
+                    args_expr_v_->push_back(expr_gco);
 
                 if (tk.tk_type() == tokentype::tk_rightparen) {
-                    // expression completes apply
+                    // begin assemble_expr()..
 
-                    // TODO: assemble apply expression..
+                    std::uint32_t n_args = args_expr_v_->size();
 
-                    assert(false);
+                    DApplyExpr * apply
+                        = (DApplyExpr::scaffold
+                           (mm,
+                            TypeRef::dwim(TypeRef::prefix_type::from_chars("apply"),
+                                          nullptr),
+                            fn_expr_,
+                            n_args));
+
+                    for (std::uint32_t i_arg = 0; i_arg < n_args; ++i_arg) {
+                        auto arg_expr
+                            = args_expr_v_->at(i_arg).to_facet<AExpression>();
+
+                        apply->assign_arg(i_arg, arg_expr);
+                    }
+
+                    // ..end assemble_expr()
+
+                    obj<AExpression,DApplyExpr> apply_ex(apply);
+
+                    p_psm->pop_ssm();
+                    p_psm->on_parsed_expression(apply_ex);
+
+                    return;
+                } else if (tk.tk_type() == tokentype::tk_comma) {
+                    // 1. want to remain in state apply_2
+                    // 2. expr from nested ssm already incorporated
+                    //    into .args_expr_v_
+                    // -> so updated state already achieved.
+
+                    return;
                 }
-
-                if ((tk.tk_type() == tokentype::tk_comma)
-                    || (tk.tk_type() == tokentype::tk_rightparen)) {
-
-                    // do stuff,
-                    //return;
-                }
-
-                 // complain
-
-                assert(false);
             }
 
-            Super::on_parsed_expression_with_token(expr, tk);
+            Super::on_parsed_expression_with_token(expr, tk, p_psm);
         }
 
 #ifdef NOT_YET
@@ -319,7 +348,7 @@ namespace xo {
         bool
         DApplySsm::pretty(const ppindentinfo & ppii) const
         {
-            // TODO: const-correct version of obj<> template 
+            // TODO: const-correct version of obj<> template
             auto fn_expr = const_cast<DApplySsm*>(this)->fn_expr_.to_facet<APrintable>();
             bool fn_expr_present(fn_expr);
 

@@ -81,7 +81,8 @@ namespace xo {
              *  that we parse f before parser knows that it will be
              *  followed by leftparen
              **/
-            explicit DApplySsm(obj<AExpression> fn_expr,
+            explicit DApplySsm(applyexprstatetype applystate,
+                               obj<AExpression> fn_expr,
                                DArray * args);
 
             /** create instance using memory from @p parser_mm.
@@ -140,6 +141,13 @@ namespace xo {
             void on_token(const Token & tk,
                           ParserStateMachine * p_psm);
 
+            /** update this apply-ssm with data from nested ssm:
+             *  expression @p expr, followed by token @p tk.
+             **/
+            void on_parsed_expression_with_token(obj<AExpression> expr,
+                                                 const Token & tk,
+                                                 ParserStateMachine * p_psm);
+
             ///@}
 
 #ifdef NOT_YET
@@ -165,6 +173,15 @@ namespace xo {
             ///@}
 
         private:
+            /** @defgroup ssm-applyssm-mpl-methods **/
+            ///@{
+
+            ///@}
+
+        private:
+            /** @defgroup ssm-applyssm-member-variables **/
+            ///@{
+
             /** current state of parser for this apply expression **/
             applyexprstatetype applystate_ = applyexprstatetype::apply_0;
             /** evaluates to function to be invoked **/
@@ -177,6 +194,8 @@ namespace xo {
              *  place to optimize)
              **/
             DArray * args_expr_v_ = nullptr;
+
+            ///@}
         };
     } /*namespace scm */
 
