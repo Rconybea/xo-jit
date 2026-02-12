@@ -142,6 +142,8 @@ namespace xo {
 
             void on_symbol_token(const Token & tk,
                                  ParserStateMachine * p_psm);
+            void on_comma_token(const Token & tk,
+                                ParserStateMachine * p_psm);
             void on_colon_token(const Token & tk,
                                 ParserStateMachine * p_psm);
             void on_singleassign_token(const Token & tk,

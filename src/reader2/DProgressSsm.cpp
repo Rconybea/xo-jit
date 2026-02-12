@@ -224,6 +224,7 @@ namespace xo {
             switch (tk.tk_type()) {
             case tokentype::tk_then:
             case tokentype::tk_else:
+            case tokentype::tk_comma:
                 this->on_completing_token(tk, p_psm);
                 return;
 
@@ -283,7 +284,6 @@ namespace xo {
             case tokentype::tk_lessequal:
             case tokentype::tk_greatequal:
             case tokentype::tk_dot:
-            case tokentype::tk_comma:
             case tokentype::tk_doublecolon:
             case tokentype::tk_assign:
             case tokentype::tk_yields:
@@ -911,7 +911,7 @@ namespace xo {
                 // input:
                 ///  <--- F1 --->
                 //   (..........)(.. )..
-                //   <------ A1 -----> 
+                //   <------ A1 ----->
                 //   <------- X1 ------>
                 //
                 //   F1: expression evaluating to a function,
@@ -933,7 +933,7 @@ namespace xo {
                 // 1. keep ProgressSsm on the stack in case input continues like:
                 //      fn_expr(args..) + ..
                 //    i.e. to allow for infix operator following apply
-                //     
+                //
 
                 obj<AExpression> fn_expr(this->lhs_);
 

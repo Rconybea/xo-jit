@@ -1242,6 +1242,90 @@ namespace xo {
                 REQUIRE(result.result_expr());
             }
         }
+
+        TEST_CASE("SchematikaParser-interactive-apply2", "[reader2][SchematikaParser]")
+        {
+            // top-level apply, with multiple arguments
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag));
+
+            ArenaConfig config;
+            config.name_ = "test-arena";
+            config.size_ = 16 * 1024;
+
+            DArena expr_arena = DArena::map(config);
+            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
+
+            SchematikaParser parser(config, 4096, expr_alloc, false /*debug_flag*/);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    (lambda (x : i64, y : i64) { x * y })(13, 15);
+             *
+             **/
+
+            std::vector<Token> tk_v{
+                Token::leftparen_token(),
+
+                /**/ Token::lambda_token(),
+                /*  */ Token::leftparen_token(),
+                /*    */ Token::symbol_token("x"),
+                /*    */ Token::colon_token(),
+                /*    */ Token::symbol_token("i64"),
+                /*  */ Token::comma_token(),
+                /*    */ Token::symbol_token("y"),
+                /*    */ Token::colon_token(),
+                /*    */ Token::symbol_token("i64"),
+                /*  */ Token::rightparen_token(),
+
+                /**/ Token::leftbrace_token(),
+                /*  */ Token::symbol_token("x"),
+                /*  */ Token::star_token(),
+                /*  */ Token::symbol_token("y"),
+                /**/ Token::rightbrace_token(),
+
+                Token::rightparen_token(),
+
+                Token::leftparen_token(),
+                /**/ Token::i64_token("13"),
+                /**/ Token::comma_token(),
+                /**/ Token::i64_token("15"),
+                Token::rightparen_token(),
+
+                Token::semicolon_token(),
+            };
+
+            size_t i_tk = 0;
+            size_t n_tk = tk_v.size();
+            for (const auto & tk : tk_v) {
+                INFO(tostr(xtag("i_tk", i_tk), xtag("tk", tk)));
+
+                auto & result = parser.on_token(tk);
+
+                log && log("after token", xtag("i_tk", i_tk), xtag("tk", tk));
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                if (i_tk + 1 < n_tk) {
+                    REQUIRE(parser.has_incomplete_expr() == true);
+                    REQUIRE(!result.is_error());
+                    REQUIRE(result.is_incomplete());
+                } else {
+                    /* last token in tk_v[] */
+
+                    REQUIRE(parser.has_incomplete_expr() == false);
+                    REQUIRE(!result.is_error());
+                    REQUIRE(result.is_expression());
+                    REQUIRE(result.result_expr());
+                }
+
+                ++i_tk;
+            }
+
+        }
     } /*namespace ut*/
 } /*namespace xo*/
 

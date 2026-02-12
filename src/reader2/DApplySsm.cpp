@@ -253,8 +253,8 @@ namespace xo {
                     // 1. want to remain in state apply_2
                     // 2. expr from nested ssm already incorporated
                     //    into .args_expr_v_
-                    // -> so updated state already achieved.
 
+                    DExpectExprSsm::start(p_psm);
                     return;
                 }
             }
