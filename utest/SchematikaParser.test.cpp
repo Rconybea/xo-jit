@@ -838,8 +838,10 @@ namespace xo {
         {
             // top-level apply, with multiple arguments
 
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
             constexpr bool c_debug_flag = true;
-            scope log(XO_DEBUG(c_debug_flag));
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ArenaConfig config;
             config.name_ = "test-arena";
@@ -854,68 +856,44 @@ namespace xo {
 
             /** Walkthrough parsing input equivalent to:
              *
-             *    (lambda (x : i64, y : i64) { x * y })(13, 15);
-             *
+             *    (lambda (x : i64, y : i64) { x * y })(13, 15) ;
+             *    ^^      ^^ ^  ^  ^ ^^ ^  ^ ^ ^ ^ ^ ^^^^ ^ ^ ^ ^
+             *    0|      2| 4  5  6 7| 9  a b c d e f|h| j k l m
+             *     1       3          8               g i 
              **/
 
             std::vector<Token> tk_v{
-                Token::leftparen_token(),
+                /* [ 0] */ Token::leftparen_token(),
 
-                /**/ Token::lambda_token(),
-                /*  */ Token::leftparen_token(),
-                /*    */ Token::symbol_token("x"),
-                /*    */ Token::colon_token(),
-                /*    */ Token::symbol_token("i64"),
-                /*  */ Token::comma_token(),
-                /*    */ Token::symbol_token("y"),
-                /*    */ Token::colon_token(),
-                /*    */ Token::symbol_token("i64"),
-                /*  */ Token::rightparen_token(),
+                /* [ 1] */   Token::lambda_token(),
+                /* [ 2] */     Token::leftparen_token(),
+                /* [ 3] */       Token::symbol_token("x"),
+                /* [ 4] */       Token::colon_token(),
+                /* [ 5] */       Token::symbol_token("i64"),
+                /* [ 6] */     Token::comma_token(),
+                /* [ 7] */       Token::symbol_token("y"),
+                /* [ 8] */       Token::colon_token(),
+                /* [ 9] */       Token::symbol_token("i64"),
+                /* [ a] */     Token::rightparen_token(),
 
-                /**/ Token::leftbrace_token(),
-                /*  */ Token::symbol_token("x"),
-                /*  */ Token::star_token(),
-                /*  */ Token::symbol_token("y"),
-                /**/ Token::rightbrace_token(),
+                /* [ b] */     Token::leftbrace_token(),
+                /* [ c] */       Token::symbol_token("x"),
+                /* [ d] */       Token::star_token(),
+                /* [ e] */       Token::symbol_token("y"),
+                /* [ f] */     Token::rightbrace_token(),
 
-                Token::rightparen_token(),
+                /* [ g] */   Token::rightparen_token(),
 
-                Token::leftparen_token(),
-                /**/ Token::i64_token("13"),
-                /**/ Token::comma_token(),
-                /**/ Token::i64_token("15"),
-                Token::rightparen_token(),
+                /* [ h] */   Token::leftparen_token(),
+                /* [ i] */     Token::i64_token("13"),
+                /* [ j] */     Token::comma_token(),
+                /* [ k] */     Token::i64_token("15"),
+                /* [ l] */   Token::rightparen_token(),
 
-                Token::semicolon_token(),
+                /* [ m] */ Token::semicolon_token(),
             };
 
-            size_t i_tk = 0;
-            size_t n_tk = tk_v.size();
-            for (const auto & tk : tk_v) {
-                INFO(tostr(xtag("i_tk", i_tk), xtag("tk", tk)));
-
-                auto & result = parser.on_token(tk);
-
-                log && log("after token", xtag("i_tk", i_tk), xtag("tk", tk));
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                if (i_tk + 1 < n_tk) {
-                    REQUIRE(parser.has_incomplete_expr() == true);
-                    REQUIRE(!result.is_error());
-                    REQUIRE(result.is_incomplete());
-                } else {
-                    /* last token in tk_v[] */
-
-                    REQUIRE(parser.has_incomplete_expr() == false);
-                    REQUIRE(!result.is_error());
-                    REQUIRE(result.is_expression());
-                    REQUIRE(result.result_expr());
-                }
-
-                ++i_tk;
-            }
-
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
         }
     } /*namespace ut*/
 } /*namespace xo*/
