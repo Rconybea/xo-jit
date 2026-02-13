@@ -31,7 +31,7 @@ namespace xo {
             /** Coda to restore vsm registers (local_env, stack, cont)
              *  after invoking a closure
              **/
-            applycoda,
+            apply_cont,
 
             /** Loop over elements of a SequenceExpr **/
             seq_cont,

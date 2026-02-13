@@ -185,7 +185,7 @@ namespace xo {
              *  (specifically: local_env_, stack_, cont_)
              *  after invoking a schematika closure
              **/
-            void _do_applycoda_op();
+            void _do_apply_cont_op();
 
             /** loop continuation after evaluating element of a SequenceExpr **/
             void _do_seq_cont_op();

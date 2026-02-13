@@ -246,11 +246,12 @@ namespace xo {
             log && log(xtag("res.tseq", res.value()->_typeseq()));
 
             // currently get not-implemented error 
-            auto x = obj<AGCObject,DRuntimeError>::from(*res.value());
+            auto x = obj<AGCObject,DInteger>::from(*res.value());
 
             REQUIRE(x);
+            REQUIRE(x->value() == 195);
 
-            log && log("runtime-error", xtag("ex.src", x->src_function()), xtag("ex.descr", x->error_descr()));
+            //log && log("runtime-error", xtag("ex.src", x->src_function()), xtag("ex.descr", x->error_descr()));
 
             //REQUIRE(x.data()->value() == 1.570796325);
 

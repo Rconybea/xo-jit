@@ -30,11 +30,11 @@ namespace xo {
 
             /** create instance, using memory from @p mm **/
             static DVsmApplyClosureFrame * make(obj<AAllocator> mm,
-                                                obj<AGCObject> stack,
+                                                obj<AGCObject> parent,
                                                 VsmInstr cont,
                                                 DLocalEnv * env);
 
-            obj<AGCObject> stack() const { return stack_; }
+            obj<AGCObject> parent() const { return stack_; }
             VsmInstr cont() const { return cont_; }
             DLocalEnv * local_env() const { return local_env_; }
 

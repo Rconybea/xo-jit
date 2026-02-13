@@ -187,8 +187,8 @@ namespace xo {
             case vsm_opcode::evalargs:
                 _do_evalargs_op();
                 break;
-            case vsm_opcode::applycoda:
-                _do_applycoda_op();
+            case vsm_opcode::apply_cont:
+                _do_apply_cont_op();
                 break;
             case vsm_opcode::seq_cont:
                 _do_seq_cont_op();
@@ -302,8 +302,37 @@ namespace xo {
         void
         VirtualSchematikaMachine::_do_eval_varref_op()
         {
-            // not implemented
-            assert(false);
+            auto var = obj<AExpression,DVarRef>::from(expr_);
+
+            Binding b = var->path();
+
+            if (!local_env_) {
+                // need lookup on global_env_
+                assert(false);
+            }
+
+            auto value = local_env_->lookup_value(b);
+
+            if (value) {
+                this->value_ = VsmResult(value);
+                this->pc_ = this->cont_;
+                return;
+            }
+
+            // no binding
+
+            auto error = DRuntimeError::make(mm_.to_op(),
+                                             "_do_eval_varref_op",
+                                             "no binding for variable");
+            this->value_ = VsmResult(error);
+
+            // for now: halt VSM execution
+            // TODO: some combination of
+            // 1. emit stack trace 
+            // 2. go to debugger
+            // 3. have every vsm instruction check inputs for errors
+            
+            this->pc_ = VsmInstr::c_halt;
         }
 
         void
@@ -439,7 +468,7 @@ namespace xo {
             //       DVsmApplyClosureFrame instance, in which case
             //       we can just refer to it instead of pushing a new one
 
-            if (cont_ == VsmInstr::c_applycoda) {
+            if (cont_ == VsmInstr::c_apply_cont) {
                 // we are making a tail call.
                 // No need to preserve (stack, cont, local_env),
                 // since continuation will restore on top of them
@@ -454,7 +483,7 @@ namespace xo {
 
                 // push frame w/ saved vsm registers
                 this->stack_ = frame;
-                this->cont_ = VsmInstr::c_applycoda;
+                this->cont_ = VsmInstr::c_apply_cont;
             }
 
             auto lambda = closure->lambda();
@@ -598,7 +627,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_applycoda_op()
+        VirtualSchematikaMachine::_do_apply_cont_op()
         {
             // see DVsmApplyClosureFrame
 
@@ -606,12 +635,9 @@ namespace xo {
 
             assert(frame);
 
-            this->stack_ = frame->stack();
+            this->stack_ = frame->parent();
             this->local_env_ = frame->local_env();
             this->pc_ = frame->cont();
-
-            // not implemented
-            assert(false);
         }
 
         void
