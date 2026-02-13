@@ -451,14 +451,15 @@ namespace xo {
             /** Walkthrough parsing input equivalent to:
              *
              *    312 == 312 ;
-             *
+             *    ^   ^  ^   ^
+             *    0   1  2   3
              **/
 
             std::vector<Token> tk_v{
-                Token::i64_token("312"),
-                Token::cmpeq_token(),
-                Token::i64_token("312"),
-                Token::semicolon_token(),
+                /* [0] */ Token::i64_token("312"),
+                /* [1] */ Token::cmpeq_token(),
+                /* [2] */ Token::i64_token("312"),
+                /* [3] */ Token::semicolon_token(),
             };
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
