@@ -411,6 +411,39 @@ namespace xo {
             //REQUIRE(result.error_description());
         }
 
+        void
+        utest_tokenizer_loop(SchematikaParser * parser, std::vector<Token> & tk_v, bool debug_flag)
+        {
+            scope log(XO_DEBUG(debug_flag));
+
+            size_t i_tk = 0;
+            size_t n_tk = tk_v.size();
+            for (const auto & tk : tk_v) {
+                INFO(tostr(xtag("i_tk", i_tk), xtag("tk", tk)));
+
+                auto & result = parser->on_token(tk);
+
+                log && log("after token", xtag("i_tk", i_tk), xtag("tk", tk));
+                log && log(xtag("parser", parser));
+                log && log(xtag("result", result));
+
+                if (i_tk + 1 < n_tk) {
+                    REQUIRE(parser->has_incomplete_expr() == true);
+                    REQUIRE(!result.is_error());
+                    REQUIRE(result.is_incomplete());
+                } else {
+                    /* last token in tk_v[] */
+
+                    REQUIRE(parser->has_incomplete_expr() == false);
+                    REQUIRE(!result.is_error());
+                    REQUIRE(result.is_expression());
+                    REQUIRE(result.result_expr());
+                }
+
+                ++i_tk;
+            }
+        }
+
         TEST_CASE("SchematikaParser-interactive-arith", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
@@ -435,54 +468,17 @@ namespace xo {
              *
              **/
 
+            std::vector<Token> tk_v{
+                Token::f64_token("3.14159265"),
+                Token::star_token(),
+                Token::f64_token("0.5"),
+                Token::semicolon_token(),
+            };
+
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            const auto & result = parser.result();
             {
-                auto & result = parser.on_token(Token::f64_token("3.14159265"));
-
-                log && log("after float(3.14159265) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::star_token());
-
-                log && log("after star token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::f64_token("0.5"));
-
-                log && log("after float(0.5) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::semicolon_token());
-
-                log && log("after semicolon token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == false);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_expression());
-                REQUIRE(result.result_expr());
-
                 auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
                 REQUIRE(expr);
 
@@ -509,10 +505,69 @@ namespace xo {
                 REQUIRE(rhs_f64);
                 REQUIRE(rhs_f64->value() == 0.5);
             }
+        }
 
-            //REQUIRE(result.is_error());
-            //// illegal input on token
-            //REQUIRE(result.error_description());
+        TEST_CASE("SchematikaParser-interactive-cmp", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ArenaConfig config;
+            config.name_ = "test-arena";
+            config.size_ = 16 * 1024;
+
+            DArena expr_arena = DArena::map(config);
+            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
+
+            SchematikaParser parser(config, 4096, expr_alloc, false /*debug_flag*/);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    312 == 312 ;
+             *
+             **/
+
+            std::vector<Token> tk_v{
+                Token::i64_token("312"),
+                Token::cmpeq_token(),
+                Token::i64_token("312"),
+                Token::semicolon_token(),
+            };
+
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            const auto & result = parser.result();
+            {
+                auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
+                REQUIRE(expr);
+
+                REQUIRE(expr->n_args() == 2);
+
+                auto fn = obj<AExpression,DConstant>::from(expr->fn());
+                REQUIRE(fn);
+
+                auto pm = obj<AGCObject,DPrimitive_gco_2_gco_gco>::from(fn->value());
+                REQUIRE(pm);
+                REQUIRE(pm->name() == "_equal");
+
+                auto lhs = obj<AExpression,DConstant>::from(expr->arg(0));
+                REQUIRE(lhs);
+
+                auto lhs_i64 = obj<AGCObject,DInteger>::from(lhs->value());
+                REQUIRE(lhs_i64);
+                REQUIRE(lhs_i64->value() == 312);
+
+                auto rhs = obj<AExpression,DConstant>::from(expr->arg(1));
+                REQUIRE(rhs);
+
+                auto rhs_i64 = obj<AGCObject,DInteger>::from(rhs->value());
+                REQUIRE(rhs_i64);
+                REQUIRE(rhs_i64->value() == 312);
+            }
         }
 
         TEST_CASE("SchematikaParser-interactive-lambda", "[reader2][SchematikaParser]")
@@ -1017,7 +1072,7 @@ namespace xo {
 
         TEST_CASE("SchematikaParser-interactive-apply", "[reader2][SchematikaParser]")
         {
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag));
 
             ArenaConfig config;

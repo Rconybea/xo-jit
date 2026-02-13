@@ -47,6 +47,12 @@ namespace xo {
             return psm_.top_ssm();
         }
 
+        const ParserResult &
+        SchematikaParser::result() const
+        {
+            return psm_.result();
+        }
+
         void
         SchematikaParser::visit_pools(const MemorySizeVisitor & visitor) const
         {

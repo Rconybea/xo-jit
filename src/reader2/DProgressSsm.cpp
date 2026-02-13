@@ -292,11 +292,11 @@ namespace xo {
                 break;
 
             case tokentype::tk_star:
+            case tokentype::tk_cmpeq:
                 this->on_operator_token(tk, p_psm);
                 return;
 
             case tokentype::tk_slash:
-            case tokentype::tk_cmpeq:
             case tokentype::tk_cmpne:
             case tokentype::tk_type:
             case tokentype::tk_lambda:
@@ -1177,6 +1177,10 @@ namespace xo {
                         );
         }
 
+        namespace {
+            // make_builtin_apply_pm2
+        }
+
         obj<AExpression>
         DProgressSsm::assemble_expr(ParserStateMachine * p_psm)
         {
@@ -1209,7 +1213,28 @@ namespace xo {
                 return this->lhs_;
 
             case optype::op_assign:
+                assert(false);
+                break;
+                
             case optype::op_equal:
+                {
+                    auto pm_obj = (with_facet<AGCObject>::mkobj
+                                       (&Primitives::s_equal_gco_gco_pm));
+                    auto fn_expr = (DConstant::make
+                                        (p_psm->expr_alloc(), pm_obj));
+
+                    // see note on op_multiply
+
+                    TypeRef tref = TypeRef::dwim
+                                       (TypeRef::prefix_type::from_chars("_equal_gco"),
+                                        nullptr);
+
+                    return DApplyExpr::make2(p_psm->expr_alloc(),
+                                             tref,
+                                             fn_expr, lhs_, rhs_);
+                }
+                break;
+
             case optype::op_not_equal:
             case optype::op_less:
             case optype::op_less_equal:
@@ -1217,6 +1242,7 @@ namespace xo {
             case optype::op_great_equal:
             case optype::op_add:
             case optype::op_subtract:
+                assert(false);
                 break;
 
             case optype::op_multiply:
@@ -1255,6 +1281,7 @@ namespace xo {
                 break;
             case optype::op_divide:
                 // TODO: implement binary operator expression assembly
+                assert(false);
                 break;
 
 #ifdef NOT_YET

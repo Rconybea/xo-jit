@@ -193,6 +193,9 @@ namespace xo {
             /** top of parser stack **/
             obj<ASyntaxStateMachine> top_ssm() const;
 
+            /** current parser result. Value of last return from @ref on_token **/
+            const ParserResult & result() const;
+
             /** visit parser-owned memory pools; invoke visitor(info) for each **/
             void visit_pools(const MemorySizeVisitor & visitor) const;
 
