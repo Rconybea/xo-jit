@@ -754,24 +754,26 @@ namespace xo {
 
             /** Walkthrough parsing input equivalent to:
              *
-             *    lambda (x : i64) -> i64 { x * x };
-             *
+             *    lambda (x : i64) -> i64 { x * x }
+             *    ^      ^^ ^  ^  ^  ^ ^  ^ ^ ^ ^ ^
+             *    0      1| 3  4  5  6 7  8 9 a b c
+             *            2
              **/
 
             std::vector<Token> tk_v{
-                /**/ Token::lambda_token(),
-                /**/   Token::leftparen_token(),
-                /**/     Token::symbol_token("x"),
-                /**/     Token::colon_token(),
-                /**/     Token::symbol_token("i64"),
-                /**/   Token::rightparen_token(),
-                /**/ Token::yields_token(),
-                /**/ Token::symbol_token("i64"),
-                /**/ Token::leftbrace_token(),
-                /**/   Token::symbol_token("x"),
-                /**/   Token::star_token(),
-                /**/   Token::symbol_token("x"),
-                /**/ Token::rightbrace_token(),
+                /* [ 0] */ Token::lambda_token(),
+                /* [ 1] */   Token::leftparen_token(),
+                /* [ 2] */     Token::symbol_token("x"),
+                /* [ 3] */     Token::colon_token(),
+                /* [ 4] */     Token::symbol_token("i64"),
+                /* [ 5] */   Token::rightparen_token(),
+                /* [ 6] */ Token::yields_token(),
+                /* [ 7] */ Token::symbol_token("i64"),
+                /* [ 8] */ Token::leftbrace_token(),
+                /* [ 9] */   Token::symbol_token("x"),
+                /* [ a] */   Token::star_token(),
+                /* [ b] */   Token::symbol_token("x"),
+                /* [ c] */ Token::rightbrace_token(),
             };
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
