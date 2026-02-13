@@ -738,8 +738,10 @@ namespace xo {
 
         TEST_CASE("SchematikaParser-interactive-lambda2", "[reader2][SchematikaParser]")
         {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
             constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag));
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ArenaConfig config;
             config.name_ = "test-arena";
