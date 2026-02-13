@@ -36,6 +36,14 @@ namespace xo {
         DClosure::apply_nocheck(obj<ARuntimeContext> rcx,
                                 const DArray * args)
         {
+            // control here only if you try to invoke a closure
+            // as a procedure.
+            //
+            // May support this later, but requires
+            // nesting VSM (because call consumes c++ stack)
+            //
+            // typically prefer trampoline built into VSM
+
             (void)args;
 
             scope log(XO_DEBUG(true));
@@ -44,23 +52,6 @@ namespace xo {
                 = obj<ARuntimeContext,DVsmRcx>::from(rcx);
 
             log && log(xtag("vsm_rcx.data", (void*)vsm_rcx.data()));
-
-            // we already checked this stuff before calling apply_nocheck()
-           // assert (n_args == args->size());
-
-#ifdef NOT_YET
-            auto local_env
-                = DLocalEnv::_make(vsm_rcx->allocator(),
-                                   env_, 
-                                   lambda_->local_symtab(),
-                                   args);
-#endif
-
-            // plan:
-            // 1. push current local environment to vsm stack_
-            // 2. set expr_ to lambda body
-            // 2. set pc_ to eval
-            // 3. set cont_ to restore local_env_
 
             auto err_mm
                 = vsm_rcx->error_allocator();

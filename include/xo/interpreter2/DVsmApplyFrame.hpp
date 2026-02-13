@@ -30,10 +30,10 @@ namespace xo {
 
             obj<AGCObject> parent() const noexcept { return parent_; }
             VsmInstr cont() const noexcept { return cont_; }
-            obj<AProcedure> fn() const noexcept { return fn_; }
+            obj<AGCObject> fn() const noexcept { return fn_; }
             DArray * args() const noexcept { return args_; }
 
-            void assign_fn(obj<AProcedure> x) { this->fn_ = x; }
+            void assign_fn(obj<AGCObject> x) { this->fn_ = x; }
 
             std::size_t shallow_size() const noexcept;
             DVsmApplyFrame * shallow_copy(obj<AAllocator> mm) const noexcept;
@@ -51,9 +51,13 @@ namespace xo {
              *
              *  note: when initially created, this will be unpopulated;
              *        don't know correct value until we evaluate
-             *        expression in head position
+             *        expression in head position.
+             *
+             *  Must exhibit either:
+             *  1. AProcedure    facet (runs natively)
+             *  2. AVsmProcedure facet (requires schematika runtime)
              **/
-            obj<AProcedure> fn_;
+            obj<AGCObject> fn_;
             /** evaluated arguments (to target procedure) **/
             DArray * args_;
         };

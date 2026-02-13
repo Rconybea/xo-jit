@@ -176,16 +176,28 @@ namespace xo {
              **/
             void _do_evalargs_op();
 
+            /** call closure @ref fn_ with arguments @ref args_ **/
+            void _do_call_closure_op();
+            /** call primitive @ref fn_ with arguments @ref args_ **/
+            void _do_call_primitive_op();
+
+            /** restore registers from stack frame
+             *  (specifically: local_env_, stack_, cont_)
+             *  after invoking a schematika closure
+             **/
+            void _do_applycoda_op();
+
+
         private:
             /*
              * Some registers are preserved by evaluation:
              *   stack_
              *   cont_
+             *   local_env_
              *
              * Other registers not preserved
              *   pc_
              *   expr_
-             *   local_env_
              *   fn_
              *   args_
              *   value_
@@ -244,8 +256,8 @@ namespace xo {
             DGlobalEnv * global_env_ = nullptr;
 
         private:
-            /** function to call **/
-            obj<AProcedure> fn_;
+            /** evaluated function to call **/
+            obj<AGCObject> fn_;
             /** evaluated argument list **/
             DArray * args_;
 

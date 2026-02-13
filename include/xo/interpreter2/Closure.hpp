@@ -6,7 +6,7 @@
 #pragma once
 
 #include "DClosure.hpp"
-#include "detail/IProcedure_DClosure.hpp"
+//#include "detail/IProcedure_DClosure.hpp"
 #include "detail/IGCObject_DClosure.hpp"
 #include "detail/IPrintable_DClosure.hpp"
 

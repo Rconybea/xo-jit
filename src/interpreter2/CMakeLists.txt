@@ -21,7 +21,6 @@ set(SELF_SRCS
     IPrintable_DVsmApplyClosureFrame.cpp
 
     DClosure.cpp
-    IProcedure_DClosure.cpp
     IGCObject_DClosure.cpp
     IPrintable_DClosure.cpp
 

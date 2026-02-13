@@ -19,11 +19,19 @@ namespace xo {
             static VsmInstr c_apply;
             static VsmInstr c_evalargs;
 
+            /** restore registers after calling a schematika closure **/
+            static VsmInstr c_applycoda;
+
             vsm_opcode opcode() const noexcept { return opcode_; }
 
         private:
             vsm_opcode opcode_;
         };
+
+        inline bool
+        operator==(VsmInstr x, VsmInstr y) noexcept {
+            return x.opcode() == y.opcode();
+        }
 
         inline std::ostream &
         operator<<(std::ostream & os, VsmInstr x) {

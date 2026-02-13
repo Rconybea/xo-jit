@@ -6,6 +6,7 @@
 #include "VirtualSchematikaMachine.hpp"
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
+#include "VsmApplyClosureFrame.hpp"
 #include "VsmRcx.hpp"
 #include "Closure.hpp"
 #include <xo/expression2/ApplyExpr.hpp>
@@ -164,9 +165,9 @@ namespace xo {
             log && log(xtag("pc", pc_),
                        xtag("cont", cont_));
 
-            obj<APrintable> stack_pr
-                = (FacetRegistry::instance()
-                   .try_variant<APrintable,AGCObject>(stack_));
+            obj<APrintable> stack_pr = stack_.to_facet<APrintable>();
+//                = (FacetRegistry::instance()
+//                   .try_variant<APrintable,AGCObject>(stack_));
 
             if (stack_pr)
                 log && log(xtag("stack", stack_pr));
@@ -183,6 +184,9 @@ namespace xo {
                 break;
             case vsm_opcode::evalargs:
                 _do_evalargs_op();
+                break;
+            case vsm_opcode::applycoda:
+                _do_applycoda_op();
                 break;
             }
 
@@ -370,10 +374,68 @@ namespace xo {
 
             // TODO: check argument types
 
-            this->value_ = VsmResult(fn_.apply_nocheck(rcx_.to_op(), args_));
-            this->pc_ = cont_;
+            auto closure = obj<AGCObject,DClosure>::from(fn_);
 
-            return;
+            if (closure) {
+                _do_call_closure_op();
+                return;
+            } else {
+                _do_call_closure_op();
+                return;
+            }
+        }
+
+        void
+        VirtualSchematikaMachine::_do_call_closure_op()
+        {
+            // We need to preserve registers while evaluating
+            // lambda body
+
+            auto closure = obj<AGCObject,DClosure>::from(fn_);
+
+            // TODO: for tail recursion:
+            //       check whether stack_ already refers to a
+            //       DVsmApplyClosureFrame instance, in which case
+            //       we can just refer to it instead of pushing a new one
+
+            if (cont_ == VsmInstr::c_applycoda) {
+                // we are making a tail call.
+                // No need to preserve (stack, cont, local_env),
+                // since continuation will restore on top of them
+                // frame top stackframe anyway
+            } else {
+                obj<AGCObject,
+                    DVsmApplyClosureFrame> frame(
+                        DVsmApplyClosureFrame::make(mm_.to_op(),
+                                                    stack_,
+                                                    cont_,
+                                                    local_env_));
+
+                // push frame w/ saved vsm registers
+                this->stack_ = frame;
+                this->cont_ = VsmInstr::c_applycoda;
+            }
+
+            auto lambda = closure->lambda();
+
+            auto local_env
+                = DLocalEnv::_make(mm_.to_op(),
+                                   local_env_,
+                                   lambda->local_symtab(),
+                                   args_);
+
+            this->local_env_ = local_env;
+            this->expr_ = lambda->body_expr();
+            this->pc_ = VsmInstr::c_eval;
+        }
+
+        void
+        VirtualSchematikaMachine::_do_call_primitive_op()
+        {
+            auto fn = fn_.to_facet<AProcedure>();
+
+            this->value_ = VsmResult(fn.apply_nocheck(rcx_.to_op(), args_));
+            this->pc_ = cont_;
         }
 
         void
@@ -434,10 +496,11 @@ namespace xo {
                 = evalargs_frame->apply_expr();
 
             if (i_arg == -1) {
-                auto fn = value.to_facet<AProcedure>();
+                bool is_native_fn = value.to_facet<AProcedure>();
+                bool is_closure = obj<AGCObject,DClosure>::from(value);
 
-                if (fn) {
-                    apply_frame->assign_fn(fn);
+                if (is_native_fn || is_closure) {
+                    apply_frame->assign_fn(value);
 
                     i_arg = evalargs_frame->increment_arg();
 
@@ -493,6 +556,22 @@ namespace xo {
             assert(false);
         }
 
+        void
+        VirtualSchematikaMachine::_do_applycoda_op()
+        {
+            // see DVsmApplyClosureFrame
+
+            auto frame = obj<AGCObject,DVsmApplyClosureFrame>::from(stack_);
+
+            assert(frame);
+
+            this->stack_ = frame->stack();
+            this->local_env_ = frame->local_env();
+            this->pc_ = frame->cont();
+
+            // not implemented
+            assert(false);
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

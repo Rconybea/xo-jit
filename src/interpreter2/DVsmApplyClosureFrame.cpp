@@ -7,6 +7,7 @@
 
 namespace xo {
     using xo::mm::AGCObject;
+    using xo::reflect::typeseq;
 
     namespace scm {
 
@@ -17,6 +18,18 @@ namespace xo {
               cont_{cont},
               local_env_{local_env}
         {}
+
+        DVsmApplyClosureFrame *
+        DVsmApplyClosureFrame::make(obj<AAllocator> mm,
+                                    obj<AGCObject> stack,
+                                    VsmInstr cont,
+                                    DLocalEnv * local_env)
+        {
+            void * mem = mm.alloc(typeseq::id<DVsmApplyClosureFrame>(),
+                                  sizeof(DVsmApplyClosureFrame));
+
+            return new (mem) DVsmApplyClosureFrame(stack, cont, local_env);
+        }
 
         std::size_t
         DVsmApplyClosureFrame::shallow_size() const noexcept

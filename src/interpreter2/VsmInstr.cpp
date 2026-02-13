@@ -15,6 +15,7 @@ namespace xo {
             case vsm_opcode::eval: return "eval";
             case vsm_opcode::apply: return "apply";
             case vsm_opcode::evalargs: return "evalargs";
+            case vsm_opcode::applycoda: return "applycoda";
             case vsm_opcode::N:
                 break;
             }
@@ -33,6 +34,9 @@ namespace xo {
 
         VsmInstr
         VsmInstr::c_evalargs = VsmInstr(vsm_opcode::evalargs);
+
+        VsmInstr
+        VsmInstr::c_applycoda = VsmInstr(vsm_opcode::applycoda);
     } /*namespace scm*/
 } /*namespace xo*/
 

@@ -28,6 +28,11 @@ namespace xo {
              **/
             evalargs,
 
+            /** Coda to restore vsm registers (local_env, stack, cont)
+             *  after invoking a closure
+             **/
+            applycoda,
+
             /** sentinel, counts number of opcodes **/
             N,
         };

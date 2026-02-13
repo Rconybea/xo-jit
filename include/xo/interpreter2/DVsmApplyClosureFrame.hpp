@@ -28,6 +28,16 @@ namespace xo {
                                   VsmInstr cont,
                                   DLocalEnv * env);
 
+            /** create instance, using memory from @p mm **/
+            static DVsmApplyClosureFrame * make(obj<AAllocator> mm,
+                                                obj<AGCObject> stack,
+                                                VsmInstr cont,
+                                                DLocalEnv * env);
+
+            obj<AGCObject> stack() const { return stack_; }
+            VsmInstr cont() const { return cont_; }
+            DLocalEnv * local_env() const { return local_env_; }
+
             /** gcobject facet **/
             std::size_t shallow_size() const noexcept;
             DVsmApplyClosureFrame * shallow_copy(obj<AAllocator> mm) const noexcept;

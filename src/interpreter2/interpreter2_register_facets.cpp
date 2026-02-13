@@ -59,9 +59,9 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DPrimitive_gco_2_gco_gco>();
             FacetRegistry::register_impl<APrintable, DPrimitive_gco_2_gco_gco>();
 
-            FacetRegistry::register_impl<AProcedure, DClosure>();
-            FacetRegistry::register_impl<AGCObject, DClosure>();
-            FacetRegistry::register_impl<APrintable, DClosure>();
+//            FacetRegistry::register_impl<AProcedure, DClosure>();
+//            FacetRegistry::register_impl<AGCObject, DClosure>();
+//            FacetRegistry::register_impl<APrintable, DClosure>();
 
             // RuntimeContext
             // \- VsmRcx
