@@ -19,6 +19,12 @@ namespace xo {
             return vsm_->allocator();
         }
 
+        obj<AAllocator>
+        DVsmRcx::error_allocator() const noexcept
+        {
+            return vsm_->error_allocator();
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

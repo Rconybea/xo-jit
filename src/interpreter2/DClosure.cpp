@@ -7,6 +7,7 @@
 #include "LambdaExpr.hpp"
 #include "LocalEnv.hpp"
 #include "VsmRcx.hpp"
+#include <xo/object2/RuntimeError.hpp>
 #include <xo/indentlog/scope.hpp>
 #include <cstddef>
 
@@ -35,6 +36,8 @@ namespace xo {
         DClosure::apply_nocheck(obj<ARuntimeContext> rcx,
                                 const DArray * args)
         {
+            (void)args;
+
             scope log(XO_DEBUG(true));
 
             auto vsm_rcx
@@ -42,26 +45,31 @@ namespace xo {
 
             log && log(xtag("vsm_rcx.data", (void*)vsm_rcx.data()));
 
-            // let's try a not-implemented error
-
-            // don't want to clutter Procedure facet, since it's
-            // lower-level than xo-interpreter2
+            // we already checked this stuff before calling apply_nocheck()
+           // assert (n_args == args->size());
 
 #ifdef NOT_YET
-            // TODO: verify arguments against type signature.
-            //       unless we have evidence that program is type correct
-
-            int32_t n_args = this->n_args();
-
-            if (n_args != args->size()) {
-                // 
-            }
+            auto local_env
+                = DLocalEnv::_make(vsm_rcx->allocator(),
+                                   env_, 
+                                   lambda_->local_symtab(),
+                                   args);
 #endif
 
+            // plan:
+            // 1. push current local environment to vsm stack_
+            // 2. set expr_ to lambda body
+            // 2. set pc_ to eval
+            // 3. set cont_ to restore local_env_
 
-            (void)args;
+            auto err_mm
+                = vsm_rcx->error_allocator();
 
-            assert(false);
+            auto err
+                = DRuntimeError::make(err_mm,
+                                      "DClosure::apply_nocheck",
+                                      "not implemented");
+            return err;
         }
 
         size_t

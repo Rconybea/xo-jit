@@ -82,6 +82,7 @@ namespace xo {
         VirtualSchematikaMachine::visit_pools(const MemorySizeVisitor & visitor) const
         {
             mm_.visit_pools(visitor);
+            error_mm_.visit_pools(visitor);
             reader_.visit_pools(visitor);
         }
 

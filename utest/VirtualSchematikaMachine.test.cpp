@@ -6,9 +6,8 @@
 #include <xo/interpreter2/VirtualSchematikaMachine.hpp>
 #include <xo/interpreter2/Closure.hpp>
 #include <xo/object2/Float.hpp>
-//#include <xo/object2/number/IGCObject_DFloat.hpp>
 #include <xo/object2/Integer.hpp>
-//#include <xo/object2/number/IGCObject_DInteger.hpp>
+#include <xo/object2/RuntimeError.hpp>
 
 #ifdef NOT_YET
 #include <xo/reader2/SchematikaParser.hpp>
@@ -32,6 +31,7 @@ namespace xo {
     using xo::scm::DClosure;
     using xo::scm::DFloat;
     using xo::scm::DInteger;
+    using xo::scm::DRuntimeError;
     using xo::mm::AGCObject;
     using xo::mm::MemorySizeInfo;
     using xo::facet::FacetRegistry;
@@ -245,9 +245,13 @@ namespace xo {
 
             log && log(xtag("res.tseq", res.value()->_typeseq()));
 
-            auto x = obj<AGCObject,DClosure>::from(*res.value());
+            // currently get not-implemented error 
+            auto x = obj<AGCObject,DRuntimeError>::from(*res.value());
 
             REQUIRE(x);
+
+            log && log("runtime-error", xtag("ex.src", x->src_function()), xtag("ex.descr", x->error_descr()));
+
             //REQUIRE(x.data()->value() == 1.570796325);
 
             REQUIRE(res.remaining_.size() == 1);

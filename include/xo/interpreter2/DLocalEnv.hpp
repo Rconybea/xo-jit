@@ -26,15 +26,15 @@ namespace xo {
             /** @defgroup scm-localenv-constructors constructors **/
             ///@{
 
-            /** empty instance with parent @p p for variables in @p symtab **/
+            /** create instance with parent @p p for variables in @p symtab **/
             DLocalEnv(DLocalEnv * parent,
                       DLocalSymtab * symtab,
                       DArray * args);
 
-            static DLocalEnv * _make_empty(obj<AAllocator> mm,
-                                           DLocalEnv * parent,
-                                           DLocalSymtab * symtab,
-                                           DArray * args);
+            static DLocalEnv * _make(obj<AAllocator> mm,
+                                     DLocalEnv * parent,
+                                     DLocalSymtab * symtab,
+                                     DArray * args);
 
             ///@}
             /** @defgroup scm-local-env-methods methods **/

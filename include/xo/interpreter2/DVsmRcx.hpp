@@ -24,6 +24,7 @@ namespace xo {
             DVsmRcx(VirtualSchematikaMachine * vsm);
 
             obj<AAllocator> allocator() const noexcept;
+            obj<AAllocator> error_allocator() const noexcept;
 
         private:
             /** schematika interpreter **/

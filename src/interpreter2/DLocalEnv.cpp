@@ -22,10 +22,10 @@ namespace xo {
         {}
 
         DLocalEnv *
-        DLocalEnv::_make_empty(obj<AAllocator> mm,
-                               DLocalEnv * parent,
-                               DLocalSymtab * symtab,
-                               DArray * args)
+        DLocalEnv::_make(obj<AAllocator> mm,
+                         DLocalEnv * parent,
+                         DLocalSymtab * symtab,
+                         DArray * args)
         {
             assert(symtab);
 

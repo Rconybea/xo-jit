@@ -31,7 +31,7 @@ namespace xo {
             /** Configuration for error allocator
              *  TODO: may want to make ArenaConfig polymorphic
              **/
-            ArenaConfig error_config_ = ArenaConfig().with_size(64*1024);
+            ArenaConfig error_config_ = ArenaConfig().with_name("error-reserve").with_size(64*1024);
         };
     } /*namespace scm*/
 } /*namespace xo*/
