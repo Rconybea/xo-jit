@@ -64,7 +64,9 @@ namespace xo {
     namespace ut {
         TEST_CASE("VirtualSchematikaMachine-ctor", "[interpreter2][VSM]")
         {
-            scope log(XO_DEBUG(true));
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            scope log(XO_DEBUG(true), xtag("test", testname));
 
             VsmConfig cfg;
             VirtualSchematikaMachine vsm(cfg);
@@ -83,7 +85,9 @@ namespace xo {
 
         TEST_CASE("VirtualSchematikaMachine-const1", "[interpreter2][VSM]")
         {
-            scope log(XO_DEBUG(true));
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            scope log(XO_DEBUG(true), xtag("test", testname));
 
             VsmConfig cfg;
             VirtualSchematikaMachine vsm(cfg);
@@ -118,7 +122,9 @@ namespace xo {
 
         TEST_CASE("VirtualSchematikaMachine-const2", "[interpreter2][VSM]")
         {
-            scope log(XO_DEBUG(true));
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            scope log(XO_DEBUG(true), xtag("test", testname));
 
             VsmConfig cfg;
             VirtualSchematikaMachine vsm(cfg);
@@ -155,7 +161,9 @@ namespace xo {
 
         TEST_CASE("VirtualSchematikaMachine-arith1", "[interpreter2][VSM]")
         {
-            scope log(XO_DEBUG(true));
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            scope log(XO_DEBUG(true), xtag("test", testname));
 
             VsmConfig cfg;
             VirtualSchematikaMachine vsm(cfg);
@@ -270,7 +278,9 @@ namespace xo {
 
         TEST_CASE("VirtualSchematikaMachine-apply2", "[interpreter2][VSM]")
         {
-            scope log(XO_DEBUG(false));
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            scope log(XO_DEBUG(false), xtag("test", testname));
 
             VsmConfig cfg;
             VirtualSchematikaMachine vsm(cfg);
