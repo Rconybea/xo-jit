@@ -135,7 +135,7 @@ namespace xo {
 
             gc.forward_inplace(&iface, (void**)&expr_v_);
 
-            return shallow_size();
+            return this->shallow_size();
         }
 
     } /*namespace scm*/
