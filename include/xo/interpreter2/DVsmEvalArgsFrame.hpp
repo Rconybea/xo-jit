@@ -28,12 +28,12 @@ namespace xo {
              **/
             DVsmEvalArgsFrame(DVsmApplyFrame * parent,
                               VsmInstr cont,
-                              const DApplyExpr * apply_expr);
+                              DApplyExpr * apply_expr);
 
             static DVsmEvalArgsFrame * make(obj<AAllocator> mm,
                                             DVsmApplyFrame * apply_frame,
                                             VsmInstr old_cont,
-                                            const DApplyExpr * apply_expr);
+                                            DApplyExpr * apply_expr);
 
             DVsmApplyFrame * parent() const noexcept { return parent_; }
             VsmInstr cont() const noexcept { return cont_; }
@@ -55,7 +55,7 @@ namespace xo {
             VsmInstr cont_;
 
             /** expression being evaluated **/
-            const DApplyExpr * apply_expr_ = nullptr;
+            DApplyExpr * apply_expr_ = nullptr;
 
             /** next argument to be evaluated. -1 means function head **/
             int32_t i_arg_ = -1;

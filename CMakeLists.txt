@@ -104,6 +104,32 @@ xo_add_genfacetimpl(
 # ----------------------------------------------------------------
 
 # note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-gcobject-vsmseqcontframe
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR VsmSeqContFrame
+    INPUT idl/IGCObject_DVsmSeqContFrame.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR sequence
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-printable-vsmseqcontframe
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR DVsmSeqContFrame
+    INPUT idl/IPrintable_DVsmSeqContFrame.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR sequence
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
 #
 #xo_add_genfacetimpl(
 #    TARGET xo-interpreter2-facetimpl-procedure-closure

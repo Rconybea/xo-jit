@@ -187,6 +187,8 @@ namespace xo {
              **/
             void _do_applycoda_op();
 
+            /** loop continuation after evaluating element of a SequenceExpr **/
+            void _do_seq_cont_op();
 
         private:
             /*

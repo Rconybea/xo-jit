@@ -18,9 +18,11 @@ namespace xo {
 
             static VsmInstr c_apply;
             static VsmInstr c_evalargs;
-
             /** restore registers after calling a schematika closure **/
             static VsmInstr c_applycoda;
+
+            /** loop to evaluate members of a SequenceExpr **/
+            static VsmInstr c_seq_cont;
 
             vsm_opcode opcode() const noexcept { return opcode_; }
 

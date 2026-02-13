@@ -4,6 +4,7 @@
  **/
 
 #include "DVsmEvalArgsFrame.hpp"
+#include <xo/expression2/ApplyExpr.hpp>
 #include <xo/indentlog/print/pretty.hpp>
 
 namespace xo {
@@ -16,7 +17,7 @@ namespace xo {
 
         DVsmEvalArgsFrame::DVsmEvalArgsFrame(DVsmApplyFrame * parent,
                                              VsmInstr cont,
-                                             const DApplyExpr * apply_expr)
+                                             DApplyExpr * apply_expr)
         : parent_{parent},
           cont_{cont},
           apply_expr_{apply_expr}
@@ -26,7 +27,7 @@ namespace xo {
         DVsmEvalArgsFrame::make(obj<AAllocator> mm,
                                 DVsmApplyFrame * apply_frame,
                                 VsmInstr cont,
-                                const DApplyExpr * apply_expr)
+                                DApplyExpr * apply_expr)
         {
             DVsmEvalArgsFrame * result = nullptr;
 
@@ -61,7 +62,8 @@ namespace xo {
         std::size_t
         DVsmEvalArgsFrame::forward_children(obj<ACollector> gc) noexcept
         {
-            (void)gc;
+            gc.forward_inplace(&parent_);
+            gc.forward_inplace(&apply_expr_);
 
             return this->shallow_size();
         }
@@ -69,12 +71,10 @@ namespace xo {
         bool
         DVsmEvalArgsFrame::pretty(const ppindentinfo & ppii) const
         {
-            return ppii.pps()->pretty_struct
-                (ppii,
-                 "DVsmEvalArgsFrame",
-                 refrtag("cont", cont_),
-                 refrtag("i_arg", i_arg_)
-                    );
+            return ppii.pps()->pretty_struct(ppii,
+                                             "DVsmEvalArgsFrame",
+                                             refrtag("cont", cont_),
+                                             refrtag("i_arg", i_arg_));
         }
     } /*namespace scm*/
 } /*namespace xo*/

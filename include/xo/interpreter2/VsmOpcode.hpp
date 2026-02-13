@@ -33,6 +33,9 @@ namespace xo {
              **/
             applycoda,
 
+            /** Loop over elements of a SequenceExpr **/
+            seq_cont,
+
             /** sentinel, counts number of opcodes **/
             N,
         };

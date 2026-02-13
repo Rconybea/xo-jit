@@ -4,6 +4,7 @@
  **/
 
 #include "DVsmApplyFrame.hpp"
+#include <xo/object2/Array.hpp>
 #include <xo/indentlog/print/pretty.hpp>
 
 namespace xo {
@@ -59,9 +60,9 @@ namespace xo {
         std::size_t
         DVsmApplyFrame::forward_children(obj<ACollector> gc) noexcept
         {
-            // GC needs to locate AGCObject iface for each member
-
-            (void)gc;
+            gc.forward_inplace(&parent_);
+            gc.forward_inplace(&fn_);
+            gc.forward_inplace(&args_);
 
             return this->shallow_size();
         }
@@ -69,12 +70,10 @@ namespace xo {
         bool
         DVsmApplyFrame::pretty(const ppindentinfo & ppii) const
         {
-            return ppii.pps()->pretty_struct
-                (ppii,
-                 "DVsmApplyFrame",
-                 refrtag("cont", cont_),
-                 refrtag("n_args", args_->size())
-                    );
+            return ppii.pps()->pretty_struct(ppii,
+                                             "DVsmApplyFrame",
+                                             refrtag("cont", cont_),
+                                             refrtag("n_args", args_->size()));
         }
 
     } /*namespace scm*/

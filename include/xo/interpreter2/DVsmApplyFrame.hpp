@@ -5,7 +5,9 @@
 
 #pragma once
 
-#include "VsmFrame.hpp"
+#include "VsmInstr.hpp"
+#include <xo/procedure2/Procedure.hpp>
+#include <xo/object2/DArray.hpp>
 
 namespace xo {
     namespace scm {

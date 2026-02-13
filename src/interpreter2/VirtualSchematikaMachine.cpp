@@ -7,11 +7,13 @@
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
 #include "VsmApplyClosureFrame.hpp"
+#include "VsmSeqContFrame.hpp"
 #include "VsmRcx.hpp"
 #include "Closure.hpp"
 #include <xo/expression2/ApplyExpr.hpp>
 #include <xo/expression2/LambdaExpr.hpp>
 #include <xo/expression2/Constant.hpp>
+#include <xo/expression2/SequenceExpr.hpp>
 #include <xo/procedure2/RuntimeContext.hpp>
 //#include <xo/procedure2/SimpleRcx.hpp>
 #include <xo/gc/DX1Collector.hpp>
@@ -188,6 +190,9 @@ namespace xo {
             case vsm_opcode::applycoda:
                 _do_applycoda_op();
                 break;
+            case vsm_opcode::seq_cont:
+                _do_seq_cont_op();
+                break;
             }
 
             return true;
@@ -328,7 +333,7 @@ namespace xo {
 
             auto apply = obj<AExpression,DApplyExpr>::from(expr_);
 
-            // evaluated arguments
+            // accumulate evaluated arguments here
             DArray * args = DArray::empty(mm_.to_op(),
                                           apply->n_args());
 
@@ -361,8 +366,42 @@ namespace xo {
         void
         VirtualSchematikaMachine::_do_eval_sequence_op()
         {
-            // not implemented
-            assert(false);
+            // assuming bump allocator:
+            //
+            //   VsmEvalSequence
+            //   v
+            //   +-------+------+-------+-------+
+            //   | par x | cont |  seq  | i_elt |
+            //   +-----|-+------+-------+-------+
+            //         |
+            //   <-----/
+            //
+
+            auto seq_expr = obj<AExpression,DSequenceExpr>::from(expr_);
+
+            if (seq_expr->size() == 0) {
+                /* empty sequence expression does not produce a value */
+
+                this->value_ = VsmResult(obj<AGCObject>());
+                this->pc_ = this->cont_;
+                return;
+            }
+
+            auto seqexpr_frame 
+                = obj<AGCObject,DVsmSeqContFrame>
+                      (DVsmSeqContFrame::make(mm_.to_op(),
+                                              this->stack_ /*saved stack*/,
+                                              this->cont_ /*saved cont*/,
+                                              seq_expr.data() /*saved expr*/,
+                                              0 /*index of seq element*/));
+
+            this->stack_ = seqexpr_frame;
+
+            // Setup evaluation of first sequence element
+
+            this->cont_ = VsmInstr::c_seq_cont;
+            this->expr_ = (*seq_expr.data())[0];
+            this->pc_ = VsmInstr::c_eval;
         }
 
         void
@@ -380,7 +419,7 @@ namespace xo {
                 _do_call_closure_op();
                 return;
             } else {
-                _do_call_closure_op();
+                _do_call_primitive_op();
                 return;
             }
         }
@@ -392,6 +431,8 @@ namespace xo {
             // lambda body
 
             auto closure = obj<AGCObject,DClosure>::from(fn_);
+
+            assert(closure);
 
             // TODO: for tail recursion:
             //       check whether stack_ already refers to a
@@ -496,8 +537,8 @@ namespace xo {
                 = evalargs_frame->apply_expr();
 
             if (i_arg == -1) {
-                bool is_native_fn = value.to_facet<AProcedure>();
                 bool is_closure = obj<AGCObject,DClosure>::from(value);
+                bool is_native_fn = value.try_to_facet<AProcedure>();
 
                 if (is_native_fn || is_closure) {
                     apply_frame->assign_fn(value);
@@ -572,6 +613,39 @@ namespace xo {
             // not implemented
             assert(false);
         }
+
+        void
+        VirtualSchematikaMachine::_do_seq_cont_op()
+        {
+            auto frame = obj<AGCObject,DVsmSeqContFrame>::from(stack_);
+
+            assert(frame);
+
+            uint32_t i_seq = 1 + frame->i_seq();
+
+            auto seq_expr = frame->seq_expr();
+
+            assert(seq_expr);
+
+            if (i_seq == seq_expr->size()) {
+                /* done with sequence
+                 * value of sequence-expr is the value of the last expression in that sequence,
+                 * which is already in the value_ register
+                 */
+
+                this->stack_ = frame->parent();
+                this->pc_ = frame->cont();
+                return;
+            } else {
+                frame->incr_i_seq();
+
+                this->cont_ = VsmInstr::c_seq_cont;
+                this->expr_ = (*seq_expr)[i_seq];
+                this->pc_ = VsmInstr::c_eval;
+                return;
+            }
+         }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

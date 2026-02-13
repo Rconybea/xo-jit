@@ -9,6 +9,7 @@
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
 #include "VsmApplyClosureFrame.hpp"
+#include "VsmSeqContFrame.hpp"
 #include "Primitive_gco_2_gco_gco.hpp"
 #include "Closure.hpp"
 #include "LocalEnv.hpp"
@@ -32,10 +33,12 @@ namespace xo {
         {
             scope log(XO_DEBUG(true));
 
-            // VsmStackFrame
+
+            // VsmStqackFrame
             // +- VsmApplyFrame
             // +- VsmEvalArgsFrame
-            // \- VsmApplyClosureFrame
+            // +- VsmApplyClosureFrame
+            // \- VsmSeqContFrame
 
             FacetRegistry::register_impl<AGCObject, DVsmApplyFrame>();
             FacetRegistry::register_impl<APrintable, DVsmApplyFrame>();
@@ -46,22 +49,27 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DVsmApplyClosureFrame>();
             FacetRegistry::register_impl<APrintable, DVsmApplyClosureFrame>();
 
+            FacetRegistry::register_impl<AGCObject, DVsmSeqContFrame>();
+            FacetRegistry::register_impl<APrintable, DVsmSeqContFrame>();
+
             // LocalEnv
 
             FacetRegistry::register_impl<AGCObject, DLocalEnv>();
             FacetRegistry::register_impl<APrintable, DLocalEnv>();
 
             // Procedure
-            // +- Primitive_gco_2_gco_gco
-            // \- Closure
+            // \- Primitive_gco_2_gco_gco
 
             FacetRegistry::register_impl<AProcedure, DPrimitive_gco_2_gco_gco>();
             FacetRegistry::register_impl<AGCObject, DPrimitive_gco_2_gco_gco>();
             FacetRegistry::register_impl<APrintable, DPrimitive_gco_2_gco_gco>();
 
-//            FacetRegistry::register_impl<AProcedure, DClosure>();
-//            FacetRegistry::register_impl<AGCObject, DClosure>();
-//            FacetRegistry::register_impl<APrintable, DClosure>();
+            // Closure
+
+//            FacetRegistry::register_impl<AProcedure, DClosure>();  // if/when provided
+            FacetRegistry::register_impl<AGCObject, DClosure>();
+            FacetRegistry::register_impl<APrintable, DClosure>();
+
 
             // RuntimeContext
             // \- VsmRcx
@@ -70,6 +78,8 @@ namespace xo {
 
             log && log(xtag("DVsmApplyFrame.tseq", typeseq::id<DVsmApplyFrame>()));
             log && log(xtag("DVsmEvalArgsFrame.tseq", typeseq::id<DVsmEvalArgsFrame>()));
+            log && log(xtag("DVsmApplyClosureFrame.tseq", typeseq::id<DVsmApplyClosureFrame>()));
+            log && log(xtag("DVsmSeqContFrame.tseq", typeseq::id<DVsmSeqContFrame>()));
             log && log(xtag("DClosure.tseq", typeseq::id<DClosure>()));
             log && log(xtag("DLocalEnv.tseq", typeseq::id<DLocalEnv>()));
             log && log(xtag("DVsmRcx.tseq", typeseq::id<DVsmRcx>()));

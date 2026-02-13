@@ -4,6 +4,7 @@
  **/
 
 #include "DVsmApplyClosureFrame.hpp"
+#include "LocalEnv.hpp"
 
 namespace xo {
     using xo::mm::AGCObject;
@@ -52,7 +53,8 @@ namespace xo {
         std::size_t
         DVsmApplyClosureFrame::forward_children(obj<ACollector> gc) noexcept
         {
-            (void)gc;
+            gc.forward_inplace(&stack_);
+            gc.forward_inplace(&local_env_);
 
             return this->shallow_size();
         }
