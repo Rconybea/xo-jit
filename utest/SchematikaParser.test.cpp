@@ -703,8 +703,10 @@ namespace xo {
 
         TEST_CASE("SchematikaParser-interactive-if", "[reader2][SchematikaParser]")
         {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
             constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag));
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ArenaConfig config;
             config.name_ = "test-arena";
@@ -720,17 +722,18 @@ namespace xo {
             /** Walkthrough parsing input equivalent to:
              *
              *    if true then 777 else "fooey" ;
-             *
+             *    ^  ^    ^    ^   ^    ^       ^
+             *    0  1    2    3   4    5       6
              **/
 
             std::vector<Token> tk_v{
-                Token::if_token(),
-                Token::bool_token("true"),
-                Token::then_token(),
-                Token::i64_token("777"),
-                Token::else_token(),
-                Token::string_token("fooey"),
-                Token::semicolon_token(),
+                /* [0] */ Token::if_token(),
+                /* [1] */   Token::bool_token("true"),
+                /* [2] */ Token::then_token(),
+                /* [3] */   Token::i64_token("777"),
+                /* [4] */ Token::else_token(),
+                /* [5] */   Token::string_token("fooey"),
+                /* [6] */ Token::semicolon_token(),
             };
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
