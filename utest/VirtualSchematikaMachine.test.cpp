@@ -7,6 +7,7 @@
 #include <xo/interpreter2/Closure.hpp>
 #include <xo/object2/Float.hpp>
 #include <xo/object2/Integer.hpp>
+#include <xo/object2/Boolean.hpp>
 #include <xo/object2/RuntimeError.hpp>
 
 #ifdef NOT_YET
@@ -30,6 +31,7 @@ namespace xo {
     using xo::scm::VsmResultExt;
     using xo::scm::DClosure;
     using xo::scm::DFloat;
+    using xo::scm::DBoolean;
     using xo::scm::DInteger;
     using xo::scm::DRuntimeError;
     using xo::mm::AGCObject;
@@ -188,9 +190,50 @@ namespace xo {
             vsm.visit_pools(visitor);
         }
 
+        TEST_CASE("VirtualSchematikaMachine-cmp1", "[interpreter2][VSM]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            scope log(XO_DEBUG(true), xtag("test", testname));
+
+            VsmConfig cfg;
+            VirtualSchematikaMachine vsm(cfg);
+
+            bool eof_flag = false;
+
+            vsm.begin_interactive_session();
+            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("123 == 123;"), eof_flag);
+
+            REQUIRE(res.is_value());
+            REQUIRE(res.value());
+
+            log && log(xtag("res.tseq", res.value()->_typeseq()));
+
+            auto x = obj<AGCObject,DBoolean>::from(*res.value());
+
+            REQUIRE(x);
+            REQUIRE(x.data()->value() == true);
+
+            REQUIRE(res.remaining_.size() == 1);
+            REQUIRE(*res.remaining_.lo() == '\n');
+
+            auto visitor = [&log](const MemorySizeInfo & info) {
+                log && log(xtag("resource", info.resource_name_),
+                           xtag("used", info.used_),
+                           xtag("alloc", info.allocated_),
+                           xtag("commit", info.committed_),
+                           xtag("resv", info.reserved_));
+            };
+
+            FacetRegistry::instance().visit_pools(visitor);
+            vsm.visit_pools(visitor);
+        }
+
         TEST_CASE("VirtualSchematikaMachine-lambda1", "[interpreter2][VSM]")
         {
-            scope log(XO_DEBUG(true));
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            scope log(XO_DEBUG(false), xtag("test", testname));
 
             VsmConfig cfg;
             VirtualSchematikaMachine vsm(cfg);
