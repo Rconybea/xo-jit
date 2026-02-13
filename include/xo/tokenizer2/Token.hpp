@@ -129,6 +129,9 @@ namespace xo {
             /** token for @c "/" **/
             static Token slash_token() { return Token(tokentype::tk_slash); }
 
+            /** token for @c "==" **/
+            static Token cmpeq_token() { return Token(tokentype::tk_cmpeq); }
+
             /** token representing keyword @c type **/
             static Token type() { return Token(tokentype::tk_type); }
             /** token representing keyword @c def **/
