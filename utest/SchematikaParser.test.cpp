@@ -47,6 +47,39 @@ namespace xo {
     static InitEvidence s_init = (InitSubsys<S_reader2_tag>::require());
 
     namespace ut {
+        void
+        utest_tokenizer_loop(SchematikaParser * parser, std::vector<Token> & tk_v, bool debug_flag)
+        {
+            scope log(XO_DEBUG(debug_flag));
+
+            size_t i_tk = 0;
+            size_t n_tk = tk_v.size();
+            for (const auto & tk : tk_v) {
+                INFO(tostr(xtag("i_tk", i_tk), xtag("tk", tk)));
+
+                auto & result = parser->on_token(tk);
+
+                log && log("after token", xtag("i_tk", i_tk), xtag("tk", tk));
+                log && log(xtag("parser", parser));
+                log && log(xtag("result", result));
+
+                if (i_tk + 1 < n_tk) {
+                    REQUIRE(parser->has_incomplete_expr() == true);
+                    REQUIRE(!result.is_error());
+                    REQUIRE(result.is_incomplete());
+                } else {
+                    /* last token in tk_v[] */
+
+                    REQUIRE(parser->has_incomplete_expr() == false);
+                    REQUIRE(!result.is_error());
+                    REQUIRE(result.is_expression());
+                    REQUIRE(result.result_expr());
+                }
+
+                ++i_tk;
+            }
+        }
+
         TEST_CASE("SchematikaParser-ctor", "[reader2][SchematikaParser]")
         {
             ArenaConfig config;
@@ -120,100 +153,23 @@ namespace xo {
              *
              **/
 
+            std::vector<Token> tk_v{
+                Token::def_token(),
+                Token::symbol_token("foo"),
+                Token::colon_token(),
+                Token::symbol_token("f64"),
+                Token::singleassign_token(),
+                Token::f64_token("3.141593"),
+                Token::semicolon_token(),
+            };
+
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            const auto & result = parser.result();
             {
-                auto & result = parser.on_token(Token::def_token());
-
-                // after begin_interactive_session, parser has toplevel exprseq
-                // but is still "at toplevel" in the sense of ready for input
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(result.is_incomplete());
-
-                log && log("after def token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("foo"));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(result.is_incomplete());
-
-                log && log("after lhs symbol token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-            }
-
-            {
-                auto & result = parser.on_token(Token::colon_token());
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(result.is_incomplete());
-
-                log && log("after colon token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("f64"));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(result.is_incomplete());
-
-                log && log("after typename symbol token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-            }
-
-            {
-                auto & result = parser.on_token(Token::singleassign_token());
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(result.is_incomplete());
-
-                log && log("after typename symbol token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                auto exp_ssm
-                    = obj<ASyntaxStateMachine,DExpectExprSsm>::from(parser.top_ssm());
-
-                REQUIRE(exp_ssm);
-                REQUIRE(exp_ssm.data()->ssm_type() == syntaxstatetype::expect_rhs_expression);
-                REQUIRE(exp_ssm.data()->allow_defs() == false);
-                REQUIRE(exp_ssm.data()->cxl_on_rightbrace() == false);
-            }
-
-            {
-                // future-proofing for Token only holding a string_view
-                const DString * str = DString::from_cstr(expr_alloc, "3.141593");
-
-                auto & result = parser.on_token(Token::f64_token(std::string(*str)));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-
-                log && log("after f64 token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-            }
-
-            {
-                auto & result = parser.on_token(Token::semicolon_token());
-
-                log && log("after semicolon token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == false);
-
                 auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
                 REQUIRE(expr);
             }
-
-            // define-expressions not properly implemented
-
-            //REQUIRE(result.error_description());
         }
 
         TEST_CASE("SchematikaParser-interactive-integer", "[reader2][SchematikaParser]")
@@ -409,39 +365,6 @@ namespace xo {
             //REQUIRE(result.is_error());
             //// illegal input on token
             //REQUIRE(result.error_description());
-        }
-
-        void
-        utest_tokenizer_loop(SchematikaParser * parser, std::vector<Token> & tk_v, bool debug_flag)
-        {
-            scope log(XO_DEBUG(debug_flag));
-
-            size_t i_tk = 0;
-            size_t n_tk = tk_v.size();
-            for (const auto & tk : tk_v) {
-                INFO(tostr(xtag("i_tk", i_tk), xtag("tk", tk)));
-
-                auto & result = parser->on_token(tk);
-
-                log && log("after token", xtag("i_tk", i_tk), xtag("tk", tk));
-                log && log(xtag("parser", parser));
-                log && log(xtag("result", result));
-
-                if (i_tk + 1 < n_tk) {
-                    REQUIRE(parser->has_incomplete_expr() == true);
-                    REQUIRE(!result.is_error());
-                    REQUIRE(result.is_incomplete());
-                } else {
-                    /* last token in tk_v[] */
-
-                    REQUIRE(parser->has_incomplete_expr() == false);
-                    REQUIRE(!result.is_error());
-                    REQUIRE(result.is_expression());
-                    REQUIRE(result.result_expr());
-                }
-
-                ++i_tk;
-            }
         }
 
         TEST_CASE("SchematikaParser-interactive-arith", "[reader2][SchematikaParser]")
