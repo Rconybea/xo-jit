@@ -495,8 +495,10 @@ namespace xo {
 
         TEST_CASE("SchematikaParser-interactive-lambda", "[reader2][SchematikaParser]")
         {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
             constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag));
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ArenaConfig config;
             config.name_ = "test-arena";
@@ -512,193 +514,30 @@ namespace xo {
             /** Walkthrough parsing input equivalent to:
              *
              *    lambda (n : i64, r : i64) -> i64 { 123 }
-             *
+             *    ^      ^^ ^ ^  ^ ^ ^ ^  ^ ^  ^   ^ ^   ^
+             *    0      1| 3 4  5 6 7 8  9 a  b   c d   e
+             *            2          
              **/
 
-            {
-                auto & result = parser.on_token(Token::lambda_token());
+            std::vector<Token> tk_v{
+                /* [ 0] */ Token::lambda_token(),
+                /* [ 1] */   Token::leftparen_token(),
+                /* [ 2] */     Token::symbol_token("n"),
+                /* [ 3] */     Token::colon_token(),
+                /* [ 4] */     Token::symbol_token("i64"),
+                /* [ 5] */   Token::comma_token(),
+                /* [ 6] */     Token::symbol_token("r"),
+                /* [ 7] */     Token::colon_token(),
+                /* [ 8] */     Token::symbol_token("i64"),
+                /* [ 9] */   Token::rightparen_token(),
+                /* [ a] */ Token::yields_token(),
+                /* [ b] */ Token::symbol_token("i64"),
+                /* [ c] */ Token::leftbrace_token(),
+                /* [ d] */   Token::i64_token("123"),
+                /* [ e] */ Token::rightbrace_token(),
+            };
 
-                log && log("after lambda token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::leftparen_token());
-
-                log && log("after lparen token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("n"));
-
-                log && log("after symbol(n) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::colon_token());
-
-                log && log("after colon token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("i64"));
-
-                log && log("after symbol(i64) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::comma_token());
-
-                log && log("after comma token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("r"));
-
-                log && log("after symbol(r) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::colon_token());
-
-                log && log("after colon token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("i64"));
-
-                log && log("after symbol(i64) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::rightparen_token());
-
-                log && log("after rightparen token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::yields_token());
-
-                log && log("after yields token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("i64"));
-
-                log && log("after symbol(i64) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::leftbrace_token());
-
-                log && log("after leftbrace token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::i64_token("123"));
-
-                log && log("after f64(123) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::rightbrace_token());
-
-                log && log("after rightbrace token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == false);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_expression());
-                REQUIRE(result.result_expr());
-            }
-
-            //REQUIRE(result.is_error());
-            //// illegal input on token
-            //REQUIRE(result.error_description());
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
         }
 
         TEST_CASE("SchematikaParser-interactive-if", "[reader2][SchematikaParser]")
