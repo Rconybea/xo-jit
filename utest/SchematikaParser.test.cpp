@@ -786,8 +786,10 @@ namespace xo {
 
         TEST_CASE("SchematikaParser-interactive-apply", "[reader2][SchematikaParser]")
         {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
             constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag));
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ArenaConfig config;
             config.name_ = "test-arena";
@@ -802,58 +804,34 @@ namespace xo {
 
             /** Walkthrough parsing input equivalent to:
              *
-             *    (lambda (x : i64) { x * x })(13);
-             *
+             *    (lambda (x : i64) { x * x })(13) ;
+             *    ^^      ^^ ^  ^ ^ ^ ^ ^ ^ ^^^^ ^ ^
+             *    0|      2| 4  5 6 7 8 9 a b|d| f g
+             *     1       3                 c e
              **/
 
             std::vector<Token> tk_v{
-                Token::leftparen_token(),
+                /* [ 0] */ Token::leftparen_token(),
 
-                /**/ Token::lambda_token(),
-                /**/   Token::leftparen_token(),
-                /**/     Token::symbol_token("x"),
-                /**/     Token::colon_token(),
-                /**/     Token::symbol_token("i64"),
-                /**/   Token::rightparen_token(),
-                /**/   Token::leftbrace_token(),
-                /**/     Token::symbol_token("x"),
-                /**/     Token::star_token(),
-                /**/     Token::symbol_token("x"),
-                /**/   Token::rightbrace_token(),
-                /**/ Token::rightparen_token(),
-                /**/ Token::leftparen_token(),
-                /**/   Token::i64_token("13"),
-                /**/ Token::rightparen_token(),
-
-                /**/ Token::semicolon_token(),
+                /* [ 1] */   Token::lambda_token(),
+                /* [ 2] */     Token::leftparen_token(),
+                /* [ 3] */       Token::symbol_token("x"),
+                /* [ 4] */       Token::colon_token(),
+                /* [ 5] */       Token::symbol_token("i64"),
+                /* [ 6] */     Token::rightparen_token(),
+                /* [ 7] */     Token::leftbrace_token(),
+                /* [ 8] */       Token::symbol_token("x"),
+                /* [ 9] */       Token::star_token(),
+                /* [ a] */       Token::symbol_token("x"),
+                /* [ b] */     Token::rightbrace_token(),
+                /* [ c] */   Token::rightparen_token(),
+                /* [ d] */   Token::leftparen_token(),
+                /* [ e] */     Token::i64_token("13"),
+                /* [ f] */   Token::rightparen_token(),
+                /* [ g] */ Token::semicolon_token(),
             };
 
-            size_t i_tk = 0;
-            size_t n_tk = tk_v.size();
-            for (const auto & tk : tk_v) {
-                INFO(tostr(xtag("i_tk", i_tk), xtag("tk", tk)));
-
-                auto & result = parser.on_token(tk);
-
-                log && log("after token", xtag("i_tk", i_tk), xtag("tk", tk));
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                if (i_tk + 1 < n_tk) {
-                    REQUIRE(parser.has_incomplete_expr() == true);
-                    REQUIRE(!result.is_error());
-                    REQUIRE(result.is_incomplete());
-                } else {
-                    /* last token in tk_v[] */
-
-                    REQUIRE(parser.has_incomplete_expr() == false);
-                    REQUIRE(!result.is_error());
-                    REQUIRE(result.is_expression());
-                    REQUIRE(result.result_expr());
-                }
-
-                ++i_tk;
-            }
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
         }
 
         TEST_CASE("SchematikaParser-interactive-apply2", "[reader2][SchematikaParser]")
