@@ -758,163 +758,23 @@ namespace xo {
              *
              **/
 
-            {
-                auto & result = parser.on_token(Token::lambda_token());
+            std::vector<Token> tk_v{
+                /**/ Token::lambda_token(),
+                /**/   Token::leftparen_token(),
+                /**/     Token::symbol_token("x"),
+                /**/     Token::colon_token(),
+                /**/     Token::symbol_token("i64"),
+                /**/   Token::rightparen_token(),
+                /**/ Token::yields_token(),
+                /**/ Token::symbol_token("i64"),
+                /**/ Token::leftbrace_token(),
+                /**/   Token::symbol_token("x"),
+                /**/   Token::star_token(),
+                /**/   Token::symbol_token("x"),
+                /**/ Token::rightbrace_token(),
+            };
 
-                log && log("after lambda token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::leftparen_token());
-
-                log && log("after lparen token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("x"));
-
-                log && log("after symbol(n) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::colon_token());
-
-                log && log("after colon token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("i64"));
-
-                log && log("after symbol(i64) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::rightparen_token());
-
-                log && log("after rightparen token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::yields_token());
-
-                log && log("after yields token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("i64"));
-
-                log && log("after symbol(i64) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::leftbrace_token());
-
-                log && log("after leftbrace token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("x"));
-
-                log && log("after symbol(x) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::star_token());
-
-                log && log("after star(*) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::symbol_token("x"));
-
-                log && log("after symbol(x) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::rightbrace_token());
-
-                log && log("after rightbrace(}) token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == false);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_expression());
-                REQUIRE(result.result_expr());
-            }
-
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
         }
 
         TEST_CASE("SchematikaParser-interactive-apply", "[reader2][SchematikaParser]")
