@@ -800,93 +800,17 @@ namespace xo {
              *
              **/
 
-            {
-                auto & result = parser.on_token(Token::if_token());
+            std::vector<Token> tk_v{
+                Token::if_token(),
+                Token::bool_token("true"),
+                Token::then_token(),
+                Token::i64_token("777"),
+                Token::else_token(),
+                Token::string_token("fooey"),
+                Token::semicolon_token(),
+            };
 
-                log && log("after if token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::bool_token("true"));
-
-                log && log("after true token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::then_token());
-
-                log && log("after then token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::i64_token("777"));
-
-                log && log("after i64 token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::else_token());
-
-                log && log("after else token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::string_token("fooey"));
-
-                log && log("after string token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == true);
-                REQUIRE(!result.is_error());
-                REQUIRE(result.is_incomplete());
-            }
-
-            {
-                auto & result = parser.on_token(Token::semicolon_token());
-
-                log && log("after semicolon token:");
-                log && log(xtag("parser", &parser));
-                log && log(xtag("result", result));
-
-                REQUIRE(parser.has_incomplete_expr() == false);
-                REQUIRE(!result.is_error());
-                REQUIRE(!result.is_incomplete());
-            }
-
-            //REQUIRE(result.is_error());
-            //// illegal input on token
-            //REQUIRE(result.error_description());
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
         }
 
         TEST_CASE("SchematikaParser-interactive-lambda2", "[reader2][SchematikaParser]")
