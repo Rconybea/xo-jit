@@ -63,6 +63,7 @@ namespace xo {
 
             DLocalSymtab * local_symtab() const noexcept { return local_symtab_; }
             size_type n_args() const noexcept { return local_symtab_->size(); }
+            obj<AExpression> body_expr() const noexcept { return body_expr_; }
 
             // get_free_variables()
             // visit_preorder()
