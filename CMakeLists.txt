@@ -79,6 +79,32 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-gcobject-vsmapplyclosureframe
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR VsmApplyClosureFrame
+    INPUT idl/IGCObject_DVsmApplyClosureFrame.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-printable-vsmapplyclosureframe
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR DVsmApplyClosureFrame
+    INPUT idl/IPrintable_DVsmApplyClosureFrame.json5
+    OUTPUT_HPP_DIR include/xo/interpreter2
+    OUTPUT_IMPL_SUBDIR detail
+    OUTPUT_CPP_DIR src/interpreter2
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-procedure-closure
     FACET_PKG xo_procedure2
     FACET Procedure

@@ -16,6 +16,10 @@ set(SELF_SRCS
     IGCObject_DVsmApplyFrame.cpp
     IPrintable_DVsmApplyFrame.cpp
 
+    DVsmApplyClosureFrame.cpp
+    IGCObject_DVsmApplyClosureFrame.cpp
+    IPrintable_DVsmApplyClosureFrame.cpp
+
     DClosure.cpp
     IProcedure_DClosure.cpp
     IGCObject_DClosure.cpp

@@ -21,7 +21,7 @@ namespace xo {
 #ifdef OBSOLETE // see DVsmError
         // TODO: move error to collected space?
         //       or special arena?
-        // 
+        //
         struct EvaluationError {
             /** source location (in vsm implementation) at which error identified **/
             std::string_view src_function_;
@@ -182,9 +182,10 @@ namespace xo {
              *   stack_
              *   cont_
              *
-             * Other registers are not preserved
+             * Other registers not preserved
              *   pc_
              *   expr_
+             *   local_env_
              *   fn_
              *   args_
              *   value_
@@ -200,7 +201,7 @@ namespace xo {
 
             /** Sidecar allocator for error reporting.
              *  Separate to mitigate interference with @ref mm_
-             *  (separate memory so we can for example report 
+             *  (separate memory so we can for example report
              *   an out-of-memory error).
              *  Likely DArena or similar
              **/

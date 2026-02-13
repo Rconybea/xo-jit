@@ -14,8 +14,9 @@ namespace xo {
         DVsmApplyFrame::DVsmApplyFrame(obj<AGCObject> old_parent,
                                        VsmInstr old_cont,
                                        DArray * args)
-        : VsmFrame(old_parent, old_cont),
-          args_{args}
+            : parent_{old_parent},
+              cont_{old_cont},
+              args_{args}
         {}
 
         DVsmApplyFrame *

@@ -5,8 +5,11 @@
 
 #include "interpreter2_register_facets.hpp"
 
+#include "DPrimitive_gco_2_gco_gco.hpp"
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
+#include "VsmApplyClosureFrame.hpp"
+#include "Primitive_gco_2_gco_gco.hpp"
 #include "Closure.hpp"
 #include "LocalEnv.hpp"
 #include "VsmRcx.hpp"
@@ -31,7 +34,8 @@ namespace xo {
 
             // VsmStackFrame
             // +- VsmApplyFrame
-            // \- VsmEvalArgsFrame
+            // +- VsmEvalArgsFrame
+            // \- VsmApplyClosureFrame
 
             FacetRegistry::register_impl<AGCObject, DVsmApplyFrame>();
             FacetRegistry::register_impl<APrintable, DVsmApplyFrame>();
@@ -39,9 +43,10 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DVsmEvalArgsFrame>();
             FacetRegistry::register_impl<APrintable, DVsmEvalArgsFrame>();
 
-            FacetRegistry::register_impl<AProcedure, DClosure>();
-            FacetRegistry::register_impl<AGCObject, DClosure>();
-            FacetRegistry::register_impl<APrintable, DClosure>();
+            FacetRegistry::register_impl<AGCObject, DVsmApplyClosureFrame>();
+            FacetRegistry::register_impl<APrintable, DVsmApplyClosureFrame>();
+
+            // LocalEnv
 
             FacetRegistry::register_impl<AGCObject, DLocalEnv>();
             FacetRegistry::register_impl<APrintable, DLocalEnv>();
@@ -50,7 +55,13 @@ namespace xo {
             // +- Primitive_gco_2_gco_gco
             // \- Closure
 
+            FacetRegistry::register_impl<AProcedure, DPrimitive_gco_2_gco_gco>();
+            FacetRegistry::register_impl<AGCObject, DPrimitive_gco_2_gco_gco>();
+            FacetRegistry::register_impl<APrintable, DPrimitive_gco_2_gco_gco>();
+
             FacetRegistry::register_impl<AProcedure, DClosure>();
+            FacetRegistry::register_impl<AGCObject, DClosure>();
+            FacetRegistry::register_impl<APrintable, DClosure>();
 
             // RuntimeContext
             // \- VsmRcx

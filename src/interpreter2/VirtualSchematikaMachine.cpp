@@ -62,7 +62,7 @@ namespace xo {
 
                 error_mm_.adopt(obj<AAllocator,DArena>(arena));
             }
-                
+
             // TODO: allocate global_env
         }
 

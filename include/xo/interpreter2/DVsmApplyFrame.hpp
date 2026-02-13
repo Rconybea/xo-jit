@@ -9,11 +9,12 @@
 
 namespace xo {
     namespace scm {
-        class DVsmApplyFrame : public VsmFrame {
+        class DVsmApplyFrame {
         public:
             using AProcedure = xo::scm::AProcedure;
             using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
+            using AGCObject = xo::mm::AGCObject;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
@@ -27,6 +28,8 @@ namespace xo {
                                          VsmInstr old_cont,
                                          DArray * args);
 
+            obj<AGCObject> parent() const noexcept { return parent_; }
+            VsmInstr cont() const noexcept { return cont_; }
             obj<AProcedure> fn() const noexcept { return fn_; }
             DArray * args() const noexcept { return args_; }
 
@@ -40,6 +43,10 @@ namespace xo {
             bool pretty(const ppindentinfo & ppii) const;
 
         private:
+            /** saved VSM stack; restore when this frame consumed **/
+            obj<AGCObject> parent_;
+            /** saved continuation; restore when this frame consumed **/
+            VsmInstr cont_;
             /** evaluated target procedure.
              *
              *  note: when initially created, this will be unpopulated;
