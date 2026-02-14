@@ -73,7 +73,7 @@ namespace xo {
                 return slots_[ix.j_slot()].var_;
             }
 
-            /** increase slot size (provided beleow capacity) to append
+            /** increase slot size (provided below capacity) to append
              *  binding for one local variable.  Local variable will be allocated
              *  from @p mm, named @p name, with type described by @p typeref.
              **/

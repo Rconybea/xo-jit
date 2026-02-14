@@ -12,6 +12,8 @@ namespace xo {
     namespace scm {
         class Binding {
         public:
+            using slot_type = int32_t;
+
             static constexpr int32_t c_link_sentinel = -2;
             static constexpr int32_t c_link_global = -1;
 
@@ -22,7 +24,7 @@ namespace xo {
 
             static Binding null() { return Binding(); }
             /** global bindings are located by symbol name **/
-            static Binding global() { return Binding(c_link_global, 0); }
+            static Binding global(int32_t j_slot) { return Binding(c_link_global, j_slot); }
             static Binding local(int32_t j_slot) { return Binding(0, j_slot); }
             static Binding relative(int32_t i_link, Binding def);
 

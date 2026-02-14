@@ -6,6 +6,8 @@
 #pragma once
 
 #include "Binding.hpp"
+#include "DVariable.hpp"
+#include <xo/object2/DArray.hpp>
 #include <xo/arena/DArenaHashMap.hpp>
 
 namespace xo {
@@ -23,7 +25,8 @@ namespace xo {
         public:
             using key_type = const DUniqueString *;
             using value_type = Binding;
-            using repr_type = xo::map::DArenaHashMap<key_type, value_type>;
+            using repr_type = xo::map::DArenaHashMap<key_type, Binding::slot_type>;
+            using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
 
         public:
@@ -31,6 +34,17 @@ namespace xo {
             void visit_pools(const MemorySizeVisitor & visitor) const;
 
         public:
+            /** lookup global symbol with name @p sym **/
+            DVariable * lookup_variable(const DUniqueString * sym) const noexcept;
+
+            /** establish binding for @p sym, with type described by @p typeref,
+             *  replacing existing global (if present) with the same name.
+             *  Use memory from @p mm to create variable-expr
+             **/
+            DVariable * establish_variable(obj<AAllocator> mm,
+                                           const DUniqueString * sym,
+                                           TypeRef typeref);
+
             /** @defgroup xo-expression2-symboltable-facet symboltable facet**/
             ///@{
 
@@ -49,6 +63,13 @@ namespace xo {
             /** map symbols -> bindings **/
             repr_type map_;
             
+            /** array of variables.
+             *  When S is a unique-string for a global symbol, then:
+             *  1. map_[S] is unique global index i(S) for S.
+             *  2. vars_[i(S)] is variable-expr var(S) for S
+             *  3. var(S)->name == S
+             **/
+            DArray * vars_ = nullptr;
         };
 
     } /*namespace scm*/
