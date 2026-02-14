@@ -16,6 +16,7 @@ namespace xo {
             case vsm_opcode::apply: return "apply";
             case vsm_opcode::evalargs: return "evalargs";
             case vsm_opcode::apply_cont: return "apply_cont";
+            case vsm_opcode::ifelse_cont: return "ifelse_cont";
             case vsm_opcode::seq_cont: return "seq_cont";
             case vsm_opcode::N:
                 break;
@@ -39,6 +40,9 @@ namespace xo {
         VsmInstr
         VsmInstr::c_apply_cont = VsmInstr(vsm_opcode::apply_cont);
 
+        VsmInstr
+        VsmInstr::c_ifelse_cont = VsmInstr(vsm_opcode::ifelse_cont);
+        
         VsmInstr
         VsmInstr::c_seq_cont = VsmInstr(vsm_opcode::seq_cont);
     } /*namespace scm*/

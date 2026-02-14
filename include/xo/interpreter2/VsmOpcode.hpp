@@ -28,10 +28,13 @@ namespace xo {
              **/
             evalargs,
 
-            /** Coda to restore vsm registers (local_env, stack, cont)
+            /** continuation to restore vsm registers (local_env, stack, cont)
              *  after invoking a closure
              **/
             apply_cont,
+
+            /** continuation to act on a branch **/
+            ifelse_cont,
 
             /** Loop over elements of a SequenceExpr **/
             seq_cont,
@@ -55,3 +58,4 @@ namespace xo {
 } /*namespace xo*/
 
 /* end VsmOpcode.hpp */
+

@@ -7,6 +7,7 @@
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
 #include "VsmApplyClosureFrame.hpp"
+#include "VsmIfElseContFrame.hpp"
 #include "VsmSeqContFrame.hpp"
 #include "VsmRcx.hpp"
 #include "Closure.hpp"
@@ -14,6 +15,7 @@
 #include <xo/expression2/LambdaExpr.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/expression2/SequenceExpr.hpp>
+#include <xo/object2/Boolean.hpp>
 #include <xo/procedure2/RuntimeContext.hpp>
 //#include <xo/procedure2/SimpleRcx.hpp>
 #include <xo/gc/DX1Collector.hpp>
@@ -189,6 +191,9 @@ namespace xo {
                 break;
             case vsm_opcode::apply_cont:
                 _do_apply_cont_op();
+                break;
+            case vsm_opcode::ifelse_cont:
+                _do_ifelse_cont_op();
                 break;
             case vsm_opcode::seq_cont:
                 _do_seq_cont_op();
@@ -388,14 +393,26 @@ namespace xo {
         void
         VirtualSchematikaMachine::_do_eval_if_else_op()
         {
-            // not implemented
-            assert(false);
+            // control:
+            //   self -> eval(test) -> ifelse_cont -> eval(when_true)
+            //                                     -> eval(when_false)
+            
+            auto ifelse_expr = obj<AExpression,DIfElseExpr>::from(expr_);
+
+            obj<AGCObject,DVsmIfElseContFrame> ifelse_frame
+                (DVsmIfElseContFrame::make(mm_.to_op(),
+                                           stack_, cont_, ifelse_expr.data()));
+
+            this->stack_ = ifelse_frame;
+            this->cont_ = VsmInstr::c_ifelse_cont;
+            this->expr_ = ifelse_expr->test();
+            this->pc_ = VsmInstr::c_eval;
         }
 
         void
         VirtualSchematikaMachine::_do_eval_sequence_op()
         {
-            // assuming bump allocator:
+            // stack:
             //
             //   VsmEvalSequence
             //   v
@@ -638,6 +655,50 @@ namespace xo {
             this->stack_ = frame->parent();
             this->local_env_ = frame->local_env();
             this->pc_ = frame->cont();
+        }
+
+        void
+        VirtualSchematikaMachine::_do_ifelse_cont_op()
+        {
+            // pre: result of evaluating test condition in value_ register
+
+            auto frame = obj<AGCObject,DVsmIfElseContFrame>::from(stack_);
+
+            assert(frame);
+            assert(value_.is_value());
+
+            auto flag = obj<AGCObject,DBoolean>::from(*value_.value());
+
+            if (flag.data()) {
+                obj<AExpression> next_expr;
+                {
+                    if (flag->value()) {
+                        // proceed with if-branch
+                        next_expr = frame->ifelse_expr()->when_true();
+                    } else {
+                        // proceed with else-branch
+                        next_expr = frame->ifelse_expr()->when_false();
+                    }
+                }
+
+                this->stack_ = frame->parent();
+                this->cont_ = frame->cont();
+                this->expr_ = next_expr;
+                this->pc_ = VsmInstr::c_eval;
+            } else {
+                auto error = DRuntimeError::make(mm_.to_op(),
+                                                 "_do_ifelse_cont_op",
+                                                 "expected boolean for test condition");
+                this->value_ = VsmResult(error);
+
+                // for now: halt VSM execution
+                // TODO: some combination of
+                // 1. emit stack trace 
+                // 2. go to debugger
+                // 3. have every vsm instruction check inputs for errors
+            
+                this->pc_ = VsmInstr::c_halt;
+            }
         }
 
         void

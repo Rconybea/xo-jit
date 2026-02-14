@@ -20,6 +20,10 @@ set(SELF_SRCS
     IGCObject_DVsmApplyClosureFrame.cpp
     IPrintable_DVsmApplyClosureFrame.cpp
 
+    DVsmIfElseContFrame.cpp
+    IGCObject_DVsmIfElseContFrame.cpp
+    IPrintable_DVsmIfElseContFrame.cpp
+
     DVsmSeqContFrame.cpp
     IGCObject_DVsmSeqContFrame.cpp
     IPrintable_DVsmSeqContFrame.cpp

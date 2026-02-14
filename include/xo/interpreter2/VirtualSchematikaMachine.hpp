@@ -187,6 +187,11 @@ namespace xo {
              **/
             void _do_apply_cont_op();
 
+            /** proceed with if- or else- branch of an if-else expression
+             *  after evaluating test condition
+             **/
+            void _do_ifelse_cont_op();
+
             /** loop continuation after evaluating element of a SequenceExpr **/
             void _do_seq_cont_op();
 

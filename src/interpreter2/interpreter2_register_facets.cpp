@@ -9,6 +9,7 @@
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
 #include "VsmApplyClosureFrame.hpp"
+#include "VsmIfElseContFrame.hpp"
 #include "VsmSeqContFrame.hpp"
 #include "Primitive_gco_2_gco_gco.hpp"
 #include "Closure.hpp"
@@ -38,6 +39,7 @@ namespace xo {
             // +- VsmApplyFrame
             // +- VsmEvalArgsFrame
             // +- VsmApplyClosureFrame
+            // +- VsmIfElseContFrame
             // \- VsmSeqContFrame
 
             FacetRegistry::register_impl<AGCObject, DVsmApplyFrame>();
@@ -48,6 +50,9 @@ namespace xo {
 
             FacetRegistry::register_impl<AGCObject, DVsmApplyClosureFrame>();
             FacetRegistry::register_impl<APrintable, DVsmApplyClosureFrame>();
+
+            FacetRegistry::register_impl<AGCObject, DVsmIfElseContFrame>();
+            FacetRegistry::register_impl<APrintable, DVsmIfElseContFrame>();
 
             FacetRegistry::register_impl<AGCObject, DVsmSeqContFrame>();
             FacetRegistry::register_impl<APrintable, DVsmSeqContFrame>();

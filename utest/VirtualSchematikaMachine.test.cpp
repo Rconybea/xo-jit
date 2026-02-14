@@ -30,6 +30,7 @@ namespace xo {
     using xo::scm::VsmConfig;
     using xo::scm::VsmResultExt;
     using xo::scm::DClosure;
+    using xo::scm::DString;
     using xo::scm::DFloat;
     using xo::scm::DBoolean;
     using xo::scm::DInteger;
@@ -258,10 +259,10 @@ namespace xo {
 
             log && log(xtag("res.tseq", res.value()->_typeseq()));
 
-            auto x = obj<AGCObject,DBoolean>::from(*res.value());
+            auto x = obj<AGCObject,DString>::from(*res.value());
 
             REQUIRE(x);
-            REQUIRE(x.data()->value() == true);
+            REQUIRE(strcmp(x.data()->chars(), "equal") == 0);
 
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
