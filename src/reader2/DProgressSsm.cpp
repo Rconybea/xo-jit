@@ -497,7 +497,7 @@ namespace xo {
         DProgressSsm::on_parsed_expression(obj<AExpression> expr,
                                            ParserStateMachine * p_psm)
         {
-            const bool c_debug_flag = p_psm->debug_flag() || true;
+            const bool c_debug_flag = p_psm->debug_flag();
 
             scope log(XO_DEBUG(c_debug_flag));
 
@@ -516,7 +516,7 @@ namespace xo {
                                                       const Token & tk,
                                                       ParserStateMachine * p_psm)
         {
-            const bool c_debug_flag = p_psm->debug_flag() || true;
+            const bool c_debug_flag = p_psm->debug_flag();
 
             scope log(XO_DEBUG(c_debug_flag),
                       xtag("expr", expr),
@@ -1215,7 +1215,7 @@ namespace xo {
             case optype::op_assign:
                 assert(false);
                 break;
-                
+
             case optype::op_equal:
                 {
                     auto pm_obj = (with_facet<AGCObject>::mkobj
