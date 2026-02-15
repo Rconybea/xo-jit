@@ -2,8 +2,9 @@
 
 #include <xo/reader2/init_reader2.hpp>
 #include <xo/reader2/SchematikaReader.hpp>
-#include <xo/gc/DX1Collector.hpp>
+#include <xo/gc/X1Collector.hpp>
 #include <xo/gc/detail/IAllocator_DX1Collector.hpp>
+#include <xo/alloc2/Arena.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -137,6 +138,7 @@ namespace {
 struct AppConfig {
     using ReaderConfig = xo::scm::ReaderConfig;
     using X1CollectorConfig = xo::mm::X1CollectorConfig;
+    using ArenaConfig = xo::mm::ArenaConfig;
 
     AppConfig() {
         rdr_config_.reader_debug_flag_ = true;
@@ -147,17 +149,24 @@ struct AppConfig {
     std::size_t max_history_size_ = 1000;
     std::string repl_history_fname_ = "repl_history.txt";;
     ReaderConfig rdr_config_;
-    X1CollectorConfig x1_config_ = (X1CollectorConfig().with_size(4*1024*1024));
+    X1CollectorConfig x1_config_ = (X1CollectorConfig().with_name("gc").with_size(4*1024*1024));
+    ArenaConfig fixed_config_ = (ArenaConfig().with_name("fixed").with_size(4*1024));
 };
 
 struct AppContext {
+    using AAllocator = xo::mm::AAllocator;
     using DX1Collector = xo::mm::DX1Collector;
     using X1CollectorConfig = xo::mm::X1CollectorConfig;
+    using DArena = xo::mm::DArena;
+    using ArenaConfig = xo::mm::ArenaConfig;
     using Replxx = replxx::Replxx;
 
     AppContext(const AppConfig & cfg = AppConfig()) : config_{cfg},
-                                                      x1_{X1CollectorConfig().with_size(4*1024*1024)},
-                                                      rdr_{config_.rdr_config_, x1_.ref()}
+                                                      x1_{cfg.x1_config_},
+                                                      fixed_{cfg.fixed_config_},
+                                                      rdr_{config_.rdr_config_,
+                                                           x1_.ref(),
+                                                           obj<AAllocator,DArena>(&fixed_)}
     {
         rx_.set_max_history_size(config_.max_history_size_);
         rx_.history_load(config_.repl_history_fname_);
@@ -167,9 +176,12 @@ struct AppContext {
 
     AppConfig config_;
     Replxx rx_;
+    /** collector/allocator for schematika expressions **/
     DX1Collector x1_;
+    /** e.g. for DArenaHashMap within global symtab **/
+    DArena fixed_;
     SchematikaReader rdr_;
-}; 
+};
 
 int
 main()

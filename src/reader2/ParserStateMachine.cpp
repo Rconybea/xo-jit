@@ -24,13 +24,14 @@ namespace xo {
     namespace scm {
         ParserStateMachine::ParserStateMachine(const ArenaConfig & config,
                                                size_type max_stringtable_capacity,
-                                               obj<AAllocator> expr_alloc)
+                                               obj<AAllocator> expr_alloc,
+                                               obj<AAllocator> aux_alloc)
             : stringtable_{max_stringtable_capacity},
               parser_alloc_{DArena::map(config)},
               expr_alloc_{expr_alloc},
+              aux_alloc_{aux_alloc},
               debug_flag_{config.debug_flag_}
         {
-
         }
 
         bool
@@ -60,8 +61,8 @@ namespace xo {
             stringtable_.visit_pools(visitor);
             parser_alloc_.visit_pools(visitor);
 
-            // not counting expr_alloc_. We don't consider
-            // that to be owned by ParserStateMachine
+            // not counting {expr_alloc_, fixed_alloc_}. We don't consider
+            // either to be owned by ParserStateMachine
         }
 
         void

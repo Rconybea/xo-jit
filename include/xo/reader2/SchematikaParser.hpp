@@ -164,14 +164,18 @@ namespace xo {
             /** create parser in initial state;
              *  parser is ready to receive tokens via @ref include_token
              *
-             *  @p config      arena configuration for parser stack
-             *  @p expr_alloc  allocator for schematika expressions.
-             *                 Probably shared with execution.
+             *  @p config        arena configuration for parser stack
+             *  @p expr_alloc    allocator for schematika expressions.
+             *                   Probably shared with execution.
+             *  @p aux_alloc     aux allocator for non-copyable memory
+             *                   with lifetime bounded by this
+             *                   SchematikeParser itself
              *  @p debug_flag  true to enable debug logging
              **/
             SchematikaParser(const ArenaConfig & config,
                              size_t max_stringtable_capacity,
                              obj<AAllocator> expr_alloc,
+                             obj<AAllocator> aux_alloc,
                              bool debug_flag);
 
             /** scm-schematikaparser-access-methods **/

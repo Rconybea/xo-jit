@@ -41,8 +41,15 @@ namespace xo {
             using size_type = std::size_t;
 
         public:
+            /**
+             *  @p expr_alloc.  allocator for Schematika expressions
+             *  @p aux_alloc.   allocator for miscellaneous objects
+             *                  (e.g. DArenaHashMap for global symtab)
+             *  that have lifetime bounded by Schematika reader itself.
+             **/
             SchematikaReader(const ReaderConfig & config,
-                             obj<AAllocator> expr_alloc);
+                             obj<AAllocator> expr_alloc,
+                             obj<AAllocator> fixed_alloc);
 
             /** visit reader-owned memory pools; call visitor(info) for each.
              *  Specifically exclude expr_alloc, since we don't consider

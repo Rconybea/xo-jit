@@ -41,9 +41,21 @@ namespace xo {
             using size_type = std::size_t;
 
         public:
+            /**
+             *  @p config        arena configuration for parser state
+             *  @p max_stringtable_capacity
+             *                   hard max size for unique stringtable
+             *  @p expr_alloc    allocator for schematika expressions.
+             *                   Probably shared with execution.
+             *  @p aux_alloc     auxiliary allocator for non-copyable memory
+             *                   (e.g. DArenaHashMap for global symtable).
+             *                   If not using X1Collector, this can be the
+             *                   same as @p expr_alloc.
+             **/
             ParserStateMachine(const ArenaConfig & config,
                                size_type max_stringtable_capacity,
-                               obj<AAllocator> expr_alloc);
+                               obj<AAllocator> expr_alloc,
+                               obj<AAllocator> aux_alloc);
 
             /** @defgroup scm-parserstatemachine-accessors accessor methods **/
             ///@{
@@ -279,6 +291,19 @@ namespace xo {
              *  once compiled.
              **/
             obj<AAllocator> expr_alloc_;
+
+            /** Allocator for data with lifetime bounded by this ParserStateMachine
+             *
+             *  Cannot be DX1Collector; for example DArenaHashMap will
+             *  for global symtab will be allocated from here,
+             *  and does not support gc.
+             *
+             *  If @ref expr_alloc_ is an ordinary arena (e.g. DArenaAlloc)
+             *  can have aux_alloc_ = expr_alloc_.
+             *  When expr_alloc_ is a garbage collector (e.g. DX1Collector)
+             *  this needs to be distinct.
+             **/
+            obj<AAllocator> aux_alloc_;
 
             /** symbol table with local bindings.
              *  non-null during parsing of lambda expressions.
