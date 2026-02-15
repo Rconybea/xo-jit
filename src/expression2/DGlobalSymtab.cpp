@@ -18,35 +18,25 @@ namespace xo {
 
     namespace scm {
 
-        DGlobalSymtab::DGlobalSymtab(repr_type * map,
+        DGlobalSymtab::DGlobalSymtab(dp<repr_type> map,
                                      DArray * vars)
-        : map_{map}, vars_{vars}
+        : map_{std::move(map)}, vars_{vars}
         {
         }
 
-        DGlobalSymtab *
-        DGlobalSymtab::make(obj<AAllocator> global_mm,
+        dp<DGlobalSymtab>
+        DGlobalSymtab::make(obj<AAllocator> aux_mm,
                             obj<AAllocator> mm,
                             const ArenaHashMapConfig & cfg)
         {
-            repr_type * map = nullptr;
-            {
-                /** memory DGlobalSymtab::map_
-                 *  (but not counting the mmap()'s that map will make for itself)
-                 **/
-                void * global_mem = global_mm.alloc_for<repr_type>();
-
-                map = new (global_mem) repr_type(cfg);
-            }            
+            auto map = dp<repr_type>::make(aux_mm, cfg);
             assert(map);
-
-            void * symtab_mem = mm.alloc_for<DGlobalSymtab>();
 
             /* choosing same capacity for hash, vars */
             DArray * vars = DArray::empty(mm, map->capacity());
             assert(vars);
 
-            DGlobalSymtab * symtab = new (symtab_mem) DGlobalSymtab(map, vars);
+            auto symtab = dp<DGlobalSymtab>::make(mm, std::move(map), vars);
             assert(symtab);
 
             return symtab;
@@ -133,7 +123,7 @@ namespace xo {
 
             auto ix = map_->find(sym);
 
-            if (ix == map_->end()) 
+            if (ix == map_->end())
                 return Binding::null();
 
             return Binding::global(ix->second);
@@ -150,7 +140,22 @@ namespace xo {
         DGlobalSymtab *
         DGlobalSymtab::shallow_copy(obj<AAllocator> mm) const noexcept
         {
-            return mm.std_copy_for<DGlobalSymtab>(this);
+            /** can't use std_copy_for because of non-copyable dp<repr_type>
+             *
+             * TODO: rename to shallow_move() throughout, and have std_copy_for()
+             *       -> std_move_for()
+             *
+             **/
+
+            void * copy_mem = mm.alloc_copy_for(this);
+
+            if (copy_mem) {
+                DGlobalSymtab * self = const_cast<DGlobalSymtab*>(this);
+
+                return new (copy_mem) DGlobalSymtab(std::move(self->map_), vars_);
+            }
+
+            return nullptr;
         }
 
         std::size_t

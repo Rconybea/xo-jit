@@ -8,6 +8,7 @@
 #include "Binding.hpp"
 #include "DVariable.hpp"
 #include <xo/object2/DArray.hpp>
+#include <xo/alloc2/dp.hpp>
 #include <xo/arena/DArenaHashMap.hpp>
 
 namespace xo {
@@ -35,16 +36,16 @@ namespace xo {
             /** @defgroup scm-globalsymtab-ctors constructors **/
             ///@{
 
-            DGlobalSymtab(repr_type * map, DArray * vars);
+            DGlobalSymtab(dp<repr_type> map, DArray * vars);
 
             /** create instance.
              *  Use memory from @p fixed_mm for @ref map_.
              *  Use memory from @p mm for DGlobalSymtab instance.
              *  Hashmap configured per @p cfg.
              **/
-            DGlobalSymtab * make(obj<AAllocator> fixed_mm,
-                                 obj<AAllocator> mm,
-                                 const ArenaHashMapConfig & cfg);
+            dp<DGlobalSymtab> make(obj<AAllocator> fixed_mm,
+                                   obj<AAllocator> mm,
+                                   const ArenaHashMapConfig & cfg);
 
             ///@}
             /** @defgroup scm-globalsymtab-access-methods access methods **/
@@ -81,21 +82,21 @@ namespace xo {
             ///@}
             /** @defgroup scm-globalsymtab-gcobject-facet gcobject facet **/
             ///@{
-            
+
             std::size_t shallow_size() const noexcept;
             DGlobalSymtab * shallow_copy(obj<AAllocator> mm) const noexcept;
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
-            
+
         private:
             /** map symbols -> bindings.
              *  Minor point: storing offsets instead of Variables allows us to omit
              *  iterating over map elements during GC. Possible savings if map_ slots
              *  sparsely populated.
              **/
-            repr_type * map_ = nullptr;
-            
+            dp<repr_type> map_;
+
             /** array of variables.
              *  When S is a unique-string for a global symbol, then:
              *  1. map_[S] is unique global index i(S) for S.
