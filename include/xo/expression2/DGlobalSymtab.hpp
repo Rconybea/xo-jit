@@ -25,17 +25,40 @@ namespace xo {
         public:
             using key_type = const DUniqueString *;
             using value_type = Binding;
+            using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
             using repr_type = xo::map::DArenaHashMap<key_type, Binding::slot_type>;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
 
         public:
+            /** @defgroup scm-globalsymtab-ctors constructors **/
+            ///@{
+
+            DGlobalSymtab(repr_type * map, DArray * vars);
+
+            /** create instance.
+             *  Use memory from @p fixed_mm for @ref map_.
+             *  Use memory from @p mm for DGlobalSymtab instance.
+             *  Hashmap configured per @p cfg.
+             **/
+            DGlobalSymtab * make(obj<AAllocator> fixed_mm,
+                                 obj<AAllocator> mm,
+                                 const ArenaHashMapConfig & cfg);
+
+            ///@}
+            /** @defgroup scm-globalsymtab-access-methods access methods **/
+            ///@{
+
             /** visit symtab-owned memory pools; call visitor(info) for each **/
             void visit_pools(const MemorySizeVisitor & visitor) const;
 
-        public:
             /** lookup global symbol with name @p sym **/
             DVariable * lookup_variable(const DUniqueString * sym) const noexcept;
+
+            ///@}
+            /** @defgroup scm-globalsymtab-general-methods general methods **/
+            ///@{
 
             /** establish binding for @p sym, with type described by @p typeref,
              *  replacing existing global (if present) with the same name.
@@ -45,7 +68,8 @@ namespace xo {
                                            const DUniqueString * sym,
                                            TypeRef typeref);
 
-            /** @defgroup xo-expression2-symboltable-facet symboltable facet**/
+            ///@}
+            /** @defgroup scm-globalsymtab-symboltable-facet symboltable facet **/
             ///@{
 
             /** true for global symbol table **/
@@ -55,13 +79,22 @@ namespace xo {
             Binding lookup_binding(const DUniqueString * sym) const noexcept;
 
             ///@}
+            /** @defgroup scm-globalsymtab-gcobject-facet gcobject facet **/
+            ///@{
+            
+            std::size_t shallow_size() const noexcept;
+            DGlobalSymtab * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
 
+            ///@}
+            
         private:
-            /** next binding will use this global index. See DGlobalEnv **/
-            uint32_t next_binding_ix_ = 0;
-
-            /** map symbols -> bindings **/
-            repr_type map_;
+            /** map symbols -> bindings.
+             *  Minor point: storing offsets instead of Variables allows us to omit
+             *  iterating over map elements during GC. Possible savings if map_ slots
+             *  sparsely populated.
+             **/
+            repr_type * map_ = nullptr;
             
             /** array of variables.
              *  When S is a unique-string for a global symbol, then:
