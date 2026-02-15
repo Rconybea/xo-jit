@@ -47,6 +47,9 @@ namespace xo {
                                    obj<AAllocator> mm,
                                    const ArenaHashMapConfig & cfg);
 
+            /** non-trivial destructor for @ref map_ **/
+            ~DGlobalSymtab() = default;
+
             ///@}
             /** @defgroup scm-globalsymtab-access-methods access methods **/
             ///@{
