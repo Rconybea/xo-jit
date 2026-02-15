@@ -81,6 +81,11 @@ namespace xo {
             VirtualSchematikaMachine(const VsmConfig & config,
                                      obj<AAllocator> aux_mm);
 
+            /** non-trivial dtor because of @ref reader_
+             *  indirect dependency on DGlobalSymtab
+             **/
+            ~VirtualSchematikaMachine() = default;
+
             /** allocator for schematika data **/
             obj<AAllocator> allocator() const noexcept;
             /** allocator for runtime errors **/
