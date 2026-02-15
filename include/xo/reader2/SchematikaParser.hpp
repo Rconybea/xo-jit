@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "ParserConfig.hpp"
 #include "ParserStateMachine.hpp"
 #include "ParserResult.hpp"
 #include <xo/tokenizer2/Token.hpp>
@@ -154,6 +155,7 @@ namespace xo {
         class SchematikaParser {
         public:
             using token_type = Token;
+            using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
             using ArenaConfig = xo::mm::ArenaConfig;
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
@@ -164,19 +166,16 @@ namespace xo {
             /** create parser in initial state;
              *  parser is ready to receive tokens via @ref include_token
              *
-             *  @p config        arena configuration for parser stack
+             *  @p config        parser configuration
              *  @p expr_alloc    allocator for schematika expressions.
              *                   Probably shared with execution.
              *  @p aux_alloc     aux allocator for non-copyable memory
              *                   with lifetime bounded by this
              *                   SchematikeParser itself
-             *  @p debug_flag  true to enable debug logging
              **/
-            SchematikaParser(const ArenaConfig & config,
-                             size_t max_stringtable_capacity,
+            SchematikaParser(const ParserConfig & config,
                              obj<AAllocator> expr_alloc,
-                             obj<AAllocator> aux_alloc,
-                             bool debug_flag);
+                             obj<AAllocator> aux_alloc);
 
             /** non-trivial dtor because of @ref psm_ **/
             ~SchematikaParser() = default;

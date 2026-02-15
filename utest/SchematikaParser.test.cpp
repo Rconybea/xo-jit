@@ -20,6 +20,7 @@
 #include <catch2/catch.hpp>
 
 namespace xo {
+    using xo::scm::ParserConfig;
     using xo::scm::SchematikaParser;
     using xo::scm::ASyntaxStateMachine;
     using xo::scm::syntaxstatetype;
@@ -39,14 +40,64 @@ namespace xo {
     using xo::scm::DFloat;
     using xo::scm::DInteger;
 
+    using xo::facet::FacetRegistry;
+
     using xo::mm::ArenaConfig;
     using xo::mm::AAllocator;
     using xo::mm::DArena;
+    using xo::mm::MemorySizeInfo;
     using xo::facet::with_facet;
 
     static InitEvidence s_init = (InitSubsys<S_reader2_tag>::require());
 
     namespace ut {
+        struct ParserFixture {
+            ParserFixture(const std::string & testname, bool debug_flag)
+            {
+                this->aux_arena_
+                    = std::move(DArena(ArenaConfig().with_name(testname).with_size(4 * 1024)));
+                obj<AAllocator,DArena> aux_mm(&aux_arena_);
+
+                this->expr_arena_
+                    = dp<DArena>::make(aux_mm,
+                                       ArenaConfig().with_name("expr").with_size(16 * 1024));
+                obj<AAllocator,DArena> expr_mm(expr_arena_.data());
+
+                ParserConfig cfg;
+                cfg.parser_arena_config_.size_ = 16 * 1024;
+                cfg.symtab_config_.hint_max_capacity_ = 512;
+                cfg.max_stringtable_capacity_ = 512;
+                cfg.debug_flag_ = false;
+
+                this->parser_
+                    = dp<SchematikaParser>::make(aux_mm, cfg, expr_mm, aux_mm);
+            }
+
+            ParserFixture(const ParserFixture & other) = delete;
+            ParserFixture(const ParserFixture && other) = delete;
+
+            bool log_memory_layout(scope * p_log) {
+                auto visitor = [p_log](const MemorySizeInfo & info) {
+                    *p_log && (*p_log)(xtag("resource", info.resource_name_),
+                                       xtag("used", info.used_),
+                                       xtag("alloc", info.allocated_),
+                                       xtag("commit", info.committed_),
+                                       xtag("resv", info.reserved_));
+                };
+
+                aux_arena_.visit_pools(visitor);
+                FacetRegistry::instance().visit_pools(visitor);
+                expr_arena_->visit_pools(visitor);
+                parser_->visit_pools(visitor);
+
+                return true;
+            }
+
+            DArena aux_arena_;
+            dp<DArena> expr_arena_;
+            dp<SchematikaParser> parser_;
+        };
+
         void
         utest_tokenizer_loop(SchematikaParser * parser, std::vector<Token> & tk_v, bool debug_flag)
         {
@@ -82,56 +133,56 @@ namespace xo {
 
         TEST_CASE("SchematikaParser-ctor", "[reader2][SchematikaParser]")
         {
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             REQUIRE(parser.debug_flag() == false);
             REQUIRE(parser.is_at_toplevel() == true);
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-begin-interactive", "[reader2][SchematikaParser]")
         {
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
+            constexpr bool c_debug_flag = false;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
             // after begin_interactive_session, parser has toplevel exprseq
             // but is still "at toplevel" in the sense of ready for input
             REQUIRE(parser.has_incomplete_expr() == false);
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-begin-batch", "[reader2][SchematikaParser]")
         {
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
+            constexpr bool c_debug_flag = false;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_batch_session();
 
             // after begin_translation_unit, parser has toplevel exprseq
             // but is still "at toplevel" in the sense of ready for input
             REQUIRE(parser.has_incomplete_expr() == false);
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-batch-def", "[reader2][SchematikaParser]")
@@ -141,15 +192,8 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ArenaConfig config;
-            config.name_ = testname;
-            config.size_ = 16 * 1024;
-
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_batch_session();
 
@@ -176,6 +220,8 @@ namespace xo {
                 auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
                 REQUIRE(expr);
             }
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-interactive-integer", "[reader2][SchematikaParser]")
@@ -185,15 +231,8 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
-
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
@@ -242,6 +281,8 @@ namespace xo {
             //REQUIRE(result.is_error());
             //// illegal input on token
             //REQUIRE(result.error_description());
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-interactive-float", "[reader2][SchematikaParser]")
@@ -251,15 +292,8 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
-
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
@@ -308,6 +342,8 @@ namespace xo {
             //REQUIRE(result.is_error());
             //// illegal input on token
             //REQUIRE(result.error_description());
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-interactive-string", "[reader2][SchematikaParser]")
@@ -317,15 +353,8 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
-
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
@@ -374,6 +403,8 @@ namespace xo {
             //REQUIRE(result.is_error());
             //// illegal input on token
             //REQUIRE(result.error_description());
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-interactive-arith", "[reader2][SchematikaParser]")
@@ -383,15 +414,8 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
-
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
@@ -438,24 +462,20 @@ namespace xo {
                 REQUIRE(rhs_f64);
                 REQUIRE(rhs_f64->value() == 0.5);
             }
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-interactive-cmp", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag),
                       xtag("test", testname));
 
-            ArenaConfig config
-                = (ArenaConfig().with_name(testname).with_size(16 * 1024));
-
-            DArena expr_arena = DArena::map(config);
-            auto expr_alloc = obj<AAllocator,DArena>(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
@@ -503,6 +523,8 @@ namespace xo {
                 REQUIRE(rhs_i64);
                 REQUIRE(rhs_i64->value() == 312);
             }
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-interactive-lambda", "[reader2][SchematikaParser]")
@@ -512,15 +534,8 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
-
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
@@ -551,6 +566,8 @@ namespace xo {
             };
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-interactive-if", "[reader2][SchematikaParser]")
@@ -560,15 +577,8 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ArenaConfig config;
-            config.name_ = testname;
-            config.size_ = 16 * 1024;
-
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
@@ -590,6 +600,8 @@ namespace xo {
             };
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-interactive-lambda2", "[reader2][SchematikaParser]")
@@ -599,15 +611,8 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
-
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
@@ -636,6 +641,8 @@ namespace xo {
             };
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-interactive-apply", "[reader2][SchematikaParser]")
@@ -645,15 +652,8 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ArenaConfig config;
-            config.name_ = testname;
-            config.size_ = 16 * 1024;
-
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
@@ -687,6 +687,8 @@ namespace xo {
             };
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            log && fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("SchematikaParser-interactive-apply2", "[reader2][SchematikaParser]")
@@ -698,15 +700,8 @@ namespace xo {
             constexpr bool c_debug_flag = true;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ArenaConfig config;
-            config.name_ = "test-arena";
-            config.size_ = 16 * 1024;
-
-            DArena expr_arena = DArena::map(config);
-            obj<AAllocator> expr_alloc = with_facet<AAllocator>::mkobj(&expr_arena);
-            auto aux_alloc = expr_alloc;
-
-            SchematikaParser parser(config, 4096, expr_alloc, aux_alloc, false /*debug_flag*/);
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
 
             parser.begin_interactive_session();
 
@@ -750,7 +745,10 @@ namespace xo {
             };
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            log && fixture.log_memory_layout(&log);
         }
+
     } /*namespace ut*/
 } /*namespace xo*/
 

@@ -23,6 +23,7 @@ namespace xo {
 
     namespace scm {
         ParserStateMachine::ParserStateMachine(const ArenaConfig & config,
+                                               const ArenaHashMapConfig & symtab_config,
                                                size_type max_stringtable_capacity,
                                                obj<AAllocator> expr_alloc,
                                                obj<AAllocator> aux_alloc)
@@ -30,6 +31,7 @@ namespace xo {
               parser_alloc_{DArena::map(config)},
               expr_alloc_{expr_alloc},
               aux_alloc_{aux_alloc},
+              global_symtab_{DGlobalSymtab::make(expr_alloc, aux_alloc, symtab_config)},
               debug_flag_{config.debug_flag_}
         {
         }
@@ -60,6 +62,7 @@ namespace xo {
         {
             stringtable_.visit_pools(visitor);
             parser_alloc_.visit_pools(visitor);
+            global_symtab_->visit_pools(visitor);
 
             // not counting {expr_alloc_, fixed_alloc_}. We don't consider
             // either to be owned by ParserStateMachine

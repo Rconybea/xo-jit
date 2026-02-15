@@ -14,11 +14,12 @@ namespace xo {
                                            obj<AAllocator> fixed_alloc)
                 : tokenizer_{config.tk_buffer_config_,
                              config.tk_debug_flag_},
-                  parser_{config.parser_arena_config_,
-                          config.max_stringtable_cap_,
+                  parser_{ParserConfig(config.parser_arena_config_,
+                                       config.symtab_config_,
+                                       config.max_stringtable_cap_,
+                                       config.parser_debug_flag_),
                           expr_alloc,
-                          fixed_alloc,
-                          config.parser_debug_flag_},
+                          fixed_alloc},
                   debug_flag_{config.reader_debug_flag_}
         {
         }

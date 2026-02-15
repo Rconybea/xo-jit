@@ -14,6 +14,7 @@
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/object2/DArray.hpp>
 #include <xo/alloc2/Allocator.hpp>
+#include <xo/arena/ArenaHashMapConfig.hpp>
 #include <xo/arena/DArena.hpp>
 
 namespace xo {
@@ -38,11 +39,14 @@ namespace xo {
             using ArenaConfig = xo::mm::ArenaConfig;
             using DArena = xo::mm::DArena;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
+            using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
             using size_type = std::size_t;
 
         public:
             /**
              *  @p config        arena configuration for parser state
+             *  @p symtab_config configuration for global symtab
+             *                   (maps separate dedicated memory)
              *  @p max_stringtable_capacity
              *                   hard max size for unique stringtable
              *  @p expr_alloc    allocator for schematika expressions.
@@ -53,6 +57,7 @@ namespace xo {
              *                   same as @p expr_alloc.
              **/
             ParserStateMachine(const ArenaConfig & config,
+                               const ArenaHashMapConfig & symtab_config,
                                size_type max_stringtable_capacity,
                                obj<AAllocator> expr_alloc,
                                obj<AAllocator> aux_alloc);
@@ -320,6 +325,8 @@ namespace xo {
              *  Toplevel definitions go here.
              *
              *  Uses mmap -> non-trivial destructor.
+             *
+             *  TODO: may want to move ownership upstairs
              **/
             dp<DGlobalSymtab> global_symtab_;
 

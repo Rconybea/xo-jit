@@ -20,13 +20,15 @@ namespace xo {
     namespace scm {
         // ----- SchematikaParser -----
 
-        SchematikaParser::SchematikaParser(const ArenaConfig & config,
-                                           size_t max_stringtable_capacity,
+        SchematikaParser::SchematikaParser(const ParserConfig & cfg,
                                            obj<AAllocator> expr_alloc,
-                                           obj<AAllocator> fixed_alloc,
-                                           bool debug_flag)
-        : psm_{config, max_stringtable_capacity, expr_alloc, fixed_alloc},
-          debug_flag_{debug_flag}
+                                           obj<AAllocator> fixed_alloc)
+        : psm_{cfg.parser_arena_config_,
+               cfg.symtab_config_,
+               cfg.max_stringtable_capacity_,
+               expr_alloc,
+               fixed_alloc},
+          debug_flag_{cfg.debug_flag_}
         {
         }
 
