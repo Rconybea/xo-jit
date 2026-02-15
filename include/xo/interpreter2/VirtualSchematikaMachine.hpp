@@ -14,7 +14,7 @@
 #include <xo/reader2/SchematikaReader.hpp>
 #include <xo/expression2/Expression.hpp>
 #include <xo/gc/GCObject.hpp>
-#include <xo/facet/box.hpp>
+#include <xo/alloc2/abox.hpp>
 
 namespace xo {
     namespace scm {
@@ -74,7 +74,12 @@ namespace xo {
             using span_type = xo::mm::span<const char>;
 
         public:
-            VirtualSchematikaMachine(const VsmConfig & config);
+            /** @p config. configuration
+             *  @p aux_mm.  Allocator for miscellaneous dataN
+             *  owned by this VSM.
+             **/
+            VirtualSchematikaMachine(const VsmConfig & config,
+                                     obj<AAllocator> aux_mm);
 
             /** allocator for schematika data **/
             obj<AAllocator> allocator() const noexcept;
@@ -213,10 +218,17 @@ namespace xo {
             /** configuration **/
             VsmConfig config_;
 
+#ifdef NOT_YET
+            /** allocator (likely DArena) for globals.
+             *  For example DArenaHashMap in global symtab,
+             **/
+            obj<AAllocator> aux_mm_;
+#endif
+
             /** allocator (likely DX1Collector or similar) for
              *  expressions and values
              **/
-            box<AAllocator> mm_;
+            abox<AAllocator> mm_;
 
             /** Sidecar allocator for error reporting.
              *  Separate to mitigate interference with @ref mm_
@@ -224,12 +236,12 @@ namespace xo {
              *   an out-of-memory error).
              *  Likely DArena or similar
              **/
-            box<AAllocator> error_mm_;
+            abox<AAllocator> error_mm_;
 
             /** runtime context for this vsm.
              *  For example, provides allocator to primitives
              **/
-            box<ARuntimeContext> rcx_;
+            abox<ARuntimeContext> rcx_;
 
             // consider separate allocator (which _may_ turn out to be the same)
             // for VM stack. Only works for code that doesn't rely on fancy

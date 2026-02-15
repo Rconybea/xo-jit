@@ -9,6 +9,7 @@
 #include <xo/object2/Integer.hpp>
 #include <xo/object2/Boolean.hpp>
 #include <xo/object2/RuntimeError.hpp>
+#include <xo/alloc2/Arena.hpp>
 
 #ifdef NOT_YET
 #include <xo/reader2/SchematikaParser.hpp>
@@ -37,61 +38,80 @@ namespace xo {
     using xo::scm::DRuntimeError;
     using xo::mm::AGCObject;
     using xo::mm::MemorySizeInfo;
+    using xo::mm::AAllocator;
+    using xo::mm::DArena;
+    using xo::mm::ArenaConfig;
     using xo::facet::FacetRegistry;
     using span_type = xo::scm::VirtualSchematikaMachine::span_type;
     using Catch::Matchers::WithinAbs;
 
-#ifdef NOT_YET
-    using xo::scm::SchematikaParser;
-    using xo::scm::ASyntaxStateMachine;
-    using xo::scm::syntaxstatetype;
-//    using xo::scm::DDefineSsm;
-    using xo::scm::DExpectExprSsm;
-//    using xo::scm::defexprstatetype;
-    //using xo::scm::ParserResult;
-    //using xo::scm::parser_result_type;
-    using xo::scm::Token;
-    using xo::scm::DString;
-    using xo::mm::ArenaConfig;
-    using xo::mm::AAllocator;
-    using xo::mm::DArena;
-    using xo::facet::with_facet;
-#endif
     using std::cout;
     using std::endl;
 
     static InitEvidence s_init = (InitSubsys<S_interpreter2_tag>::require());
 
     namespace ut {
+        struct ArenaShim {
+            explicit ArenaShim(const std::string & name, std::size_t size = 16*1024)
+            : arena_(ArenaConfig().with_name(name).with_size(size))
+            {
+            }
+
+            obj<AAllocator,DArena> to_op() { return obj<AAllocator,DArena>(&arena_); }
+
+            DArena arena_;
+        };
+
+        struct VsmFixture {
+            explicit VsmFixture(const std::string & testname,
+                                bool debug_flag,
+                                const VsmConfig & cfg = VsmConfig())
+            : aux_mm_{testname},
+              vsm_{cfg.with_debug_flag(debug_flag), aux_mm_.to_op()}
+            {}
+
+            bool log_memory_layout(scope * p_log) {
+                auto visitor = [p_log](const MemorySizeInfo & info) {
+                    *p_log && (*p_log)(xtag("resource", info.resource_name_),
+                                       xtag("used", info.used_),
+                                       xtag("alloc", info.allocated_),
+                                       xtag("commit", info.committed_),
+                                       xtag("resv", info.reserved_));
+                };
+
+                aux_mm_.arena_.visit_pools(visitor);
+                FacetRegistry::instance().visit_pools(visitor);
+                vsm_.visit_pools(visitor);
+
+                return true;
+            }
+
+            ArenaShim aux_mm_;
+            VirtualSchematikaMachine vsm_;
+        };
+
         TEST_CASE("VirtualSchematikaMachine-ctor", "[interpreter2][VSM]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            scope log(XO_DEBUG(true), xtag("test", testname));
+            bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            VsmConfig cfg;
-            VirtualSchematikaMachine vsm(cfg);
+            VsmFixture vsm_fixture(testname, c_debug_flag);
 
-            auto visitor = [&log](const MemorySizeInfo & info) {
-                log && log(xtag("resource", info.resource_name_),
-                           xtag("used", info.used_),
-                           xtag("alloc", info.allocated_),
-                           xtag("commit", info.committed_),
-                           xtag("resv", info.reserved_));
-            };
-
-            FacetRegistry::instance().visit_pools(visitor);
-            vsm.visit_pools(visitor);
+            log && vsm_fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("VirtualSchematikaMachine-const1", "[interpreter2][VSM]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            scope log(XO_DEBUG(true), xtag("test", testname));
+            constexpr bool c_debug_flag = false;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            VsmConfig cfg;
-            VirtualSchematikaMachine vsm(cfg);
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+
+            auto & vsm = vsm_fixture.vsm_;
 
             bool eof_flag = false;
 
@@ -109,26 +129,19 @@ namespace xo {
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
 
-            auto visitor = [&log](const MemorySizeInfo & info) {
-                log && log(xtag("resource", info.resource_name_),
-                           xtag("used", info.used_),
-                           xtag("alloc", info.allocated_),
-                           xtag("commit", info.committed_),
-                           xtag("resv", info.reserved_));
-            };
-
-            FacetRegistry::instance().visit_pools(visitor);
-            vsm.visit_pools(visitor);
+            log && vsm_fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("VirtualSchematikaMachine-const2", "[interpreter2][VSM]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            scope log(XO_DEBUG(true), xtag("test", testname));
+            constexpr bool c_debug_flag = false;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            VsmConfig cfg;
-            VirtualSchematikaMachine vsm(cfg);
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+
+            auto & vsm = vsm_fixture.vsm_;
 
             bool eof_flag = false;
 
@@ -148,26 +161,18 @@ namespace xo {
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
 
-            auto visitor = [&log](const MemorySizeInfo & info) {
-                log && log(xtag("resource", info.resource_name_),
-                           xtag("used", info.used_),
-                           xtag("alloc", info.allocated_),
-                           xtag("commit", info.committed_),
-                           xtag("resv", info.reserved_));
-            };
-
-            FacetRegistry::instance().visit_pools(visitor);
-            vsm.visit_pools(visitor);
+            log && vsm_fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("VirtualSchematikaMachine-arith1", "[interpreter2][VSM]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            scope log(XO_DEBUG(true), xtag("test", testname));
+            constexpr bool c_debug_flag = false;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            VsmConfig cfg;
-            VirtualSchematikaMachine vsm(cfg);
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
 
             bool eof_flag = false;
 
@@ -187,16 +192,7 @@ namespace xo {
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
 
-            auto visitor = [&log](const MemorySizeInfo & info) {
-                log && log(xtag("resource", info.resource_name_),
-                           xtag("used", info.used_),
-                           xtag("alloc", info.allocated_),
-                           xtag("commit", info.committed_),
-                           xtag("resv", info.reserved_));
-            };
-
-            FacetRegistry::instance().visit_pools(visitor);
-            vsm.visit_pools(visitor);
+            log && vsm_fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("VirtualSchematikaMachine-cmp1", "[interpreter2][VSM]")
@@ -206,13 +202,15 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            VsmConfig cfg;
-            VirtualSchematikaMachine vsm(cfg);
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
 
             bool eof_flag = false;
 
             vsm.begin_interactive_session();
-            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("123 == 123;"), eof_flag);
+            VsmResultExt res
+                = vsm.read_eval_print(span_type::from_cstr("123 == 123;"),
+                                      eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -227,32 +225,25 @@ namespace xo {
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
 
-            auto visitor = [&log](const MemorySizeInfo & info) {
-                log && log(xtag("resource", info.resource_name_),
-                           xtag("used", info.used_),
-                           xtag("alloc", info.allocated_),
-                           xtag("commit", info.committed_),
-                           xtag("resv", info.reserved_));
-            };
-
-            FacetRegistry::instance().visit_pools(visitor);
-            vsm.visit_pools(visitor);
+            log && vsm_fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("VirtualSchematikaMachine-if", "[interpreter2][VSM]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            VsmConfig cfg;
-            VirtualSchematikaMachine vsm(cfg);
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
 
             bool eof_flag = false;
 
             vsm.begin_interactive_session();
-            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("if 123 == 123 then \"equal\" else \"notequal\";"), eof_flag);
+            VsmResultExt res
+                = vsm.read_eval_print(span_type::from_cstr("if 123 == 123 then \"equal\" else \"notequal\";"),
+                                      eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -267,16 +258,7 @@ namespace xo {
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
 
-            auto visitor = [&log](const MemorySizeInfo & info) {
-                log && log(xtag("resource", info.resource_name_),
-                           xtag("used", info.used_),
-                           xtag("alloc", info.allocated_),
-                           xtag("commit", info.committed_),
-                           xtag("resv", info.reserved_));
-            };
-
-            FacetRegistry::instance().visit_pools(visitor);
-            vsm.visit_pools(visitor);
+            log && vsm_fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("VirtualSchematikaMachine-lambda1", "[interpreter2][VSM]")
@@ -286,13 +268,15 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            VsmConfig cfg;
-            VirtualSchematikaMachine vsm(cfg);
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
 
             bool eof_flag = false;
 
             vsm.begin_interactive_session();
-            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("lambda (x : i64) -> i64 { x * x; }"), eof_flag);
+            VsmResultExt res
+                = vsm.read_eval_print(span_type::from_cstr("lambda (x : i64) -> i64 { x * x; }"),
+                                      eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -307,26 +291,18 @@ namespace xo {
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
 
-            auto visitor = [&log](const MemorySizeInfo & info) {
-                log && log(xtag("resource", info.resource_name_),
-                           xtag("used", info.used_),
-                           xtag("alloc", info.allocated_),
-                           xtag("commit", info.committed_),
-                           xtag("resv", info.reserved_));
-            };
-
-            FacetRegistry::instance().visit_pools(visitor);
-            vsm.visit_pools(visitor);
+            log && vsm_fixture.log_memory_layout(&log);
         }
 
         TEST_CASE("VirtualSchematikaMachine-apply2", "[interpreter2][VSM]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            scope log(XO_DEBUG(false), xtag("test", testname));
+            bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            VsmConfig cfg;
-            VirtualSchematikaMachine vsm(cfg);
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
 
             bool eof_flag = false;
 
@@ -341,7 +317,7 @@ namespace xo {
 
             log && log(xtag("res.tseq", res.value()->_typeseq()));
 
-            // currently get not-implemented error 
+            // currently get not-implemented error
             auto x = obj<AGCObject,DInteger>::from(*res.value());
 
             REQUIRE(x);
@@ -354,16 +330,7 @@ namespace xo {
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
 
-            auto visitor = [&log](const MemorySizeInfo & info) {
-                log && log(xtag("resource", info.resource_name_),
-                           xtag("used", info.used_),
-                           xtag("alloc", info.allocated_),
-                           xtag("commit", info.committed_),
-                           xtag("resv", info.reserved_));
-            };
-
-            FacetRegistry::instance().visit_pools(visitor);
-            vsm.visit_pools(visitor);
+            log && vsm_fixture.log_memory_layout(&log);
         }
 
     } /*namespace ut*/

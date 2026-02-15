@@ -54,16 +54,16 @@ namespace xo {
         // NOTE: using heap here for {DX1Collector, DArena, DVsmRcx} instances
         //       (though DX1Collector allocations will be from explictly mmap'd memory)
         //
-        VirtualSchematikaMachine::VirtualSchematikaMachine(const VsmConfig & config)
+        VirtualSchematikaMachine::VirtualSchematikaMachine(const VsmConfig & config,
+                                                           obj<AAllocator> aux_mm)
         : config_{config},
-          mm_(box<AAllocator,DX1Collector>(new DX1Collector(config.x1_config_))),
-          rcx_(box<ARuntimeContext,DVsmRcx>(new DVsmRcx(this))),
-          reader_{config.rdr_config_, mm_.to_op()}
+          mm_(abox<AAllocator,DX1Collector>::make(aux_mm, config.x1_config_)),
+          rcx_(abox<ARuntimeContext,DVsmRcx>::make(aux_mm, this)),
+          reader_{config.rdr_config_, mm_.to_op(), aux_mm}
         {
             {
-                DArena * arena = new DArena();
+                DArena * arena = new DArena(config_.error_config_);
                 assert(arena);
-                *arena = DArena::map(config_.error_config_);
 
                 error_mm_.adopt(obj<AAllocator,DArena>(arena));
             }
@@ -165,7 +165,7 @@ namespace xo {
         bool
         VirtualSchematikaMachine::execute_one()
         {
-            scope log(XO_DEBUG(true));
+            scope log(XO_DEBUG(config_.debug_flag_));
             log && log(xtag("pc", pc_),
                        xtag("cont", cont_));
 
@@ -333,10 +333,10 @@ namespace xo {
 
             // for now: halt VSM execution
             // TODO: some combination of
-            // 1. emit stack trace 
+            // 1. emit stack trace
             // 2. go to debugger
             // 3. have every vsm instruction check inputs for errors
-            
+
             this->pc_ = VsmInstr::c_halt;
         }
 
@@ -396,7 +396,7 @@ namespace xo {
             // control:
             //   self -> eval(test) -> ifelse_cont -> eval(when_true)
             //                                     -> eval(when_false)
-            
+
             auto ifelse_expr = obj<AExpression,DIfElseExpr>::from(expr_);
 
             obj<AGCObject,DVsmIfElseContFrame> ifelse_frame
@@ -433,7 +433,7 @@ namespace xo {
                 return;
             }
 
-            auto seqexpr_frame 
+            auto seqexpr_frame
                 = obj<AGCObject,DVsmSeqContFrame>
                       (DVsmSeqContFrame::make(mm_.to_op(),
                                               this->stack_ /*saved stack*/,
@@ -693,10 +693,10 @@ namespace xo {
 
                 // for now: halt VSM execution
                 // TODO: some combination of
-                // 1. emit stack trace 
+                // 1. emit stack trace
                 // 2. go to debugger
                 // 3. have every vsm instruction check inputs for errors
-            
+
                 this->pc_ = VsmInstr::c_halt;
             }
         }
