@@ -51,6 +51,9 @@ namespace xo {
                              obj<AAllocator> expr_alloc,
                              obj<AAllocator> fixed_alloc);
 
+            /** non-trivial dtor because of @p parser **/
+            ~SchematikaReader() = default;
+
             /** visit reader-owned memory pools; call visitor(info) for each.
              *  Specifically exclude expr_alloc, since we don't consider
              *  that reader-owned

@@ -178,6 +178,9 @@ namespace xo {
                              obj<AAllocator> aux_alloc,
                              bool debug_flag);
 
+            /** non-trivial dtor because of @ref psm_ **/
+            ~SchematikaParser() = default;
+
             /** scm-schematikaparser-access-methods **/
             ///@{
 

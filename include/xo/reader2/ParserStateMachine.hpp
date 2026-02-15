@@ -57,6 +57,9 @@ namespace xo {
                                obj<AAllocator> expr_alloc,
                                obj<AAllocator> aux_alloc);
 
+            /** non-trivial dtor for @ref global_symtab_ **/
+            ~ParserStateMachine() = default;
+
             /** @defgroup scm-parserstatemachine-accessors accessor methods **/
             ///@{
 
@@ -313,12 +316,12 @@ namespace xo {
              **/
             DLocalSymtab * local_symtab_ = nullptr;
 
-#ifdef NOT_YET
             /** global symbol table.
              *  Toplevel definitions go here.
+             *
+             *  Uses mmap -> non-trivial destructor.
              **/
-            DGlobalSymtab * global_symtab_ = nullptr;
-#endif
+            dp<DGlobalSymtab> global_symtab_;
 
             /** current output from parser **/
             ParserResult result_;
