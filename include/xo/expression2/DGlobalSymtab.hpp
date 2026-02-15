@@ -43,9 +43,9 @@ namespace xo {
              *  Use memory from @p mm for DGlobalSymtab instance.
              *  Hashmap configured per @p cfg.
              **/
-            dp<DGlobalSymtab> make(obj<AAllocator> fixed_mm,
-                                   obj<AAllocator> mm,
-                                   const ArenaHashMapConfig & cfg);
+            static dp<DGlobalSymtab> make(obj<AAllocator> mm,
+                                          obj<AAllocator> fixed_mm,
+                                          const ArenaHashMapConfig & cfg);
 
             /** non-trivial destructor for @ref map_ **/
             ~DGlobalSymtab() = default;

@@ -25,8 +25,8 @@ namespace xo {
         }
 
         dp<DGlobalSymtab>
-        DGlobalSymtab::make(obj<AAllocator> aux_mm,
-                            obj<AAllocator> mm,
+        DGlobalSymtab::make(obj<AAllocator> mm,
+                            obj<AAllocator> aux_mm,
                             const ArenaHashMapConfig & cfg)
         {
             auto map = dp<repr_type>::make(aux_mm, cfg);
