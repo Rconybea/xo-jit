@@ -61,7 +61,7 @@ namespace xo {
             }
 
         private:
-            int32_t seqno_ = 0;
+            int32_t seqno_ = -1;
             std::string_view name_;
         };
 
@@ -91,10 +91,11 @@ namespace xo {
                 return typeseq(xo::reflect::typerecd::recd<T>().seqno());
             }
 
+            bool is_sentinel() const { return seqno_ == -1; }
             int32_t seqno() const { return seqno_; }
 
         private:
-            int32_t seqno_ = 0;
+            int32_t seqno_ = -1;
         };
 
         //template <typename Tag>
