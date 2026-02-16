@@ -77,6 +77,8 @@ namespace xo {
 
             // misc types showing up in aux arena
             TypeRegistry::register_type<SchematikaParser>();
+            // misc types showing up in parser stack arena
+            TypeRegistry::register_type<ParserStack>();
 
             log && log(xtag("DExprSeqState.tseq", typeseq::id<DExprSeqState>()));
             log && log(xtag("DDefineSsm.tseq", typeseq::id<DDefineSsm>()));

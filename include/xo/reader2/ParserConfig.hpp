@@ -20,7 +20,7 @@ namespace xo {
             ArenaConfig parser_arena_config_ { .name_ = "parser-arena",
                                                .size_ = 2*1024*1024,
                                                .hugepage_z_ = 2*1024*1024,
-                                               .store_header_flag_ = false,
+                                               .store_header_flag_ = true,
                                                .header_{},
                                                .debug_flag_ = false };
 
