@@ -39,13 +39,13 @@ namespace xo {
          **/
         class ISyntaxStateMachine_DToplevelSeqSsm {
         public:
-            /** @defgroup scm-syntaxstatemachine-dexprseqstate-type-traits **/
+            /** @defgroup scm-syntaxstatemachine-dtoplevelseqssm-type-traits **/
             ///@{
             using TypeDescr = xo::scm::ASyntaxStateMachine::TypeDescr;
             using Copaque = xo::scm::ASyntaxStateMachine::Copaque;
             using Opaque = xo::scm::ASyntaxStateMachine::Opaque;
             ///@}
-            /** @defgroup scm-syntaxstatemachine-dexprseqstate-methods **/
+            /** @defgroup scm-syntaxstatemachine-dtoplevelseqssm-methods **/
             ///@{
             // const methods
             /** identify a type of syntax state machine **/

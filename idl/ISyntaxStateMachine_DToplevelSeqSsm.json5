@@ -1,5 +1,6 @@
 {
     mode: "implementation",
+    output_cpp_dir: "src/reader2",
     includes: [ "\"SyntaxStateMachine.hpp\"",
                 "\"ssm/ISyntaxStateMachine_Xfer.hpp\"" ],
     local_types: [ ],

@@ -31,7 +31,6 @@ xo_add_genfacet(
     INPUT idl/SyntaxStateMachine.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
     )
 
 # ----------------------------------------------------------------
@@ -45,7 +44,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DToplevelSeqSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -57,7 +55,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DToplevelSeqSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -71,7 +68,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DDefineSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -83,7 +79,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DDefineSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -97,7 +92,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DLambdaSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -109,7 +103,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DLambdaSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -123,7 +116,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DParenSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -135,7 +127,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DParenSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -149,7 +140,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DExpectFormalArglistSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -161,7 +151,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DExpectFormalArglistSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -175,7 +164,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DExpectFormalArgSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -187,7 +175,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DExpectFormalArgSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -201,7 +188,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DIfElseSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -213,7 +199,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DIfElseSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -227,7 +212,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DSequenceSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -239,7 +223,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DSequenceSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -253,7 +236,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DApplySsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -265,7 +247,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DApplySsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -279,7 +260,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DExpectSymbolSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -291,7 +271,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DExpectSymbolSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -305,7 +284,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DExpectTypeSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -317,7 +295,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DExpectTypeSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -331,7 +308,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DExpectExprSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -343,7 +319,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DExpectExprSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------
@@ -357,7 +332,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISyntaxStateMachine_DProgressSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # note: manual target; generated code committed to git
@@ -369,7 +343,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DProgressSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
-    OUTPUT_CPP_DIR src/reader2
 )
 
 # ----------------------------------------------------------------

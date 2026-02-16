@@ -1,5 +1,6 @@
 {
     mode: "facet",
+    output_cpp_dir: "src/reader2",
     // includes in ASyntaxStateMachine.hpp
     includes: [
         "\"ParserStateMachine.hpp\"",

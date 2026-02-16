@@ -39,13 +39,13 @@ namespace xo {
          **/
         class IPrintable_DToplevelSeqSsm {
         public:
-            /** @defgroup scm-printable-dexprseqstate-type-traits **/
+            /** @defgroup scm-printable-dtoplevelseqssm-type-traits **/
             ///@{
             using ppindentinfo = xo::print::APrintable::ppindentinfo;
             using Copaque = xo::print::APrintable::Copaque;
             using Opaque = xo::print::APrintable::Opaque;
             ///@}
-            /** @defgroup scm-printable-dexprseqstate-methods **/
+            /** @defgroup scm-printable-dtoplevelseqssm-methods **/
             ///@{
             // const methods
             /** Pretty-printing support for this object.
