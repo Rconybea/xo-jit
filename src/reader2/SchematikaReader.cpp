@@ -11,7 +11,7 @@ namespace xo {
     namespace scm {
         SchematikaReader::SchematikaReader(const ReaderConfig & config,
                                            obj<AAllocator> expr_alloc,
-                                           obj<AAllocator> fixed_alloc)
+                                           obj<AAllocator> aux_alloc)
                 : tokenizer_{config.tk_buffer_config_,
                              config.tk_debug_flag_},
                   parser_{ParserConfig(config.parser_arena_config_,
@@ -19,7 +19,7 @@ namespace xo {
                                        config.max_stringtable_cap_,
                                        config.parser_debug_flag_),
                           expr_alloc,
-                          fixed_alloc},
+                          aux_alloc},
                   debug_flag_{config.reader_debug_flag_}
         {
         }

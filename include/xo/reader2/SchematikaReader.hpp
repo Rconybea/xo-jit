@@ -49,7 +49,7 @@ namespace xo {
              **/
             SchematikaReader(const ReaderConfig & config,
                              obj<AAllocator> expr_alloc,
-                             obj<AAllocator> fixed_alloc);
+                             obj<AAllocator> aux_alloc);
 
             /** non-trivial dtor because of @p parser **/
             ~SchematikaReader() = default;
