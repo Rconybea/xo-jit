@@ -65,14 +65,14 @@ namespace xo {
         void
         SchematikaParser::begin_interactive_session()
         {
-            DExprSeqState::establish_interactive(psm_.expr_alloc(), &psm_);
+            DExprSeqState::establish_interactive(psm_.parser_alloc(), &psm_);
 
         }
 
         void
         SchematikaParser::begin_batch_session()
         {
-            DExprSeqState::establish_batch(psm_.expr_alloc(), &psm_);
+            DExprSeqState::establish_batch(psm_.parser_alloc(), &psm_);
         }
 
         const ParserResult &

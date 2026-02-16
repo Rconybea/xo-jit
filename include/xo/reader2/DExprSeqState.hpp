@@ -41,16 +41,17 @@ namespace xo {
             using Super = DSyntaxStateMachine<DExprSeqState>;
             using TypeDescr = xo::reflect::TypeDescr;
             using AAllocator = xo::mm::AAllocator;
+            using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             explicit DExprSeqState(exprseqtype ty);
 
             /** start interactive top-level session **/
-            static void establish_interactive(obj<AAllocator> mm,
+            static void establish_interactive(DArena & mm,
                                               ParserStateMachine * p_psm);
             /** start non-interactive top-level session **/
-            static void establish_batch(obj<AAllocator> mm,
+            static void establish_batch(DArena & mm,
                                         ParserStateMachine * p_psm);
 
         public:

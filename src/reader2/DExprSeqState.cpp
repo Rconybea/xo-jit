@@ -35,6 +35,7 @@ namespace xo {
     using xo::scm::DFloat;
     using xo::mm::AGCObject;
     using xo::mm::AAllocator;
+    using xo::mm::DArena;
     using xo::facet::with_facet;
     using xo::reflect::typeseq;
 
@@ -59,7 +60,7 @@ namespace xo {
 
         namespace {
             obj<ASyntaxStateMachine>
-            make_exprseq_ssm(obj<AAllocator> mm,
+            make_exprseq_ssm(DArena & mm,
                              exprseqtype seqtype)
             {
                 void * mem = mm.alloc(typeseq::id<DExprSeqState>(),
@@ -67,12 +68,12 @@ namespace xo {
 
                 DExprSeqState * ssm = new (mem) DExprSeqState(seqtype);
 
-                return with_facet<ASyntaxStateMachine>::mkobj(ssm);
+                return obj<ASyntaxStateMachine,DExprSeqState>(ssm);
             }
         }
 
         void
-        DExprSeqState::establish_interactive(obj<AAllocator> mm,
+        DExprSeqState::establish_interactive(DArena & mm,
                                              ParserStateMachine * p_psm)
         {
             p_psm->establish_toplevel_ssm(make_exprseq_ssm
@@ -81,7 +82,7 @@ namespace xo {
         }
 
         void
-        DExprSeqState::establish_batch(obj<AAllocator> mm,
+        DExprSeqState::establish_batch(DArena & mm,
                                        ParserStateMachine * p_psm)
         {
             p_psm->establish_toplevel_ssm(make_exprseq_ssm
