@@ -1699,10 +1699,6 @@ function(xo_add_genfacet)
     if(NOT DEFINED GF_OUTPUT_IMPL_SUBDIR)
         message(FATAL_ERROR "xo_add_genfacet: OUTPUT_IMPL_SUBDIR is required")
     endif()
-    if(NOT DEFINED GF_OUTPUT_CPP_DIR)
-        message(FATAL_ERROR "xo_add_genfacet: OUTPUT_CPP_DIR is required")
-    endif()
-
     find_program(GENFACET_EXECUTABLE NAMES genfacet
         HINTS ${CMAKE_SOURCE_DIR}/xo-facet/codegen
         DOC "path to xo genfacet code generator"
@@ -1714,8 +1710,13 @@ function(xo_add_genfacet)
         ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/A${GF_FACET}.hpp
         ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/I${GF_FACET}_Any.hpp
         ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/I${GF_FACET}_Xfer.hpp
-        ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/R${GF_FACET}.hpp
-        ${GF_OUTPUT_CPP_DIR}/I${GF_FACET}_Any.cpp)
+        ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/R${GF_FACET}.hpp)
+
+    set(_output_cpp_args "")
+    if(DEFINED GF_OUTPUT_CPP_DIR)
+        list(APPEND generatedFiles ${GF_OUTPUT_CPP_DIR}/I${GF_FACET}_Any.cpp)
+        set(_output_cpp_args --output-cpp ${GF_OUTPUT_CPP_DIR})
+    endif()
 
     #message(STATUS "generatedFiles=${generatedFiles}")
 
@@ -1726,7 +1727,7 @@ function(xo_add_genfacet)
             --input ${GF_INPUT}
             --output-hpp ${GF_OUTPUT_HPP_DIR}
             --output-impl-hpp ${GF_OUTPUT_IMPL_SUBDIR}
-            --output-cpp ${GF_OUTPUT_CPP_DIR}
+            ${_output_cpp_args}
         DEPENDS ${GF_INPUT}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating facet source files from ${GF_INPUT}"
@@ -1775,10 +1776,6 @@ function(xo_add_genfacetimpl)
     if(NOT DEFINED GF_OUTPUT_IMPL_SUBDIR)
         message(FATAL_ERROR "xo_add_genfacetimpl: OUTPUT_IMPL_SUBDIR is required")
     endif()
-    if(NOT DEFINED GF_OUTPUT_CPP_DIR)
-        message(FATAL_ERROR "xo_add_genfacetimpl: OUTPUT_CPP_DIR is required")
-    endif()
-
     if(NOT DEFINED GF_FACET_DIR)
         if (NOT DEFINED GF_FACET_PKG)
             message(FATAL_ERROR "xo_add_genfacetimpl: FACET_PKG or FACET_DIR required")
@@ -1795,8 +1792,13 @@ function(xo_add_genfacetimpl)
     message(STATUS "GENFACET_EXECUTABLE=${GENFACET_EXECUTABLE}")
 
     set(generatedFiles
-        ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/I${GF_FACET}_D${GF_REPR}.hpp
-        ${GF_OUTPUT_CPP_DIR}/I${GF_FACET}_D${GF_REPR}.cpp)
+        ${GF_OUTPUT_HPP_DIR}/${GF_OUTPUT_IMPL_SUBDIR}/I${GF_FACET}_D${GF_REPR}.hpp)
+
+    set(_output_cpp_args "")
+    if(DEFINED GF_OUTPUT_CPP_DIR)
+        list(APPEND generatedFiles ${GF_OUTPUT_CPP_DIR}/I${GF_FACET}_D${GF_REPR}.cpp)
+        set(_output_cpp_args --output-cpp ${GF_OUTPUT_CPP_DIR})
+    endif()
 
     # Build the genfacet command.
     # But careful: can't have the same generated files in two different rules,
@@ -1808,7 +1810,7 @@ function(xo_add_genfacetimpl)
             --facet-dir ${GF_FACET_DIR}
             --output-hpp ${GF_OUTPUT_HPP_DIR}
             --output-impl-hpp ${GF_OUTPUT_IMPL_SUBDIR}
-            --output-cpp ${GF_OUTPUT_CPP_DIR}
+            ${_output_cpp_args}
         DEPENDS ${GF_INPUT}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating facet source files from ${GF_INPUT}"
