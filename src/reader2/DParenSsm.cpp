@@ -40,7 +40,7 @@ namespace xo {
         {}
 
         DParenSsm *
-        DParenSsm::make(DArena & mm)
+        DParenSsm::_make(DArena & mm)
         {
             void * mem = mm.alloc(typeseq::id<DParenSsm>(),
                                   sizeof(DParenSsm));
@@ -48,14 +48,20 @@ namespace xo {
             return new (mem) DParenSsm();
         }
 
+        obj<ASyntaxStateMachine,DParenSsm>
+        DParenSsm::make(DArena & mm)
+        {
+            return obj<ASyntaxStateMachine,DParenSsm>(_make(mm));
+        }
+
         void
         DParenSsm::start(ParserStateMachine * p_psm)
         {
-            DParenSsm * paren_ssm = DParenSsm::make(p_psm->parser_alloc());
+            DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
 
-            auto ssm = with_facet<ASyntaxStateMachine>::mkobj(paren_ssm);
+            auto paren_ssm = DParenSsm::make(p_psm->parser_alloc());
 
-            p_psm->push_ssm(ssm);
+            p_psm->push_ssm(ckp, paren_ssm);
         }
 
         syntaxstatetype

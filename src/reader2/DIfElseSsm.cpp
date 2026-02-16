@@ -70,13 +70,15 @@ namespace xo {
         {
             scope log(XO_DEBUG(p_psm->debug_flag()));
 
+            DArena::Checkpoint ckp = parser_mm.checkpoint();
+
             DIfElseExpr * if_expr = DIfElseExpr::_make_empty(expr_mm);
             DIfElseSsm * if_ssm = DIfElseSsm::_make(parser_mm, if_expr);
 
             obj<ASyntaxStateMachine> ssm
                 = with_facet<ASyntaxStateMachine>::mkobj(if_ssm);
 
-            p_psm->push_ssm(ssm);
+            p_psm->push_ssm(ckp, ssm);
 
             // note: triggers poly dispatch
             p_psm->on_token(Token::if_token());

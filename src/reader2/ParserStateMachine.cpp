@@ -75,18 +75,20 @@ namespace xo {
 
             assert(stack_ == nullptr);
 
-            this->stack_ = ParserStack::push(nullptr /*stack*/, parser_alloc_, ssm);
+            DArena::Checkpoint ckp = parser_alloc_.checkpoint();
+
+            this->stack_ = ParserStack::push(nullptr /*stack*/, ckp, parser_alloc_, ssm);
             this->parser_alloc_ckp_ = parser_alloc_.checkpoint();
         }
 
         void
-        ParserStateMachine::push_ssm(obj<ASyntaxStateMachine> ssm)
+        ParserStateMachine::push_ssm(DArena::Checkpoint ckp, obj<ASyntaxStateMachine> ssm)
         {
             scope log(XO_DEBUG(debug_flag_));
 
             // note: using parser_alloc_ for parser stack, since stacklike behavior
 
-            this->stack_ = ParserStack::push(stack_, parser_alloc_, ssm);
+            this->stack_ = ParserStack::push(stack_, ckp, parser_alloc_, ssm);
         }
 
         void

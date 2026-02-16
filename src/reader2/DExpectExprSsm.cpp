@@ -69,6 +69,8 @@ namespace xo {
                               bool cxl_on_rightbrace,
                               ParserStateMachine * p_psm)
         {
+            DArena::Checkpoint ckp = mm.checkpoint();
+
             DExpectExprSsm * exp_expr
                 = DExpectExprSsm::make(mm,
                                        allow_defs,
@@ -76,7 +78,7 @@ namespace xo {
             obj<ASyntaxStateMachine> ssm
                 = with_facet<ASyntaxStateMachine>::mkobj(exp_expr);
 
-            p_psm->push_ssm(ssm);
+            p_psm->push_ssm(ckp, ssm);
         }
 
         void

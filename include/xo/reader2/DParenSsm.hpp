@@ -62,7 +62,10 @@ namespace xo {
 
             /** create instance using memory from @p parser_mm
              **/
-            static DParenSsm * make(DArena & parser_mm);
+            static DParenSsm * _make(DArena & parser_mm);
+
+            /** create fop pointing with new DParenSsm using memory from @p parser_mm **/
+            static obj<ASyntaxStateMachine,DParenSsm> make(DArena & parser_mm);
 
             /** push DParenSsm instance onto @p p_psm stack **/
             static void start(ParserStateMachine * p_psm);

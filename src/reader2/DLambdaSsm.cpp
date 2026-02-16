@@ -78,7 +78,9 @@ namespace xo {
         void
         DLambdaSsm::start(ParserStateMachine * p_psm)
         {
-            p_psm->push_ssm(DLambdaSsm::make(p_psm->parser_alloc()));
+            DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
+
+            p_psm->push_ssm(ckp, DLambdaSsm::make(p_psm->parser_alloc()));
             p_psm->on_token(Token::lambda_token());
         }
 

@@ -343,13 +343,20 @@ namespace xo {
         {}
 
         DDefineSsm *
-        DDefineSsm::make(DArena & mm,
-                         DDefineExpr * def_expr)
+        DDefineSsm::_make(DArena & mm,
+                          DDefineExpr * def_expr)
         {
             void * mem = mm.alloc(typeseq::id<DDefineSsm>(),
                                   sizeof(DDefineSsm));
 
             return new (mem) DDefineSsm(def_expr);
+        }
+
+        obj<ASyntaxStateMachine,DDefineSsm>
+        DDefineSsm::make(DArena & mm,
+                         DDefineExpr * def_expr)
+        {
+            return obj<ASyntaxStateMachine,DDefineSsm>(_make(mm, def_expr));
         }
 
         void
@@ -361,14 +368,13 @@ namespace xo {
 
             assert(p_psm->stack());
 
+            DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
+
             DDefineExpr * def_expr = DDefineExpr::make_empty(expr_mm);
 
-            DDefineSsm * define_ssm = DDefineSsm::make(mm, def_expr);
+            auto define_ssm = DDefineSsm::make(mm, def_expr);
 
-            obj<ASyntaxStateMachine> ssm
-                = with_facet<ASyntaxStateMachine>::mkobj(define_ssm);
-
-            p_psm->push_ssm(ssm);
+            p_psm->push_ssm(ckp, define_ssm);
 
             // note: triggers poly dispatch
             p_psm->on_token(Token::def_token());

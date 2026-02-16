@@ -164,12 +164,14 @@ namespace xo {
                             optype op,
                             ParserStateMachine * p_psm)
         {
+            DArena::Checkpoint ckp = parser_mm.checkpoint();
+
             DProgressSsm * progress_ssm
                 = DProgressSsm::make(parser_mm, lhs, op);
 
             obj<ASyntaxStateMachine,DProgressSsm> ssm(progress_ssm);
 
-            p_psm->push_ssm(ssm);
+            p_psm->push_ssm(ckp, ssm);
         }
 
         void
@@ -323,8 +325,6 @@ namespace xo {
                                           ParserStateMachine * p_psm)
         {
             scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            (void)tk;
 
             obj<AExpression> expr = this->assemble_expr(p_psm);
 

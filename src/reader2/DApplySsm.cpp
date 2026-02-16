@@ -89,14 +89,14 @@ namespace xo {
         {
             scope log(XO_DEBUG(p_psm->debug_flag()));
 
+            DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
+
             DApplySsm * apply_ssm
                 = DApplySsm::make(p_psm->parser_alloc(), fn_expr);
 
             obj<ASyntaxStateMachine,DApplySsm> ssm(apply_ssm);
 
-            p_psm->push_ssm(ssm);
-            //OBSOLETE //p_psm->top_exprstate().on_expr(fn_expr.get(), p_psm);
-            //OBSOLETE //p_psm->on_token(token_type::leftparen(), p_psm);
+            p_psm->push_ssm(ckp, ssm);
         }
 
         syntaxstatetype

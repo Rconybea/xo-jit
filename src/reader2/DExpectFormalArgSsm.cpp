@@ -56,7 +56,9 @@ namespace xo {
         void
         DExpectFormalArgSsm::start(ParserStateMachine * p_psm)
         {
-            p_psm->push_ssm(DExpectFormalArgSsm::make(p_psm->parser_alloc()));
+            DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
+
+            p_psm->push_ssm(ckp, DExpectFormalArgSsm::make(p_psm->parser_alloc()));
 
             DExpectSymbolSsm::start(p_psm);
         }

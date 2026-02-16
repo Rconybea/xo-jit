@@ -30,9 +30,11 @@ namespace xo {
                         ParserStack * parent);
 
             /** create new top of stack for syntax @p ssm, using memory from @p mm.
-             *  previous stack given by @p parent
+             *  previous stack given by @p parent.
+             *  Checkpoint @p ckp will refer to stack _before_ allocating @p ssm
              **/
             static ParserStack * push(ParserStack * stack,
+                                      DArena::Checkpoint ckp,
                                       DArena & mm,
                                       obj<ASyntaxStateMachine> ssm);
 

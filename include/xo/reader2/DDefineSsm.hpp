@@ -87,8 +87,12 @@ namespace xo {
             /** create instance using memory from @p parser_mm.
              *  Initial expression scaffold @p def_expr
              **/
-            static DDefineSsm * make(DArena & parser_mm,
-                                     DDefineExpr * def_expr);
+            static DDefineSsm * _make(DArena & parser_mm,
+                                      DDefineExpr * def_expr);
+
+            /** create fop referring to new DDefineSsm **/
+            static obj<ASyntaxStateMachine,DDefineSsm> make(DArena & parser_mm,
+                                                            DDefineExpr * def_expr);
 
             /** start nested parser for a define-expression,
              *  on top of parser state machine @p p_psm

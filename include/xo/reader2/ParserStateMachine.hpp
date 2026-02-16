@@ -97,8 +97,10 @@ namespace xo {
             /** establish toplevel @p ssm.  Must have empty stack **/
             void establish_toplevel_ssm(obj<ASyntaxStateMachine> ssm);
 
-            /** push syntax @p ssm onto @ref stack_ **/
-            void push_ssm(obj<ASyntaxStateMachine> ssm);
+            /** push syntax @p ssm onto @ref stack_, restore parser stack to @p ckp
+             *  when popped
+             **/
+            void push_ssm(DArena::Checkpoint ckp, obj<ASyntaxStateMachine> ssm);
 
             /** pop syntax state machine from top of @ref stack_ **/
             void pop_ssm();

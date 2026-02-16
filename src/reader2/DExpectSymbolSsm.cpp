@@ -31,6 +31,8 @@ namespace xo {
         void
         DExpectSymbolSsm::start(ParserStateMachine * p_psm)
         {
+            DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
+
             DExpectSymbolSsm * sym_ssm
                 = DExpectSymbolSsm::make(p_psm->parser_alloc());
 
@@ -40,7 +42,7 @@ namespace xo {
             obj<ASyntaxStateMachine> ssm
                 = with_facet<ASyntaxStateMachine>::mkobj(sym_ssm);
 
-            p_psm->push_ssm(ssm);
+            p_psm->push_ssm(ckp, ssm);
         }
 
         syntaxstatetype

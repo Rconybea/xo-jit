@@ -22,8 +22,10 @@ namespace xo {
         void
         DSequenceSsm::start(ParserStateMachine * p_psm)
         {
-            p_psm->push_ssm(DSequenceSsm::make(p_psm->parser_alloc(),
-                                               p_psm->expr_alloc()));
+            DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
+
+            p_psm->push_ssm(ckp, DSequenceSsm::make(p_psm->parser_alloc(),
+                                                     p_psm->expr_alloc()));
             /* want to accept anything that starts an expression,
              * except that rightbrace '}' ends it
              */

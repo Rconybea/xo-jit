@@ -34,13 +34,15 @@ namespace xo {
         void
         DExpectTypeSsm::start(ParserStateMachine * p_psm)
         {
+            DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
+
             DExpectTypeSsm * expect_type_ssm
                 = DExpectTypeSsm::make(p_psm->parser_alloc());
 
             auto ssm
                 = with_facet<ASyntaxStateMachine>::mkobj(expect_type_ssm);
 
-            p_psm->push_ssm(ssm);
+            p_psm->push_ssm(ckp, ssm);
         }
 
         syntaxstatetype

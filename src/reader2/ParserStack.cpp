@@ -22,11 +22,12 @@ namespace xo {
 
         ParserStack *
         ParserStack::push(ParserStack * stack,
+                          DArena::Checkpoint ckp,
                           DArena & mm,
                           obj<ASyntaxStateMachine> ssm)
 
         {
-            DArena::Checkpoint ckp = mm.checkpoint();
+            //DArena::Checkpoint ckp = mm.checkpoint();  // wrong, must precede allocation of ssm
 
             void * mem = mm.alloc(typeseq::id<ParserStack>(),
                                   sizeof(ParserStack));

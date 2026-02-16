@@ -87,7 +87,9 @@ namespace xo {
         void
         DExpectFormalArglistSsm::start(ParserStateMachine * p_psm)
         {
-            p_psm->push_ssm(DExpectFormalArglistSsm::make(p_psm->parser_alloc()));
+            DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
+
+            p_psm->push_ssm(ckp, DExpectFormalArglistSsm::make(p_psm->parser_alloc()));
         }
 
         syntaxstatetype
