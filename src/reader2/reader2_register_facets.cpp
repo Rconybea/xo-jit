@@ -6,7 +6,7 @@
 #include "reader2_register_facets.hpp"
 
 #include "SchematikaParser.hpp"
-#include "ExprSeqState.hpp"
+#include "ToplevelSeqSsm.hpp"
 #include "DefineSsm.hpp"
 #include "LambdaSsm.hpp"
 #include "IfElseSsm.hpp"
@@ -37,8 +37,8 @@ namespace xo {
         {
             scope log(XO_DEBUG(true));
 
-            FacetRegistry::register_impl<ASyntaxStateMachine, DExprSeqState>();
-            FacetRegistry::register_impl<APrintable, DExprSeqState>();
+            FacetRegistry::register_impl<ASyntaxStateMachine, DToplevelSeqSsm>();
+            FacetRegistry::register_impl<APrintable, DToplevelSeqSsm>();
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DDefineSsm>();
             FacetRegistry::register_impl<APrintable, DDefineSsm>();
@@ -80,7 +80,7 @@ namespace xo {
             // misc types showing up in parser stack arena
             TypeRegistry::register_type<ParserStack>();
 
-            log && log(xtag("DExprSeqState.tseq", typeseq::id<DExprSeqState>()));
+            log && log(xtag("DToplevelSeqSsm.tseq", typeseq::id<DToplevelSeqSsm>()));
             log && log(xtag("DDefineSsm.tseq", typeseq::id<DDefineSsm>()));
             log && log(xtag("DLambdaSsm.tseq", typeseq::id<DLambdaSsm>()));
             log && log(xtag("DIfElseSsm.tseq", typeseq::id<DIfElseSsm>()));

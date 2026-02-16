@@ -17,9 +17,9 @@ set(SELF_SRCS
     syntaxstatetype.cpp
     ISyntaxStateMachine_Any.cpp
 
-    DExprSeqState.cpp
-    ISyntaxStateMachine_DExprSeqState.cpp
-    IPrintable_DExprSeqState.cpp
+    DToplevelSeqSsm.cpp
+    ISyntaxStateMachine_DToplevelSeqSsm.cpp
+    IPrintable_DToplevelSeqSsm.cpp
 
     DDefineSsm.cpp
     ISyntaxStateMachine_DDefineSsm.cpp

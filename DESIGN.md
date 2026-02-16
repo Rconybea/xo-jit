@@ -7,6 +7,6 @@ Composition of nested state machines.
 a state machine dedicated to some particular Schematika syntax.
 Examples: if-expression, type declaration, function call
 
-## DExprSeqState
+## DToplevelSeqSsm
 
 top-level expression sequence

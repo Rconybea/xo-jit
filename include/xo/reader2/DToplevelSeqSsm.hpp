@@ -1,4 +1,4 @@
-/** @file DExprSeqState.hpp
+/** @file DToplevelSeqSsm.hpp
 *
  *  @author Roland Conybeare, Jan 2026
  **/
@@ -31,21 +31,21 @@ namespace xo {
             return os;
         }
 
-        /** @class DExprSeqState
+        /** @class DToplevelSeqSsm
          *  @brief state machine for parsing a sequence of expression
          *
          *  Similar to exprseq_xs in xo-expresion
          **/
-        class DExprSeqState : public DSyntaxStateMachine<DExprSeqState> {
+        class DToplevelSeqSsm : public DSyntaxStateMachine<DToplevelSeqSsm> {
         public:
-            using Super = DSyntaxStateMachine<DExprSeqState>;
+            using Super = DSyntaxStateMachine<DToplevelSeqSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
-            explicit DExprSeqState(exprseqtype ty);
+            explicit DToplevelSeqSsm(exprseqtype ty);
 
             /** start interactive top-level session **/
             static void establish_interactive(DArena & mm,
@@ -55,7 +55,7 @@ namespace xo {
                                         ParserStateMachine * p_psm);
 
         public:
-            static const char * ssm_classname() { return "DExprSeqState"; }
+            static const char * ssm_classname() { return "DToplevelSeqSsm"; }
 
             /** @defgroup scm-exprseq-ssm-facet syntaxstatemachine facet methods **/
             ///@{
@@ -152,4 +152,4 @@ namespace xo {
     } /*namespace scm*/
 } /*namespace xo*/
 
-/* end DExprSeqState.hpp */
+/* end DToplevelSeqSsm.hpp */

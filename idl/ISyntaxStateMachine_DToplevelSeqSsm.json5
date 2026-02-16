@@ -6,8 +6,8 @@
     namespace1: "xo",
     namespace2: "scm",
     facet_idl: "idl/SyntaxStateMachine.json5",
-    brief: "provide ASyntaxStateMachine interface for DExprSeqState",
+    brief: "provide ASyntaxStateMachine interface for DToplevelSeqSsm",
     using_doxygen: true,
-    repr: "DExprSeqState",
-    doc: [ "implement ASyntaxStateMachine for DExprSeqState" ],
+    repr: "DToplevelSeqSsm",
+    doc: [ "implement ASyntaxStateMachine for DToplevelSeqSsm" ],
 }

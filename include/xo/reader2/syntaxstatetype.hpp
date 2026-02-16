@@ -39,7 +39,7 @@ namespace xo {
             /** expression enclosed in parentheses. See @ref DParenSsm **/
             paren,
 
-            /** toplevel of some translation unit. See @ref DExprSeqState **/
+            /** toplevel of some translation unit. See @ref DToplevelSeqSsm **/
             expect_toplevel_expression_sequence,
 
             /** expecting a formal argument list (sub-syntax within lambda-expression) **/

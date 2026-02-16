@@ -1,14 +1,14 @@
-/** @file IPrintable_DExprSeqState.hpp
+/** @file IPrintable_DToplevelSeqSsm.hpp
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
  *       [xo-facet/codegen/genfacet]
  *     arguments:
- *       --input [idl/IPrintable_DExprSeqState.json5]
+ *       --input [idl/IPrintable_DToplevelSeqSsm.json5]
  *  2. jinja2 template for abstract facet .hpp file:
  *       [iface_facet_repr.hpp.j2]
  *  3. idl for facet methods
- *       [idl/IPrintable_DExprSeqState.json5]
+ *       [idl/IPrintable_DToplevelSeqSsm.json5]
  **/
 
 #pragma once
@@ -16,28 +16,28 @@
 #include "Printable.hpp"
 #include <xo/printable2/Printable.hpp>
 #include <xo/printable2/detail/IPrintable_Xfer.hpp>
-#include "DExprSeqState.hpp"
+#include "DToplevelSeqSsm.hpp"
 
-namespace xo { namespace scm { class IPrintable_DExprSeqState; } }
+namespace xo { namespace scm { class IPrintable_DToplevelSeqSsm; } }
 
 namespace xo {
     namespace facet {
         template <>
         struct FacetImplementation<xo::print::APrintable,
-                                   xo::scm::DExprSeqState>
+                                   xo::scm::DToplevelSeqSsm>
         {
             using ImplType = xo::print::IPrintable_Xfer
-              <xo::scm::DExprSeqState,
-               xo::scm::IPrintable_DExprSeqState>;
+              <xo::scm::DToplevelSeqSsm,
+               xo::scm::IPrintable_DToplevelSeqSsm>;
         };
     }
 }
 
 namespace xo {
     namespace scm {
-        /** @class IPrintable_DExprSeqState
+        /** @class IPrintable_DToplevelSeqSsm
          **/
-        class IPrintable_DExprSeqState {
+        class IPrintable_DToplevelSeqSsm {
         public:
             /** @defgroup scm-printable-dexprseqstate-type-traits **/
             ///@{
@@ -50,7 +50,7 @@ namespace xo {
             // const methods
             /** Pretty-printing support for this object.
 See [xo-indentlog/xo/indentlog/pretty.hpp] **/
-            static bool pretty(const DExprSeqState & self, const ppindentinfo & ppii);
+            static bool pretty(const DToplevelSeqSsm & self, const ppindentinfo & ppii);
 
             // non-const methods
             ///@}

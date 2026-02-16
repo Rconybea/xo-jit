@@ -1,14 +1,14 @@
-/** @file ISyntaxStateMachine_DExprSeqState.hpp
+/** @file ISyntaxStateMachine_DToplevelSeqSsm.hpp
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
  *       [xo-facet/codegen/genfacet]
  *     arguments:
- *       --input [idl/ISyntaxStateMachine_DExprSeqState.json5]
+ *       --input [idl/ISyntaxStateMachine_DToplevelSeqSsm.json5]
  *  2. jinja2 template for abstract facet .hpp file:
  *       [iface_facet_repr.hpp.j2]
  *  3. idl for facet methods
- *       [idl/ISyntaxStateMachine_DExprSeqState.json5]
+ *       [idl/ISyntaxStateMachine_DToplevelSeqSsm.json5]
  **/
 
 #pragma once
@@ -16,28 +16,28 @@
 #include "SyntaxStateMachine.hpp"
 #include "SyntaxStateMachine.hpp"
 #include "ssm/ISyntaxStateMachine_Xfer.hpp"
-#include "DExprSeqState.hpp"
+#include "DToplevelSeqSsm.hpp"
 
-namespace xo { namespace scm { class ISyntaxStateMachine_DExprSeqState; } }
+namespace xo { namespace scm { class ISyntaxStateMachine_DToplevelSeqSsm; } }
 
 namespace xo {
     namespace facet {
         template <>
         struct FacetImplementation<xo::scm::ASyntaxStateMachine,
-                                   xo::scm::DExprSeqState>
+                                   xo::scm::DToplevelSeqSsm>
         {
             using ImplType = xo::scm::ISyntaxStateMachine_Xfer
-              <xo::scm::DExprSeqState,
-               xo::scm::ISyntaxStateMachine_DExprSeqState>;
+              <xo::scm::DToplevelSeqSsm,
+               xo::scm::ISyntaxStateMachine_DToplevelSeqSsm>;
         };
     }
 }
 
 namespace xo {
     namespace scm {
-        /** @class ISyntaxStateMachine_DExprSeqState
+        /** @class ISyntaxStateMachine_DToplevelSeqSsm
          **/
-        class ISyntaxStateMachine_DExprSeqState {
+        class ISyntaxStateMachine_DToplevelSeqSsm {
         public:
             /** @defgroup scm-syntaxstatemachine-dexprseqstate-type-traits **/
             ///@{
@@ -49,25 +49,25 @@ namespace xo {
             ///@{
             // const methods
             /** identify a type of syntax state machine **/
-            static syntaxstatetype ssm_type(const DExprSeqState & self) noexcept;
+            static syntaxstatetype ssm_type(const DToplevelSeqSsm & self) noexcept;
             /** text describing expected/allowed input to this ssm in current state **/
-            static std::string_view get_expect_str(const DExprSeqState & self) noexcept;
+            static std::string_view get_expect_str(const DToplevelSeqSsm & self) noexcept;
 
             // non-const methods
             /** operate state machine for incoming token @p tk **/
-            static void on_token(DExprSeqState & self, const Token & tk, ParserStateMachine * p_psm);
+            static void on_token(DToplevelSeqSsm & self, const Token & tk, ParserStateMachine * p_psm);
             /** update  stat machine for incoming parsed symbol @p sym **/
-            static void on_parsed_symbol(DExprSeqState & self, std::string_view sym, ParserStateMachine * p_psm);
+            static void on_parsed_symbol(DToplevelSeqSsm & self, std::string_view sym, ParserStateMachine * p_psm);
             /** operate state machine for incoming type description @p td **/
-            static void on_parsed_typedescr(DExprSeqState & self, TypeDescr td, ParserStateMachine * p_psm);
+            static void on_parsed_typedescr(DToplevelSeqSsm & self, TypeDescr td, ParserStateMachine * p_psm);
             /** operate state machine for formal emitted by nested ssm **/
-            static void on_parsed_formal(DExprSeqState & self, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm);
+            static void on_parsed_formal(DToplevelSeqSsm & self, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm);
             /** consume formal arglist emitted by nested ssm **/
-            static void on_parsed_formal_arglist(DExprSeqState & self, DArray * arglist, ParserStateMachine * p_psm);
+            static void on_parsed_formal_arglist(DToplevelSeqSsm & self, DArray * arglist, ParserStateMachine * p_psm);
             /** update state machine for incoming parsed expression @p expr **/
-            static void on_parsed_expression(DExprSeqState & self, obj<AExpression> expr, ParserStateMachine * p_psm);
+            static void on_parsed_expression(DToplevelSeqSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm);
             /** update state machine @p p_psm for incoming parsed expression @p expr followed by token @p tk **/
-            static void on_parsed_expression_with_token(DExprSeqState & self, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm);
+            static void on_parsed_expression_with_token(DToplevelSeqSsm & self, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm);
             ///@}
         };
 

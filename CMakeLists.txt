@@ -38,11 +38,11 @@ xo_add_genfacet(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
-    TARGET xo-reader2-facetimpl-syntaxstatemachine-exprseqstate
+    TARGET xo-reader2-facetimpl-syntaxstatemachine-toplevelseqssm
     FACET_PKG xo_reader2
     FACET SyntaxStateMachine
-    REPR ExprSeqState
-    INPUT idl/ISyntaxStateMachine_DExprSeqState.json5
+    REPR ToplevelSeqSsm
+    INPUT idl/ISyntaxStateMachine_DToplevelSeqSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
     OUTPUT_CPP_DIR src/reader2
@@ -50,11 +50,11 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
-    TARGET xo-reader2-facetimpl-printable-exprseqstate
+    TARGET xo-reader2-facetimpl-printable-toplevelseqssm
     FACET_PKG xo_printable2
     FACET Printable
-    REPR ExprSeqState
-    INPUT idl/IPrintable_DExprSeqState.json5
+    REPR ToplevelSeqSsm
+    INPUT idl/IPrintable_DToplevelSeqSsm.json5
     OUTPUT_HPP_DIR include/xo/reader2
     OUTPUT_IMPL_SUBDIR ssm
     OUTPUT_CPP_DIR src/reader2

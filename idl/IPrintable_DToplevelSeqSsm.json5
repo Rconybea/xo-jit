@@ -6,8 +6,8 @@
     namespace1: "xo",
     namespace2: "scm",
     facet_idl: "idl/Printable.json5",
-    brief: "provide APrintable interface for DExprSeqState",
+    brief: "provide APrintable interface for DToplevelSeqSsm",
     using_doxygen: true,
-    repr: "DExprSeqState",
-    doc: [ "implement APrintable for DExprSeqState" ],
+    repr: "DToplevelSeqSsm",
+    doc: [ "implement APrintable for DToplevelSeqSsm" ],
 }

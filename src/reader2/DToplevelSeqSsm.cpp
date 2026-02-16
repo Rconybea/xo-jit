@@ -1,10 +1,10 @@
-/** @file DExprSeqState.cpp
+/** @file DToplevelSeqSsm.cpp
  *
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "DExprSeqState.hpp"
-#include "ssm/ISyntaxStateMachine_DExprSeqState.hpp"
+#include "DToplevelSeqSsm.hpp"
+#include "ssm/ISyntaxStateMachine_DToplevelSeqSsm.hpp"
 #include "DDefineSsm.hpp"
 #include "DLambdaSsm.hpp"
 #include "ProgressSsm.hpp"
@@ -55,7 +55,7 @@ namespace xo {
             return "exprseqtype?";
         }
 
-        DExprSeqState::DExprSeqState(exprseqtype ty) : seqtype_{ty}
+        DToplevelSeqSsm::DToplevelSeqSsm(exprseqtype ty) : seqtype_{ty}
         {}
 
         namespace {
@@ -63,17 +63,17 @@ namespace xo {
             make_exprseq_ssm(DArena & mm,
                              exprseqtype seqtype)
             {
-                void * mem = mm.alloc(typeseq::id<DExprSeqState>(),
-                                      sizeof(DExprSeqState));
+                void * mem = mm.alloc(typeseq::id<DToplevelSeqSsm>(),
+                                      sizeof(DToplevelSeqSsm));
 
-                DExprSeqState * ssm = new (mem) DExprSeqState(seqtype);
+                DToplevelSeqSsm * ssm = new (mem) DToplevelSeqSsm(seqtype);
 
-                return obj<ASyntaxStateMachine,DExprSeqState>(ssm);
+                return obj<ASyntaxStateMachine,DToplevelSeqSsm>(ssm);
             }
         }
 
         void
-        DExprSeqState::establish_interactive(DArena & mm,
+        DToplevelSeqSsm::establish_interactive(DArena & mm,
                                              ParserStateMachine * p_psm)
         {
             p_psm->establish_toplevel_ssm(make_exprseq_ssm
@@ -82,7 +82,7 @@ namespace xo {
         }
 
         void
-        DExprSeqState::establish_batch(DArena & mm,
+        DToplevelSeqSsm::establish_batch(DArena & mm,
                                        ParserStateMachine * p_psm)
         {
             p_psm->establish_toplevel_ssm(make_exprseq_ssm
@@ -93,13 +93,13 @@ namespace xo {
         // SyntaxStateMachine facet methods
 
         syntaxstatetype
-        DExprSeqState::ssm_type() const noexcept
+        DToplevelSeqSsm::ssm_type() const noexcept
         {
             return syntaxstatetype::expect_toplevel_expression_sequence;
         }
 
         std::string_view
-        DExprSeqState::get_expect_str() const noexcept
+        DToplevelSeqSsm::get_expect_str() const noexcept
         {
             // TODO: provisional.  Will expand as more syntax implemented
 
@@ -113,11 +113,11 @@ namespace xo {
             }
 
             assert(false);
-            return "impossible-DExprSeqState::get_expr_str";
+            return "impossible-DToplevelSeqSsm::get_expr_str";
         }
 
         void
-        DExprSeqState::on_token(const Token & tk,
+        DToplevelSeqSsm::on_token(const Token & tk,
                                 ParserStateMachine * p_psm)
         {
             scope log(XO_DEBUG(p_psm->debug_flag()), xtag("tk", tk));
@@ -197,13 +197,13 @@ namespace xo {
                 break;
             }
 
-            p_psm->illegal_input_on_token("DExprSeqState::on_token",
+            p_psm->illegal_input_on_token("DToplevelSeqSsm::on_token",
                                           tk,
                                           this->get_expect_str());
         }
 
         void
-        DExprSeqState::on_symbol_token(const Token & tk,
+        DToplevelSeqSsm::on_symbol_token(const Token & tk,
                                        ParserStateMachine * p_psm)
         {
             switch (seqtype_) {
@@ -215,7 +215,7 @@ namespace xo {
                     if (var) {
                         DProgressSsm::start(var, p_psm);
                     } else {
-                        p_psm->unknown_variable_error("DExprSeqState::on_symbol_token",
+                        p_psm->unknown_variable_error("DToplevelSeqSsm::on_symbol_token",
                                                       tk,
                                                       this->get_expect_str(),
                                                       p_psm);
@@ -234,7 +234,7 @@ namespace xo {
         }
 
         void
-        DExprSeqState::on_def_token(const Token & tk,
+        DToplevelSeqSsm::on_def_token(const Token & tk,
                                     ParserStateMachine * p_psm)
         {
             (void)tk;
@@ -250,7 +250,7 @@ namespace xo {
         }
 
         void
-        DExprSeqState::on_lambda_token(const Token & tk,
+        DToplevelSeqSsm::on_lambda_token(const Token & tk,
                                        ParserStateMachine * p_psm)
         {
             (void)tk;
@@ -271,7 +271,7 @@ namespace xo {
         }
 
         void
-        DExprSeqState::on_if_token(const Token & tk,
+        DToplevelSeqSsm::on_if_token(const Token & tk,
                                    ParserStateMachine * p_psm)
         {
             switch (seqtype_) {
@@ -291,7 +291,7 @@ namespace xo {
         }
 
         void
-        DExprSeqState::on_string_token(const Token & tk,
+        DToplevelSeqSsm::on_string_token(const Token & tk,
                                        ParserStateMachine * p_psm)
         {
             switch (seqtype_) {
@@ -318,7 +318,7 @@ namespace xo {
         }
 
         void
-        DExprSeqState::on_f64_token(const Token & tk,
+        DToplevelSeqSsm::on_f64_token(const Token & tk,
                                     ParserStateMachine * p_psm)
         {
             switch (seqtype_) {
@@ -344,7 +344,7 @@ namespace xo {
         }
 
         void
-        DExprSeqState::on_i64_token(const Token & tk,
+        DToplevelSeqSsm::on_i64_token(const Token & tk,
                                     ParserStateMachine * p_psm)
         {
             switch (seqtype_) {
@@ -370,7 +370,7 @@ namespace xo {
         }
 
         void
-        DExprSeqState::on_bool_token(const Token & tk,
+        DToplevelSeqSsm::on_bool_token(const Token & tk,
                                      ParserStateMachine * p_psm)
         {
             switch (seqtype_) {
@@ -396,7 +396,7 @@ namespace xo {
         }
 
         void
-        DExprSeqState::on_leftparen_token(const Token & tk,
+        DToplevelSeqSsm::on_leftparen_token(const Token & tk,
                                           ParserStateMachine * p_psm)
         {
             switch (seqtype_) {
@@ -423,21 +423,21 @@ namespace xo {
         }
 
         void
-        DExprSeqState::on_parsed_expression(obj<AExpression> expr,
+        DToplevelSeqSsm::on_parsed_expression(obj<AExpression> expr,
                                             ParserStateMachine * p_psm)
         {
             // toplevel expr sequence accepts an arbitrary number of expressions.
 
-            p_psm->capture_result("DExprSeqState::on_parsed_expression", expr);
+            p_psm->capture_result("DToplevelSeqSsm::on_parsed_expression", expr);
         }
 
         void
-        DExprSeqState::on_parsed_expression_with_token(obj<AExpression> expr,
+        DToplevelSeqSsm::on_parsed_expression_with_token(obj<AExpression> expr,
                                                        const Token & tk,
                                                        ParserStateMachine * p_psm)
         {
             if (tk.tk_type() == tokentype::tk_semicolon) {
-                p_psm->capture_result("DExprSeqState::on_parsed_expression_with_token", expr);
+                p_psm->capture_result("DToplevelSeqSsm::on_parsed_expression_with_token", expr);
                 return;
             }
 
@@ -445,14 +445,14 @@ namespace xo {
         }
 
         bool
-        DExprSeqState::pretty(const ppindentinfo & ppii) const
+        DToplevelSeqSsm::pretty(const ppindentinfo & ppii) const
         {
             return ppii.pps()->pretty_struct
                 (ppii,
-                 "DExprSeqState",
+                 "DToplevelSeqSsm",
                  refrtag("seqtype", seqtype_));
         }
     } /*namespace scm*/
 } /*namespace xo*/
 
-/* end DExprSeqState.cpp */
+/* end DToplevelSeqSsm.cpp */

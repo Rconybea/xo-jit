@@ -6,7 +6,7 @@
 #include "SchematikaParser.hpp"
 #include "ParserStateMachine.hpp"
 #include "ParserStack.hpp"
-#include "DExprSeqState.hpp"
+#include "DToplevelSeqSsm.hpp"
 #include <cstddef>
 #include <xo/indentlog/scope.hpp>
 #include <stdexcept>
@@ -65,14 +65,14 @@ namespace xo {
         void
         SchematikaParser::begin_interactive_session()
         {
-            DExprSeqState::establish_interactive(psm_.parser_alloc(), &psm_);
+            DToplevelSeqSsm::establish_interactive(psm_.parser_alloc(), &psm_);
 
         }
 
         void
         SchematikaParser::begin_batch_session()
         {
-            DExprSeqState::establish_batch(psm_.parser_alloc(), &psm_);
+            DToplevelSeqSsm::establish_batch(psm_.parser_alloc(), &psm_);
         }
 
         const ParserResult &
