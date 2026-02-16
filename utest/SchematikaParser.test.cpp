@@ -17,6 +17,7 @@
 #include <xo/object2/Integer.hpp>
 #include <xo/object2/String.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
+#include <xo/facet/TypeRegistry.hpp>
 #include <catch2/catch.hpp>
 
 namespace xo {
@@ -55,17 +56,23 @@ namespace xo {
             ParserFixture(const std::string & testname, bool debug_flag)
             {
                 this->aux_arena_
-                    = std::move(DArena(ArenaConfig().with_name(testname).with_size(4 * 1024)));
+                    = std::move(DArena(ArenaConfig()
+                                       .with_name(testname)
+                                       .with_size(4 * 1024)));
                 obj<AAllocator,DArena> aux_mm(&aux_arena_);
 
                 this->expr_arena_
                     = dp<DArena>::make(aux_mm,
-                                       ArenaConfig().with_name("expr").with_size(16 * 1024));
+                                       (ArenaConfig()
+                                        .with_name("expr")
+                                        .with_size(16 * 1024)
+                                        .with_store_header_flag(true)));
                 obj<AAllocator,DArena> expr_mm(expr_arena_.data());
 
                 ParserConfig cfg;
                 cfg.parser_arena_config_.size_ = 16 * 1024;
-                cfg.symtab_config_.hint_max_capacity_ = 512;
+                /* editor bait: symbol table */
+                cfg.symtab_config_.hint_max_capacity_ = 128;
                 cfg.max_stringtable_capacity_ = 512;
                 cfg.debug_flag_ = false;
 
@@ -77,12 +84,32 @@ namespace xo {
             ParserFixture(const ParserFixture && other) = delete;
 
             bool log_memory_layout(scope * p_log) {
+                using xo::facet::TypeRegistry;
+                using xo::mm::MemorySizeDetail;
+
                 auto visitor = [p_log](const MemorySizeInfo & info) {
-                    *p_log && (*p_log)(xtag("name", info.resource_name_),
-                                       xtag("used", info.used_),
-                                       xtag("alloc", info.allocated_),
+                    *p_log && (*p_log)(xtag("name",   info.resource_name_),
+                                       xtag("used",   info.used_),
+                                       xtag("alloc",  info.allocated_),
                                        xtag("commit", info.committed_),
-                                       xtag("resv", info.reserved_));
+                                       xtag("resv",   info.reserved_));
+                    if (*p_log && info.detail_) {
+                        (*p_log)("detail",
+                                 xtag("n", (*info.detail_)[0].n_alloc_),
+                                 xtag("z", (*info.detail_)[0].z_alloc_));
+                        for (size_t i = 1; i < info.detail_->size(); ++i) {
+                            const MemorySizeDetail & d = (*info.detail_)[i];
+
+                            if (d.tseq_.is_sentinel())
+                                break;
+
+                            (*p_log)("[",i,"]",
+                                     xtag("tseq",d.tseq_),
+                                     xtag("type", TypeRegistry::id2name(d.tseq_)),
+                                     xtag("n", d.n_alloc_),
+                                     xtag("z", d.z_alloc_));
+                        }
+                    }
                 };
 
                 aux_arena_.visit_pools(visitor);
@@ -144,14 +171,29 @@ namespace xo {
             REQUIRE(parser.debug_flag() == false);
             REQUIRE(parser.is_at_toplevel() == true);
 
+            // baseline:
+            //   SchematikaParser-ctor :used 1408
+            //   facets-ctl            :used 73    // facet hashtable
+            //   facets-slots          :used 1168  // facet hashtable
+            //   expr                  :used 2056
+            //   [1] :type xo::scm::DArray :n 1 :z 2056 // DArray of DUniqueString*
+            //   [2] :type ? :n 1 : z 16
+            //   strings               :used 0
+            //   stringkeys-ctl        :used 0
+            //   strinkeys-slots       :used 0
+            //   parser-arena          :used 0
+            //   global-symtab-ctl     :used 0
+            //   global-symtab-slots   :used 0
+
             log && fixture.log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-begin-interactive", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-begin-interactive",
+                  "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
+            constexpr bool c_debug_flag = true;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ParserFixture fixture(testname, c_debug_flag);
@@ -697,7 +739,7 @@ namespace xo {
 
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ParserFixture fixture(testname, c_debug_flag);
