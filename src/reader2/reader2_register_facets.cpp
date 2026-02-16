@@ -5,25 +5,22 @@
 
 #include "reader2_register_facets.hpp"
 
-#include <xo/reader2/SchematikaParser.hpp>
-
-#include <xo/reader2/ExprSeqState.hpp>
-#include <xo/reader2/DefineSsm.hpp>
-#include <xo/reader2/LambdaSsm.hpp>
-#include <xo/reader2/IfElseSsm.hpp>
-
+#include "SchematikaParser.hpp"
+#include "ExprSeqState.hpp"
+#include "DefineSsm.hpp"
+#include "LambdaSsm.hpp"
+#include "IfElseSsm.hpp"
 #include "ApplySsm.hpp"
 #include "SequenceSsm.hpp"
 #include "ParenSsm.hpp"
+#include "ExpectFormalArglistSsm.hpp"
+#include "ExpectFormalArgSsm.hpp"
+#include "ExpectSymbolSsm.hpp"
+#include "ExpectTypeSsm.hpp"
+#include "ExpectExprSsm.hpp"
+#include "ProgressSsm.hpp"
+#include "SyntaxStateMachine.hpp"
 
-#include <xo/reader2/ExpectFormalArglistSsm.hpp>
-#include <xo/reader2/ExpectFormalArgSsm.hpp>
-#include <xo/reader2/ExpectSymbolSsm.hpp>
-#include <xo/reader2/ExpectTypeSsm.hpp>
-#include <xo/reader2/ExpectExprSsm.hpp>
-#include <xo/reader2/ProgressSsm.hpp>
-
-#include <xo/reader2/ssm/ASyntaxStateMachine.hpp>
 #include <xo/printable2/detail/APrintable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>
