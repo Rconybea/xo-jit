@@ -47,6 +47,7 @@
 namespace xo {
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
+    using xo::facet::TypeRegistry;
     using xo::facet::typeseq;
 
     namespace scm {
@@ -92,6 +93,9 @@ namespace xo {
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DParenSsm>();
             FacetRegistry::register_impl<APrintable, DParenSsm>();
+
+            // misc types showing up in aux arena
+            TypeRegistry::register_type<SchematikaParser>();
 
             log && log(xtag("DExprSeqState.tseq", typeseq::id<DExprSeqState>()));
             log && log(xtag("DDefineSsm.tseq", typeseq::id<DDefineSsm>()));
