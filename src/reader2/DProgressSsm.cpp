@@ -146,16 +146,22 @@ namespace xo {
         }
 
         DProgressSsm *
-        DProgressSsm::make(DArena & mm,
-                           obj<AExpression> lhs,
-                           optype op)
+        DProgressSsm::_make(DArena & mm,
+                            obj<AExpression> lhs,
+                            optype op)
         {
             void * mem = mm.alloc(typeseq::id<DProgressSsm>(),
                                   sizeof(DProgressSsm));
 
             return new (mem) DProgressSsm(lhs, op);
+        }
 
-            //return std::make_unique<progress_xs>(progress_xs(std::move(valex), op));
+        obj<ASyntaxStateMachine,DProgressSsm>
+        DProgressSsm::make(DArena & mm,
+                           obj<AExpression> lhs,
+                           optype op)
+        {
+            return obj<ASyntaxStateMachine,DProgressSsm>(_make(mm, lhs, op));
         }
 
         void
@@ -166,10 +172,7 @@ namespace xo {
         {
             DArena::Checkpoint ckp = parser_mm.checkpoint();
 
-            DProgressSsm * progress_ssm
-                = DProgressSsm::make(parser_mm, lhs, op);
-
-            obj<ASyntaxStateMachine,DProgressSsm> ssm(progress_ssm);
+            auto ssm = DProgressSsm::make(parser_mm, lhs, op);
 
             p_psm->push_ssm(ckp, ssm);
         }

@@ -20,7 +20,7 @@ namespace xo {
         {}
 
         DExpectSymbolSsm *
-        DExpectSymbolSsm::make(DArena & mm)
+        DExpectSymbolSsm::_make(DArena & mm)
         {
             void * mem = mm.alloc(typeseq::id<DExpectSymbolSsm>(),
                                   sizeof(DExpectSymbolSsm));
@@ -28,19 +28,18 @@ namespace xo {
             return new (mem) DExpectSymbolSsm();
         }
 
+        obj<ASyntaxStateMachine,DExpectSymbolSsm>
+        DExpectSymbolSsm::make(DArena & mm)
+        {
+            return obj<ASyntaxStateMachine,DExpectSymbolSsm>(_make(mm));
+        }
+
         void
         DExpectSymbolSsm::start(ParserStateMachine * p_psm)
         {
             DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
 
-            DExpectSymbolSsm * sym_ssm
-                = DExpectSymbolSsm::make(p_psm->parser_alloc());
-
-            // note:
-            // relying on [ISyntaxStateMachine_DExpectedSymbolSsm.hpp]
-            //
-            obj<ASyntaxStateMachine> ssm
-                = with_facet<ASyntaxStateMachine>::mkobj(sym_ssm);
+            auto ssm = DExpectSymbolSsm::make(p_psm->parser_alloc());
 
             p_psm->push_ssm(ckp, ssm);
         }

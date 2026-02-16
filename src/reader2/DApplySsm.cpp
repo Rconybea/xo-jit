@@ -58,8 +58,8 @@ namespace xo {
         }
 
         DApplySsm *
-        DApplySsm::make(DArena & arena,
-                        obj<AExpression> fn_expr)
+        DApplySsm::_make(DArena & arena,
+                         obj<AExpression> fn_expr)
         {
             obj<AAllocator,DArena> mm(&arena);
 
@@ -83,6 +83,13 @@ namespace xo {
             return new (mem) DApplySsm(applystate, fn_expr, args);
         }
 
+        obj<ASyntaxStateMachine,DApplySsm>
+        DApplySsm::make(DArena & arena,
+                        obj<AExpression> fn_expr)
+        {
+            return obj<ASyntaxStateMachine,DApplySsm>(_make(arena, fn_expr));
+        }
+
         void
         DApplySsm::start(obj<AExpression> fn_expr,
                          ParserStateMachine * p_psm)
@@ -91,10 +98,7 @@ namespace xo {
 
             DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
 
-            DApplySsm * apply_ssm
-                = DApplySsm::make(p_psm->parser_alloc(), fn_expr);
-
-            obj<ASyntaxStateMachine,DApplySsm> ssm(apply_ssm);
+            auto ssm = DApplySsm::make(p_psm->parser_alloc(), fn_expr);
 
             p_psm->push_ssm(ckp, ssm);
         }

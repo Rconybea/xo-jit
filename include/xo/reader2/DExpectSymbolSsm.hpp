@@ -29,7 +29,10 @@ namespace xo {
             DExpectSymbolSsm();
 
             /** create instance using memory from @p parser_mm **/
-            static DExpectSymbolSsm * make(DArena & parser_mm);
+            static DExpectSymbolSsm * _make(DArena & parser_mm);
+
+            /** create fop referring to new DExpectSymbolSsm **/
+            static obj<ASyntaxStateMachine,DExpectSymbolSsm> make(DArena & parser_mm);
 
             /** start nested parser expecting a symbol,
              *  on top of parser state machine @p p_psm.

@@ -52,15 +52,23 @@ namespace xo {
         }
 
         DExpectExprSsm *
-        DExpectExprSsm::make(DArena & mm,
-                             bool allow_defs,
-                             bool cxl_on_rightbrace)
+        DExpectExprSsm::_make(DArena & mm,
+                              bool allow_defs,
+                              bool cxl_on_rightbrace)
         {
             void * mem = mm.alloc(typeseq::id<DExpectExprSsm>(),
                                   sizeof(DExpectExprSsm));
 
             return new (mem) DExpectExprSsm(allow_defs,
                                             cxl_on_rightbrace);
+        }
+
+        obj<ASyntaxStateMachine,DExpectExprSsm>
+        DExpectExprSsm::make(DArena & mm,
+                             bool allow_defs,
+                             bool cxl_on_rightbrace)
+        {
+            return obj<ASyntaxStateMachine,DExpectExprSsm>(_make(mm, allow_defs, cxl_on_rightbrace));
         }
 
         void
@@ -71,12 +79,7 @@ namespace xo {
         {
             DArena::Checkpoint ckp = mm.checkpoint();
 
-            DExpectExprSsm * exp_expr
-                = DExpectExprSsm::make(mm,
-                                       allow_defs,
-                                       cxl_on_rightbrace);
-            obj<ASyntaxStateMachine> ssm
-                = with_facet<ASyntaxStateMachine>::mkobj(exp_expr);
+            auto ssm = DExpectExprSsm::make(mm, allow_defs, cxl_on_rightbrace);
 
             p_psm->push_ssm(ckp, ssm);
         }

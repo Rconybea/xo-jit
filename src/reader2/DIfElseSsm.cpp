@@ -63,6 +63,13 @@ namespace xo {
             return new (mem) DIfElseSsm(ifelse_expr);
         }
 
+        obj<ASyntaxStateMachine,DIfElseSsm>
+        DIfElseSsm::make(DArena & mm,
+                         DIfElseExpr * ifelse_expr)
+        {
+            return obj<ASyntaxStateMachine,DIfElseSsm>(_make(mm, ifelse_expr));
+        }
+
         void
         DIfElseSsm::start(DArena & parser_mm,
                           obj<AAllocator> expr_mm,
@@ -73,10 +80,8 @@ namespace xo {
             DArena::Checkpoint ckp = parser_mm.checkpoint();
 
             DIfElseExpr * if_expr = DIfElseExpr::_make_empty(expr_mm);
-            DIfElseSsm * if_ssm = DIfElseSsm::_make(parser_mm, if_expr);
 
-            obj<ASyntaxStateMachine> ssm
-                = with_facet<ASyntaxStateMachine>::mkobj(if_ssm);
+            auto ssm = DIfElseSsm::make(parser_mm, if_expr);
 
             p_psm->push_ssm(ckp, ssm);
 

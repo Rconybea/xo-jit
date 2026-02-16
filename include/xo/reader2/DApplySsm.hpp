@@ -88,8 +88,12 @@ namespace xo {
             /** create instance using memory from @p parser_mm.
              *  with function to be called supplied by @p fn_expr.
              **/
-            static DApplySsm * make(DArena & parser_mm,
-                                    obj<AExpression> fn_expr);
+            static DApplySsm * _make(DArena & parser_mm,
+                                     obj<AExpression> fn_expr);
+
+            /** create fop referring to new DApplySsm **/
+            static obj<ASyntaxStateMachine,DApplySsm> make(DArena & parser_mm,
+                                                           obj<AExpression> fn_expr);
 
             /**
              * Start apply. Will trigger this after input like

@@ -23,7 +23,7 @@ namespace xo {
         {}
 
         DExpectTypeSsm *
-        DExpectTypeSsm::make(DArena & mm)
+        DExpectTypeSsm::_make(DArena & mm)
         {
             void * mem = mm.alloc(typeseq::id<DArena>(),
                                   sizeof(DArena));
@@ -31,16 +31,18 @@ namespace xo {
             return new (mem) DExpectTypeSsm();
         }
 
+        obj<ASyntaxStateMachine,DExpectTypeSsm>
+        DExpectTypeSsm::make(DArena & mm)
+        {
+            return obj<ASyntaxStateMachine,DExpectTypeSsm>(_make(mm));
+        }
+
         void
         DExpectTypeSsm::start(ParserStateMachine * p_psm)
         {
             DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
 
-            DExpectTypeSsm * expect_type_ssm
-                = DExpectTypeSsm::make(p_psm->parser_alloc());
-
-            auto ssm
-                = with_facet<ASyntaxStateMachine>::mkobj(expect_type_ssm);
+            auto ssm = DExpectTypeSsm::make(p_psm->parser_alloc());
 
             p_psm->push_ssm(ckp, ssm);
         }

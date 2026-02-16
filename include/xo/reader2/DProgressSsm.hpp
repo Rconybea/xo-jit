@@ -96,9 +96,14 @@ namespace xo {
         public:
             DProgressSsm(obj<AExpression> lhs, optype op);
 
-            static DProgressSsm * make(DArena & parser_mm,
-                                       obj<AExpression> lhs,
-                                       optype op);
+            static DProgressSsm * _make(DArena & parser_mm,
+                                        obj<AExpression> lhs,
+                                        optype op);
+
+            /** create fop referring to new DProgressSsm **/
+            static obj<ASyntaxStateMachine,DProgressSsm> make(DArena & parser_mm,
+                                                              obj<AExpression> lhs,
+                                                              optype op);
 
             static void start(DArena & parser_mm,
                               ParserStateMachine * p_psm);

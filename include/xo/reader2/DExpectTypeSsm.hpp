@@ -6,6 +6,7 @@
 #pragma once
 
 #include "DSyntaxStateMachine.hpp"
+#include <xo/facet/obj.hpp>
 #include <xo/indentlog/print/ppindentinfo.hpp>
 
 namespace xo {
@@ -31,7 +32,10 @@ namespace xo {
         public:
             DExpectTypeSsm();
 
-            static DExpectTypeSsm * make(DArena & parser_mm);
+            static DExpectTypeSsm * _make(DArena & parser_mm);
+
+            /** create fop referring to new DExpectTypeSsm **/
+            static obj<ASyntaxStateMachine,DExpectTypeSsm> make(DArena & parser_mm);
 
             static void start(ParserStateMachine * p_psm);
 

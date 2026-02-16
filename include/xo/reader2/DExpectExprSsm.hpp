@@ -25,9 +25,14 @@ namespace xo {
             explicit DExpectExprSsm(bool allow_defs,
                                     bool cxl_on_rightparen);
 
-            static DExpectExprSsm * make(DArena & parser_mm,
-                                         bool allow_defs,
-                                         bool cxl_on_rightbrace);
+            static DExpectExprSsm * _make(DArena & parser_mm,
+                                          bool allow_defs,
+                                          bool cxl_on_rightbrace);
+
+            /** create fop referring to new DExpectExprSsm **/
+            static obj<ASyntaxStateMachine,DExpectExprSsm> make(DArena & parser_mm,
+                                                                bool allow_defs,
+                                                                bool cxl_on_rightbrace);
 
             static void start(DArena & parser_mm,
                               bool allow_defs,

@@ -65,19 +65,15 @@ namespace xo {
             ///@{
             explicit DIfElseSsm(DIfElseExpr * ifelse_expr);
 
-#ifdef NOT_YET
-            /** create instance using memory from @p parser_mm
-             *  with initial scaffold @p ifelse_expr
-             **/
-            static obj<AExpression,DIfElseSsm> make(DArena & parser_mm,
-                                                    DIfElseExpr * ifelse_expr);
-#endif
-
             /** create instance using memory from @p parser_mm
              *  with initial scaffold @p ifelse_expr.
              **/
             static DIfElseSsm * _make(DArena & parser_mm,
                                       DIfElseExpr * ifelse_expr);
+
+            /** create fop referring to new DIfElseSsm **/
+            static obj<ASyntaxStateMachine,DIfElseSsm> make(DArena & parser_mm,
+                                                            DIfElseExpr * ifelse_expr);
 
             /** start nested parser for an if-else expression
              *  on top of parser state machine @p p_psm.
