@@ -7,49 +7,21 @@
 
 #include <xo/reader2/SchematikaParser.hpp>
 
-//#include <xo/reader2/ExprSeqState.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DExprSeqState.hpp>
-#include <xo/reader2/ssm/IPrintable_DExprSeqState.hpp>
-
-//#include <xo/reader2/DefineSsm.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DDefineSsm.hpp>
-#include <xo/reader2/ssm/IPrintable_DDefineSsm.hpp>
-
+#include <xo/reader2/ExprSeqState.hpp>
+#include <xo/reader2/DefineSsm.hpp>
 #include <xo/reader2/LambdaSsm.hpp>
-//#include <xo/reader2/ssm/ISyntaxStateMachine_DLambdaSsm.hpp>
-//#include <xo/reader2/ssm/IPrintable_DLambdaSsm.hpp>
-
-//#include <xo/reader2/IfElseSsm.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DIfElseSsm.hpp>
-#include <xo/reader2/ssm/IPrintable_DIfElseSsm.hpp>
+#include <xo/reader2/IfElseSsm.hpp>
 
 #include "ApplySsm.hpp"
 #include "SequenceSsm.hpp"
 #include "ParenSsm.hpp"
 
-//#include <xo/reader2/ExpectFormalArglistSsm.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp>
-#include <xo/reader2/ssm/IPrintable_DExpectFormalArglistSsm.hpp>
-
-//#include <xo/reader2/ExpectFormalArgSsm.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp>
-#include <xo/reader2/ssm/IPrintable_DExpectFormalArgSsm.hpp>
-
-//#include <xo/reader2/ExpectSymbolSsm.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectSymbolSsm.hpp>
-#include <xo/reader2/ssm/IPrintable_DExpectSymbolSsm.hpp>
-
-//#include <xo/reader2/ExpectTypeSsm.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectTypeSsm.hpp>
-#include <xo/reader2/ssm/IPrintable_DExpectTypeSsm.hpp>
-
+#include <xo/reader2/ExpectFormalArglistSsm.hpp>
+#include <xo/reader2/ExpectFormalArgSsm.hpp>
+#include <xo/reader2/ExpectSymbolSsm.hpp>
+#include <xo/reader2/ExpectTypeSsm.hpp>
 #include <xo/reader2/ExpectExprSsm.hpp>
-//#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectExprSsm.hpp>
-//#include <xo/reader2/ssm/IPrintable_DExpectExprSsm.hpp>
-
 #include <xo/reader2/ProgressSsm.hpp>
-//#include <xo/reader2/ssm/ISyntaxStateMachine_DProgressSsm.hpp>
-//#include <xo/reader2/ssm/IPrintable_DProgressSsm.hpp>
 
 #include <xo/reader2/ssm/ASyntaxStateMachine.hpp>
 #include <xo/printable2/detail/APrintable.hpp>
