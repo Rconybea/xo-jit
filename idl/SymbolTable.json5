@@ -1,5 +1,6 @@
 {
     mode: "facet",
+    output_cpp_dir: "src/expression2",
     includes: [
         "\"Binding.hpp\"",
         "\"DUniqueString.hpp\""

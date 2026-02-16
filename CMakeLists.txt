@@ -29,7 +29,6 @@ xo_add_genfacet(
     INPUT idl/SymbolTable.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
     )
 
 # ----------------------------------------------------------------
@@ -43,7 +42,6 @@ xo_add_genfacetimpl(
     INPUT idl/ISymbolTable_DLocalSymtab.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -55,7 +53,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DLocalSymtab.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -67,7 +64,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DLocalSymtab.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # ----------------------------------------------------------------
@@ -79,7 +75,6 @@ xo_add_genfacet(
     INPUT idl/Expression.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
     )
 
 # ----------------------------------------------------------------
@@ -93,7 +88,6 @@ xo_add_genfacetimpl(
     INPUT idl/IExpression_DConstant.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -105,7 +99,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DConstant.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -117,7 +110,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DConstant.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # ----------------------------------------------------------------
@@ -131,7 +123,6 @@ xo_add_genfacetimpl(
     INPUT idl/IExpression_DVariable.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -143,7 +134,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DVariable.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -155,7 +145,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DVariable.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # ----------------------------------------------------------------
@@ -169,7 +158,6 @@ xo_add_genfacetimpl(
     INPUT idl/IExpression_DVarRef.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -181,7 +169,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DVarRef.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -193,7 +180,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DVarRef.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # ----------------------------------------------------------------
@@ -207,7 +193,6 @@ xo_add_genfacetimpl(
     INPUT idl/IExpression_DDefineExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -219,7 +204,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DDefineExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # ----------------------------------------------------------------
@@ -233,7 +217,6 @@ xo_add_genfacetimpl(
     INPUT idl/IExpression_DApplyExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -245,7 +228,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DApplyExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -257,7 +239,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DApplyExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # ----------------------------------------------------------------
@@ -271,7 +252,6 @@ xo_add_genfacetimpl(
     INPUT idl/IExpression_DLambdaExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -283,7 +263,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DLambdaExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -295,7 +274,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DLambdaExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # ----------------------------------------------------------------
@@ -309,7 +287,6 @@ xo_add_genfacetimpl(
     INPUT idl/IExpression_DIfElseExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -321,7 +298,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DIfElseExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -333,7 +309,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DIfElseExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # ----------------------------------------------------------------
@@ -347,7 +322,6 @@ xo_add_genfacetimpl(
     INPUT idl/IExpression_DSequenceExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -359,7 +333,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DSequenceExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -371,7 +344,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DSequenceExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # ----------------------------------------------------------------
@@ -385,7 +357,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DUniqueString.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # note: manual target; generated code committed to git
@@ -397,7 +368,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DUniqueString.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/expression2
 )
 
 # ----------------------------------------------------------------
