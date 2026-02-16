@@ -1,5 +1,6 @@
 {
     mode: "implementation",
+    output_cpp_dir: "src/interpreter2",
     includes: [
         "<xo/gc/GCObject.hpp>",
         "<xo/alloc2/Allocator.hpp>"

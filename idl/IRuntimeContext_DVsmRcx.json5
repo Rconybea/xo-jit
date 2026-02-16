@@ -1,5 +1,6 @@
 {
     mode: "implementation",
+    output_cpp_dir: "src/interpreter2",
     includes: [
         //"<xo/procedure2/RuntimeContext.hpp>",
         //"<xo/procedure2/detail/IRuntimeContext_Xfer.hpp>",

@@ -34,7 +34,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DVsmApplyFrame.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # note: manual target; generated code committed to git
@@ -46,7 +45,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DVsmApplyFrame.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # ----------------------------------------------------------------
@@ -60,7 +58,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DVsmEvalArgsFrame.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # note: manual target; generated code committed to git
@@ -72,7 +69,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DVsmEvalArgsFrame.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # ----------------------------------------------------------------
@@ -86,7 +82,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DVsmApplyClosureFrame.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # note: manual target; generated code committed to git
@@ -98,7 +93,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DVsmApplyClosureFrame.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # ----------------------------------------------------------------
@@ -112,7 +106,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DVsmIfElseContFrame.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR ifelse
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # note: manual target; generated code committed to git
@@ -124,7 +117,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DVsmIfElseContFrame.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR ifelse
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # ----------------------------------------------------------------
@@ -138,7 +130,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DVsmSeqContFrame.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR sequence
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # note: manual target; generated code committed to git
@@ -150,7 +141,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DVsmSeqContFrame.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR sequence
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # ----------------------------------------------------------------
@@ -165,7 +155,6 @@ xo_add_genfacetimpl(
 #    INPUT idl/IProcedure_DClosure.json5
 #    OUTPUT_HPP_DIR include/xo/interpreter2
 #    OUTPUT_IMPL_SUBDIR detail
-#    OUTPUT_CPP_DIR src/interpreter2
 #)
 
 # note: manual target; generated code committed to git
@@ -177,7 +166,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DClosure.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # note: manual target; generated code committed to git
@@ -189,7 +177,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DClosure.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # ----------------------------------------------------------------
@@ -203,7 +190,6 @@ xo_add_genfacetimpl(
     INPUT idl/IGCObject_DLocalEnv.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # note: manual target; generated code committed to git
@@ -215,7 +201,6 @@ xo_add_genfacetimpl(
     INPUT idl/IPrintable_DLocalEnv.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
 )
 
 # ----------------------------------------------------------------
@@ -228,7 +213,6 @@ xo_add_genfacetimpl(
     INPUT idl/IRuntimeContext_DVsmRcx.json5
     OUTPUT_HPP_DIR include/xo/interpreter2
     OUTPUT_IMPL_SUBDIR detail
-    OUTPUT_CPP_DIR src/interpreter2
     )
 
 # ----------------------------------------------------------------
