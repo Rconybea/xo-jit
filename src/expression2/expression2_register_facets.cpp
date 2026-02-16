@@ -26,6 +26,7 @@
 #include <xo/expression2/detail/IGCObject_DSequenceExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DSequenceExpr.hpp>
 
+#include <xo/expression2/GlobalSymtab.hpp>
 #include <xo/expression2/LocalSymtab.hpp>
 
 #include <xo/gc/detail/AGCObject.hpp>
@@ -37,6 +38,7 @@ namespace xo {
     using xo::mm::AGCObject;
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
+    using xo::facet::TypeRegistry;
     using xo::facet::typeseq;
 
     namespace scm {
@@ -44,6 +46,8 @@ namespace xo {
         expression2_register_facets()
         {
             scope log(XO_DEBUG(true));
+
+
 
             FacetRegistry::register_impl<AGCObject, DUniqueString>();
             FacetRegistry::register_impl<APrintable, DUniqueString>();
@@ -57,10 +61,6 @@ namespace xo {
             // +- LambdaExpr
             // +- IfElseExpr
             // \- SequenceExpr
-
-            // SymbolTable
-            // +- LocalSymtab
-            // \- GlobalSymtab
 
             FacetRegistry::register_impl<AExpression, DConstant>();
             FacetRegistry::register_impl<AGCObject, DConstant>();
@@ -94,9 +94,16 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DSequenceExpr>();
             FacetRegistry::register_impl<APrintable, DSequenceExpr>();
 
+            // SymbolTable
+            // +- LocalSymtab
+            // \- GlobalSymtab
+
             FacetRegistry::register_impl<ASymbolTable, DLocalSymtab>();
             FacetRegistry::register_impl<AGCObject, DLocalSymtab>();
             FacetRegistry::register_impl<APrintable, DLocalSymtab>();
+
+            // until we register facets
+            TypeRegistry::register_type<DGlobalSymtab>();
 
             log && log(xtag("DUniqueString.tseq", typeseq::id<DUniqueString>()));
             log && log(xtag("DDefineExpr.tseq", typeseq::id<DDefineExpr>()));
@@ -108,6 +115,7 @@ namespace xo {
             log && log(xtag("DIfElseExpr.tseq", typeseq::id<DIfElseExpr>()));
             log && log(xtag("DSequenceExpr.tseq", typeseq::id<DSequenceExpr>()));
 
+            log && log(xtag("DGlobalSymtab.tseq", typeseq::id<DGlobalSymtab>()));
             log && log(xtag("DLocalSymtab.tseq", typeseq::id<DLocalSymtab>()));
 
             log && log(xtag("AExpression.tseq", typeseq::id<AExpression>()));
