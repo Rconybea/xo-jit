@@ -58,7 +58,8 @@ namespace xo {
                 this->aux_arena_
                     = std::move(DArena(ArenaConfig()
                                        .with_name(testname)
-                                       .with_size(4 * 1024)));
+                                       .with_size(4 * 1024)
+                                       .with_store_header_flag(true)));
                 obj<AAllocator,DArena> aux_mm(&aux_arena_);
 
                 this->expr_arena_

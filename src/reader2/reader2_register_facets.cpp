@@ -5,15 +5,21 @@
 
 #include "reader2_register_facets.hpp"
 
+#include <xo/reader2/SchematikaParser.hpp>
+
+//#include <xo/reader2/ExprSeqState.hpp>
 #include <xo/reader2/ssm/ISyntaxStateMachine_DExprSeqState.hpp>
 #include <xo/reader2/ssm/IPrintable_DExprSeqState.hpp>
 
+//#include <xo/reader2/DefineSsm.hpp>
 #include <xo/reader2/ssm/ISyntaxStateMachine_DDefineSsm.hpp>
 #include <xo/reader2/ssm/IPrintable_DDefineSsm.hpp>
 
-#include <xo/reader2/ssm/ISyntaxStateMachine_DLambdaSsm.hpp>
-#include <xo/reader2/ssm/IPrintable_DLambdaSsm.hpp>
+#include <xo/reader2/LambdaSsm.hpp>
+//#include <xo/reader2/ssm/ISyntaxStateMachine_DLambdaSsm.hpp>
+//#include <xo/reader2/ssm/IPrintable_DLambdaSsm.hpp>
 
+//#include <xo/reader2/IfElseSsm.hpp>
 #include <xo/reader2/ssm/ISyntaxStateMachine_DIfElseSsm.hpp>
 #include <xo/reader2/ssm/IPrintable_DIfElseSsm.hpp>
 
