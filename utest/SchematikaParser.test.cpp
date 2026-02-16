@@ -78,7 +78,7 @@ namespace xo {
 
             bool log_memory_layout(scope * p_log) {
                 auto visitor = [p_log](const MemorySizeInfo & info) {
-                    *p_log && (*p_log)(xtag("resource", info.resource_name_),
+                    *p_log && (*p_log)(xtag("name", info.resource_name_),
                                        xtag("used", info.used_),
                                        xtag("alloc", info.allocated_),
                                        xtag("commit", info.committed_),
