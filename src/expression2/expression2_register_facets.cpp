@@ -5,6 +5,7 @@
 
 #include "expression2_register_facets.hpp"
 
+#include <xo/expression2/UniqueString.hpp>
 #include <xo/expression2/detail/IGCObject_DUniqueString.hpp>
 #include <xo/expression2/detail/IPrintable_DUniqueString.hpp>
 
@@ -46,8 +47,6 @@ namespace xo {
         expression2_register_facets()
         {
             scope log(XO_DEBUG(true));
-
-
 
             FacetRegistry::register_impl<AGCObject, DUniqueString>();
             FacetRegistry::register_impl<APrintable, DUniqueString>();
@@ -104,6 +103,8 @@ namespace xo {
 
             // until we register facets
             TypeRegistry::register_type<DGlobalSymtab>();
+
+            TypeRegistry::register_type<DGlobalSymtab::repr_type>();
 
             log && log(xtag("DUniqueString.tseq", typeseq::id<DUniqueString>()));
             log && log(xtag("DDefineExpr.tseq", typeseq::id<DDefineExpr>()));
