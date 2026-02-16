@@ -168,6 +168,18 @@ namespace xo {
             return this->shallow_size();
         }
 
+        // ----- printable facet -----
+
+        bool
+        DGlobalSymtab::pretty(const ppindentinfo & ppii) const
+        {
+            return ppii.pps()->pretty_struct
+                       (ppii,
+                        "DGlobalSymtab",
+                        refrtag("nsym", vars_->size()),
+                        refrtag("capacity", vars_->capacity()));
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

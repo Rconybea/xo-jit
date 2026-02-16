@@ -69,6 +69,41 @@ xo_add_genfacetimpl(
 # ----------------------------------------------------------------
 
 # note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-symboltable-globalsymtab
+    FACET_PKG xo_expression2
+    FACET SymbolTable
+    REPR GlobalSymtab
+    INPUT idl/ISymbolTable_DGlobalSymtab.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR symtab
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-gcobject-globalsymtab
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR GlobalSymtab
+    INPUT idl/IGCObject_DGlobalSymtab.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR symtab
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-printable-globalsymtab
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR GlobalSymtab
+    INPUT idl/IPrintable_DGlobalSymtab.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR symtab
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
 xo_add_genfacet(
     TARGET xo-expression2-facet-expression
     FACET Expression

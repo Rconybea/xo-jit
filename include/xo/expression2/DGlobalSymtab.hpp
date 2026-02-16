@@ -31,6 +31,7 @@ namespace xo {
             using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
+            using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             /** @defgroup scm-globalsymtab-ctors constructors **/
@@ -89,6 +90,13 @@ namespace xo {
             std::size_t shallow_size() const noexcept;
             DGlobalSymtab * shallow_copy(obj<AAllocator> mm) const noexcept;
             std::size_t forward_children(obj<ACollector> gc) noexcept;
+
+            ///@}
+            /** @defgroup scm-globalsymtab-printable-facet printable facet **/
+            ///@{
+
+            /** pretty-printing support **/
+            bool pretty(const ppindentinfo & ppii) const;
 
             ///@}
 

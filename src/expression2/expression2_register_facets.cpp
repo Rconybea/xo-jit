@@ -6,8 +6,8 @@
 #include "expression2_register_facets.hpp"
 
 #include <xo/expression2/UniqueString.hpp>
-#include <xo/expression2/detail/IGCObject_DUniqueString.hpp>
-#include <xo/expression2/detail/IPrintable_DUniqueString.hpp>
+//#include <xo/expression2/detail/IGCObject_DUniqueString.hpp>
+//#include <xo/expression2/detail/IPrintable_DUniqueString.hpp>
 
 #include <xo/expression2/detail/IExpression_DDefineExpr.hpp>
 //#include <xo/expression2/detail/IGCObject_DDefineExpr.hpp>
@@ -100,6 +100,10 @@ namespace xo {
             FacetRegistry::register_impl<ASymbolTable, DLocalSymtab>();
             FacetRegistry::register_impl<AGCObject, DLocalSymtab>();
             FacetRegistry::register_impl<APrintable, DLocalSymtab>();
+
+            FacetRegistry::register_impl<ASymbolTable, DGlobalSymtab>();
+            FacetRegistry::register_impl<AGCObject, DGlobalSymtab>();
+            FacetRegistry::register_impl<APrintable, DGlobalSymtab>();
 
             // until we register facets
             TypeRegistry::register_type<DGlobalSymtab>();

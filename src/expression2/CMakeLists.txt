@@ -58,6 +58,9 @@ set(SELF_SRCS
     IPrintable_DLocalSymtab.cpp
 
     DGlobalSymtab.cpp
+    ISymbolTable_DGlobalSymtab.cpp
+    IGCObject_DGlobalSymtab.cpp
+    IPrintable_DGlobalSymtab.cpp
 
     StringTable.cpp
 
