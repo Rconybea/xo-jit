@@ -1772,7 +1772,7 @@ function(xo_add_genfacetimpl)
     )
 
     # Create a target for this generation
-    add_custom_target(${GF_TARGET} DEPENDS ${GF_INPUT})
+    add_custom_target(${GF_TARGET} DEPENDS ${GF_INPUT}.out)
 
     set_property(DIRECTORY APPEND PROPERTY XO_GENFACET_TARGETS ${GF_TARGET})
 endfunction()
