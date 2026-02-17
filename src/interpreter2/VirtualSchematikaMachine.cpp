@@ -113,6 +113,8 @@ namespace xo {
                 return VsmResultExt();
             }
 
+            reader_.reset_result();
+
             auto [expr, remaining, error1]
                 = reader_.read_expr(input, eof);
 
@@ -392,12 +394,21 @@ namespace xo {
 
             Binding b = var->path();
 
-            if (!local_env_) {
-                // need lookup on global_env_
-                assert(false);
+            if (local_env_) {
+                auto value = local_env_->lookup_value(b);
+
+                if (value) {
+                    this->value_ = VsmResult(value);
+
+                    this->pc_ = this->cont_;
+                    this->cont_ = VsmInstr::c_sentinel;
+                    return;
+                }
             }
 
-            auto value = local_env_->lookup_value(b);
+            // no local binding. perhaps there's a global binding
+
+            auto value = global_env_->lookup_value(b);
 
             if (value) {
                 this->value_ = VsmResult(value);
@@ -407,7 +418,7 @@ namespace xo {
                 return;
             }
 
-            // no binding
+            // no local or global binding
 
             auto error = DRuntimeError::make(mm_.to_op(),
                                              "_do_eval_varref_op",

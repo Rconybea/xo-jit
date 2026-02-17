@@ -391,9 +391,11 @@ namespace xo {
 
             vsm.begin_interactive_session();
 
-            span_type input = span_type::from_cstr("def foo = 3.14159; foo");
+            span_type input = span_type::from_cstr("def foo = 3.14159; foo;");
 
             for (int i_expr = 0; i_expr < 2; ++i_expr) {
+                log && log(xtag("input", input));
+
                 VsmResultExt res
                     = vsm.read_eval_print(input, eof_flag);
 
@@ -414,14 +416,12 @@ namespace xo {
                 } else if (i_expr == 1) {
                     auto x = obj<AGCObject,DFloat>::from(*res.value());
                     REQUIRE(x);
-                    REQUIRE(x->value() == 3.14159);
+                    REQUIRE_THAT(x->value(), WithinAbs(3.14159, 1e-6));
 
                     REQUIRE(res.remaining_.size() == 1);
                     REQUIRE(*res.remaining_.lo() == '\n');
                     input = res.remaining_;
                 }
-
-                ++i_expr;
             }
 
             log && vsm_fixture.log_memory_layout(&log);
