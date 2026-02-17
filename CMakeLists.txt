@@ -29,8 +29,6 @@ xo_add_genfacet(
     TARGET xo-reader2-facet-syntaxstatemachine
     FACET SyntaxStateMachine
     INPUT idl/SyntaxStateMachine.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
     )
 
 # ----------------------------------------------------------------
@@ -42,8 +40,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR ToplevelSeqSsm
     INPUT idl/ISyntaxStateMachine_DToplevelSeqSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -53,8 +49,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR ToplevelSeqSsm
     INPUT idl/IPrintable_DToplevelSeqSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -66,8 +60,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR DefineSsm
     INPUT idl/ISyntaxStateMachine_DDefineSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -77,8 +69,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR DefineSsm
     INPUT idl/IPrintable_DDefineSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -90,8 +80,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR LambdaSsm
     INPUT idl/ISyntaxStateMachine_DLambdaSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -101,8 +89,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR LambdaSsm
     INPUT idl/IPrintable_DLambdaSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -114,8 +100,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR ParenSsm
     INPUT idl/ISyntaxStateMachine_DParenSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -125,8 +109,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR ParenSsm
     INPUT idl/IPrintable_DParenSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -138,8 +120,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR ExpectFormalArglistSsm
     INPUT idl/ISyntaxStateMachine_DExpectFormalArglistSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -149,8 +129,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR ExpectFormalArglistSsm
     INPUT idl/IPrintable_DExpectFormalArglistSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -162,8 +140,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR ExpectFormalArgSsm
     INPUT idl/ISyntaxStateMachine_DExpectFormalArgSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -173,8 +149,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR ExpectFormalArgSsm
     INPUT idl/IPrintable_DExpectFormalArgSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -186,8 +160,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR IfElseSsm
     INPUT idl/ISyntaxStateMachine_DIfElseSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -197,8 +169,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR IfElseSsm
     INPUT idl/IPrintable_DIfElseSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -210,8 +180,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR SequenceSsm
     INPUT idl/ISyntaxStateMachine_DSequenceSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -221,8 +189,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR SequenceSsm
     INPUT idl/IPrintable_DSequenceSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -234,8 +200,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR ApplySsm
     INPUT idl/ISyntaxStateMachine_DApplySsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -245,8 +209,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR ApplySsm
     INPUT idl/IPrintable_DApplySsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -258,8 +220,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR ExpectSymbolSsm
     INPUT idl/ISyntaxStateMachine_DExpectSymbolSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -269,8 +229,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR ExpectSymbolSsm
     INPUT idl/IPrintable_DExpectSymbolSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -282,8 +240,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR ExpectTypeSsm
     INPUT idl/ISyntaxStateMachine_DExpectTypeSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -293,8 +249,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR ExpectTypeSsm
     INPUT idl/IPrintable_DExpectTypeSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -306,8 +260,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR ExpectExprSsm
     INPUT idl/ISyntaxStateMachine_DExpectExprSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -317,8 +269,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR ExpectExprSsm
     INPUT idl/IPrintable_DExpectExprSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
@@ -330,8 +280,6 @@ xo_add_genfacetimpl(
     FACET SyntaxStateMachine
     REPR ProgressSsm
     INPUT idl/ISyntaxStateMachine_DProgressSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # note: manual target; generated code committed to git
@@ -341,8 +289,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR ProgressSsm
     INPUT idl/IPrintable_DProgressSsm.json5
-    OUTPUT_HPP_DIR include/xo/reader2
-    OUTPUT_IMPL_SUBDIR ssm
 )
 
 # ----------------------------------------------------------------
