@@ -27,6 +27,26 @@ add_subdirectory(utest)
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-gcobject-vsmdefcontframe
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR VsmDefContFrame
+    INPUT idl/IGCObject_DVsmDefContFrame.json5
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-printable-vsmdefcontframe
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR VsmDefContFrame
+    INPUT idl/IPrintable_DVsmDefContFrame.json5
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-gcobject-vsmapplyframe
     FACET_PKG xo_gc
     FACET GCObject
@@ -151,6 +171,26 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR Closure
     INPUT idl/IPrintable_DClosure.json5
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-gcobject-globalenv
+    FACET_PKG xo_gc
+    FACET GCObject
+    REPR GlobalEnv
+    INPUT idl/IGCObject_DGlobalEnv.json5
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-printable-globalenv
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR GlobalEnv
+    INPUT idl/IPrintable_DGlobalEnv.json5
 )
 
 # ----------------------------------------------------------------

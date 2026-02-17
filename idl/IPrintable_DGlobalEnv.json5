@@ -9,8 +9,8 @@
     namespace1: "xo",
     namespace2: "scm",
     facet_idl: "idl/Printable.json5",
-    brief: "provide APrintable interface for DLocalEnv",
+    brief: "provide APrintable interface for DGlobalEnv",
     using_doxygen: true,
-    repr: "DLocalEnv",
-    doc: [ "implement APrintable for DLocalEnv" ],
+    repr: "DGlobalEnv",
+    doc: [ "implement APrintable for DGlobalEnv" ],
 }

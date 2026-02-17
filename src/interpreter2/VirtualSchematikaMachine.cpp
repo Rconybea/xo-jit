@@ -4,6 +4,7 @@
  **/
 
 #include "VirtualSchematikaMachine.hpp"
+#include "VsmDefContFrame.hpp"
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
 #include "VsmApplyClosureFrame.hpp"
@@ -11,10 +12,12 @@
 #include "VsmSeqContFrame.hpp"
 #include "VsmRcx.hpp"
 #include "Closure.hpp"
+#include <xo/expression2/DefineExpr.hpp>
 #include <xo/expression2/ApplyExpr.hpp>
 #include <xo/expression2/LambdaExpr.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/expression2/SequenceExpr.hpp>
+#include <xo/expression2/UniqueString.hpp>
 #include <xo/object2/Boolean.hpp>
 #include <xo/procedure2/RuntimeContext.hpp>
 //#include <xo/procedure2/SimpleRcx.hpp>
@@ -65,10 +68,10 @@ namespace xo {
                 DArena * arena = new DArena(config_.error_config_);
                 assert(arena);
 
-                error_mm_.adopt(obj<AAllocator,DArena>(arena));
+                this->error_mm_.adopt(obj<AAllocator,DArena>(arena));
             }
 
-            // TODO: allocate global_env
+            this->global_env_ = DGlobalEnv::_make(mm_.to_op(), reader_.global_symtab());
         }
 
         obj<AAllocator>
@@ -166,17 +169,20 @@ namespace xo {
         VirtualSchematikaMachine::execute_one()
         {
             scope log(XO_DEBUG(config_.debug_flag_));
+
             log && log(xtag("pc", pc_),
                        xtag("cont", cont_));
 
-            obj<APrintable> stack_pr = stack_.to_facet<APrintable>();
-//                = (FacetRegistry::instance()
-//                   .try_variant<APrintable,AGCObject>(stack_));
+            auto expr_pr = expr_.to_facet<APrintable>();
+            if (expr_pr)
+                log && log(xtag("expr", expr_pr));
 
+            auto stack_pr = stack_.to_facet<APrintable>();
             if (stack_pr)
                 log && log(xtag("stack", stack_pr));
 
             switch (pc_.opcode()) {
+            case vsm_opcode::sentinel:
             case vsm_opcode::halt:
             case vsm_opcode::N:
                 return false;
@@ -188,6 +194,9 @@ namespace xo {
                 break;
             case vsm_opcode::evalargs:
                 _do_evalargs_op();
+                break;
+            case vsm_opcode::def_cont:
+                _do_def_cont_op();
                 break;
             case vsm_opcode::apply_cont:
                 _do_apply_cont_op();
@@ -244,14 +253,84 @@ namespace xo {
                 = obj<AExpression,DConstant>::from(expr_);
 
             this->value_ = VsmResult(expr.data()->value());
+
             this->pc_ = this->cont_;
+            this->cont_ = VsmInstr::c_sentinel;
         }
 
         void
         VirtualSchematikaMachine::_do_eval_define_op()
         {
-            // not implemented
-            assert(false);
+            scope log(XO_DEBUG(true));
+
+            auto def_expr
+                = obj<AExpression,DDefineExpr>::from(expr_);
+
+            if (local_env_ == nullptr) {
+                // top-level define
+
+                // .stack_ --+
+                //           |
+                //           v
+                //           +------DVsmDefContFrame------+
+                //           | .parent x | .cont | .def x |
+                //           +---------|-+-------+------|-+
+                //                     |                |
+                //  ParserStack* <-----/                |
+                //                                      |
+                //                                      v
+                //                                 DDefineExpr
+
+                /* stack frame for nested continuation
+                 * (to perform assignment)
+                 */
+                auto defcont_frame
+                    = obj<AGCObject,DVsmDefContFrame>
+                          (DVsmDefContFrame::make(mm_.to_op(),
+                                                  this->stack_ /*saved stack*/,
+                                                  this->cont_ /*saved cont*/,
+                                                  def_expr.data() /*saved expr*/));
+
+                this->stack_ = defcont_frame;
+
+                // setup evaluation of rhs
+
+                this->expr_ = def_expr->rhs();
+                this->pc_ = VsmInstr::c_eval;
+                this->cont_ = VsmInstr::c_def_cont;
+            } else {
+                // nested defines implemented by rewriting,
+                // so this branch should be unreachable
+
+                assert(false);
+            }
+        }
+
+        void
+        VirtualSchematikaMachine::_do_def_cont_op()
+        {
+            // see DVsmDefContFrame
+
+            auto frame = obj<AGCObject,DVsmDefContFrame>::from(stack_);
+
+            assert(frame);
+            assert(value_.is_value());
+
+            // TODO: verify that value satisfies expected type ?
+
+            DVariable * lhs = frame->def_expr()->lhs();
+            obj<AGCObject> rhs = *value_.value();
+
+            assert(lhs->path().is_global());
+
+            global_env_->assign_value(mm_.to_op(), lhs->path(), rhs);
+
+            // TODO: unfortunate const_cast here, because obj<> doesn't support const DRepr yet
+            this->value_ = VsmResult(obj<AGCObject,DUniqueString>(const_cast<DUniqueString*>(lhs->name())));
+
+            this->stack_ = frame->parent();
+            this->pc_ = frame->cont();
+            this->cont_ = VsmInstr::c_sentinel;
         }
 
         void
@@ -294,7 +373,9 @@ namespace xo {
 
             this->value_
                 = VsmResult(obj<AGCObject>(obj<AGCObject,DClosure>(closure)));
+
             this->pc_ = this->cont_;
+            this->cont_ = VsmInstr::c_sentinel;
         }
 
         void
@@ -320,7 +401,9 @@ namespace xo {
 
             if (value) {
                 this->value_ = VsmResult(value);
+
                 this->pc_ = this->cont_;
+                this->cont_ = VsmInstr::c_sentinel;
                 return;
             }
 
@@ -338,6 +421,7 @@ namespace xo {
             // 3. have every vsm instruction check inputs for errors
 
             this->pc_ = VsmInstr::c_halt;
+            this->cont_ = VsmInstr::c_sentinel;
         }
 
         void
@@ -385,9 +469,9 @@ namespace xo {
 
             // Setup evaluation of first argument.  No new stack for this.
 
-            this->cont_ = VsmInstr::c_evalargs;
             this->expr_ = apply->fn();
             this->pc_   = VsmInstr::c_eval;
+            this->cont_ = VsmInstr::c_evalargs;
         }
 
         void
@@ -404,9 +488,9 @@ namespace xo {
                                            stack_, cont_, ifelse_expr.data()));
 
             this->stack_ = ifelse_frame;
-            this->cont_ = VsmInstr::c_ifelse_cont;
             this->expr_ = ifelse_expr->test();
             this->pc_ = VsmInstr::c_eval;
+            this->cont_ = VsmInstr::c_ifelse_cont;
         }
 
         void
@@ -445,9 +529,9 @@ namespace xo {
 
             // Setup evaluation of first sequence element
 
-            this->cont_ = VsmInstr::c_seq_cont;
             this->expr_ = (*seq_expr.data())[0];
             this->pc_ = VsmInstr::c_eval;
+            this->cont_ = VsmInstr::c_seq_cont;
         }
 
         void
@@ -514,6 +598,7 @@ namespace xo {
             this->local_env_ = local_env;
             this->expr_ = lambda->body_expr();
             this->pc_ = VsmInstr::c_eval;
+            // cont_ already established
         }
 
         void
@@ -523,6 +608,7 @@ namespace xo {
 
             this->value_ = VsmResult(fn.apply_nocheck(rcx_.to_op(), args_));
             this->pc_ = cont_;
+            this->cont_ = VsmInstr::c_sentinel;
         }
 
         void
@@ -537,6 +623,7 @@ namespace xo {
                 log && log("error in apply -> terminating app");
 
                 this->pc_ = VsmInstr::c_halt;
+                this->cont_ = VsmInstr::c_sentinel;
                 return;
             }
 
@@ -595,7 +682,7 @@ namespace xo {
 
                     this->expr_ = apply_expr->arg(i_arg);
                     this->pc_ = VsmInstr::c_eval;
-                    //this->cont_ = VsmInstra::c_evalargs;  // redundant, since preserved
+                    this->cont_ = VsmInstr::c_evalargs;
 
                     return;
                 } else {
@@ -633,7 +720,7 @@ namespace xo {
                 } else {
                     this->expr_ = apply_expr->arg(i_arg);
                     this->pc_ = VsmInstr::c_eval;
-                    //this->cont_ = VsmInstra::c_evalargs;  // redundant, since preserved
+                    this->cont_ = VsmInstr::c_evalargs;
 
                     return;
                 }
@@ -655,6 +742,7 @@ namespace xo {
             this->stack_ = frame->parent();
             this->local_env_ = frame->local_env();
             this->pc_ = frame->cont();
+            this->cont_ = VsmInstr::c_sentinel;
         }
 
         void
@@ -682,9 +770,9 @@ namespace xo {
                 }
 
                 this->stack_ = frame->parent();
-                this->cont_ = frame->cont();
                 this->expr_ = next_expr;
                 this->pc_ = VsmInstr::c_eval;
+                this->cont_ = frame->cont();
             } else {
                 auto error = DRuntimeError::make(mm_.to_op(),
                                                  "_do_ifelse_cont_op",
@@ -698,6 +786,7 @@ namespace xo {
                 // 3. have every vsm instruction check inputs for errors
 
                 this->pc_ = VsmInstr::c_halt;
+                this->cont_ = VsmInstr::c_sentinel;
             }
         }
 
@@ -722,13 +811,16 @@ namespace xo {
 
                 this->stack_ = frame->parent();
                 this->pc_ = frame->cont();
+                this->cont_ = VsmInstr::c_sentinel;
+
                 return;
             } else {
                 frame->incr_i_seq();
 
-                this->cont_ = VsmInstr::c_seq_cont;
                 this->expr_ = (*seq_expr)[i_seq];
                 this->pc_ = VsmInstr::c_eval;
+                this->cont_ = VsmInstr::c_seq_cont;
+
                 return;
             }
          }

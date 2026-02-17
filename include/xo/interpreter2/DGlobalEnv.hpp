@@ -25,18 +25,55 @@ namespace xo {
          **/
         class DGlobalEnv {
         public:
+            using ACollector = xo::mm::ACollector;
+            using AAllocator = xo::mm::AAllocator;
+            using AGCObject = xo::mm::AGCObject;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
+            using ppindentinfo = xo::print::ppindentinfo;
+            using size_type = std::uint32_t;
 
         public:
-            DGlobalEnv() = default;
+            /** @defgroup scm-globalenv-ctors constructors **/
+            ///@{
 
-            /** visit env-owned memory pools; call visitor(info) for each **/
-            void visit_pools(const MemorySizeVisitor & visitor) const;
+            DGlobalEnv(DGlobalSymtab * symtab, DArray * values);
 
-        protected: // temporary, to appease compiler
+            static DGlobalEnv * _make(obj<AAllocator> mm,
+                                      DGlobalSymtab * symtab);
 
-            // absurd O(n) implementation for now
-            // replace with gc-aware hashtable, when available.
+
+            ///@}
+            /** @defgroup scm-globalenv-methods methods **/
+            ///@{
+
+            /** symbol-table size.  Is the number of distinct global symbols **/
+            size_type size() const noexcept { return symtab_->size(); }
+
+            /** lookup current value associated with binding @p ix **/
+            obj<AGCObject> lookup_value(Binding ix) const noexcept;
+
+            /** assign value associated with binding @p to @p x.
+             *  If need to expand size of this env, use memory from @p mm
+             **/
+            void assign_value(obj<AAllocator> mm, Binding ix, obj<AGCObject> x);
+
+            ///@}
+            /** @defgroup scm-globalenv-gcobject-facet **/
+            ///@{
+
+            std::size_t shallow_size() const noexcept;
+            DGlobalEnv * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
+
+            ///@}
+            /** @defgroup scm-globalenv-printable-facet **/
+            ///@{
+
+            bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
+
+        private:
 
             /** symbol table assigns a unique index for each symbol **/
             DGlobalSymtab * symtab_;

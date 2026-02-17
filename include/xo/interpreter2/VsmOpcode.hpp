@@ -14,6 +14,8 @@ namespace xo {
          *  exeucted by VirtualSchematikaMachine
          **/
         enum class vsm_opcode {
+            /** Flags bad state (defect in VSM itself) **/
+            sentinel,
             /** Immediately halt virtual schematika machine. **/
             halt,
             /** Evaluate expression in expr register **/
@@ -27,6 +29,11 @@ namespace xo {
              *  See diagram in VirtualSchematikaMachine::_do_eval_apply_op
              **/
             evalargs,
+
+            /** continuation to complete execution of define-expression,
+             *  after evaluting rhs expression
+             **/
+            def_cont,
 
             /** continuation to restore vsm registers (local_env, stack, cont)
              *  after invoking a closure
@@ -58,4 +65,3 @@ namespace xo {
 } /*namespace xo*/
 
 /* end VsmOpcode.hpp */
-

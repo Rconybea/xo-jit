@@ -11,8 +11,8 @@
     namespace1: "xo",
     namespace2: "scm",
     facet_idl: "idl/GCObject.json5",
-    brief: "provide AGCObject interface for LocalEnv",
+    brief: "provide AGCObject interface for GlobalEnv",
     using_doxygen: true,
-    repr: "DLocalEnv",
-    doc: [ "implement AGCObject for DLocalEnv" ],
+    repr: "DGlobalEnv",
+    doc: [ "implement AGCObject for DGlobalEnv" ],
 }

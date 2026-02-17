@@ -37,7 +37,7 @@ namespace xo {
                                      DArray * args);
 
             ///@}
-            /** @defgroup scm-local-env-methods methods **/
+            /** @defgroup scm-localenv-methods methods **/
             ///@{
 
             DLocalEnv * parent() const noexcept { return parent_; }

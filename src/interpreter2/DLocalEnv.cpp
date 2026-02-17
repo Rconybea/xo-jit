@@ -6,6 +6,7 @@
 #include "LocalEnv.hpp"
 #include <xo/object2/Array.hpp>
 #include <xo/reflectutil/typeseq.hpp>
+#include <xo/indentlog/scope.hpp>
 
 namespace xo {
     using xo::mm::AGCObject;
@@ -64,6 +65,8 @@ namespace xo {
         void
         DLocalEnv::assign_value(Binding ix, obj<AGCObject> x)
         {
+            scope log(XO_DEBUG(true));
+
             assert(!ix.is_global());
 
             const DLocalEnv * env = this;
@@ -76,6 +79,7 @@ namespace xo {
                 auto j = ix.j_slot();
 
                 if (j < static_cast<decltype(j)>(env->size())) {
+                    log && log("STUB: need write barrier for GC here");
                     (*(env->args_))[j] = x;
                 } else {
                     assert(false);

@@ -191,6 +191,11 @@ namespace xo {
             /** call primitive @ref fn_ with arguments @ref args_ **/
             void _do_call_primitive_op();
 
+            /** perform assignment after evaluating
+             *  the rhs of a define-expr
+             **/
+            void _do_def_cont_op();
+
             /** restore registers from stack frame
              *  (specifically: local_env_, stack_, cont_)
              *  after invoking a schematika closure
@@ -225,13 +230,13 @@ namespace xo {
 
 #ifdef NOT_YET
             /** allocator (likely DArena) for globals.
-             *  For example DArenaHashMap in global symtab,
+             *  For example DArenaHashMap in global symta.
              **/
             obj<AAllocator> aux_mm_;
 #endif
 
             /** allocator (likely DX1Collector or similar) for
-             *  expressions and values
+             *  expressions and values. Schemaatika reader will use this also
              **/
             abox<AAllocator> mm_;
 
@@ -267,19 +272,17 @@ namespace xo {
             /** expression register **/
             obj<AExpression> expr_;
 
+            /** environment pointer.  Maintains bindings
+             *  for global variables.
+             **/
+            DGlobalEnv * global_env_ = nullptr;
+
             /** environment pointer.  Provides bindings
              *  for surrounding lexical scope at this point
              *  in execution
              **/
             DLocalEnv * local_env_ = nullptr;
 
-        protected:  // temporarily, to appease compiler
-            /** environment pointer.  Maintains bindings
-             *  for global variables.
-             **/
-            DGlobalEnv * global_env_ = nullptr;
-
-        private:
             /** evaluated function to call **/
             obj<AGCObject> fn_;
             /** evaluated argument list **/

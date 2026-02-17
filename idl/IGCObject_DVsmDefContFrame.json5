@@ -2,7 +2,7 @@
     mode: "implementation",
     output_cpp_dir: "src/interpreter2",
     output_hpp_dir: "include/xo/interpreter2",
-    output_impl_subdir: "env",
+    output_impl_subdir: "define",
     includes: [
         "<xo/gc/GCObject.hpp>",
         "<xo/alloc2/Allocator.hpp>"
@@ -11,8 +11,8 @@
     namespace1: "xo",
     namespace2: "scm",
     facet_idl: "idl/GCObject.json5",
-    brief: "provide AGCObject interface for LocalEnv",
+    brief: "provide AGCObject interface for DVsmDefContFrame",
     using_doxygen: true,
-    repr: "DLocalEnv",
-    doc: [ "implement AGCObject for DLocalEnv" ],
+    repr: "DVsmDefContFrame",
+    doc: [ "implement AGCObject for DVsmDefContFrame" ],
 }

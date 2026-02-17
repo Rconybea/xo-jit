@@ -6,6 +6,7 @@
 #include "interpreter2_register_facets.hpp"
 
 #include "DPrimitive_gco_2_gco_gco.hpp"
+#include "VsmDefContFrame.hpp"
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
 #include "VsmApplyClosureFrame.hpp"
@@ -13,6 +14,7 @@
 #include "VsmSeqContFrame.hpp"
 #include "Primitive_gco_2_gco_gco.hpp"
 #include "Closure.hpp"
+#include "GlobalEnv.hpp"
 #include "LocalEnv.hpp"
 #include "VsmRcx.hpp"
 
@@ -39,6 +41,7 @@ namespace xo {
             // +- VsmApplyFrame
             // +- VsmEvalArgsFrame
             // +- VsmApplyClosureFrame
+            // +- VsmDefContFrame
             // +- VsmIfElseContFrame
             // \- VsmSeqContFrame
 
@@ -51,11 +54,19 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DVsmApplyClosureFrame>();
             FacetRegistry::register_impl<APrintable, DVsmApplyClosureFrame>();
 
+            FacetRegistry::register_impl<AGCObject, DVsmDefContFrame>();
+            FacetRegistry::register_impl<APrintable, DVsmDefContFrame>();
+
             FacetRegistry::register_impl<AGCObject, DVsmIfElseContFrame>();
             FacetRegistry::register_impl<APrintable, DVsmIfElseContFrame>();
 
             FacetRegistry::register_impl<AGCObject, DVsmSeqContFrame>();
             FacetRegistry::register_impl<APrintable, DVsmSeqContFrame>();
+
+            // GlobalEnv
+
+            FacetRegistry::register_impl<AGCObject, DGlobalEnv>();
+            FacetRegistry::register_impl<APrintable, DGlobalEnv>();
 
             // LocalEnv
 
@@ -84,8 +95,12 @@ namespace xo {
             log && log(xtag("DVsmApplyFrame.tseq", typeseq::id<DVsmApplyFrame>()));
             log && log(xtag("DVsmEvalArgsFrame.tseq", typeseq::id<DVsmEvalArgsFrame>()));
             log && log(xtag("DVsmApplyClosureFrame.tseq", typeseq::id<DVsmApplyClosureFrame>()));
+            log && log(xtag("DVsmDefContFrame.tseq", typeseq::id<DVsmDefContFrame>()));
+            log && log(xtag("DVsmDefContFrame.tseq", typeseq::id<DVsmDefContFrame>()));
+            log && log(xtag("DVsmIfElseContFrame.tseq", typeseq::id<DVsmIfElseContFrame>()));
             log && log(xtag("DVsmSeqContFrame.tseq", typeseq::id<DVsmSeqContFrame>()));
             log && log(xtag("DClosure.tseq", typeseq::id<DClosure>()));
+            log && log(xtag("DGlobalEnv.tseq", typeseq::id<DGlobalEnv>()));
             log && log(xtag("DLocalEnv.tseq", typeseq::id<DLocalEnv>()));
             log && log(xtag("DVsmRcx.tseq", typeseq::id<DVsmRcx>()));
 

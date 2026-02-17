@@ -5,11 +5,13 @@
 
 #include <xo/interpreter2/VirtualSchematikaMachine.hpp>
 #include <xo/interpreter2/Closure.hpp>
+#include <xo/expression2/UniqueString.hpp>
 #include <xo/object2/Float.hpp>
 #include <xo/object2/Integer.hpp>
 #include <xo/object2/Boolean.hpp>
 #include <xo/object2/RuntimeError.hpp>
 #include <xo/alloc2/Arena.hpp>
+#include <xo/facet/TypeRegistry.hpp>
 
 #ifdef NOT_YET
 #include <xo/reader2/SchematikaParser.hpp>
@@ -32,6 +34,7 @@ namespace xo {
     using xo::scm::VsmResultExt;
     using xo::scm::DClosure;
     using xo::scm::DString;
+    using xo::scm::DUniqueString;  // aks Symbol in lisp
     using xo::scm::DFloat;
     using xo::scm::DBoolean;
     using xo::scm::DInteger;
@@ -42,6 +45,7 @@ namespace xo {
     using xo::mm::DArena;
     using xo::mm::ArenaConfig;
     using xo::facet::FacetRegistry;
+    using xo::facet::TypeRegistry;
     using span_type = xo::scm::VirtualSchematikaMachine::span_type;
     using Catch::Matchers::WithinAbs;
 
@@ -81,6 +85,7 @@ namespace xo {
 
                 aux_mm_.arena_.visit_pools(visitor);
                 FacetRegistry::instance().visit_pools(visitor);
+                TypeRegistry::instance().visit_pools(visitor);
                 vsm_.visit_pools(visitor);
 
                 return true;
@@ -298,7 +303,7 @@ namespace xo {
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            bool c_debug_flag = true;
+            bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             VsmFixture vsm_fixture(testname, c_debug_flag);
@@ -331,6 +336,96 @@ namespace xo {
             REQUIRE(*res.remaining_.lo() == '\n');
 
             log && vsm_fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("VirtualSchematikaMachine-def1", "[interpreter2][VSM]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            bool c_debug_flag = false;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
+
+            bool eof_flag = false;
+
+            vsm.begin_interactive_session();
+            VsmResultExt res
+                = vsm.read_eval_print(span_type::from_cstr("def foo = 3.14159;"),
+                                      eof_flag);
+
+            REQUIRE(res.is_value());
+            REQUIRE(res.value());
+
+            log && log(xtag("res.tseq", res.value()->_typeseq()),
+                       xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
+
+            // currently get not-implemented error
+            auto x = obj<AGCObject,DUniqueString>::from(*res.value());
+
+            REQUIRE(x);
+            REQUIRE(strcmp(x->chars(), "foo") == 0);
+
+            //log && log("runtime-error", xtag("ex.src", x->src_function()), xtag("ex.descr", x->error_descr()));
+
+            //REQUIRE(x.data()->value() == 1.570796325);
+
+            REQUIRE(res.remaining_.size() == 1);
+            REQUIRE(*res.remaining_.lo() == '\n');
+
+            log && vsm_fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("VirtualSchematikaMachine-def2", "[interpreter2][VSM]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
+
+            bool eof_flag = false;
+
+            vsm.begin_interactive_session();
+
+            span_type input = span_type::from_cstr("def foo = 3.14159; foo");
+
+            for (int i_expr = 0; i_expr < 2; ++i_expr) {
+                VsmResultExt res
+                    = vsm.read_eval_print(input, eof_flag);
+
+                REQUIRE(res.is_value());
+                REQUIRE(res.value());
+
+                log && log(xtag("res.tseq", res.value()->_typeseq()),
+                           xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
+
+                if (i_expr == 0) {
+                    auto x = obj<AGCObject,DUniqueString>::from(*res.value());
+                    REQUIRE(x);
+                    REQUIRE(strcmp(x->chars(), "foo") == 0);
+
+                    REQUIRE(res.remaining_.size() > 1);
+
+                    input = res.remaining_;
+                } else if (i_expr == 1) {
+                    auto x = obj<AGCObject,DFloat>::from(*res.value());
+                    REQUIRE(x);
+                    REQUIRE(x->value() == 3.14159);
+
+                    REQUIRE(res.remaining_.size() == 1);
+                    REQUIRE(*res.remaining_.lo() == '\n');
+                    input = res.remaining_;
+                }
+
+                ++i_expr;
+            }
+
+            log && vsm_fixture.log_memory_layout(&log);
+
         }
 
     } /*namespace ut*/

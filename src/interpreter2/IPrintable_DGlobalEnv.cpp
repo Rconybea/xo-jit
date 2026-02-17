@@ -1,22 +1,22 @@
-/** @file IPrintable_DLocalEnv.cpp
+/** @file IPrintable_DGlobalEnv.cpp
  *
  *  Generated automagically from ingredients:
  *  1. code generator:
  *       [xo-facet/codegen/genfacet]
  *     arguments:
- *       --input [idl/IPrintable_DLocalEnv.json5]
+ *       --input [idl/IPrintable_DGlobalEnv.json5]
  *  2. jinja2 template for abstract facet .hpp file:
  *       [iface_facet_any.hpp.j2]
  *  3. idl for facet methods
- *       [idl/IPrintable_DLocalEnv.json5]
+ *       [idl/IPrintable_DGlobalEnv.json5]
 **/
 
-#include "env/IPrintable_DLocalEnv.hpp"
+#include "env/IPrintable_DGlobalEnv.hpp"
 
 namespace xo {
     namespace scm {
         auto
-        IPrintable_DLocalEnv::pretty(const DLocalEnv & self, const ppindentinfo & ppii) -> bool
+        IPrintable_DGlobalEnv::pretty(const DGlobalEnv & self, const ppindentinfo & ppii) -> bool
         {
             return self.pretty(ppii);
         }
@@ -25,4 +25,4 @@ namespace xo {
     } /*namespace scm*/
 } /*namespace xo*/
 
-/* end IPrintable_DLocalEnv.cpp */
+/* end IPrintable_DGlobalEnv.cpp */

@@ -9,14 +9,24 @@
 
 namespace xo {
     namespace scm {
+        /**
+         *  Thin instruction wrapper for VSM (virtual schematika machine) instructions.
+         *  For exeuction see VirtualSchematikaMachine.cpp
+         **/
         class VsmInstr {
         public:
             explicit VsmInstr(vsm_opcode oc) : opcode_{oc} {}
 
             // instructions
 
+            static VsmInstr c_sentinel;
             static VsmInstr c_halt;
             static VsmInstr c_eval;
+
+            /** proceed to assignment after evaluating rhs
+             *  of define-expression
+             **/
+            static VsmInstr c_def_cont;
 
             static VsmInstr c_apply;
             static VsmInstr c_evalargs;
