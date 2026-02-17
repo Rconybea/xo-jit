@@ -176,6 +176,49 @@ namespace xo {
             Super::on_token(tk, p_psm);
         }
 
+
+        void
+        DExpectFormalArglistSsm::_accept_formal(obj<AAllocator> expr_alloc,
+                                                DArena & parser_alloc,
+                                                const DUniqueString * param_name,
+                                                TypeDescr param_type)
+        {
+            /* note: param_type can be nullptr */
+            TypeRef typeref
+                = TypeRef::dwim(TypeRef::prefix_type::from_chars("formal"), param_type);
+
+            DVariable * var = DVariable::make(expr_alloc,
+                                              param_name,
+                                              typeref);
+
+            // need AGCObject facet to use DArray here.
+            // May want to have gc feature that allows it to use
+            // FacetRegistry on memory that stores obj<AExpression,..>
+            //
+            // In this case doesn't matter since DExpectFormalArglistSsm not actually collected!
+
+            obj<AGCObject,DVariable> var_o(var);
+
+            if (argl_->size() == argl_->capacity()) {
+                // need to expand argl_ capacity.
+                // If DArena were to allow it (i.e. offer a realloc() feature,
+                // could do this in place since this SSM is at the top of the parser stack.
+
+                obj<AAllocator,DArena> mm(&parser_alloc);
+                DArray * argl_2x = DArray::empty(mm, 2 * argl_->capacity());
+
+                for (DArray::size_type i = 0, n = argl_->size(); i < n; ++i) {
+                    // TODO: prefer non-bounds-checked access here
+                    argl_2x->push_back(argl_->at(i));
+                }
+
+                // update in place
+                this->argl_ = argl_2x;
+            }
+
+            this->argl_->push_back(var_o);
+        }
+
         void
         DExpectFormalArglistSsm::on_parsed_formal(const DUniqueString * param_name,
                                                   TypeDescr param_type,
@@ -184,44 +227,35 @@ namespace xo {
             if (fastate_ == formalarglstatetype::argl_1a) {
                 this->fastate_ = formalarglstatetype::argl_1b;
 
-                TypeRef typeref
-                    = TypeRef::dwim(TypeRef::prefix_type::from_chars("formal"), param_type);
-
-                DVariable * var = DVariable::make(p_psm->expr_alloc(),
-                                                  param_name,
-                                                  typeref);
-
-                // need AGCObject facet to use DArray here.
-                // May want to have gc feature that allows it to use
-                // FacetRegistry on memory that stores obj<AExpression,..>
-                //
-                // In this case doesn't matter since DExpectFormalArglistSsm not actually collected!
-
-                obj<AGCObject,DVariable> var_o(var);
-
-                if (argl_->size() == argl_->capacity()) {
-                    // need to expand argl_ capacity.
-                    // If DArena were to allow it (i.e. offer a realloc() feature,
-                    // could do this in place since this SSM is at the top of the parser stack.
-
-                    obj<AAllocator,DArena> mm(&(p_psm->parser_alloc()));
-
-                    DArray * argl_2x = DArray::empty(mm, 2 * argl_->capacity());
-
-                    for (DArray::size_type i = 0, n = argl_->size(); i < n; ++i) {
-                        // TODO: prefer non-bounds-checked access here
-                        argl_2x->push_back(argl_->at(i));
-                    }
-
-                    // update in place
-                    this->argl_ = argl_2x;
-                }
-
-                this->argl_->push_back(var_o);
+                this->_accept_formal(p_psm->expr_alloc(),
+                                     p_psm->parser_alloc(),
+                                     param_name,
+                                     param_type);
                 return;
             }
 
             Super::on_parsed_formal(param_name, param_type, p_psm);
+        }
+
+        void
+        DExpectFormalArglistSsm::on_parsed_formal_with_token(const DUniqueString * param_name,
+                                                             TypeDescr param_type,
+                                                             const Token & tk,
+                                                             ParserStateMachine * p_psm)
+        {
+            if (fastate_ == formalarglstatetype::argl_1a) {
+                this->fastate_ = formalarglstatetype::argl_1b;
+
+                this->_accept_formal(p_psm->expr_alloc(),
+                                     p_psm->parser_alloc(),
+                                     param_name,
+                                     param_type);
+
+                this->on_token(tk, p_psm);
+                return;
+            }
+
+            Super::on_parsed_formal_with_token(param_name, param_type, tk, p_psm);
         }
 
         void

@@ -84,6 +84,23 @@ namespace xo {
             }
 
             /** Default implementation for required SyntaxStateMachine facet method
+             **/
+            void on_parsed_formal_with_token(const DUniqueString * param_name,
+                                             TypeDescr param_type,
+                                             const Token & tk,
+                                             ParserStateMachine * p_psm)
+            {
+                // starting with c++23 can use "this auto&& self" instead
+                Derived & self = reinterpret_cast<Derived&>(*this);
+
+                p_psm->illegal_parsed_formal_with_token(Derived::ssm_classname(),
+                                                        param_name,
+                                                        param_type,
+                                                        tk,
+                                                        self.get_expect_str());
+            }
+
+            /** Default implementation for required SyntaxStateMachine facet method
              *
              *  arglist is DArray of obj<AGCObejct,DVariable>
              **/

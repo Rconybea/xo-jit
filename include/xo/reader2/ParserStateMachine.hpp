@@ -149,11 +149,19 @@ namespace xo {
              **/
             void on_parsed_typedescr(TypeDescr td);
 
-            /** update state to consume param (name, value) emitted by
+            /** update state to consume param (name, type) emitted by
              *  nested (expired) parsing state
              **/
             void on_parsed_formal(const DUniqueString * param_name,
                                   TypeDescr param_type);
+
+            /** update state to consume formal parameter (name, type)
+             *  emitted by nested (now expired) parsing state,
+             *  with trailing token @p tk
+             **/
+            void on_parsed_formal_with_token(const DUniqueString * param_name,
+                                             TypeDescr param_type,
+                                             const Token & tk);
 
             /** update state to consume formal arugment list
              *  emitted by nested (expired) parsing state
@@ -230,6 +238,15 @@ namespace xo {
                                        const DUniqueString * param_name,
                                        TypeDescr param_type,
                                        std::string_view expect_str);
+
+            /** report illegal parsed formal (param_name, param_type) from nested ssm;
+             *  presented with immediately-following input token @p tk.
+             **/
+            void illegal_parsed_formal_with_token(std::string_view ssm_name,
+                                                  const DUniqueString * param_name,
+                                                  TypeDescr param_type,
+                                                  const Token & tk,
+                                                  std::string_view expect_str);
 
             /** @p arglist stores obj<AGCObject,DVariable> pointers.
              **/

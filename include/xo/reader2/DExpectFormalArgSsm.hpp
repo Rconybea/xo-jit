@@ -79,6 +79,12 @@ namespace xo {
             void on_colon_token(const Token & tk,
                                 ParserStateMachine * p_psm);
 
+            /** update state on incoming rightparen token @p tk;
+             *  with overall parser state in @p p_psm
+             **/
+            void on_rightparen_token(const Token & tk,
+                                     ParserStateMachine * p_psm);
+
             ///@}
             /** @defgroup scm-expectformalargssm-ssm-facet syntaxstatemachine facet methods **/
             ///@{

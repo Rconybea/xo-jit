@@ -55,6 +55,7 @@ namespace xo {
         class DExpectFormalArglistSsm : public DSyntaxStateMachine<DExpectFormalArglistSsm> {
         public:
             using Super = DSyntaxStateMachine<DExpectFormalArglistSsm>;
+            using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -108,12 +109,35 @@ namespace xo {
             void on_parsed_formal(const DUniqueString * param_name,
                                   TypeDescr param_type,
                                   ParserStateMachine * p_psm);
+            /** update state to consume parsed formal (name,type) emitted
+             *  by nested ssm, that's followed immediately by token @p tk.
+             *  overall parser state in @p *p_psm
+             **/
+            void on_parsed_formal_with_token(const DUniqueString * param_name,
+                                             TypeDescr param_type,
+                                             const Token & tk,
+                                             ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-expectformalarglistssm-printable-facet printable facet methods **/
             ///@{
 
             bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
+
+        private:
+            /** @defgroup scm-expectformalarglistssm-impl-methods **/
+            ///@{
+
+            /** update local state to include parsed formal (param_name, param_type).
+             *  If stack memory needed, get from @p parser_alloc.
+             *  Lifetime until formal arglist completely parsed
+             **/
+            void _accept_formal(obj<AAllocator> expr_alloc,
+                                DArena & parser_alloc,
+                                const DUniqueString * param_name,
+                                TypeDescr param_type);
 
             ///@}
 

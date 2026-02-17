@@ -62,6 +62,8 @@ namespace xo {
             static void on_parsed_typedescr(DApplySsm & self, TypeDescr td, ParserStateMachine * p_psm);
             /** operate state machine for formal emitted by nested ssm **/
             static void on_parsed_formal(DApplySsm & self, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm);
+            /** operate state machine for formal emitted by nested ssm **/
+            static void on_parsed_formal_with_token(DApplySsm & self, const DUniqueString * param_name, TypeDescr param_type, const Token & tk, ParserStateMachine * p_psm);
             /** consume formal arglist emitted by nested ssm **/
             static void on_parsed_formal_arglist(DApplySsm & self, DArray * arglist, ParserStateMachine * p_psm);
             /** update state machine for incoming parsed expression @p expr **/

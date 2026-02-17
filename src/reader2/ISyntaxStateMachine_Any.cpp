@@ -59,6 +59,12 @@ ISyntaxStateMachine_Any::on_parsed_formal(Opaque, const DUniqueString *, TypeDes
 }
 
 auto
+ISyntaxStateMachine_Any::on_parsed_formal_with_token(Opaque, const DUniqueString *, TypeDescr, const Token &, ParserStateMachine *)  -> void
+{
+    _fatal();
+}
+
+auto
 ISyntaxStateMachine_Any::on_parsed_formal_arglist(Opaque, DArray *, ParserStateMachine *)  -> void
 {
     _fatal();

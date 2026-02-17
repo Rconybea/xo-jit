@@ -287,6 +287,18 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::on_parsed_formal_with_token(const DUniqueString * sym,
+                                                        TypeDescr td,
+                                                        const Token & tk)
+        {
+            scope log(XO_DEBUG(debug_flag_), xtag("sym", std::string_view(*sym)), xtag("td", td), xtag("tk", tk));
+
+            assert(stack_);
+
+            this->stack_->top().on_parsed_formal_with_token(sym, td, tk, this);
+        }
+
+        void
         ParserStateMachine::on_parsed_formal_arglist(DArray * arglist)
         {
             scope log(XO_DEBUG(debug_flag_),
@@ -434,6 +446,33 @@ namespace xo {
             auto errmsg_string = tostr("Unexpected formal",
                                        xtag("param_name", std::string_view(*param_name)),
                                        xtag("param_type", param_type),
+                                       xtag("expecting", expect_str),
+                                       xtag("ssm", ssm_name),
+                                       xtag("via", "ParserStateMachine::illegal_parsed_formal"));
+
+            assert(expr_alloc_);
+
+            auto errmsg = DString::from_view(expr_alloc_,
+                                             std::string_view(errmsg_string));
+
+            this->capture_error(ssm_name, errmsg);
+        }
+
+        void
+        ParserStateMachine::illegal_parsed_formal_with_token(std::string_view ssm_name,
+                                                             const DUniqueString * param_name,
+                                                             TypeDescr param_type,
+                                                             const Token & tk,
+                                                             std::string_view expect_str)
+        {
+            // TODO:
+            // - want to write error message using DArena
+            // - need something like log_streambuf and/or tostr() that's arena-aware
+
+            auto errmsg_string = tostr("Unexpected formal",
+                                       xtag("param_name", std::string_view(*param_name)),
+                                       xtag("param_type", param_type),
+                                       xtag("tk", tk),
                                        xtag("expecting", expect_str),
                                        xtag("ssm", ssm_name),
                                        xtag("via", "ParserStateMachine::illegal_parsed_formal"));

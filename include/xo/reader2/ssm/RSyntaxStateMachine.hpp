@@ -73,6 +73,9 @@ public:
     void on_parsed_formal(const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_formal(O::data(), param_name, param_type, p_psm);
     }
+    void on_parsed_formal_with_token(const DUniqueString * param_name, TypeDescr param_type, const Token & tk, ParserStateMachine * p_psm)  {
+        return O::iface()->on_parsed_formal_with_token(O::data(), param_name, param_type, tk, p_psm);
+    }
     void on_parsed_formal_arglist(DArray * arglist, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_formal_arglist(O::data(), arglist, p_psm);
     }

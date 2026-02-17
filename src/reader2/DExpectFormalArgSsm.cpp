@@ -97,6 +97,10 @@ namespace xo {
             case tokentype::tk_colon:
                 this->on_colon_token(tk, p_psm);
                 return;
+            case tokentype::tk_rightparen:
+                this->on_rightparen_token(tk, p_psm);
+                return;
+
                 // all the not-yet-handled cases
             case tokentype::tk_leftparen:
             case tokentype::tk_lambda:
@@ -110,7 +114,6 @@ namespace xo {
             case tokentype::tk_bool:
             case tokentype::tk_semicolon:
             case tokentype::tk_invalid:
-            case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
@@ -153,6 +156,24 @@ namespace xo {
                 DExpectTypeSsm::start(p_psm);
 
                 /* control reenters via DExpectFormalArgSsm::on_parsed_typedescr() */
+                return;
+            }
+
+            Super::on_token(tk, p_psm);
+        }
+
+        void
+        DExpectFormalArgSsm::on_rightparen_token(const Token & tk,
+                                                 ParserStateMachine * p_psm)
+        {
+            if (fstate_ == formalstatetype::formal_1) {
+                // formal with no type annotation
+
+                assert(name_);
+
+                p_psm->pop_ssm();
+                p_psm->on_parsed_formal_with_token(name_, nullptr, tk);
+
                 return;
             }
 

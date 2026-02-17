@@ -48,6 +48,11 @@ namespace xo {
             self.on_parsed_formal(param_name, param_type, p_psm);
         }
         auto
+        ISyntaxStateMachine_DDefineSsm::on_parsed_formal_with_token(DDefineSsm & self, const DUniqueString * param_name, TypeDescr param_type, const Token & tk, ParserStateMachine * p_psm) -> void
+        {
+            self.on_parsed_formal_with_token(param_name, param_type, tk, p_psm);
+        }
+        auto
         ISyntaxStateMachine_DDefineSsm::on_parsed_formal_arglist(DDefineSsm & self, DArray * arglist, ParserStateMachine * p_psm) -> void
         {
             self.on_parsed_formal_arglist(arglist, p_psm);
