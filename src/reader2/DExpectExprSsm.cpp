@@ -8,6 +8,7 @@
 #include "SyntaxStateMachine.hpp"
 #include "ssm/ISyntaxStateMachine_DProgressSsm.hpp"
 #include "DSequenceSsm.hpp"
+#include "IfElseSsm.hpp"
 #include "LambdaSsm.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/Variable.hpp>
@@ -103,9 +104,9 @@ namespace xo {
         DExpectExprSsm::get_expect_str() const noexcept
         {
             if (allow_defs_) {
-                return "def|lambda|lparen|lbrace|literal|var";
+                return "def|if|lambda|lparen|lbrace|literal|var";
             } else {
-                return "lambda|lparen|lbrace|literal|var";
+                return "if|lambda|lparen|lbrace|literal|var";
             }
         }
 
@@ -116,6 +117,10 @@ namespace xo {
             scope log(XO_DEBUG(p_psm->debug_flag()), xtag("tk", tk));
 
             switch (tk.tk_type()) {
+            case tokentype::tk_leftparen:
+                this->on_leftparen_token(tk, p_psm);
+                return;
+
             case tokentype::tk_leftbrace:
                 this->on_leftbrace_token(tk, p_psm);
                 return;
@@ -144,17 +149,19 @@ namespace xo {
                 this->on_bool_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_if:
+                this->on_if_token(tk, p_psm);
+                return;
+
             case tokentype::tk_lambda:
                 this->on_lambda_token(tk, p_psm);
                 return;
 
             // all the not-yet handled cases
             case tokentype::tk_invalid:
-            case tokentype::tk_if:
             case tokentype::tk_singleassign:
             case tokentype::tk_colon:
             case tokentype::tk_semicolon:
-            case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
@@ -185,6 +192,22 @@ namespace xo {
             }
 
             Super::on_token(tk, p_psm);
+        }
+
+        void
+        DExpectExprSsm::on_leftparen_token(const Token & tk,
+                                           ParserStateMachine * p_psm)
+        {
+            // need progress ssm here because this is allowed:
+            //
+            //  if (foo) > 5 then ...
+            //
+            // Start progress ssm, delegate incoming token thereto
+            //
+
+            DProgressSsm::start(p_psm->parser_alloc(),
+                                p_psm);
+            p_psm->on_token(tk);
         }
 
         void
@@ -386,6 +409,18 @@ namespace xo {
             DProgressSsm::start(p_psm->parser_alloc(),
                                 expr,
                                 p_psm);
+        }
+
+        void
+        DExpectExprSsm::on_if_token(const Token & tk,
+                                    ParserStateMachine * p_psm)
+        {
+            (void)tk;
+
+            DIfElseSsm::start(p_psm->parser_alloc(),
+                              p_psm->expr_alloc(),
+                              p_psm);
+            // TODO: should send if-token here
         }
 
         void

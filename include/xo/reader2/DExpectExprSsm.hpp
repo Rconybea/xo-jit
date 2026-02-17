@@ -51,6 +51,12 @@ namespace xo {
             /** @defgroup scm-expectexpr-methods general methods **/
             ///@{
 
+            /** update state for this syntax on incoming leftparen token @p tk,
+             *  with overall parser state in @p p_psm
+             **/
+            void on_leftparen_token(const Token & tk,
+                                    ParserStateMachine * p_psm);
+
             /** update state for this syntax on incoming leftbrace token @p tk,
              *  with overall parser state in @p p_psm
              **/
@@ -81,8 +87,18 @@ namespace xo {
             void on_string_token(const Token & tk,
                                  ParserStateMachine * p_psm);
 
+            /** update state for this syntax on incoming if-token @p tk,
+             *  overall parser state in @p p_psm.
+             *
+             *  action: start nested if-else ssm
+             **/
+            void on_if_token(const Token & tk,
+                             ParserStateMachine * p_psm);
+
             /** update state for this syntax on incoming lambda token @p tk,
              *  overall parser state in @p p_psm
+             *
+             *  action: start nested lambda ssm
              **/
             void on_lambda_token(const Token & tk,
                                  ParserStateMachine * p_psm);

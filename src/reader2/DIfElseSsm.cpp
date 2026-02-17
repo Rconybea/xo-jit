@@ -423,14 +423,71 @@ namespace xo {
             // TODO: may consider allowing if-else to terminate on other particular tokens
             //       e.g. ')'
 
-            if ((tk.tk_type() == tokentype::tk_then)
-                || (tk.tk_type() == tokentype::tk_else)
-                || (tk.tk_type() == tokentype::tk_semicolon))
-                {
+            switch (ifstate_) {
+            case ifexprstatetype::invalid:
+            case ifexprstatetype::N:
+                // impossible
+                assert(false);
+                break;
+            case ifexprstatetype::if_0:
+                // also unreachable
+                break;
+            case ifexprstatetype::if_1:
+                // only ok if tk-type is tk_then.
+                if (tk.tk_type() == tokentype::tk_then) {
+                    // advance to if_2 -then-> if_3
                     this->on_parsed_expression(expr, p_psm);
                     this->on_token(tk, p_psm);
                     return;
                 }
+                break;
+            case ifexprstatetype::if_2:
+                // illegal, not expecting expression
+                break;
+            case ifexprstatetype::if_3:
+                // incoming expr argument is sufficient to complete this if-else
+                // but may continue on else-token
+                if (tk.tk_type() == tokentype::tk_else) {
+                    // advance to if_4 -else-> if_5
+                    this->on_parsed_expression(expr, p_psm);
+                    this->on_token(tk, p_psm);
+                    return;
+                } else if ((tk.tk_type() == tokentype::tk_semicolon)
+                           || (tk.tk_type() == tokentype::tk_rightparen)
+                           || (tk.tk_type() == tokentype::tk_rightbrace)) {
+
+                    this->on_parsed_expression(expr, p_psm);
+                    p_psm->pop_ssm();
+                    p_psm->on_parsed_expression_with_token(if_expr_, tk);
+                    return;
+                }
+
+                break;
+            case ifexprstatetype::if_4:
+                // illegal, not expecting expression
+                break;
+
+            case ifexprstatetype::if_5:
+                // incoming expr argument completes this if-else
+                // advance to if_6
+                if ((tk.tk_type() == tokentype::tk_semicolon)
+                    || (tk.tk_type() == tokentype::tk_rightparen)
+                    || (tk.tk_type() == tokentype::tk_rightbrace))
+                    {
+                        // attaches expr as else- branch
+                        this->on_parsed_expression(expr, p_psm);
+
+                        p_psm->pop_ssm();
+                        p_psm->on_parsed_expression_with_token(if_expr_, tk);
+                        return;
+                    }
+                break;
+
+            case ifexprstatetype::if_6:
+                // illegal, not expecting expression
+                break;
+
+            }
 
             Super::on_parsed_expression_with_token(expr, tk, p_psm);
         }

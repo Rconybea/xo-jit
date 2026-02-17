@@ -116,6 +116,14 @@ namespace xo {
             void on_parsed_expression(obj<AExpression> expr,
                                       ParserStateMachine * p_psm);
 
+            /** update ssm for expression @p expr (emitted by nested ssm)
+             *  that's immediately followed by token @p tk
+             *  with overall parser state in @p p_psm
+             **/
+            void on_parsed_expression_with_token(obj<AExpression> expr,
+                                                 const Token & tk,
+                                                 ParserStateMachine * p_psmn);
+
             ///@}
             /** @defgroup scm-parenssm-printable-facet printable facet methods **/
             ///@{

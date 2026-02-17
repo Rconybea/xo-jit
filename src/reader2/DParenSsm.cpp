@@ -364,7 +364,23 @@ namespace xo {
             }
 
             Super::on_parsed_expression(expr, p_psm);
+        }
 
+        void
+        DParenSsm::on_parsed_expression_with_token(obj<AExpression> expr,
+                                                   const Token & tk,
+                                                   ParserStateMachine * p_psm)
+        {
+            if (parenstate_ == parenexprstatetype::lparen_1) {
+                this->parenstate_ = parenexprstatetype::lparen_2;
+                this->expr_ = expr;
+
+                this->on_token(tk, p_psm);
+
+                return;
+            }
+
+            Super::on_parsed_expression(expr, p_psm);
         }
 
 #ifdef NOT_YET

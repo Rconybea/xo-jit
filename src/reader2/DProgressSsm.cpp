@@ -41,6 +41,7 @@ namespace xo {
     using xo::scm::Variable;
     using xo::scm::Apply;
 #endif
+    using xo::mm::AGCObject;
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
     using xo::facet::with_facet;
@@ -214,7 +215,7 @@ namespace xo {
             if (!lhs_) {
                 return "expr1|leftparen";
             } else if (op_type_ == optype::invalid) {
-                return "oper|semicolon|rightparen|righbrace";
+                return "oper|semicolon|rightparen|rightbrace";
             } else {
                 return "expr2|leftparen";
             }
@@ -293,10 +294,10 @@ namespace xo {
             case tokentype::tk_assign:
             case tokentype::tk_yields:
             case tokentype::tk_plus:
-            case tokentype::tk_minus:
                 break;
 
             case tokentype::tk_star:
+            case tokentype::tk_minus:
             case tokentype::tk_cmpeq:
                 this->on_operator_token(tk, p_psm);
                 return;
@@ -1244,7 +1245,6 @@ namespace xo {
             case optype::op_great:
             case optype::op_great_equal:
             case optype::op_add:
-            case optype::op_subtract:
                 assert(false);
                 break;
 
@@ -1286,6 +1286,24 @@ namespace xo {
                 // TODO: implement binary operator expression assembly
                 assert(false);
                 break;
+            case optype::op_subtract: /* editor bait: op_minus */
+                {
+                    auto pm_obj = (with_facet<AGCObject>::mkobj
+                                       (&Primitives::s_sub_gco_gco_pm));
+                    auto fn_expr = (DConstant::make
+                                        (p_psm->expr_alloc(), pm_obj));
+
+                    // see comment on op_multiply re need for poly impl
+
+                    TypeRef tref = TypeRef::dwim
+                                       (TypeRef::prefix_type::from_chars("_sub_gco"),
+                                        nullptr);
+
+                    return DApplyExpr::make2(p_psm->expr_alloc(),
+                                             tref, fn_expr, lhs_, rhs_);
+                }
+
+                break;
 
 #ifdef NOT_YET
 case optype::op_assign:
@@ -1308,6 +1326,7 @@ case optype::op_equal:
     if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
         return Apply::make_cmp_eq_i64(lhs_, rhs_);
     } else {
+
         this->apply_type_error(c_self_name,
                                op_type_, lhs_, rhs_, p_psm);
         return nullptr;

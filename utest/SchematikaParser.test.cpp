@@ -274,7 +274,7 @@ namespace xo {
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ParserFixture fixture(testname, c_debug_flag);
@@ -809,7 +809,7 @@ namespace xo {
 
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ParserFixture fixture(testname, c_debug_flag);
@@ -854,6 +854,64 @@ namespace xo {
                 /* [ l] */   Token::rightparen_token(),
 
                 /* [ m] */ Token::semicolon_token(),
+            };
+
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            log && fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("SchematikaParser-batch-def2", "[reader2][SchematikaParser]")
+        {
+            // top-level recursive function definition
+
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    def fact = lambda (n) { if (n == 0) then 1 else n * fact(n - 1) };
+             *    ^   ^    ^ ^      ^^^ ^ ^  ^^ ^  ^^ ^    ^ ^    ^ ^ ^   ^^ ^ ^^ ^^
+             *    0   1    2 3      4|6 7 8  9| b  c| e    f g    h i j   k| m n| p|
+             *                       5        a     d                      l    o  q
+             **/
+
+            std::vector<Token> tk_v{
+                /* [ 0] */ Token::def_token(),
+
+                /* [ 1] */ Token::symbol_token("fact"),
+                /* [ 2] */ Token::singleassign_token(),
+                /* [ 3] */ Token::lambda_token(),
+                /* [ 4] */   Token::leftparen_token(),
+                /* [ 5] */       Token::symbol_token("n"),
+                /* [ 6] */   Token::rightparen_token(),
+                /* [ 7] */ Token::leftbrace_token(),
+                /* [ 8] */   Token::if_token(),
+                /* [ 9] */     Token::leftparen_token(),
+                /* [ a] */       Token::symbol_token("n"),
+                /* [ b] */       Token::cmpeq_token(),
+                /* [ c] */       Token::i64_token("0"),
+                /* [ d] */     Token::rightparen_token(),
+                /* [ e] */   Token::then_token(),
+                /* [ f] */     Token::i64_token("1"),
+                /* [ g] */   Token::else_token(),
+                /* [ h] */     Token::symbol_token("n"),
+                /* [ i] */     Token::star_token(),
+                /* [ j] */     Token::symbol_token("fact"),
+                /* [ k] */     Token::leftparen_token(),
+                /* [ l] */       Token::symbol_token("n"),
+                /* [ m] */       Token::minus_token(),
+                /* [ n] */       Token::i64_token("1"),
+                /* [ o] */     Token::rightparen_token(),
+                /* [ p] */     Token::rightbrace_token(),
+                /* [ q] */     Token::semicolon_token(),
             };
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
