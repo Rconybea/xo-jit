@@ -32,8 +32,6 @@ xo_add_genfacetimpl(
     FACET GCObject
     REPR VsmApplyFrame
     INPUT idl/IGCObject_DVsmApplyFrame.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
 )
 
 # note: manual target; generated code committed to git
@@ -43,8 +41,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR VsmApplyFrame
     INPUT idl/IPrintable_DVsmApplyFrame.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
 )
 
 # ----------------------------------------------------------------
@@ -56,8 +52,6 @@ xo_add_genfacetimpl(
     FACET GCObject
     REPR VsmEvalArgsFrame
     INPUT idl/IGCObject_DVsmEvalArgsFrame.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
 )
 
 # note: manual target; generated code committed to git
@@ -67,8 +61,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR DVsmEvalArgsFrame
     INPUT idl/IPrintable_DVsmEvalArgsFrame.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
 )
 
 # ----------------------------------------------------------------
@@ -80,8 +72,6 @@ xo_add_genfacetimpl(
     FACET GCObject
     REPR VsmApplyClosureFrame
     INPUT idl/IGCObject_DVsmApplyClosureFrame.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
 )
 
 # note: manual target; generated code committed to git
@@ -91,8 +81,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR DVsmApplyClosureFrame
     INPUT idl/IPrintable_DVsmApplyClosureFrame.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
 )
 
 # ----------------------------------------------------------------
@@ -104,8 +92,6 @@ xo_add_genfacetimpl(
     FACET GCObject
     REPR VsmIfElseContFrame
     INPUT idl/IGCObject_DVsmIfElseContFrame.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR ifelse
 )
 
 # note: manual target; generated code committed to git
@@ -115,8 +101,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR VsmIfElseContFrame
     INPUT idl/IPrintable_DVsmIfElseContFrame.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR ifelse
 )
 
 # ----------------------------------------------------------------
@@ -128,8 +112,6 @@ xo_add_genfacetimpl(
     FACET GCObject
     REPR VsmSeqContFrame
     INPUT idl/IGCObject_DVsmSeqContFrame.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR sequence
 )
 
 # note: manual target; generated code committed to git
@@ -139,8 +121,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR DVsmSeqContFrame
     INPUT idl/IPrintable_DVsmSeqContFrame.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR sequence
 )
 
 # ----------------------------------------------------------------
@@ -153,8 +133,6 @@ xo_add_genfacetimpl(
 #    FACET Procedure
 #    REPR Closure
 #    INPUT idl/IProcedure_DClosure.json5
-#    OUTPUT_HPP_DIR include/xo/interpreter2
-#    OUTPUT_IMPL_SUBDIR detail
 #)
 
 # note: manual target; generated code committed to git
@@ -164,8 +142,6 @@ xo_add_genfacetimpl(
     FACET GCObject
     REPR Closure
     INPUT idl/IGCObject_DClosure.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
 )
 
 # note: manual target; generated code committed to git
@@ -175,8 +151,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR Closure
     INPUT idl/IPrintable_DClosure.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
 )
 
 # ----------------------------------------------------------------
@@ -188,8 +162,6 @@ xo_add_genfacetimpl(
     FACET GCObject
     REPR LocalEnv
     INPUT idl/IGCObject_DLocalEnv.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
 )
 
 # note: manual target; generated code committed to git
@@ -199,8 +171,6 @@ xo_add_genfacetimpl(
     FACET Printable
     REPR LocalEnv
     INPUT idl/IPrintable_DLocalEnv.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
 )
 
 # ----------------------------------------------------------------
@@ -211,8 +181,6 @@ xo_add_genfacetimpl(
     FACET RuntimeContext
     REPR DVsmRcx
     INPUT idl/IRuntimeContext_DVsmRcx.json5
-    OUTPUT_HPP_DIR include/xo/interpreter2
-    OUTPUT_IMPL_SUBDIR detail
     )
 
 # ----------------------------------------------------------------
