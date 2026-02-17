@@ -65,13 +65,12 @@ namespace xo {
             /** @defgroup scm-globalsymtab-general-methods general methods **/
             ///@{
 
-            /** establish binding for @p sym, with type described by @p typeref,
-             *  replacing existing global (if present) with the same name.
-             *  Use memory from @p mm to create variable-expr
+            /** update this symtab to associate @p var with @c var->name().
+             *  If there was a previous variable with the same name,
+             *  replace it with @p var.
              **/
-            DVariable * establish_variable(obj<AAllocator> mm,
-                                           const DUniqueString * sym,
-                                           TypeRef typeref);
+            void upsert_variable(obj<AAllocator> mm,
+                                 DVariable * var);
 
             ///@}
             /** @defgroup scm-globalsymtab-symboltable-facet symboltable facet **/

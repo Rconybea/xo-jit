@@ -65,6 +65,65 @@ namespace xo {
             return var.data();
         }
 
+        void
+        DGlobalSymtab::upsert_variable(obj<AAllocator> mm,
+                                       DVariable * var)
+        {
+            // It's possible there's already a global variable
+            // with the same name.
+            //
+            // For example redefining a variable in an interactive session.
+            // In this case use the established binding.
+            //
+            DVariable * existing = this->lookup_variable(var->name());
+
+            if (existing) {
+                if (existing == var) {
+                    // impossible, but.. noop, right?
+                    return;
+                }
+
+                // adopt the existing binding
+                var->assign_path(existing->path());
+
+                // stash new definition (possibly has different type),
+                // replacing previous one
+                //
+                (*vars_)[existing->path().j_slot()] = obj<AGCObject,DVariable>(var);
+            } else {
+                DArray::size_type n = vars_->size();
+
+                // NOTE: expansion of var_ array here is moot at present (Feb 2026),
+                //       since the feature isn't yet implemented in ArenaHashMap
+
+                /** make sure vars_ has room **/
+                if (n == vars_->capacity()) {
+                    // DArray is out of room.  Reallocate with more capacity
+                    DArray * vars_2x = DArray::copy(mm, vars_, vars_->capacity() * 2);
+
+                    if (!vars_2x) {
+                        assert(false);
+
+                        // in any case, we can't make progress
+                        return;
+                    }
+
+                    this->vars_ = vars_2x;
+                }
+
+                /** now we know binding for var **/
+                Binding binding = Binding::global(n);
+
+                var->assign_path(binding);
+
+                // need slot# in .map_ for this unique symbol
+                (*map_)[var->name()] = binding.j_slot();
+
+                vars_->push_back(obj<AGCObject,DVariable>(var));
+            }
+        }
+
+#ifdef NOT_USING // don't know if we need this path
         DVariable *
         DGlobalSymtab::establish_variable(obj<AAllocator> mm,
                                           const DUniqueString * sym,
@@ -75,43 +134,12 @@ namespace xo {
             if (!var) {
                 assert(vars_);
 
-                DArray::size_type n = vars_->size();
-
-                // NOTE: expansion here is moot at present (Feb 2026).
-                //       Not implemented in ArenaHashMap
-
-                /** make sure vars_ has room **/
-                if (n == vars_->capacity()) {
-                    // reallocate with more capacity
-                    DArray * vars_2x = DArray::copy(mm, vars_, vars_->capacity() * 2);
-
-                    assert(vars_2x);
-
-                    this->vars_ = vars_2x;
-                }
-
-                /** create new variable **/
-                Binding binding = Binding::global(n);
-                var = DVariable::make(mm, sym, typeref, binding);
-
-                if (!var) {
-                    // something terribly wrong
-                    assert(false);
-                    return var;
-                }
-
-                assert(map_->size() < map_->capacity());
-
-                (*map_)[sym] = binding.j_slot();
-
-                bool ok = vars_->push_back(obj<AGCObject,DVariable>(var));
-
-                if (!ok)
-                    assert(false);
+                xxx;
             }
 
             return var;
         }
+#endif
 
         Binding
         DGlobalSymtab::lookup_binding(const DUniqueString * sym) const noexcept

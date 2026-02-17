@@ -48,6 +48,7 @@ namespace xo {
             Binding path() const { return path_; }
 
             void assign_name(const DUniqueString * name) { this->name_ = name; }
+            void assign_path(Binding b) { this->path_ = b; }
 
             /** @defgroup scm-variable-expression-facet **/
             ///@{
