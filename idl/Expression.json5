@@ -1,6 +1,8 @@
 {
     mode: "facet",
     output_cpp_dir: "src/expression2",
+    output_hpp_dir: "include/xo/expression2",
+    output_impl_subdir: "detail",
     includes: [ "\"TypeRef.hpp\"",
                 "\"exprtype.hpp\"",
                 "<xo/reflect/TypeDescr.hpp>"],
