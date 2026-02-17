@@ -1,5 +1,7 @@
 {
     mode: "implementation",
+    output_hpp_dir: "include/xo/interpreter2",
+    output_impl_subdir: "detail",
     includes: [
         "<xo/procedure2/RuntimeContext.hpp>",
         "<xo/procedure2/detail/IRuntimeContext_Xfer.hpp>",

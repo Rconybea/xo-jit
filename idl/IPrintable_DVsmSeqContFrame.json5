@@ -1,6 +1,8 @@
 {
     mode: "implementation",
     output_cpp_dir: "src/interpreter2",
+    output_hpp_dir: "include/xo/interpreter2",
+    output_impl_subdir: "sequence",
     includes: [ "<xo/printable2/Printable.hpp>",
                 "<xo/printable2/detail/IPrintable_Xfer.hpp>" ],
     local_types: [ ],
