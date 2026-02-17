@@ -27,7 +27,7 @@ namespace xo {
         Binding::print(std::ostream & os) const
         {
             if (i_link_ == c_link_global) {
-                os << "{path:global}";
+                os << "{path:global:" << j_slot_ << "}";
             } else if (i_link_ == c_link_sentinel) {
                 os << "{path}";
             } else {

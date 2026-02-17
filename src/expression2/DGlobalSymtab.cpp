@@ -69,6 +69,8 @@ namespace xo {
         DGlobalSymtab::upsert_variable(obj<AAllocator> mm,
                                        DVariable * var)
         {
+            scope log(XO_DEBUG(true), std::string_view(*var->name()));
+
             // It's possible there's already a global variable
             // with the same name.
             //
@@ -78,6 +80,8 @@ namespace xo {
             DVariable * existing = this->lookup_variable(var->name());
 
             if (existing) {
+                log && log("variable with this symbol already exists");
+
                 if (existing == var) {
                     // impossible, but.. noop, right?
                     return;
@@ -91,6 +95,8 @@ namespace xo {
                 //
                 (*vars_)[existing->path().j_slot()] = obj<AGCObject,DVariable>(var);
             } else {
+                log && log("variable is new");
+
                 DArray::size_type n = vars_->size();
 
                 // NOTE: expansion of var_ array here is moot at present (Feb 2026),
@@ -146,8 +152,7 @@ namespace xo {
         {
             assert(sym);
 
-            scope log(XO_DEBUG(true), "stub");
-            log && log(xtag("sym", std::string_view(*sym)));
+            scope log(XO_DEBUG(true), std::string_view(*sym));
 
             auto ix = map_->find(sym);
 
