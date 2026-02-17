@@ -229,8 +229,9 @@ namespace xo {
         void
         ParserStateMachine::upsert_var(DVariable * var)
         {
-            scope log(XO_DEBUG(true), "stub impl");
-            log && log(xtag("var", std::string_view(*(var->name()))));
+            assert(global_symtab_);
+
+            global_symtab_->upsert_variable(this->expr_alloc(), var);
         }
 
         void
