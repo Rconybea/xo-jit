@@ -41,7 +41,7 @@ namespace xo {
         bool
         SchematikaParser::has_incomplete_expr() const
         {
-            return !(this->is_at_toplevel());
+            return psm_.has_incomplete_expr();
         }
 
         obj<ASyntaxStateMachine>

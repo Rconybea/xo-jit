@@ -678,6 +678,8 @@ namespace xo {
             Super::on_parsed_expression_with_token(expr, tk, p_psm);
         }
 
+        // ----- printable facet -----
+
         bool
         DDefineSsm::pretty(const ppindentinfo & ppii) const
         {

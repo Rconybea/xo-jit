@@ -6,6 +6,8 @@
 #include "ParserStateMachine.hpp"
 #include "ParserStack.hpp"
 #include "SyntaxStateMachine.hpp"
+#include "ToplevelSeqSsm.hpp"
+#include "DefineSsm.hpp"
 #include <xo/object2/array/IPrintable_DArray.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
@@ -39,16 +41,52 @@ namespace xo {
         bool
         ParserStateMachine::is_at_toplevel() const noexcept
         {
-            return ((stack_ == nullptr)
-                    || (stack_->parent() == nullptr));
+            /* top-level alwyas has DToplevelSeqSsm */
+
+            ParserStack * s = stack_;
+
+            if (s) {
+                auto def = obj<ASyntaxStateMachine,DDefineSsm>::from(s->top());
+
+                if (def) {
+                    /* carve-out for top-level DefineSsm: report 'at top-level' when
+                     * that top-level DefineSsm is on the stack, so we detect
+                     * this condition inside DefineSsm's event handling
+                     */
+                    s = stack_->parent();
+                }
+
+                if (s && s->parent() == nullptr) {
+                    auto top = obj<ASyntaxStateMachine,DToplevelSeqSsm>::from(s->top());
+
+                    return top;
+                }
+            } else {
+                /** this isn't a normal operating state, still need a batch/interactive toplevel seq.
+                 *  just the same seems better to call it top-level
+                 **/
+                return true;
+            }
+
+            return false;
         }
 
         bool
         ParserStateMachine::has_incomplete_expr() const noexcept
         {
+            scope log(XO_DEBUG(debug_flag_));
+
             // don't count toplevel expression
 
-            return !(this->is_at_toplevel());
+            ParserStack * s = stack_;
+
+            if (s) {
+                auto top = obj<ASyntaxStateMachine,DToplevelSeqSsm>::from(s->top());
+
+                return !top;
+            } else {
+                return false;
+            }
         }
 
         obj<ASyntaxStateMachine>
