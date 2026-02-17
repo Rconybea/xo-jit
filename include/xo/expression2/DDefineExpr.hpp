@@ -1,5 +1,5 @@
 /** @file DDefineExpr.hpp
-*
+ *
  *  @author Roland Conybeare, Jan 2026
  **/
 
@@ -23,6 +23,7 @@ namespace xo {
         class DDefineExpr {
         public:
             using ppindentinfo = xo::print::ppindentinfo;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
 
@@ -66,6 +67,14 @@ namespace xo {
             TypeRef typeref() const noexcept { return lhs_var_->typeref(); }
             TypeDescr valuetype() const noexcept { return lhs_var_->typeref().td(); }
             void assign_valuetype(TypeDescr td) noexcept;
+
+            ///@}
+            /** @defgroup scm-defineexpr-gcobject-facet **/
+            ///@{
+
+            std::size_t shallow_size() const noexcept;
+            DDefineExpr * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
             /** @defgroup scm-defineexpr-printable-facet **/

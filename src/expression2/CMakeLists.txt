@@ -9,7 +9,6 @@ set(SELF_SRCS
     DConstant.cpp
     DVariable.cpp
     DVarRef.cpp
-    DDefineExpr.cpp
     DApplyExpr.cpp
 
     TypeRef.cpp
@@ -30,7 +29,9 @@ set(SELF_SRCS
     IGCObject_DVarRef.cpp
     IPrintable_DVarRef.cpp
 
+    DDefineExpr.cpp
     IExpression_DDefineExpr.cpp
+    IGCObject_DDefineExpr.cpp
     IPrintable_DDefineExpr.cpp
 
     IExpression_DApplyExpr.cpp

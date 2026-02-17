@@ -1,0 +1,18 @@
+{
+    mode: "implementation",
+    output_cpp_dir: "src/expression2",
+    output_hpp_dir: "include/xo/expression2",
+    output_impl_subdir: "define",
+    includes: [
+        "<xo/gc/GCObject.hpp>",
+        "<xo/alloc2/Allocator.hpp>"
+    ],
+    local_types: [ ],
+    namespace1: "xo",
+    namespace2: "scm",
+    facet_idl: "idl/GCObject.json5",
+    brief: "provide AGCObject interface for DDefineExpr",
+    using_doxygen: true,
+    repr: "DDefineExpr",
+    doc: [ "implement AGCObject for DDefineExpr" ],
+}

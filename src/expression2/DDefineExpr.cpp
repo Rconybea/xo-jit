@@ -4,13 +4,16 @@
  **/
 
 #include "DDefineExpr.hpp"
-#include "detail/IPrintable_DVariable.hpp"
+#include "Variable.hpp"
+#include <xo/gc/GCObject.hpp>
+#include <xo/gc/PolyForwarderUtil.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>
 #include <xo/indentlog/print/cond.hpp>
 
 namespace xo {
+    using xo::mm::poly_forward_inplace;
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
     using xo::facet::typeseq;
@@ -68,8 +71,33 @@ namespace xo {
         }
 
         void
-        DDefineExpr::assign_rhs(obj<AExpression> x) {
+        DDefineExpr::assign_rhs(obj<AExpression> x)
+        {
             this->rhs_ = x;
+        }
+
+        // ----- GCObject facet -----
+
+        std::size_t
+        DDefineExpr::shallow_size() const noexcept
+        {
+            return sizeof(*this);
+        }
+
+        DDefineExpr *
+        DDefineExpr::shallow_copy(obj<AAllocator> mm) const noexcept
+        {
+            return mm.std_copy_for(this);
+        }
+
+        std::size_t
+        DDefineExpr::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_inplace(&lhs_var_);
+            //gc.forward_inplace(&rhs_);  // complicated - need to access via GCObject facet
+            poly_forward_inplace(gc, &rhs_);
+
+            return this->shallow_size();
         }
 
         bool

@@ -6,17 +6,12 @@
 #include "expression2_register_facets.hpp"
 
 #include <xo/expression2/UniqueString.hpp>
-//#include <xo/expression2/detail/IGCObject_DUniqueString.hpp>
-//#include <xo/expression2/detail/IPrintable_DUniqueString.hpp>
-
-#include <xo/expression2/detail/IExpression_DDefineExpr.hpp>
-//#include <xo/expression2/detail/IGCObject_DDefineExpr.hpp>
-#include <xo/expression2/detail/IPrintable_DDefineExpr.hpp>
 
 #include <xo/expression2/detail/IExpression_DVariable.hpp>
 #include <xo/expression2/detail/IGCObject_DVariable.hpp>
 #include <xo/expression2/detail/IPrintable_DVariable.hpp>
 
+#include <xo/expression2/DefineExpr.hpp>
 #include <xo/expression2/VarRef.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/expression2/ApplyExpr.hpp>
@@ -74,7 +69,7 @@ namespace xo {
             FacetRegistry::register_impl<APrintable, DVarRef>();
 
             FacetRegistry::register_impl<AExpression, DDefineExpr>();
-            //FacetRegistry::register_impl<AGCObject, DDefineExpr>();
+            FacetRegistry::register_impl<AGCObject, DDefineExpr>();
             FacetRegistry::register_impl<APrintable, DDefineExpr>();
 
             FacetRegistry::register_impl<AExpression, DApplyExpr>();

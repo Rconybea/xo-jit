@@ -7,7 +7,7 @@
 
 #include "DDefineExpr.hpp"
 #include "detail/IExpression_DDefineExpr.hpp"
-//#include "detail/IGCObject_DDefineExpr.hpp"
+#include "define/IGCObject_DDefineExpr.hpp"
 #include "detail/IPrintable_DDefineExpr.hpp"
 
 /* end DefineExpr.hpp */

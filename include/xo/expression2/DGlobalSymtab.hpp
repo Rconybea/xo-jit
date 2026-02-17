@@ -32,6 +32,7 @@ namespace xo {
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ppindentinfo = xo::print::ppindentinfo;
+            using size_type = std::uint32_t;
 
         public:
             /** @defgroup scm-globalsymtab-ctors constructors **/
@@ -54,6 +55,9 @@ namespace xo {
             ///@}
             /** @defgroup scm-globalsymtab-access-methods access methods **/
             ///@{
+
+            size_type size() const noexcept { return map_->size(); }
+            size_type capacity() const noexcept { return map_->capacity(); }
 
             /** visit symtab-owned memory pools; call visitor(info) for each **/
             void visit_pools(const MemorySizeVisitor & visitor) const;
