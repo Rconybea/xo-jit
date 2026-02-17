@@ -71,6 +71,7 @@ namespace xo {
             bool debug_flag() const noexcept { return debug_flag_; }
             ParserStack * stack() const noexcept { return stack_; }
             obj<AAllocator> expr_alloc() const noexcept { return expr_alloc_; }
+            DGlobalSymtab * global_symtab() const noexcept { return global_symtab_.data(); }
             DLocalSymtab * local_symtab() const noexcept { return local_symtab_; }
             const ParserResult & result() const noexcept { return result_; }
 
@@ -315,6 +316,17 @@ namespace xo {
              **/
             obj<AAllocator> aux_alloc_;
 
+            /** global symbol table.
+             *  Toplevel definitions go here.
+             *
+             *  Uses mmap -> non-trivial destructor.
+             *
+             *  TODO: may want to move ownership upstairs.
+             *        if so, along with stringtable_.
+             *        maybe new struct ParserState?
+             **/
+            dp<DGlobalSymtab> global_symtab_;
+
             /** symbol table with local bindings.
              *  non-null during parsing of lambda expressions.
              *  Always allocated from @p expr_alloc_.
@@ -322,15 +334,6 @@ namespace xo {
              *  during the body of a lambda expression.
              **/
             DLocalSymtab * local_symtab_ = nullptr;
-
-            /** global symbol table.
-             *  Toplevel definitions go here.
-             *
-             *  Uses mmap -> non-trivial destructor.
-             *
-             *  TODO: may want to move ownership upstairs
-             **/
-            dp<DGlobalSymtab> global_symtab_;
 
             /** current output from parser **/
             ParserResult result_;

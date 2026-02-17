@@ -24,6 +24,12 @@ namespace xo {
         {
         }
 
+        DGlobalSymtab *
+        SchematikaReader::global_symtab() const noexcept
+        {
+            return parser_.global_symtab();
+        }
+
         void
         SchematikaReader::visit_pools(const MemorySizeVisitor & visitor) const
         {

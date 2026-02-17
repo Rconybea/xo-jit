@@ -54,6 +54,9 @@ namespace xo {
             /** non-trivial dtor because of @p parser **/
             ~SchematikaReader() = default;
 
+            /** top-level symbol table **/
+            DGlobalSymtab * global_symtab() const noexcept;
+
             /** visit reader-owned memory pools; call visitor(info) for each.
              *  Specifically exclude expr_alloc, since we don't consider
              *  that reader-owned

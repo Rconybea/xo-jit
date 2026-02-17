@@ -117,6 +117,7 @@ namespace xo {
 
                 aux_arena_.visit_pools(visitor);
                 FacetRegistry::instance().visit_pools(visitor);
+                TypeRegistry::instance().visit_pools(visitor);
                 expr_arena_->visit_pools(visitor);
                 parser_->visit_pools(visitor);
 

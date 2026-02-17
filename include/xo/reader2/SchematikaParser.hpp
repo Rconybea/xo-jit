@@ -183,6 +183,8 @@ namespace xo {
             /** scm-schematikaparser-access-methods **/
             ///@{
 
+            DGlobalSymtab * global_symtab() const noexcept;
+
             bool debug_flag() const { return debug_flag_; }
 
             /** true if parser is at top-level,
