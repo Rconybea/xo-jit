@@ -11,6 +11,7 @@
 #include "DIfElseSsm.hpp"
 #include "ParenSsm.hpp"
 #include "ExpectExprSsm.hpp"
+#include "VarRef.hpp"
 
 #include <xo/expression2/DConstant.hpp>
 #include <xo/expression2/detail/IExpression_DConstant.hpp>
@@ -204,23 +205,23 @@ namespace xo {
 
         void
         DToplevelSeqSsm::on_symbol_token(const Token & tk,
-                                       ParserStateMachine * p_psm)
+                                         ParserStateMachine * p_psm)
         {
             switch (seqtype_) {
             case exprseqtype::toplevel_interactive:
                 {
-#ifdef NOT_YET
-                    obj<AExpression,DVariable> var = p_psm->lookup_var(tk.text());
+                    auto varref = obj<AExpression,DVarRef>(p_psm->lookup_varref(tk.text()));
 
-                    if (var) {
-                        DProgressSsm::start(var, p_psm);
+                    if (varref) {
+                        DProgressSsm::start(p_psm->parser_alloc(),
+                                            varref,
+                                            p_psm);
+                        return;
                     } else {
-                        p_psm->unknown_variable_error("DToplevelSeqSsm::on_symbol_token",
-                                                      tk,
-                                                      this->get_expect_str(),
-                                                      p_psm);
+                        p_psm->error_unbound_variable("DToplevelSeqSsm",
+                                                      tk.text());
+                        return;
                     }
-#endif
                 }
                 break;
             case exprseqtype::toplevel_batch:

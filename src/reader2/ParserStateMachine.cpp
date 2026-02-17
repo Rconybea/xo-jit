@@ -156,6 +156,16 @@ namespace xo {
         {
             scope log(XO_DEBUG(debug_flag_));
 
+            const DUniqueString * ustr = stringtable_.lookup(symbolname);
+
+            if (!ustr) {
+                // if we don't already know the symbol,
+                //  -> can't be a valid variable reference
+                //     (whether global or local)
+
+                return nullptr;
+            }
+
             // TODO:
             // 1. check global symtab
             // 2. combine local+global symtab into indept struct
@@ -163,52 +173,46 @@ namespace xo {
             //
 
             if (local_symtab_) {
-                const DUniqueString * ustr = stringtable_.lookup(symbolname);
+                DLocalSymtab * symtab = local_symtab_;
 
-                if (ustr) {
-                    DLocalSymtab * symtab = local_symtab_;
+                // count #of nested scopes to cross, to reach symbol
+                //
+                int32_t link_count = 0;
 
-                    // count #of nested scopes to cross, to reach symbol
-                    //
-                    int32_t link_count = 0;
+                while (symtab) {
+                    Binding b = symtab->lookup_binding(ustr);
 
-                    while (symtab) {
-                        Binding b = symtab->lookup_binding(ustr);
+                    if (b.is_local()) {
+                        assert(b.i_link() == 0);
 
-                        if (b.is_local()) {
-                            assert(b.i_link() == 0);
+                        DVariable * vardef = symtab->lookup_var(b);
+                        assert(vardef);
 
-                            DVariable * vardef = symtab->lookup_var(b);
-                            assert(vardef);
+                        /** ascii diagram here
+                         **/
 
-
-                            /** ascii diagram here
-                             **/
-
-                            return DVarRef::make(expr_alloc_,
-                                                 vardef,
-                                                 link_count);
-                        } else {
-                            assert(b.is_null());
-                        }
-
-                        ++link_count;
-                        symtab = symtab->parent();
+                        return DVarRef::make(expr_alloc_,
+                                             vardef,
+                                             link_count);
+                    } else {
+                        assert(b.is_null());
                     }
-                } else {
-                    // if we don't already know the symbol,
-                    //  -> can't be a valid variable reference
-                    //     (whether global or local)
 
-                    return nullptr;
+                    ++link_count;
+                    symtab = symtab->parent();
                 }
             }
 
-            // TODO: check global symtab also
+            DVariable * vardef = global_symtab_->lookup_variable(ustr);
 
-            log.retroactively_enable();
-            log("STUB: check global symtab");
+            if (vardef) {
+                return DVarRef::make(expr_alloc_,
+                                     vardef,
+                                     0 /*link_count -- n/a for globals*/);
 
+            }
+
+            // symbol not found
             return nullptr;
         }
 

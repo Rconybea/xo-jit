@@ -11,6 +11,7 @@
 #include <xo/reader2/init_reader2.hpp>
 #include <xo/expression2/DefineExpr.hpp>
 #include <xo/expression2/ApplyExpr.hpp>
+#include <xo/expression2/VarRef.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/procedure2/Primitive_gco_2_gco_gco.hpp>
 #include <xo/object2/Float.hpp>
@@ -31,6 +32,7 @@ namespace xo {
     using xo::scm::AExpression;
     using xo::scm::DDefineExpr;
     using xo::scm::DApplyExpr;
+    using xo::scm::DVarRef;
     using xo::scm::DConstant;
 
     //using xo::scm::ParserResult;
@@ -232,7 +234,7 @@ namespace xo {
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ParserFixture fixture(testname, c_debug_flag);
@@ -262,6 +264,72 @@ namespace xo {
             {
                 auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
                 REQUIRE(expr);
+            }
+
+            log && fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("SchematikaParser-interactive-def2", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
+
+            parser.begin_interactive_session();
+
+            {
+                /**  Walkthrough parsing input equivalent to:
+                 *
+                 *     def foo : f64 = 3.141593 ;
+                 *
+                 **/
+
+                std::vector<Token> tk_v{
+                    Token::def_token(),
+                    Token::symbol_token("foo"),
+                    Token::colon_token(),
+                    Token::symbol_token("f64"),
+                    Token::singleassign_token(),
+                    Token::f64_token("3.141593"),
+                    Token::semicolon_token(),
+                };
+
+                utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+                const auto & result = parser.result();
+                {
+                    auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
+                    REQUIRE(expr);
+                }
+
+                parser.reset_result();
+            }
+
+            {
+                /** Walkthrough parsing input equivalent to:
+                 *
+                 *    foo ;
+                 *
+                 **/
+
+                std::vector<Token> tk_v{
+//                    Token::f64_token("2.0"),
+//                    Token::star_token(),
+                    Token::symbol_token("foo"),
+                    Token::semicolon_token(),
+                };
+
+                utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+                const auto & result = parser.result();
+                {
+                    auto expr = obj<AExpression,DVarRef>::from(result.result_expr());
+                    REQUIRE(expr);
+                }
             }
 
             log && fixture.log_memory_layout(&log);
