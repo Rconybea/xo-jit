@@ -1,0 +1,75 @@
+// can regenerate downstream .*pp files with either:
+//   cmake --build -- xo-numeric-facet-procedure
+//   cmake --build -- xo-numeric-genfacet-all
+
+{
+    mode: "facet",
+    output_cpp_dir: "src/numeric",
+    output_hpp_dir: "include/xo/numeric",
+    output_impl_subdir: "detail",
+    // includes in ASyntaxStateMachine.hpp
+    includes: [
+//        "\"RuntimeContext.hpp\"",
+//        "<xo/gc/GCObject.hpp>",
+    ],
+    // extra includes in Procedure.hpp, if any
+    user_hpp_includes: [
+    ],
+    namespace1: "xo",
+    namespace2: "scm",
+    // text after includes, before ASyntaxStateMachine
+    pretext: [
+        //"namespace xo { namespace scm { class ARuntimeContext; } }",
+        //"namespace xo { namespace scm { class DArray; } }",
+    ],
+    facet: "Numeric",
+    detail_subdir: "detail",
+    brief: "abstraction for a schematika numeric i.e. something that can participate in arithmetic",
+    using_doxygen: true,
+    doc: [
+        "Abstraction for a schematika numeric"
+    ],
+    types: [
+//        {
+//            name: "AGCObject",
+//            definition: "xo::mm::AGCObject",
+//            doc: [ "a gc-aware object" ],
+//        },
+        // { name: string, doc: [ string ], definition: string },
+    ],
+    const_methods: [
+//        {
+//            name: "multiply",
+//            doc: [ "true iff procedure takes n arguments" ],
+//            return_type: "bool",
+//            args: [],
+//            const: true,
+//            noexcept: true,
+//            attributes: []
+//        },
+//        {
+//            name: "n_args",
+//            doc: ["number of arguments. -1 for n-ary" ],
+//            return_type: "std::int32_t",
+//            args: [],
+//            const: true,
+//            noexcept: true,
+//            attributes: []
+//        }
+    ],
+    nonconst_methods: [
+//        {
+//            name: "apply_nocheck",
+//            doc: ["invoke procedure; assume arguments satisfy type system" ],
+//            return_type: "obj<AGCObject>",
+//            args: [
+//                {type: "obj<ARuntimeContext>", name: "rcx"},
+//                {type: "const DArray *", name: "args"},
+//            ]
+//        }
+    ],
+    router_facet_explicit_content: [
+        // this doesn't seem to show up anywhere
+        "static obj<ANumeric> multiply(obj<ANumeric> lhs, obj<ANumeric> rhs);"
+    ],
+}

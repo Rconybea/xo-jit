@@ -1,0 +1,15 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# note: changes to find_dependency() calls here
+#       must coordinate with xo_dependency() calls
+#       in CMakeLists.txt
+#
+#find_dependency(xo_gc)
+find_dependency(xo_facet)
+find_dependency(subsys)
+#find_dependency(indentlog)
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+check_required_components("@PROJECT_NAME@")
