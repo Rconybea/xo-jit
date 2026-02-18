@@ -3,6 +3,7 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
+#include <xo/interpreter2/init_interpreter2.hpp>
 #include <xo/interpreter2/VirtualSchematikaMachine.hpp>
 #include <xo/interpreter2/Closure.hpp>
 #include <xo/expression2/UniqueString.hpp>
@@ -12,18 +13,6 @@
 #include <xo/object2/RuntimeError.hpp>
 #include <xo/alloc2/Arena.hpp>
 #include <xo/facet/TypeRegistry.hpp>
-
-#ifdef NOT_YET
-#include <xo/reader2/SchematikaParser.hpp>
-#include <xo/reader2/DDefineSsm.hpp>
-#include <xo/reader2/DExpectExprSsm.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectExprSsm.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DDefineSsm.hpp>
-#endif
-#include <xo/interpreter2/init_interpreter2.hpp>
-#ifdef NOT_YET
-#include <xo/alloc2/arena/IAllocator_DArena.hpp>
-#endif
 #include <xo/indentlog/print/hex.hpp>
 
 #include <catch2/catch.hpp>

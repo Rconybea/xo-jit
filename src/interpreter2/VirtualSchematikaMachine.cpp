@@ -86,6 +86,12 @@ namespace xo {
             return error_mm_.to_op();
         }
 
+        bool
+        VirtualSchematikaMachine::is_at_toplevel() const noexcept
+        {
+            return reader_.is_at_toplevel();
+        }
+
         void
         VirtualSchematikaMachine::visit_pools(const MemorySizeVisitor & visitor) const
         {

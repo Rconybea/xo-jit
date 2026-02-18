@@ -91,6 +91,11 @@ namespace xo {
             /** allocator for runtime errors **/
             obj<AAllocator> error_allocator() const noexcept;
 
+            /** true iff parser is at top-level -> does not contain 
+             *  state for a incomplete/partial expression
+             **/
+            bool is_at_toplevel() const noexcept;
+
             /** visit vsm-owned memory pools; call visitor(info) for each **/
             void visit_pools(const MemorySizeVisitor & visitor) const;
 

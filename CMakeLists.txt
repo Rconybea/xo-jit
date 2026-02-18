@@ -21,6 +21,7 @@ add_definitions(${PROJECT_CXX_FLAGS})
 # output targets
 
 add_subdirectory(src/interpreter2)
+add_subdirectory(src/skrepl)
 add_subdirectory(utest)
 
 # ----------------------------------------------------------------
