@@ -428,6 +428,95 @@ namespace xo {
 
         }
 
+        TEST_CASE("VirtualSchematikaMachine-def3", "[interpreter2][VSM]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
+
+            bool eof_flag = true;
+
+            vsm.begin_interactive_session();
+
+            span_type input = span_type::from_cstr("def fact = lambda (n) { if (n == 0) then 1 else n * fact(n - 1) };");
+
+            for (int i_expr = 0; i_expr < 1; ++i_expr) {
+                log && log(xtag("input", input));
+
+                VsmResultExt res
+                    = vsm.read_eval_print(input, eof_flag);
+
+                REQUIRE(res.is_value());
+                REQUIRE(res.value());
+
+                log && log(xtag("res.tseq", res.value()->_typeseq()),
+                           xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
+
+                if (i_expr == 0) {
+                    auto x = obj<AGCObject,DUniqueString>::from(*res.value());
+                    REQUIRE(x);
+                    REQUIRE(strcmp(x->chars(), "fact") == 0);
+
+                    REQUIRE(res.remaining_.size() == 1);
+                    REQUIRE(*res.remaining_.lo() == '\n');
+                    input = res.remaining_;
+                }
+            }
+
+            log && vsm_fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("VirtualSchematikaMachine-fact0", "[interpreter2][VSM]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
+
+            bool eof_flag = true;
+
+            vsm.begin_interactive_session();
+
+            span_type input = span_type::from_cstr("def fact = lambda (n) { if (n == 0) then 1 else n * fact(n - 1) }; fact(4);");
+
+            for (int i_expr = 0; i_expr < 2; ++i_expr) {
+                log && log(xtag("input", input));
+
+                VsmResultExt res
+                    = vsm.read_eval_print(input, eof_flag);
+
+                REQUIRE(res.is_value());
+                REQUIRE(res.value());
+
+                log && log(xtag("res.tseq", res.value()->_typeseq()),
+                           xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
+
+                if (i_expr == 0) {
+                    auto x = obj<AGCObject,DUniqueString>::from(*res.value());
+                    REQUIRE(x);
+                    REQUIRE(strcmp(x->chars(), "fact") == 0);
+                    input = res.remaining_;
+                } else if (i_expr == 1) {
+                    auto x = obj<AGCObject,DInteger>::from(*res.value());
+                    REQUIRE(x);
+                    REQUIRE(x->value() == 24);
+
+                    REQUIRE(res.remaining_.size() == 1);
+                    REQUIRE(*res.remaining_.lo() == '\n');
+                    input = res.remaining_;
+                }
+            }
+
+            log && vsm_fixture.log_memory_layout(&log);
+        }
+
     } /*namespace ut*/
 } /*namespace xo*/
 

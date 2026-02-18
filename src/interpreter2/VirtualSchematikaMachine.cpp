@@ -394,21 +394,13 @@ namespace xo {
 
             Binding b = var->path();
 
-            if (local_env_) {
-                auto value = local_env_->lookup_value(b);
+            obj<AGCObject> value;
 
-                if (value) {
-                    this->value_ = VsmResult(value);
-
-                    this->pc_ = this->cont_;
-                    this->cont_ = VsmInstr::c_sentinel;
-                    return;
-                }
+            if (b.is_local() && local_env_) {
+                value = local_env_->lookup_value(b);
+            } else if (b.is_global()) {
+                value = global_env_->lookup_value(b);
             }
-
-            // no local binding. perhaps there's a global binding
-
-            auto value = global_env_->lookup_value(b);
 
             if (value) {
                 this->value_ = VsmResult(value);
