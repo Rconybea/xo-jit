@@ -19,6 +19,14 @@ namespace xo {
         NumericPrimitives::s_div_gco_gco_pm("_div",
                                             &NumericDispatch::divide);
 
+        DPrimitive_gco_2_gco_gco
+        NumericPrimitives::s_add_gco_gco_pm("_add",
+                                            &NumericDispatch::add);
+
+        DPrimitive_gco_2_gco_gco
+        NumericPrimitives::s_sub_gco_gco_pm("_sub",
+                                            &NumericDispatch::subtract);
+
 
     } /*namespace scm*/
 } /*namespace xo*/

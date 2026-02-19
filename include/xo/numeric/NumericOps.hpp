@@ -23,11 +23,15 @@ namespace xo {
             AnonymizedNumericOps() = default;
             /** @p multiply to multiply (x,y); allocate from mm **/
             explicit AnonymizedNumericOps(BinaryOp multiply,
-                                          BinaryOp divide)
-                : multiply_{multiply}, divide_{divide} {}
+                                          BinaryOp divide,
+                                          BinaryOp add,
+                                          BinaryOp subtract)
+                : multiply_{multiply}, divide_{divide}, add_{add}, subtract_{subtract} {}
 
             BinaryOp multiply_ = nullptr;
             BinaryOp divide_ = nullptr;
+            BinaryOp add_ = nullptr;
+            BinaryOp subtract_ = nullptr;
         };
 
         template <typename DRepr1, typename DRepr2>
@@ -40,9 +44,13 @@ namespace xo {
 
         public:
             static AnonymizedNumericOps make(BinaryOp_Impl multiply,
-                                             BinaryOp_Impl divide) {
+                                             BinaryOp_Impl divide,
+                                             BinaryOp_Impl add,
+                                             BinaryOp_Impl subtract) {
                 return AnonymizedNumericOps(reinterpret_cast<BinaryOp_Anon>(multiply),
-                                            reinterpret_cast<BinaryOp_Anon>(divide));
+                                            reinterpret_cast<BinaryOp_Anon>(divide),
+                                            reinterpret_cast<BinaryOp_Anon>(add),
+                                            reinterpret_cast<BinaryOp_Anon>(subtract));
             }
         };
 

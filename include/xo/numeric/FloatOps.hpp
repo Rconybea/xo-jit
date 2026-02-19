@@ -22,6 +22,10 @@ namespace xo {
                                            DFloat * x, DFloat * y);
             static obj<AGCObject> divide(obj<ARuntimeContext> rcx,
                                          DFloat * x, DFloat * y);
+            static obj<AGCObject> add(obj<ARuntimeContext> rcx,
+                                      DFloat * x, DFloat * y);
+            static obj<AGCObject> subtract(obj<ARuntimeContext> rcx,
+                                           DFloat * x, DFloat * y);
         };
 
     }

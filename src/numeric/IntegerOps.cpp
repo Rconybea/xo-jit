@@ -25,6 +25,20 @@ namespace xo {
             return DInteger::box<AGCObject>(rcx.allocator(), x->value() / y->value());
         }
 
+        obj<AGCObject>
+        IntegerOps::add(obj<ARuntimeContext> rcx,
+                        DInteger * x, DInteger * y)
+        {
+            return DInteger::box<AGCObject>(rcx.allocator(), x->value() + y->value());
+        }
+
+        obj<AGCObject>
+        IntegerOps::subtract(obj<ARuntimeContext> rcx,
+                             DInteger * x, DInteger * y)
+        {
+            return DInteger::box<AGCObject>(rcx.allocator(), x->value() - y->value());
+        }
+
     }
 }
 

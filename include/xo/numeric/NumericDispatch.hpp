@@ -70,6 +70,18 @@ namespace xo {
                                          obj<AGCObject> x,
                                          obj<AGCObject> y);
 
+            /** add w/ runtime polymorphism (double-dispatch)
+             **/
+            static obj<AGCObject> add(obj<ARuntimeContext> rcx,
+                                      obj<AGCObject> x,
+                                      obj<AGCObject> y);
+
+            /** subtract w/ runtime polymorphism (double-dispatch)
+             **/
+            static obj<AGCObject> subtract(obj<ARuntimeContext> rcx,
+                                           obj<AGCObject> x,
+                                           obj<AGCObject> y);
+
             /** report memory use for owned arenas to @p visitor **/
             void visit_pools(const MemorySizeVisitor & visitor);
 
@@ -80,13 +92,19 @@ namespace xo {
              **/
             template <typename DRepr1, typename DRepr2>
             void register_impl(typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl mul_fn,
-                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl div_fn) {
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl div_fn,
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl add_fn,
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl sub_fn) {
 
                 KeyType key(typeseq::id<DRepr1>().seqno(),
                             typeseq::id<DRepr2>().seqno());
 
                 // note: copying op table so they're in proximity
-                this->dispatch_[key] = NumericOps<DRepr1, DRepr2>::make(mul_fn, div_fn);
+                this->dispatch_[key]
+                    = NumericOps<DRepr1, DRepr2>::make(mul_fn,
+                                                       div_fn,
+                                                       add_fn,
+                                                       sub_fn);
             }
 
         private:

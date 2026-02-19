@@ -25,6 +25,21 @@ namespace xo {
             return DFloat::box<AGCObject>(rcx.allocator(), x->value() / y->value());
         }
 
+        obj<AGCObject>
+        FloatOps::add(obj<ARuntimeContext> rcx,
+                      DFloat * x, DFloat * y)
+        {
+            return DFloat::box<AGCObject>(rcx.allocator(), x->value() + y->value());
+        }
+
+        obj<AGCObject>
+        FloatOps::subtract(obj<ARuntimeContext> rcx,
+                           DFloat * x, DFloat * y)
+        {
+            return DFloat::box<AGCObject>(rcx.allocator(), x->value() - y->value());
+        }
+
+
     }
 }
 

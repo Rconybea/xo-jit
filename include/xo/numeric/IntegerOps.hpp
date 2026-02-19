@@ -23,6 +23,12 @@ namespace xo {
             static obj<AGCObject> divide(obj<ARuntimeContext> rcx,
                                          DInteger * x, DInteger * y);
 
+            static obj<AGCObject> add(obj<ARuntimeContext> rcx,
+                                      DInteger * x, DInteger * y);
+
+            static obj<AGCObject> subtract(obj<ARuntimeContext> rcx,
+                                           DInteger * x, DInteger * y);
+
         };
 
     }

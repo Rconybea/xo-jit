@@ -27,6 +27,9 @@ namespace xo {
             auto target_fn
                 = NumericDispatch::instance().dispatch_[key].multiply_;
 
+            if (!target_fn)
+                assert(false);
+
             return (*target_fn)(rcx, x.data(), y.data());
         }
 
@@ -35,23 +38,48 @@ namespace xo {
                                 obj<AGCObject> x,
                                 obj<AGCObject> y)
         {
-            scope log(XO_DEBUG(true));
-
             KeyType key(x._typeseq(), y._typeseq());
-
-            log && log(xtag("x.tseq", x._typeseq().seqno()),
-                       xtag("y.tseq", y._typeseq().seqno()));
 
             auto target_fn
                 = NumericDispatch::instance().dispatch_[key].divide_;
 
-            log && log(xtag("target_fn", target_fn));
-
-            assert(target_fn);
+            if (!target_fn)
+                assert(false);
 
             return (*target_fn)(rcx, x.data(), y.data());
         }
 
+        obj<AGCObject>
+        NumericDispatch::add(obj<ARuntimeContext> rcx,
+                             obj<AGCObject> x,
+                             obj<AGCObject> y)
+        {
+            KeyType key(x._typeseq(), y._typeseq());
+
+            auto target_fn
+                = NumericDispatch::instance().dispatch_[key].add_;
+
+            if (!target_fn)
+                assert(false);
+
+            return (*target_fn)(rcx, x.data(), y.data());
+        }
+
+        obj<AGCObject>
+        NumericDispatch::subtract(obj<ARuntimeContext> rcx,
+                                  obj<AGCObject> x,
+                                  obj<AGCObject> y)
+        {
+            KeyType key(x._typeseq(), y._typeseq());
+
+            auto target_fn
+                = NumericDispatch::instance().dispatch_[key].subtract_;
+
+            if (!target_fn)
+                assert(false);
+
+            return (*target_fn)(rcx, x.data(), y.data());
+        }
 
     } /*namespace scm*/
 } /*namespace xo*/

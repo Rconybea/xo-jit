@@ -18,6 +18,10 @@ namespace xo {
             static DPrimitive_gco_2_gco_gco s_mul_gco_gco_pm;
             /** polymorphic (in both arguments) divide **/
             static DPrimitive_gco_2_gco_gco s_div_gco_gco_pm;
+            /** polymorphic (in both arguments) add **/
+            static DPrimitive_gco_2_gco_gco s_add_gco_gco_pm;
+            /** polymorphic (in both arguments) subtract **/
+            static DPrimitive_gco_2_gco_gco s_sub_gco_gco_pm;
         };
     }
 }
