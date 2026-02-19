@@ -11,6 +11,7 @@
 #include <xo/reader2/init_reader2.hpp>
 #include <xo/expression2/DefineExpr.hpp>
 #include <xo/expression2/ApplyExpr.hpp>
+#include <xo/expression2/IfElseExpr.hpp>
 #include <xo/expression2/VarRef.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/procedure2/Primitive_gco_2_gco_gco.hpp>
@@ -31,6 +32,7 @@ namespace xo {
 
     using xo::scm::AExpression;
     using xo::scm::DDefineExpr;
+    using xo::scm::DIfElseExpr;
     using xo::scm::DApplyExpr;
     using xo::scm::DVarRef;
     using xo::scm::DConstant;
@@ -680,7 +682,7 @@ namespace xo {
 
                 auto pm = obj<AGCObject,DPrimitive_gco_2_gco_gco>::from(fn->value());
                 REQUIRE(pm);
-                REQUIRE(pm->name() == "_equal");
+                REQUIRE(pm->name() == "_cmpeq");
 
                 auto lhs = obj<AExpression,DConstant>::from(expr->arg(0));
                 REQUIRE(lhs);
@@ -695,6 +697,84 @@ namespace xo {
                 auto rhs_i64 = obj<AGCObject,DInteger>::from(rhs->value());
                 REQUIRE(rhs_i64);
                 REQUIRE(rhs_i64->value() == 312);
+            }
+
+            log && fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("SchematikaParser-interactive-if1", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag),
+                      xtag("test", testname));
+
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
+
+            parser.begin_interactive_session();
+
+            {
+                /** Walkthrough parsing input equivalent to:
+                 *
+                 *    def n = 4 ;
+                 *    ^   ^ ^ ^ ^
+                 *    0   1 2 3 4
+                 **/
+
+                std::vector<Token> tk_v{
+                    /* [0] */ Token::def_token(),
+                    /* [1] */ Token::symbol_token("n"),
+                    /* [2] */ Token::singleassign_token(),
+                    /* [3] */ Token::i64_token("4"),
+                    /* [4] */ Token::semicolon_token()
+                };
+
+                utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            }
+
+            {
+                const auto & result = parser.result();
+
+                auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
+                REQUIRE(expr);
+            }
+
+            {
+                parser.reset_result();
+
+                /** Walkthrough parsing input equivalent to:
+                 *
+                 *    if (n == 4) then 1 else n * 5 ;
+                 *    ^  ^^ ^  ^^ ^    ^ ^    ^ ^ ^ ^
+                 *    0  1| 3  4| 6    7 8    9 a b c
+                 *        2     5
+                 **/
+
+                std::vector<Token> tk_v{
+                    /* [0] */ Token::if_token(),
+                    /* [1] */   Token::leftparen_token(),
+                    /* [2] */     Token::symbol_token("n"),
+                    /* [3] */     Token::cmpeq_token(),
+                    /* [4] */     Token::i64_token("4"),
+                    /* [5] */   Token::rightparen_token(),
+                    /* [6] */ Token::then_token(),
+                    /* [7] */   Token::i64_token("1"),
+                    /* [8] */ Token::else_token(),
+                    /* [9] */   Token::symbol_token("n"),
+                    /* [a] */   Token::star_token(),
+                    /* [b] */   Token::i64_token("5"),
+                    /* [c] */ Token::semicolon_token()
+                };
+
+                utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            }
+
+            const auto & result = parser.result();
+            {
+                auto expr = obj<AExpression,DIfElseExpr>::from(result.result_expr());
+                REQUIRE(expr);
             }
 
             log && fixture.log_memory_layout(&log);
@@ -743,7 +823,7 @@ namespace xo {
             log && fixture.log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-if", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-if2", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 

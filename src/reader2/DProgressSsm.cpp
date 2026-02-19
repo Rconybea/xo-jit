@@ -43,6 +43,7 @@ namespace xo {
     using xo::scm::Variable;
     using xo::scm::Apply;
 #endif
+    using xo::mm::AAllocator;
     using xo::mm::AGCObject;
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
@@ -1185,6 +1186,45 @@ namespace xo {
 
         namespace {
             // make_builtin_apply_pm2
+
+            // helper function for making apply expression that invokes
+            // a binary primitive.  Use for numeric operators:
+            // {*, /, +, -, ==}
+            //
+            obj<AExpression>
+            assemble_numeric_expr_aux(obj<AAllocator> expr_alloc,
+                                      const TypeRef::prefix_type & prefix,
+                                      DPrimitive_gco_2_gco_gco * p_gco_pm,
+                                      obj<AExpression> lhs,
+                                      obj<AExpression> rhs)
+            {
+                auto pm_obj  = with_facet<AGCObject>::mkobj(p_gco_pm);
+                auto fn_expr = DConstant::make(expr_alloc, pm_obj);
+
+                /* note:
+                 * 1. don't assume we know lhs_ / rhs_ value types yet.
+                 *    perhaps have expression like
+                 *      f(..) * g(..)
+                 *    where f is the function that contains current ssm.
+                 *
+                 * 2. consequence: we need representation for
+                 *    polymorphic multiply on unknown numeric arguments.
+                 *
+                 * 3. TypeRef::dwim(..) is a placeholder.
+                 *    Plan to later provide abstract interpreter
+                 *    (ie compiler pass :) to drive type inference/unification
+                 *
+                 * 4. Alternatively could supply type-annotation syntax
+                 *    so human can assist inference; context here is we want
+                 *    to automate the boring stuff
+                 */
+
+                TypeRef tref = TypeRef::dwim(prefix, nullptr);
+
+                return DApplyExpr::make2(expr_alloc,
+                                         tref, fn_expr, lhs, rhs);
+
+            }
         }
 
         obj<AExpression>
@@ -1223,9 +1263,16 @@ namespace xo {
                 break;
 
             case optype::op_equal:
+                return assemble_numeric_expr_aux
+                    (p_psm->expr_alloc(),
+                     TypeRef::prefix_type::from_chars("_cmpeq_gco"),
+                     &NumericPrimitives::s_cmpeq_gco_gco_pm,
+                     lhs_, rhs_);
+
+#ifdef OBSOLETE
                 {
                     auto pm_obj = (with_facet<AGCObject>::mkobj
-                                       (&Primitives::s_equal_gco_gco_pm));
+                                       (&NumericPrimitives::s_cmpeq_gco_gco_pm));
                     auto fn_expr = (DConstant::make
                                         (p_psm->expr_alloc(), pm_obj));
 
@@ -1240,6 +1287,7 @@ namespace xo {
                                              fn_expr, lhs_, rhs_);
                 }
                 break;
+#endif
 
             case optype::op_not_equal:
             case optype::op_less:
@@ -1250,6 +1298,13 @@ namespace xo {
                 break;
 
             case optype::op_multiply:
+                return assemble_numeric_expr_aux
+                    (p_psm->expr_alloc(),
+                     TypeRef::prefix_type::from_chars("_mul_gco"),
+                     &NumericPrimitives::s_mul_gco_gco_pm,
+                     lhs_, rhs_);
+
+#ifdef OBSOLETE
                 {
                     auto pm_obj  = (with_facet<AGCObject>::mkobj
                                     (&NumericPrimitives::s_mul_gco_gco_pm));
@@ -1281,6 +1336,7 @@ namespace xo {
                     return DApplyExpr::make2(p_psm->expr_alloc(),
                                              tref, fn_expr, lhs_, rhs_);
                 }
+#endif
 
                 break;
             case optype::op_divide:
