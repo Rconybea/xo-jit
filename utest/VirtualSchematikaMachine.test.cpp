@@ -73,8 +73,8 @@ namespace xo {
                 };
 
                 aux_mm_.arena_.visit_pools(visitor);
-                FacetRegistry::instance().visit_pools(visitor);
                 TypeRegistry::instance().visit_pools(visitor);
+                FacetRegistry::instance().visit_pools(visitor);
                 vsm_.visit_pools(visitor);
 
                 return true;
@@ -182,6 +182,37 @@ namespace xo {
 
             REQUIRE(x);
             REQUIRE(x.data()->value() == 1.570796325);
+
+            REQUIRE(res.remaining_.size() == 1);
+            REQUIRE(*res.remaining_.lo() == '\n');
+
+            log && vsm_fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("VirtualSchematikaMachine-arith2", "[interpreter2][VSM]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
+
+            bool eof_flag = false;
+
+            vsm.begin_interactive_session();
+            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("3.14159265 / 0.5;"), eof_flag);
+
+            REQUIRE(res.is_value());
+            REQUIRE(res.value());
+
+            log && log(xtag("res.tseq", res.value()->_typeseq()));
+
+            auto x = obj<AGCObject,DFloat>::from(*res.value());
+
+            REQUIRE(x);
+            REQUIRE(x.data()->value() == 6.2831853);
 
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');

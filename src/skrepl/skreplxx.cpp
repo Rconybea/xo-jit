@@ -9,6 +9,9 @@
 #include <xo/facet/FacetRegistry.hpp>
 #include <replxx.hxx>
 #include <iostream>
+#ifdef __APPLE__
+#include <unistd.h> // for STDIN_FILENO on OSX
+#endif
 
 namespace xo {
     using xo::scm::VirtualSchematikaMachine;
@@ -85,7 +88,7 @@ namespace xo {
 
         AppConfig(const ReplConfig & repl_cfg = ReplConfig(),
                   const ArenaConfig & app_arena_cfg = ArenaConfig().with_name("skreplxx").with_size(16 * 1024),
-                  const VsmConfig & vsm_cfg = VsmConfig()) 
+                  const VsmConfig & vsm_cfg = VsmConfig())
         : repl_config_{repl_cfg}, app_arena_config_{app_arena_cfg}, vsm_config_{vsm_cfg}
         {
             //rdr_config_.reader_debug_flag_ = true;
@@ -239,4 +242,3 @@ main (int argc, char * argv[])
 } /*main*/
 
 /* end skreplxx.cpp */
-
