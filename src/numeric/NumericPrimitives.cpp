@@ -27,6 +27,10 @@ namespace xo {
         NumericPrimitives::s_sub_gco_gco_pm("_sub",
                                             &NumericDispatch::subtract);
 
+        DPrimitive_gco_2_gco_gco
+        NumericPrimitives::s_cmpeq_gco_gco_pm("_cmpeq",
+                                              &NumericDispatch::cmp_equal);
+
 
     } /*namespace scm*/
 } /*namespace xo*/

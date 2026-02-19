@@ -82,6 +82,11 @@ namespace xo {
                                            obj<AGCObject> x,
                                            obj<AGCObject> y);
 
+            /** compare two numeric values for equality **/
+            static obj<AGCObject> cmp_equal(obj<ARuntimeContext> rcx,
+                                            obj<AGCObject> x,
+                                            obj<AGCObject> y);
+
             /** report memory use for owned arenas to @p visitor **/
             void visit_pools(const MemorySizeVisitor & visitor);
 
@@ -94,7 +99,8 @@ namespace xo {
             void register_impl(typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl mul_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl div_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl add_fn,
-                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl sub_fn) {
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl sub_fn,
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpeq_fn) {
 
                 KeyType key(typeseq::id<DRepr1>().seqno(),
                             typeseq::id<DRepr2>().seqno());
@@ -104,7 +110,8 @@ namespace xo {
                     = NumericOps<DRepr1, DRepr2>::make(mul_fn,
                                                        div_fn,
                                                        add_fn,
-                                                       sub_fn);
+                                                       sub_fn,
+                                                       cmpeq_fn);
             }
 
         private:

@@ -29,6 +29,9 @@ namespace xo {
             static obj<AGCObject> subtract(obj<ARuntimeContext> rcx,
                                            DInteger * x, DInteger * y);
 
+            static obj<AGCObject> cmp_equal(obj<ARuntimeContext> rcx,
+                                            DInteger * x, DInteger * y);
+
         };
 
     }

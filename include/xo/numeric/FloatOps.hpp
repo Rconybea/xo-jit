@@ -26,6 +26,9 @@ namespace xo {
                                       DFloat * x, DFloat * y);
             static obj<AGCObject> subtract(obj<ARuntimeContext> rcx,
                                            DFloat * x, DFloat * y);
+
+            static obj<AGCObject> cmp_equal(obj<ARuntimeContext> rcx,
+                                            DFloat * x, DFloat * y);
         };
 
     }

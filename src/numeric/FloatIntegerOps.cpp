@@ -5,6 +5,7 @@
 
 #include "FloatIntegerOps.hpp"
 #include "float/INumeric_DFloat.hpp"
+#include <xo/object2/Boolean.hpp>
 
 namespace xo {
     using xo::mm::AGCObject;
@@ -41,6 +42,14 @@ namespace xo {
             return DFloat::box<AGCObject>(rcx.allocator(), x->value() - y->value());
         }
 
+        obj<AGCObject>
+        FloatIntegerOps::cmp_equal(obj<ARuntimeContext> rcx,
+                                   DFloat * x, DInteger * y)
+        {
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            x->value() == DFloat::value_type(y->value()));
+        }
+
         // ----- Integer op Float -----
 
         obj<AGCObject>
@@ -69,6 +78,14 @@ namespace xo {
                                   DInteger * x, DFloat * y)
         {
             return DFloat::box<AGCObject>(rcx.allocator(), x->value() - y->value());
+        }
+
+        obj<AGCObject>
+        IntegerFloatOps::cmp_equal(obj<ARuntimeContext> rcx,
+                                   DInteger * x, DFloat * y)
+        {
+            return DFloat::box<AGCObject>(rcx.allocator(),
+                                          DFloat::value_type(x->value() == y->value()));
         }
 
     }

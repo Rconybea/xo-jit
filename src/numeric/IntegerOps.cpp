@@ -5,8 +5,10 @@
 
 #include "IntegerOps.hpp"
 #include "integer/INumeric_DInteger.hpp"
+#include <xo/object2/Boolean.hpp>
 
 namespace xo {
+    using xo::scm::DBoolean;
     using xo::mm::AGCObject;
 
     namespace scm {
@@ -37,6 +39,13 @@ namespace xo {
                              DInteger * x, DInteger * y)
         {
             return DInteger::box<AGCObject>(rcx.allocator(), x->value() - y->value());
+        }
+
+        obj<AGCObject>
+        IntegerOps::cmp_equal(obj<ARuntimeContext> rcx,
+                              DInteger * x, DInteger * y)
+        {
+            return DBoolean::box<AGCObject>(rcx.allocator(), x->value() == y->value());
         }
 
     }

@@ -81,6 +81,22 @@ namespace xo {
             return (*target_fn)(rcx, x.data(), y.data());
         }
 
+        obj<AGCObject>
+        NumericDispatch::cmp_equal(obj<ARuntimeContext> rcx,
+                                   obj<AGCObject> x,
+                                   obj<AGCObject> y)
+        {
+            KeyType key(x._typeseq(), y._typeseq());
+
+            auto target_fn
+                = NumericDispatch::instance().dispatch_[key].cmpeq_;
+
+            if (!target_fn)
+                assert(false);
+
+            return (*target_fn)(rcx, x.data(), y.data());
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 
