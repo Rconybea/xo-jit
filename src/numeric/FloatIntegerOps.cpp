@@ -50,6 +50,14 @@ namespace xo {
                                             x->value() == DFloat::value_type(y->value()));
         }
 
+        obj<AGCObject>
+        FloatIntegerOps::cmp_notequal(obj<ARuntimeContext> rcx,
+                                      DFloat * x, DInteger * y)
+        {
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            x->value() != DFloat::value_type(y->value()));
+        }
+
         // ----- Integer op Float -----
 
         obj<AGCObject>
@@ -84,8 +92,16 @@ namespace xo {
         IntegerFloatOps::cmp_equal(obj<ARuntimeContext> rcx,
                                    DInteger * x, DFloat * y)
         {
-            return DFloat::box<AGCObject>(rcx.allocator(),
-                                          DFloat::value_type(x->value() == y->value()));
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            DFloat::value_type(x->value()) == y->value());
+        }
+
+        obj<AGCObject>
+        IntegerFloatOps::cmp_notequal(obj<ARuntimeContext> rcx,
+                                      DInteger * x, DFloat * y)
+        {
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            DFloat::value_type(x->value()) != y->value());
         }
 
     }

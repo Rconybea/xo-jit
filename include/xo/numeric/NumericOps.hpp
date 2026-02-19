@@ -26,9 +26,10 @@ namespace xo {
                                           BinaryOp divide,
                                           BinaryOp add,
                                           BinaryOp subtract,
-                                          BinaryOp cmpeq)
+                                          BinaryOp cmpeq,
+                                          BinaryOp cmpne)
                 : multiply_{multiply}, divide_{divide}, add_{add}, subtract_{subtract},
-                  cmpeq_{cmpeq} {}
+                  cmpeq_{cmpeq}, cmpne_{cmpne} {}
 
             BinaryOp multiply_ = nullptr;
             BinaryOp divide_ = nullptr;
@@ -37,6 +38,8 @@ namespace xo {
 
             /** compare numerics for equality **/
             BinaryOp cmpeq_ = nullptr;
+            /** compare numerics for inequality **/
+            BinaryOp cmpne_ = nullptr;
         };
 
         template <typename DRepr1, typename DRepr2>
@@ -52,12 +55,14 @@ namespace xo {
                                              BinaryOp_Impl divide,
                                              BinaryOp_Impl add,
                                              BinaryOp_Impl subtract,
-                                             BinaryOp_Impl cmpeq) {
+                                             BinaryOp_Impl cmpeq,
+                                             BinaryOp_Impl cmpne) {
                 return AnonymizedNumericOps(reinterpret_cast<BinaryOp_Anon>(multiply),
                                             reinterpret_cast<BinaryOp_Anon>(divide),
                                             reinterpret_cast<BinaryOp_Anon>(add),
                                             reinterpret_cast<BinaryOp_Anon>(subtract),
-                                            reinterpret_cast<BinaryOp_Anon>(cmpeq));
+                                            reinterpret_cast<BinaryOp_Anon>(cmpeq),
+                                            reinterpret_cast<BinaryOp_Anon>(cmpne));
             }
         };
 

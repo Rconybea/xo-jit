@@ -39,28 +39,32 @@ namespace xo {
                  &FloatOps::divide,
                  &FloatOps::add,
                  &FloatOps::subtract,
-                 &FloatOps::cmp_equal);
+                 &FloatOps::cmp_equal,
+                 &FloatOps::cmp_notequal);
 
             NumericDispatch::instance().register_impl<DFloat, DInteger>
                 (&FloatIntegerOps::multiply,
                  &FloatIntegerOps::divide,
                  &FloatIntegerOps::add,
                  &FloatIntegerOps::subtract,
-                 &FloatIntegerOps::cmp_equal);
+                 &FloatIntegerOps::cmp_equal,
+                 &FloatIntegerOps::cmp_notequal);
 
             NumericDispatch::instance().register_impl<DInteger, DFloat>
                 (&IntegerFloatOps::multiply,
                  &IntegerFloatOps::divide,
                  &IntegerFloatOps::add,
                  &IntegerFloatOps::subtract,
-                 &IntegerFloatOps::cmp_equal);
+                 &IntegerFloatOps::cmp_equal,
+                 &IntegerFloatOps::cmp_notequal);
 
             NumericDispatch::instance().register_impl<DInteger, DInteger>
                 (&IntegerOps::multiply,
                  &IntegerOps::divide,
                  &IntegerOps::add,
                  &IntegerOps::subtract,
-                 &IntegerOps::cmp_equal);
+                 &IntegerOps::cmp_equal,
+                 &IntegerOps::cmp_notequal);
 
             log && log(xtag("ANumeric.tseq", typeseq::id<ANumeric>()));
 

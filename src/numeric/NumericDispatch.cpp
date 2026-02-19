@@ -4,10 +4,13 @@
  **/
 
 #include "NumericDispatch.hpp"
+#include <xo/object2/RuntimeError.hpp>
+#include <xo/facet/TypeRegistry.hpp>
 #include <xo/indentlog/scope.hpp>
 
 namespace xo {
     using xo::mm::AGCObject;
+    using xo::facet::TypeRegistry;
 
     namespace scm {
 
@@ -15,6 +18,35 @@ namespace xo {
         NumericDispatch::visit_pools(const MemorySizeVisitor & visitor)
         {
             dispatch_.visit_pools(visitor);
+        }
+
+        obj<AGCObject>
+        NumericDispatch::dispatch(obj<ARuntimeContext> rcx,
+                                  const char * caller,
+                                  const char * error_headline,
+                                  BinaryOp AnonymizedNumericOps::* member_ptr,
+                                  obj<AGCObject> x,
+                                  obj<AGCObject> y)
+        {
+            KeyType key(x._typeseq(), y._typeseq());
+
+            auto target_fn
+                = NumericDispatch::instance().dispatch_[key].*member_ptr;
+
+            if (!target_fn) {
+                // FIXME: use {fmt} here
+                std::stringstream ss;
+                tosn(ss,
+                     error_headline,
+                     xtag("x.type", TypeRegistry::id2name(x._typeseq())),
+                     xtag("y.type", TypeRegistry::id2name(y._typeseq())));
+
+                return DRuntimeError::make(rcx.allocator(),
+                                           caller,
+                                           ss.str().c_str());
+            }
+
+            return (*target_fn)(rcx, x.data(), y.data());
         }
 
         obj<AGCObject>
@@ -91,10 +123,54 @@ namespace xo {
             auto target_fn
                 = NumericDispatch::instance().dispatch_[key].cmpeq_;
 
-            if (!target_fn)
-                assert(false);
+            if (!target_fn) {
+                // FIXME: use {fmt} here
+                std::stringstream ss;
+                tosn(ss,
+                     "incomparable types in x==y",
+                     xtag("x.type", TypeRegistry::id2name(x._typeseq())),
+                     xtag("y.type", TypeRegistry::id2name(y._typeseq())));
+
+                return DRuntimeError::make(rcx.allocator(),
+                                           "NumericDispatch::cmp_equal",
+                                           ss.str().c_str());
+            }
 
             return (*target_fn)(rcx, x.data(), y.data());
+        }
+
+        obj<AGCObject>
+        NumericDispatch::cmp_notequal(obj<ARuntimeContext> rcx,
+                                      obj<AGCObject> x,
+                                      obj<AGCObject> y)
+        {
+            return dispatch(rcx,
+                            "NumericDispatch::cmp_notequal",
+                            "incomparable types in x!=y",
+                            &AnonymizedNumericOps::cmpne_,
+                            x, y);
+
+#ifdef OBSOLETE
+            KeyType key(x._typeseq(), y._typeseq());
+
+            auto target_fn
+                = NumericDispatch::instance().dispatch_[key].cmpne_;
+
+            if (!target_fn) {
+                // FIXME: use {fmt} here
+                std::stringstream ss;
+                tosn(ss,
+                     "incomparable types in x==y",
+                     xtag("x.type", TypeRegistry::id2name(x._typeseq())),
+                     xtag("y.type", TypeRegistry::id2name(y._typeseq())));
+
+                return DRuntimeError::make(rcx.allocator(),
+                                           "NumericDispatch::cmp_notequal",
+                                           ss.str().c_str());
+            }
+
+            return (*target_fn)(rcx, x.data(), y.data());
+#endif
         }
 
     } /*namespace scm*/

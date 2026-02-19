@@ -25,6 +25,7 @@ namespace xo {
             using typeseq = xo::reflect::typeseq;
             using KeyType = std::pair<typeseq, typeseq>;
             using MappedType = AnonymizedNumericOps;
+            using BinaryOp = AnonymizedNumericOps::BinaryOp;
 
             /** hash function for key_type **/
             struct KeyHash {
@@ -58,6 +59,16 @@ namespace xo {
                 return s_instance;
             }
 
+            /** multi-dispatch driver.
+             *  Invoke @p member_ptr in AnonymizedNumericOps
+             **/
+            static obj<AGCObject> dispatch(obj<ARuntimeContext> rcx,
+                                           const char * caller,
+                                           const char * error_headline,
+                                           BinaryOp AnonymizedNumericOps::* member_ptr,
+                                           obj<AGCObject> x,
+                                           obj<AGCObject> y);
+
             /** multiply w/ runtime polymorphism (double-dispatch)
              **/
             static obj<AGCObject> multiply(obj<ARuntimeContext> rcx,
@@ -87,6 +98,11 @@ namespace xo {
                                             obj<AGCObject> x,
                                             obj<AGCObject> y);
 
+            /** compare two numeric values for inequality **/
+            static obj<AGCObject> cmp_notequal(obj<ARuntimeContext> rcx,
+                                               obj<AGCObject> x,
+                                               obj<AGCObject> y);
+
             /** report memory use for owned arenas to @p visitor **/
             void visit_pools(const MemorySizeVisitor & visitor);
 
@@ -100,7 +116,8 @@ namespace xo {
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl div_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl add_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl sub_fn,
-                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpeq_fn) {
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpeq_fn,
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpne_fn) {
 
                 KeyType key(typeseq::id<DRepr1>().seqno(),
                             typeseq::id<DRepr2>().seqno());
@@ -111,7 +128,8 @@ namespace xo {
                                                        div_fn,
                                                        add_fn,
                                                        sub_fn,
-                                                       cmpeq_fn);
+                                                       cmpeq_fn,
+                                                       cmpne_fn);
             }
 
         private:
