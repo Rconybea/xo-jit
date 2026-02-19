@@ -295,11 +295,11 @@ namespace xo {
             case tokentype::tk_doublecolon:
             case tokentype::tk_assign:
             case tokentype::tk_yields:
-            case tokentype::tk_plus:
                 break;
 
             case tokentype::tk_star:
             case tokentype::tk_slash:
+            case tokentype::tk_plus:
             case tokentype::tk_minus:
             case tokentype::tk_cmpeq:
                 this->on_operator_token(tk, p_psm);
@@ -1246,7 +1246,6 @@ namespace xo {
             case optype::op_less_equal:
             case optype::op_great:
             case optype::op_great_equal:
-            case optype::op_add:
                 assert(false);
                 break;
 
@@ -1319,10 +1318,45 @@ namespace xo {
 
                 break;
 
+            case optype::op_add:
+                {
+                    auto pm_obj  = (with_facet<AGCObject>::mkobj
+                                    (&NumericPrimitives::s_add_gco_gco_pm));
+                    auto fn_expr = (DConstant::make
+                                    (p_psm->expr_alloc(), pm_obj));
+
+                    /* note:
+                     * 1. don't assume we know lhs_ / rhs_ value types yet.
+                     *    perhaps have expression like
+                     *      f(..) * g(..)
+                     *    where f is the function that contains current ssm.
+                     *
+                     * 2. consequence: we need representation for
+                     *    polymorphic multiply on unknown numeric arguments.
+                     *
+                     * 3. TypeRef::dwim(..) is a placeholder.
+                     *    Plan to later provide abstract interpreter
+                     *    (ie compiler pass :) to drive type inference/unification
+                     *
+                     * 4. Alternatively could supply type-annotation syntax
+                     *    so human can assist inference; context here is we want
+                     *    to automate the boring stuff
+                     */
+
+                    TypeRef tref = TypeRef::dwim
+                                       (TypeRef::prefix_type::from_chars("_add_gco"),
+                                        nullptr);
+
+                    return DApplyExpr::make2(p_psm->expr_alloc(),
+                                             tref, fn_expr, lhs_, rhs_);
+                }
+
+                break;
+
             case optype::op_subtract: /* editor bait: op_minus */
                 {
                     auto pm_obj = (with_facet<AGCObject>::mkobj
-                                       (&Primitives::s_sub_gco_gco_pm));
+                                       (&NumericPrimitives::s_sub_gco_gco_pm));
                     auto fn_expr = (DConstant::make
                                         (p_psm->expr_alloc(), pm_obj));
 
