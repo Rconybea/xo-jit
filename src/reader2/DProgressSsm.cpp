@@ -12,6 +12,8 @@
 #include "ApplySsm.hpp"
 #include "ParenSsm.hpp"
 
+#include <xo/numeric/NumericPrimitives.hpp>
+
 #include <xo/expression2/DApplyExpr.hpp>
 #include <xo/expression2/detail/IExpression_DApplyExpr.hpp>
 
@@ -118,15 +120,15 @@ namespace xo {
                 switch (tktype) {
                 case tokentype::tk_assign:
                     return optype::op_assign;
-                case tokentype::tk_plus:
+                case tokentype::tk_plus:        // [+]
                     return optype::op_add;
-                case tokentype::tk_minus:
+                case tokentype::tk_minus:       // [-]
                     return optype::op_subtract;
-                case tokentype::tk_star:
+                case tokentype::tk_star:        // [*]
                     return optype::op_multiply;
-                case tokentype::tk_slash:
+                case tokentype::tk_slash:       // [/]
                     return optype::op_divide;
-                case tokentype::tk_cmpeq:
+                case tokentype::tk_cmpeq:       // [==]
                     return optype::op_equal;
                 case tokentype::tk_cmpne:
                     return optype::op_not_equal;
@@ -297,12 +299,12 @@ namespace xo {
                 break;
 
             case tokentype::tk_star:
+            case tokentype::tk_slash:
             case tokentype::tk_minus:
             case tokentype::tk_cmpeq:
                 this->on_operator_token(tk, p_psm);
                 return;
 
-            case tokentype::tk_slash:
             case tokentype::tk_cmpne:
             case tokentype::tk_type:
             case tokentype::tk_lambda:
@@ -1283,9 +1285,40 @@ namespace xo {
 
                 break;
             case optype::op_divide:
-                // TODO: implement binary operator expression assembly
-                assert(false);
+                {
+                    auto pm_obj  = (with_facet<AGCObject>::mkobj
+                                    (&NumericPrimitives::s_div_gco_gco_pm));
+                    auto fn_expr = (DConstant::make
+                                    (p_psm->expr_alloc(), pm_obj));
+
+                    /* note:
+                     * 1. don't assume we know lhs_ / rhs_ value types yet.
+                     *    perhaps have expression like
+                     *      f(..) * g(..)
+                     *    where f is the function that contains current ssm.
+                     *
+                     * 2. consequence: we need representation for
+                     *    polymorphic multiply on unknown numeric arguments.
+                     *
+                     * 3. TypeRef::dwim(..) is a placeholder.
+                     *    Plan to later provide abstract interpreter
+                     *    (ie compiler pass :) to drive type inference/unification
+                     *
+                     * 4. Alternatively could supply type-annotation syntax
+                     *    so human can assist inference; context here is we want
+                     *    to automate the boring stuff
+                     */
+
+                    TypeRef tref = TypeRef::dwim
+                                       (TypeRef::prefix_type::from_chars("_div_gco"),
+                                        nullptr);
+
+                    return DApplyExpr::make2(p_psm->expr_alloc(),
+                                             tref, fn_expr, lhs_, rhs_);
+                }
+
                 break;
+
             case optype::op_subtract: /* editor bait: op_minus */
                 {
                     auto pm_obj = (with_facet<AGCObject>::mkobj

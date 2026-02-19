@@ -578,6 +578,67 @@ namespace xo {
             log && fixture.log_memory_layout(&log);
         }
 
+        TEST_CASE("SchematikaParser-interactive-arith2", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = false;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    3.14159265 / 10.0 ;
+             *
+             **/
+
+            std::vector<Token> tk_v{
+                Token::f64_token("3.14159265"),
+                Token::slash_token(),
+                Token::f64_token("10.0"),
+                Token::semicolon_token(),
+            };
+
+            INFO(testname);
+
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            const auto & result = parser.result();
+            {
+                auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
+                REQUIRE(expr);
+
+                REQUIRE(expr->n_args() == 2);
+
+                auto fn = obj<AExpression,DConstant>::from(expr->fn());
+                REQUIRE(fn);
+
+                auto pm = obj<AGCObject,DPrimitive_gco_2_gco_gco>::from(fn->value());
+                REQUIRE(pm);
+                REQUIRE(pm->name() == "_div");
+
+                auto lhs = obj<AExpression,DConstant>::from(expr->arg(0));
+                REQUIRE(lhs);
+
+                auto lhs_f64 = obj<AGCObject,DFloat>::from(lhs->value());
+                REQUIRE(lhs_f64);
+                REQUIRE(lhs_f64->value() == 3.14159265);
+
+                auto rhs = obj<AExpression,DConstant>::from(expr->arg(1));
+                REQUIRE(rhs);
+
+                auto rhs_f64 = obj<AGCObject,DFloat>::from(rhs->value());
+                REQUIRE(rhs_f64);
+                REQUIRE(rhs_f64->value() == 10.0);
+            }
+
+            log && fixture.log_memory_layout(&log);
+        }
+
         TEST_CASE("SchematikaParser-interactive-cmp", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();

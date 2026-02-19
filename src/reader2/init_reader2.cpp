@@ -8,6 +8,7 @@
 #include "reader2_register_types.hpp"
 
 #include <xo/expression2/init_expression2.hpp>
+#include <xo/numeric/init_numeric.hpp>
 #include <xo/gc/CollectorTypeRegistry.hpp>
 
 namespace xo {
@@ -30,6 +31,7 @@ namespace xo {
 
         /* direct subsystem deps for xo-reader2/ */
         retval ^= InitSubsys<S_expression2_tag>::require();
+        retval ^= InitSubsys<S_numeric_tag>::require();
 
         /* xo-reader2/'s own initialization code */
         retval ^= Subsystem::provide<S_reader2_tag>("reader2", &init);
