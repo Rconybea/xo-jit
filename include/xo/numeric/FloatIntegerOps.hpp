@@ -1,0 +1,42 @@
+/** @file FloatIntegerOps.hpp
+ *
+ *  @author Roland Conybeare, Feb 2026
+ **/
+
+#pragma once
+
+#include "Numeric.hpp"
+#include <xo/procedure2/RuntimeContext.hpp>
+#include <xo/object2/Float.hpp>
+#include <xo/object2/Integer.hpp>
+
+
+namespace xo {
+    namespace scm {
+
+        class FloatIntegerOps {
+        public:
+            using AGCObject = xo::mm::AGCObject;
+
+        public:
+            static obj<AGCObject> multiply(obj<ARuntimeContext> rcx,
+                                           DFloat * x, DInteger * y);
+            static obj<AGCObject> divide(obj<ARuntimeContext> rcx,
+                                         DFloat * x, DInteger * y);
+        };
+
+        class IntegerFloatOps {
+        public:
+            using AGCObject = xo::mm::AGCObject;
+
+        public:
+            static obj<AGCObject> multiply(obj<ARuntimeContext> rcx,
+                                           DInteger * x, DFloat * y);
+            static obj<AGCObject> divide(obj<ARuntimeContext> rcx,
+                                         DInteger * x, DFloat * y);
+        };
+
+    }
+}
+
+/* end FloatIntegerOps.hpp */

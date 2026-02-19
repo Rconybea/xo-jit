@@ -29,14 +29,32 @@ xo_add_genfacet(
 
 # ----------------------------------------------------------------
 
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-numeric-facetimpl-numeric-float
+    FACET_PKG xo_numeric
+    FACET Numeric
+    REPR Float
+    INPUT idl/INumeric_DFloat.json5
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-numeric-facetimpl-numeric-integer
+    FACET_PKG xo_numeric
+    FACET Numeric
+    REPR Integer
+    INPUT idl/INumeric_DInteger.json5
+)
+
+# ----------------------------------------------------------------
+
 xo_add_genfacet_all(xo-numeric-genfacet-all)
 
 # ----------------------------------------------------------------
 
-#add_subdirectory(src/numeric)   # NOTE: will need cmake export here
-#add_subdirectory(utest)
+add_subdirectory(src/numeric)
+add_subdirectory(utest)
 
 # ----------------------------------------------------------------
 # cmake export
-
-

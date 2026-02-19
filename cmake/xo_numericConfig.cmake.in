@@ -7,7 +7,7 @@ include(CMakeFindDependencyMacro)
 #       in CMakeLists.txt
 #
 #find_dependency(xo_gc)
-find_dependency(xo_facet)
+find_dependency(xo_procedure2)
 find_dependency(subsys)
 #find_dependency(indentlog)
 

@@ -1,0 +1,18 @@
+{
+    mode: "implementation",
+    output_cpp_dir: "src/numeric",
+    output_hpp_dir: "include/xo/numeric",
+    output_impl_subdir: "float",
+    includes: [
+//      "<xo/printable2/Printable.hpp>",
+//      "<xo/printable2/detail/IPrintable_Xfer.hpp>"
+    ],
+    local_types: [ ],
+    namespace1: "xo",
+    namespace2: "scm",
+    facet_idl: "idl/Numeric.json5",
+    brief: "provide ANumeric interface for DFloat",
+    using_doxygen: true,
+    repr: "DFloat",
+    doc: [ "implement ANumeric for DFloat" ],
+}

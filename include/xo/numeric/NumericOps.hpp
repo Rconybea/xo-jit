@@ -1,44 +1,52 @@
 /** @file NumericOps.hpp
-*
+ *
  *  @author Roland Conybeare, Feb 2026
  **/
 
 #pragma once
 
-#include "Numeric.hpp"
+#include <xo/numeric/Numeric.hpp>
+#include <xo/procedure2/RuntimeContext.hpp>
+#include <xo/gc/GCObject.hpp>
+#include <xo/facet/obj.hpp>
 
 namespace xo {
     namespace scm {
-
-        class INumericOps {
+        class AnonymizedNumericOps {
         public:
-            using BinaryOp1 = obj<ANumeric> (*)(obj<AAllocator> mm, void * x, void * y);
+            using ARuntimeContext = xo::scm::ARuntimeContext;
+            using AGCObject = xo::mm::AGCObject;
+            using BinaryOp = obj<AGCObject> (*)(obj<ARuntimeContext> mm, void * x, void * y);
 
         public:
-            explicit INumericOp9s(BinaryOp1 multiply) : multiply_{multiply} {}
+            /** note: null ctor load-bearing for membership in DArenaHashTable **/
+            AnonymizedNumericOps() = default;
+            /** @p multiply to multiply (x,y); allocate from mm **/
+            explicit AnonymizedNumericOps(BinaryOp multiply,
+                                          BinaryOp divide)
+                : multiply_{multiply}, divide_{divide} {}
 
-            /** multiply (x,y); allocate from mm **/
-            BinaryOp1 multiply_;
+            BinaryOp multiply_ = nullptr;
+            BinaryOp divide_ = nullptr;
         };
 
-        /** Convenience template. To use, provide implementation
-         *  for
-         *    _multiply() ...
-         *  
-         **/
         template <typename DRepr1, typename DRepr2>
-        class NumericOps : public INumericOps {
+        class NumericOps {
         public:
-            using BinaryOp1_Impl = obj<ANumeric> (*)(obj<AAllocator> mm, DRepr1 * x, DRepr2 * y);
+            using ARuntimeContext = xo::scm::ARuntimeContext;
+            using AGCObject = xo::mm::AGCObject;
+            using BinaryOp_Impl = obj<AGCObject> (*)(obj<ARuntimeContext> rcx, DRepr1 * x, DRepr2 * y);
+            using BinaryOp_Anon = AnonymizedNumericOps::BinaryOp;
 
         public:
-            explicit NumericOps(BinaryOp1_Impl multiply)
-                    : INumericOps(reinterpret_cast<INumericOps::BinaryOp1>(multiply))
-            {}
+            static AnonymizedNumericOps make(BinaryOp_Impl multiply,
+                                             BinaryOp_Impl divide) {
+                return AnonymizedNumericOps(reinterpret_cast<BinaryOp_Anon>(multiply),
+                                            reinterpret_cast<BinaryOp_Anon>(divide));
+            }
         };
 
     } /*namespace scm*/
 } /*namespace xo*/
 
 /* end NumericOps.hpp */
-
