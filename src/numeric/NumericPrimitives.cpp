@@ -12,6 +12,10 @@ namespace xo {
     namespace scm {
 
         DPrimitive_gco_2_gco_gco
+        NumericPrimitives::s_mul_gco_gco_pm("_mul",
+                                            &NumericDispatch::multiply);
+
+        DPrimitive_gco_2_gco_gco
         NumericPrimitives::s_div_gco_gco_pm("_div",
                                             &NumericDispatch::divide);
 

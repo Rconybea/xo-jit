@@ -14,7 +14,9 @@ namespace xo {
          **/
         class NumericPrimitives {
         public:
-            /** poly divide **/
+            /** polymorphic (in both arguments) multiply **/
+            static DPrimitive_gco_2_gco_gco s_mul_gco_gco_pm;
+            /** polymorphic (in both arguments) divide **/
             static DPrimitive_gco_2_gco_gco s_div_gco_gco_pm;
         };
     }
