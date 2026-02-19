@@ -490,11 +490,58 @@ namespace xo {
             log && vsm_fixture.log_memory_layout(&log);
         }
 
-        TEST_CASE("VirtualSchematikaMachine-fact0", "[interpreter2][VSM]")
+        TEST_CASE("VirtualSchematikaMachine-if2", "[interpreter2][VSM]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
             bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            VsmFixture vsm_fixture(testname, c_debug_flag);
+            auto & vsm = vsm_fixture.vsm_;
+
+            bool eof_flag = true;
+
+            vsm.begin_interactive_session();
+
+            span_type input = span_type::from_cstr("def n = 4; if (n == 4) then n * 3 else n * 5;");
+
+            for (int i_expr = 0; i_expr < 2; ++i_expr) {
+                log && log(xtag("input", input));
+
+                VsmResultExt res
+                    = vsm.read_eval_print(input, eof_flag);
+
+                REQUIRE(res.is_value());
+                REQUIRE(res.value());
+
+                log && log(xtag("res.tseq", res.value()->_typeseq()),
+                           xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
+
+                if (i_expr == 0) {
+                    auto x = obj<AGCObject,DUniqueString>::from(*res.value());
+                    REQUIRE(x);
+                    REQUIRE(strcmp(x->chars(), "n") == 0);
+                    input = res.remaining_;
+                } else if (i_expr == 1) {
+                    auto x = obj<AGCObject,DInteger>::from(*res.value());
+                    REQUIRE(x);
+                    REQUIRE(x->value() == 12);
+
+                    REQUIRE(res.remaining_.size() == 1);
+                    REQUIRE(*res.remaining_.lo() == '\n');
+                    input = res.remaining_;
+                }
+            }
+
+            log && vsm_fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("VirtualSchematikaMachine-fact0", "[interpreter2][VSM]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             VsmFixture vsm_fixture(testname, c_debug_flag);

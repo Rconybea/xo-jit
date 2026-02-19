@@ -185,6 +185,14 @@ namespace xo {
             if (expr_pr)
                 log && log(xtag("expr", expr_pr));
 
+            if (value_.value()) {
+                auto value_pr = const_cast<obj<AGCObject> *>(value_.value())->to_facet<APrintable>();
+                if (value_pr)
+                    log && log(xtag("value", value_pr));
+            } else {
+                log && log("value not present or tk error");
+            }
+
             auto stack_pr = stack_.to_facet<APrintable>();
             if (stack_pr)
                 log && log(xtag("stack", stack_pr));
