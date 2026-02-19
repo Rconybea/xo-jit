@@ -303,10 +303,10 @@ namespace xo {
             case tokentype::tk_plus:
             case tokentype::tk_minus:
             case tokentype::tk_cmpeq:
+            case tokentype::tk_cmpne:
                 this->on_operator_token(tk, p_psm);
                 return;
 
-            case tokentype::tk_cmpne:
             case tokentype::tk_type:
             case tokentype::tk_lambda:
                 break;
@@ -1290,6 +1290,12 @@ namespace xo {
 #endif
 
             case optype::op_not_equal:
+                return assemble_numeric_expr_aux
+                    (p_psm->expr_alloc(),
+                     TypeRef::prefix_type::from_chars("_cmpne_gco"),
+                     &NumericPrimitives::s_cmpne_gco_gco_pm,
+                     lhs_, rhs_);
+
             case optype::op_less:
             case optype::op_less_equal:
             case optype::op_great:
