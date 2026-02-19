@@ -132,7 +132,9 @@ namespace xo {
 
             VsmResult evalresult = this->start_eval(expr);
 
-            if (evalresult.is_eval_error() || evalresult.is_tk_error()) {
+            if (evalresult.is_tk_error()) {
+                // TODO: print error here
+
                 return VsmResultExt(evalresult, remaining);
             }
 
