@@ -5,6 +5,7 @@
 
 #include "ExpectExprSsm.hpp"
 #include "ParserStateMachine.hpp"
+#include "ParserStack.hpp"
 #include "SyntaxStateMachine.hpp"
 #include "ssm/ISyntaxStateMachine_DProgressSsm.hpp"
 #include "DSequenceSsm.hpp"
@@ -28,15 +29,10 @@
 #include "paren_xs.hpp"
 #include "sequence_xs.hpp"
 #include "progress_xs.hpp"
-#include "xo/expression/Lambda.hpp"
-#include "xo/expression/Constant.hpp"
 #include "xo/expression/pretty_expression.hpp"
 #endif
 
 namespace xo {
-#ifdef NOT_YET
-    using xo::scm::Constant;
-#endif
     using xo::scm::DFloat;
     using xo::mm::AGCObject;
 
@@ -371,6 +367,32 @@ namespace xo {
                                                  tk.i64_value());
 
             auto expr = DConstant::make(p_psm->expr_alloc(), i64o);
+
+            // Consider parser stack, with control here at b
+            //
+            //   a * b - c
+            //       ^
+            //
+            // [1] ExpectExpr  <-- this
+            // [0] ProgressSsm :lhs k(b) :op * :rhs _
+            //
+            // if parent is ProgressSsm [0], need to deliver k(b) to it;
+            // Then let that ProgressSsm [0] establish whether next token
+            // is operator.
+            //
+            assert((void*)p_psm->stack()->top().data() == (void*)this);
+
+            if (p_psm->stack()->parent()) {
+                auto parent_ssm = (obj<ASyntaxStateMachine,DProgressSsm>::from
+                                   (p_psm->stack()->parent()->top()));
+
+                if (parent_ssm) {
+                    // parent is-a DProgressSsm instance
+                    p_psm->pop_ssm();
+                    p_psm->on_parsed_expression(expr);
+                    return;
+                }
+            }
 
             // DProgressSsm responsible for resolving cases like
             //   1,

@@ -125,13 +125,13 @@ namespace xo {
                     return optype::op_add;
                 case tokentype::tk_minus:       // [-]
                     return optype::op_subtract;
-                case tokentype::tk_star:        // [*]
+                case tokentype::tk_star:         // [*]
                     return optype::op_multiply;
-                case tokentype::tk_slash:       // [/]
+                case tokentype::tk_slash:        // [/]
                     return optype::op_divide;
-                case tokentype::tk_cmpeq:       // [==]
+                case tokentype::tk_cmpeq:        // [==]
                     return optype::op_equal;
-                case tokentype::tk_cmpne:
+                case tokentype::tk_cmpne:        // [!=]
                     return optype::op_not_equal;
                 case tokentype::tk_leftangle:
                     return optype::op_less;
@@ -362,7 +362,12 @@ namespace xo {
                                         ParserStateMachine * p_psm)
         {
             if (op_type_ == optype::invalid) {
-                // tk is the operator this instance was waiting for
+                // tk is the operator this instance was waiting for.
+                // But need to consider precedence.
+                // possibly need to take lhs_ expression and rotate it into new lhs of
+                // surrounding ProgressSsm
+
+
                 this->op_type_ = tk2op(tk.tk_type());
 
                 DExpectExprSsm::start(p_psm);
@@ -393,6 +398,7 @@ namespace xo {
                                         lhs2,
                                         op_type2,
                                         p_psm);
+                    DExpectExprSsm::start(p_psm);
                     return;
                 } else {
                     /* associate to the right
@@ -512,6 +518,19 @@ namespace xo {
                 log && log("accepting expr1");
 
                 this->lhs_ = expr;
+
+                return;
+            }
+
+            assert (op_type_ != optype::invalid);
+
+            if (!rhs_) {
+                this->rhs_ = expr;
+
+                // need next token before we know whether this DProgressSsm
+                // is complete.  Consider input like 7 + 2 * 3 vs 7 * 2 + 3
+                //
+
                 return;
             }
 
