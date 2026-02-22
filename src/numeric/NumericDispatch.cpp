@@ -54,6 +54,13 @@ namespace xo {
                                   obj<AGCObject> x,
                                   obj<AGCObject> y)
         {
+            return dispatch(rcx,
+                            "NumericDispatch::multiply",
+                            "incomparable types in x*y",
+                            &AnonymizedNumericOps::multiply_,
+                            x, y);
+
+#ifdef OBSOLETE
             KeyType key(x._typeseq(), y._typeseq());
 
             auto target_fn
@@ -63,6 +70,7 @@ namespace xo {
                 assert(false);
 
             return (*target_fn)(rcx, x.data(), y.data());
+#endif
         }
 
         obj<AGCObject>
@@ -70,6 +78,13 @@ namespace xo {
                                 obj<AGCObject> x,
                                 obj<AGCObject> y)
         {
+            return dispatch(rcx,
+                            "NumericDispatch::divide",
+                            "incomparable types in x/y",
+                            &AnonymizedNumericOps::divide_,
+                            x, y);
+
+#ifdef OBSOLETE
             KeyType key(x._typeseq(), y._typeseq());
 
             auto target_fn
@@ -79,6 +94,7 @@ namespace xo {
                 assert(false);
 
             return (*target_fn)(rcx, x.data(), y.data());
+#endif
         }
 
         obj<AGCObject>
@@ -86,6 +102,13 @@ namespace xo {
                              obj<AGCObject> x,
                              obj<AGCObject> y)
         {
+            return dispatch(rcx,
+                            "NumericDispatch::add",
+                            "incomparable types in x+y",
+                            &AnonymizedNumericOps::add_,
+                            x, y);
+
+#ifdef OBSOLETE
             KeyType key(x._typeseq(), y._typeseq());
 
             auto target_fn
@@ -95,6 +118,7 @@ namespace xo {
                 assert(false);
 
             return (*target_fn)(rcx, x.data(), y.data());
+#endif
         }
 
         obj<AGCObject>
@@ -102,6 +126,13 @@ namespace xo {
                                   obj<AGCObject> x,
                                   obj<AGCObject> y)
         {
+            return dispatch(rcx,
+                            "NumericDispatch::subtract",
+                            "incomparable types in x-y",
+                            &AnonymizedNumericOps::subtract_,
+                            x, y);
+
+#ifdef OBSOLETE
             KeyType key(x._typeseq(), y._typeseq());
 
             auto target_fn
@@ -111,6 +142,7 @@ namespace xo {
                 assert(false);
 
             return (*target_fn)(rcx, x.data(), y.data());
+#endif
         }
 
         obj<AGCObject>
@@ -118,6 +150,13 @@ namespace xo {
                                    obj<AGCObject> x,
                                    obj<AGCObject> y)
         {
+            return dispatch(rcx,
+                            "NumericDispatch::cmp_equal",
+                            "incomparable types in x==y",
+                            &AnonymizedNumericOps::cmpeq_,
+                            x, y);
+
+#ifdef OBSOLETE
             KeyType key(x._typeseq(), y._typeseq());
 
             auto target_fn
@@ -137,6 +176,7 @@ namespace xo {
             }
 
             return (*target_fn)(rcx, x.data(), y.data());
+#endif
         }
 
         obj<AGCObject>
@@ -149,28 +189,6 @@ namespace xo {
                             "incomparable types in x!=y",
                             &AnonymizedNumericOps::cmpne_,
                             x, y);
-
-#ifdef OBSOLETE
-            KeyType key(x._typeseq(), y._typeseq());
-
-            auto target_fn
-                = NumericDispatch::instance().dispatch_[key].cmpne_;
-
-            if (!target_fn) {
-                // FIXME: use {fmt} here
-                std::stringstream ss;
-                tosn(ss,
-                     "incomparable types in x==y",
-                     xtag("x.type", TypeRegistry::id2name(x._typeseq())),
-                     xtag("y.type", TypeRegistry::id2name(y._typeseq())));
-
-                return DRuntimeError::make(rcx.allocator(),
-                                           "NumericDispatch::cmp_notequal",
-                                           ss.str().c_str());
-            }
-
-            return (*target_fn)(rcx, x.data(), y.data());
-#endif
         }
 
     } /*namespace scm*/
