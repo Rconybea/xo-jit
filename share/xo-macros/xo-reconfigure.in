@@ -23,7 +23,9 @@ while [[ $# -gt 0 ]]; do
         *)
             echo "error: xo-reconfigure: unexpected argument [$1]"
             echo "usage: xo-reconfigure"
-            echo "       xo-reconfigure [-n] -- CMAKE_ARGS"
+            echo "       xo-reconfigure [-n|--dry-run]"
+            echo "                      [--enable-testing|--disable-testing]"
+            echo "                      -- CMAKE_ARGS"
             exit 1
     esac
 

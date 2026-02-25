@@ -62,6 +62,7 @@ install(
     "share/xo-macros/gen-ccov.in"
     "share/xo-macros/Doxyfile.in"
     "share/xo-macros/xo-bootstrap-macros.cmake"
+    "share/xo-macros/xo-reconfigure.in"
     PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
     DESTINATION ${CMAKE_INSTALL_DATADIR}/xo-macros
 )
