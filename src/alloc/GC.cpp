@@ -551,7 +551,7 @@ namespace xo {
                 case generation_result::nursery:
                     if (is_before_checkpoint(parent)) {
                         log && log(xtag("act", "N1->N0 must mlog"));
-                        
+
                         // N1->N0, so must log
                         this->mutation_log_[role2int(role::to_space)]->push_back(MutationLogEntry(parent, lhs));
                         ++(this->gc_statistics_.n_logged_mutation_);
@@ -974,12 +974,14 @@ namespace xo {
 
                                 from_entry.fixup_parent_child_moved(child_to);
 
+#ifndef NDEBUG
                                 {
                                     // verify fixup was effective
                                     IObject * child_from2 = from_entry.child();
                                     assert(child_from2 == child_to);
                                 }
-                                
+#endif
+
 
                                 // P->C', loc(C') in {N1', T'}
 

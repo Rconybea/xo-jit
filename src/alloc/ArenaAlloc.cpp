@@ -390,8 +390,10 @@ namespace xo {
 
             /* word size for alignment */
             constexpr uint32_t c_bpw = sizeof(std::uintptr_t);
+            (void)c_bpw;
 
             std::uintptr_t free_u64 = reinterpret_cast<std::uintptr_t>(free_ptr_);
+            (void)free_u64;
 
             assert(free_u64 % c_bpw == 0ul);
 
