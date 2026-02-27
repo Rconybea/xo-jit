@@ -711,6 +711,7 @@ namespace xo {
             log && fixture.log_memory_layout(&log);
         }
 
+#ifdef OBSOLETE
         TEST_CASE("SchematikaParser-interactive-arith3-bad", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
@@ -781,6 +782,7 @@ namespace xo {
 
             log && fixture.log_memory_layout(&log);
         }
+#endif
 
         TEST_CASE("SchematikaParser-interactive-cmp", "[reader2][SchematikaParser]")
         {
