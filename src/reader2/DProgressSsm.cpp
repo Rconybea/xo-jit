@@ -121,9 +121,9 @@ namespace xo {
                 switch (tktype) {
                 case tokentype::tk_assign:
                     return optype::op_assign;
-                case tokentype::tk_plus:        // [+]
+                case tokentype::tk_plus:         // [+]
                     return optype::op_add;
-                case tokentype::tk_minus:       // [-]
+                case tokentype::tk_minus:        // [-]
                     return optype::op_subtract;
                 case tokentype::tk_star:         // [*]
                     return optype::op_multiply;
@@ -133,7 +133,7 @@ namespace xo {
                     return optype::op_equal;
                 case tokentype::tk_cmpne:        // [!=]
                     return optype::op_not_equal;
-                case tokentype::tk_leftangle:
+                case tokentype::tk_leftangle:    // [<]
                     return optype::op_less;
                 case tokentype::tk_lessequal:
                     return optype::op_less_equal;
@@ -288,7 +288,6 @@ namespace xo {
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
-            case tokentype::tk_leftangle:
             case tokentype::tk_rightangle:
             case tokentype::tk_lessequal:
             case tokentype::tk_greatequal:
@@ -304,6 +303,7 @@ namespace xo {
             case tokentype::tk_minus:
             case tokentype::tk_cmpeq:
             case tokentype::tk_cmpne:
+            case tokentype::tk_leftangle:
                 this->on_operator_token(tk, p_psm);
                 return;
 
@@ -1316,6 +1316,12 @@ namespace xo {
                      lhs_, rhs_);
 
             case optype::op_less:
+                return assemble_numeric_expr_aux
+                    (p_psm->expr_alloc(),
+                     TypeRef::prefix_type::from_chars("_cmplt_gco"),
+                     &NumericPrimitives::s_cmplt_gco_gco_pm,
+                     lhs_, rhs_);
+
             case optype::op_less_equal:
             case optype::op_great:
             case optype::op_great_equal:
