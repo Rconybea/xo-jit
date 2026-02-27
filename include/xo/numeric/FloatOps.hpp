@@ -31,6 +31,8 @@ namespace xo {
                                             DFloat * x, DFloat * y);
             static obj<AGCObject> cmp_notequal(obj<ARuntimeContext> rcx,
                                                DFloat * x, DFloat * y);
+            static obj<AGCObject> cmp_less(obj<ARuntimeContext> rcx,
+                                           DFloat * x, DFloat * y);
         };
 
     }

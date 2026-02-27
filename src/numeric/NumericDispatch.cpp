@@ -191,6 +191,18 @@ namespace xo {
                             x, y);
         }
 
+        obj<AGCObject>
+        NumericDispatch::cmp_less(obj<ARuntimeContext> rcx,
+                                  obj<AGCObject> x,
+                                  obj<AGCObject> y)
+        {
+            return dispatch(rcx,
+                            "NumericDispatch::cmp_less",
+                            "incomparable types in x<y",
+                            &AnonymizedNumericOps::cmplt_,
+                            x, y);
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

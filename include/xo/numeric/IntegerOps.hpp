@@ -33,6 +33,8 @@ namespace xo {
                                             DInteger * x, DInteger * y);
             static obj<AGCObject> cmp_notequal(obj<ARuntimeContext> rcx,
                                                DInteger * x, DInteger * y);
+            static obj<AGCObject> cmp_less(obj<ARuntimeContext> rcx,
+                                               DInteger * x, DInteger * y);
 
         };
 

@@ -55,6 +55,13 @@ namespace xo {
             return DBoolean::box<AGCObject>(rcx.allocator(), x->value() != y->value());
         }
 
+        obj<AGCObject>
+        IntegerOps::cmp_less(obj<ARuntimeContext> rcx,
+                             DInteger * x, DInteger * y)
+        {
+            return DBoolean::box<AGCObject>(rcx.allocator(), x->value() < y->value());
+        }
+
     }
 }
 

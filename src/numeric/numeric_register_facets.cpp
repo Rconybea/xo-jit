@@ -40,7 +40,8 @@ namespace xo {
                  &FloatOps::add,
                  &FloatOps::subtract,
                  &FloatOps::cmp_equal,
-                 &FloatOps::cmp_notequal);
+                 &FloatOps::cmp_notequal,
+                 &FloatOps::cmp_less);
 
             NumericDispatch::instance().register_impl<DFloat, DInteger>
                 (&FloatIntegerOps::multiply,
@@ -48,7 +49,8 @@ namespace xo {
                  &FloatIntegerOps::add,
                  &FloatIntegerOps::subtract,
                  &FloatIntegerOps::cmp_equal,
-                 &FloatIntegerOps::cmp_notequal);
+                 &FloatIntegerOps::cmp_notequal,
+                 &FloatIntegerOps::cmp_less);
 
             NumericDispatch::instance().register_impl<DInteger, DFloat>
                 (&IntegerFloatOps::multiply,
@@ -56,7 +58,8 @@ namespace xo {
                  &IntegerFloatOps::add,
                  &IntegerFloatOps::subtract,
                  &IntegerFloatOps::cmp_equal,
-                 &IntegerFloatOps::cmp_notequal);
+                 &IntegerFloatOps::cmp_notequal,
+                 &IntegerFloatOps::cmp_less);
 
             NumericDispatch::instance().register_impl<DInteger, DInteger>
                 (&IntegerOps::multiply,
@@ -64,7 +67,8 @@ namespace xo {
                  &IntegerOps::add,
                  &IntegerOps::subtract,
                  &IntegerOps::cmp_equal,
-                 &IntegerOps::cmp_notequal);
+                 &IntegerOps::cmp_notequal,
+                 &IntegerOps::cmp_less);
 
             log && log(xtag("ANumeric.tseq", typeseq::id<ANumeric>()));
 

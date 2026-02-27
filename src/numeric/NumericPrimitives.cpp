@@ -35,6 +35,10 @@ namespace xo {
         NumericPrimitives::s_cmpne_gco_gco_pm("_cmpne",
                                               &NumericDispatch::cmp_notequal);
 
+        DPrimitive_gco_2_gco_gco
+        NumericPrimitives::s_cmplt_gco_gco_pm("_cmplt",
+                                              &NumericDispatch::cmp_less);
+
 
     } /*namespace scm*/
 } /*namespace xo*/

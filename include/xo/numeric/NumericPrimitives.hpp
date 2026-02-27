@@ -27,6 +27,8 @@ namespace xo {
             static DPrimitive_gco_2_gco_gco s_cmpeq_gco_gco_pm;
             /** polymorphic (in both arguments) compare (!=) **/
             static DPrimitive_gco_2_gco_gco s_cmpne_gco_gco_pm;
+            /** polymorphic (in both arguments) compare (<) **/
+            static DPrimitive_gco_2_gco_gco s_cmplt_gco_gco_pm;
         };
     }
 }
