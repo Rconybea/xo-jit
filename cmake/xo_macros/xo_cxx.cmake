@@ -1748,6 +1748,18 @@ function(xo_add_genfacetimpl)
         if (NOT DEFINED GF_FACET_PKG)
             message(FATAL_ERROR "xo_add_genfacetimpl: FACET_PKG or FACET_DIR required")
         else()
+            # share_${GF_FACET_PKG} is a cmake target created by xo_add_shared_library4()
+            # or similar when a facet-provider (e.g. xo-gc) builds from source in the same
+            # cmake context (XO_SUBMODULE_BUILD=True).
+            #
+            # It is NOT exported in the installed cmake
+            # config, so it won't exist when the facet package is consumed as an installed
+            # dependency (e.g. in a standalone nix build).
+            #
+            if(NOT TARGET share_${GF_FACET_PKG})
+                message(STATUS "xo_add_genfacetimpl: share_${GF_FACET_PKG} not available; skipping ${GF_TARGET}")
+                return()
+            endif()
             get_target_property(_facet_dir share_${GF_FACET_PKG} path)
             set(GF_FACET_DIR ${_facet_dir})
         endif()
