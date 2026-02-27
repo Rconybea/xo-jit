@@ -4,6 +4,7 @@
 
 #include "symtab/ISymbolTable_Any.hpp"
 #include <iostream>
+#include <exception>
 
 namespace xo {
 namespace scm {
