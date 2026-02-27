@@ -1,7 +1,10 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
+find_dependency(xo_allocutil)
+find_dependency(xo_unit)
 find_dependency(indentlog)
-#find_dependency(xo_flatstring)
+find_dependency(reflect)
+find_dependency(callback)
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 check_required_components("@PROJECT_NAME@")
