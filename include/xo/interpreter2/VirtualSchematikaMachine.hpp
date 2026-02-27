@@ -15,6 +15,7 @@
 #include <xo/expression2/Expression.hpp>
 #include <xo/gc/GCObject.hpp>
 #include <xo/alloc2/abox.hpp>
+#include <variant>
 
 namespace xo {
     namespace scm {
@@ -91,7 +92,7 @@ namespace xo {
             /** allocator for runtime errors **/
             obj<AAllocator> error_allocator() const noexcept;
 
-            /** true iff parser is at top-level -> does not contain 
+            /** true iff parser is at top-level -> does not contain
              *  state for a incomplete/partial expression
              **/
             bool is_at_toplevel() const noexcept;
