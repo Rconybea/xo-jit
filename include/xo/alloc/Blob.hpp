@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Object.hpp"
-#include "IAlloc.hpp"
+#include <xo/allocutil/IAlloc.hpp>
 
 namespace xo {
     /** Use to allocate opaque binary data,
