@@ -1227,6 +1227,17 @@ macro(xo_export_cmake_config projectname projectversion projecttargets)
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/${projectname}
     )
+    # generate Share file that recreates share_${projectname} in consuming projects
+    file(WRITE "${PROJECT_BINARY_DIR}/${projectname}Share.cmake"
+        "if(NOT TARGET share_${projectname})\n"
+        "    add_custom_target(share_${projectname})\n"
+        "    set_property(TARGET share_${projectname} PROPERTY path\n"
+        "        \"\${CMAKE_CURRENT_LIST_DIR}/../../../share/${projectname}\")\n"
+        "endif()\n")
+    install(
+        FILES "${PROJECT_BINARY_DIR}/${projectname}Share.cmake"
+        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/${projectname})
 endmacro()
 
 # ----------------------------------------------------------------
