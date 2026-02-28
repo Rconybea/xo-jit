@@ -81,6 +81,12 @@ namespace xo {
             DToplevelSeqSsm::establish_batch(psm_.parser_alloc(), &psm_);
         }
 
+        const DUniqueString *
+        SchematikaParser::intern_string(std::string_view str)
+        {
+            return psm_.intern_string(str);
+        }
+
         const ParserResult &
         SchematikaParser::on_token(const token_type & tk)
         {

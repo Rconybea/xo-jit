@@ -78,6 +78,10 @@ namespace xo {
              **/
             void begin_batch_session();
 
+            /** intern string @p str in global string table
+             **/
+            const DUniqueString * intern_string(std::string_view str);
+
             /** consume input @p input_cstr **/
             const ReaderResult & read_expr(span_type input_span, bool eof);
 

@@ -58,6 +58,12 @@ namespace xo {
         // TODO:
         // Schematika::end_interactive_session()
 
+        const DUniqueString *
+        SchematikaReader::intern_string(std::string_view str)
+        {
+            return parser_.intern_string(str);
+        }
+
         const ReaderResult &
         SchematikaReader::read_expr(span_type input_ext, bool eof)
         {

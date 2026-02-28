@@ -220,6 +220,10 @@ namespace xo {
              **/
             void begin_batch_session();
 
+            /** intern string @p str in global string table
+             **/
+            const DUniqueString * intern_string(std::string_view str);
+
             /** include next token @p tk and increment parser state.
              *
              *  @param tk  next input token
