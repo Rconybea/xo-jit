@@ -20,9 +20,9 @@
 #include <xo/expression2/UniqueString.hpp>
 #include <xo/object2/Boolean.hpp>
 #include <xo/procedure2/RuntimeContext.hpp>
-//#include <xo/procedure2/SimpleRcx.hpp>
-#include <xo/gc/DX1Collector.hpp>
-#include <xo/gc/detail/IAllocator_DX1Collector.hpp>
+#include <xo/procedure2/Primitive_gco_0.hpp>
+#include <xo/gc/X1Collector.hpp>
+#include <xo/reflect/Reflect.hpp>
 #include <xo/alloc2/Arena.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -32,8 +32,9 @@ namespace xo {
     using xo::print::APrintable;
     using xo::print::ppconfig;
     using xo::print::ppstate_standalone;
+    using xo::reflect::Reflect;
     using xo::mm::AGCObject;
-    //using xo::mm::MemorySizeInfo;  // not used yet
+    using xo::mm::MemorySizeInfo;
     using xo::mm::AAllocator;
     using xo::mm::DX1Collector;
     using xo::mm::DArena;
@@ -60,9 +61,10 @@ namespace xo {
         VirtualSchematikaMachine::VirtualSchematikaMachine(const VsmConfig & config,
                                                            obj<AAllocator> aux_mm)
         : config_{config},
-          mm_(abox<AAllocator,DX1Collector>::make(aux_mm, config.x1_config_)),
-          rcx_(abox<ARuntimeContext,DVsmRcx>::make(aux_mm, this)),
-          reader_{config.rdr_config_, mm_.to_op(), aux_mm}
+          aux_mm_{aux_mm},
+          mm_(abox<AAllocator,DX1Collector>::make(aux_mm_, config.x1_config_)),
+          rcx_(abox<ARuntimeContext,DVsmRcx>::make(aux_mm_, this)),
+          reader_{config.rdr_config_, mm_.to_op(), aux_mm_}
         {
             {
                 DArena * arena = new DArena(config_.error_config_);
@@ -72,6 +74,8 @@ namespace xo {
             }
 
             this->global_env_ = DGlobalEnv::_make(mm_.to_op(), reader_.global_symtab());
+
+            this->install_core_primitives();
         }
 
         obj<AAllocator>
@@ -95,6 +99,7 @@ namespace xo {
         void
         VirtualSchematikaMachine::visit_pools(const MemorySizeVisitor & visitor) const
         {
+            aux_mm_.visit_pools(visitor);
             mm_.visit_pools(visitor);
             error_mm_.visit_pools(visitor);
             reader_.visit_pools(visitor);
@@ -857,7 +862,43 @@ namespace xo {
             }
          }
 
+        obj<AGCObject>
+        xfer_report_memory_use(obj<ARuntimeContext> rcx)
+        {
+            scope log(XO_DEBUG(true));
+
+            auto visitor = [&log](const MemorySizeInfo & info) {
+                log && log(xtag("resource", info.resource_name_),
+                           xtag("used", info.used_),
+                           xtag("alloc", info.allocated_),
+                           xtag("commit", info.committed_),
+                           xtag("resv", info.reserved_));
+            };
+
+            rcx.visit_pools(visitor);
+
+            return DBoolean::box<AGCObject>(rcx.allocator(), true);
+        }
+
+        static DPrimitive_gco_0 s_report_memory_use_pm("_report_memory_use",
+                                                       &xfer_report_memory_use);
+
+        void
+        VirtualSchematikaMachine::install_core_primitives()
+        {
+            {
+                const DUniqueString * name
+                    = reader_.intern_string("report_memory_use");
+
+                global_env_->_upsert_value
+                    (mm_.to_op(),
+                     name,
+                     Reflect::require<DPrimitive_gco_0>(),
+                     obj<AGCObject,DPrimitive_gco_0>(&s_report_memory_use_pm));
+            }
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 
-/* end VirtualSchematikaMachine.hpp */
+/* end VirtualSchematikaMachine.cpp */
