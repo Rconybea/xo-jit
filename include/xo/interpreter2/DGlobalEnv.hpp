@@ -25,6 +25,7 @@ namespace xo {
          **/
         class DGlobalEnv {
         public:
+            using TypeDescr = xo::reflect::TypeDescr;
             using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
@@ -56,6 +57,14 @@ namespace xo {
              *  If need to expand size of this env, use memory from @p mm
              **/
             void assign_value(obj<AAllocator> mm, Binding ix, obj<AGCObject> x);
+
+            /** create/establish global for symbol @p sym with resolved type @p td
+             *  and associate with @p value.
+             **/
+            DVariable * _upsert_value(obj<AAllocator> mm,
+                                      const DUniqueString * sym,
+                                      TypeDescr td,
+                                      obj<AGCObject> value);
 
             ///@}
             /** @defgroup scm-globalenv-gcobject-facet **/

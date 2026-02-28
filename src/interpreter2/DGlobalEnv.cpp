@@ -88,6 +88,23 @@ namespace xo {
             (*values_)[ix.j_slot()] = x;
         }
 
+        DVariable *
+        DGlobalEnv::_upsert_value(obj<AAllocator> mm,
+                                  const DUniqueString * sym,
+                                  TypeDescr td,
+                                  obj<AGCObject> value)
+        {
+            DVariable * var
+                = DVariable::make(mm, sym, TypeRef::resolved(td));
+
+            assert(var);
+
+            symtab_->upsert_variable(mm, var);
+            this->assign_value(mm, var->path(), value);
+
+            return var;
+        }
+
         // ----- AGCObject facet -----
 
         std::size_t
