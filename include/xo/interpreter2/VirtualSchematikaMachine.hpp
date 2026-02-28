@@ -234,12 +234,10 @@ namespace xo {
             /** configuration **/
             VsmConfig config_;
 
-#ifdef NOT_YET
             /** allocator (likely DArena) for globals.
              *  For example DArenaHashMap in global symta.
              **/
             obj<AAllocator> aux_mm_;
-#endif
 
             /** allocator (likely DX1Collector or similar) for
              *  expressions and values. Schemaatika reader will use this also
