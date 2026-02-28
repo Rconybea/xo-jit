@@ -25,6 +25,12 @@ namespace xo {
             return vsm_->error_allocator();
         }
 
+        void
+        DVsmRcx::visit_pools(const MemorySizeVisitor & visitor) const
+        {
+            vsm_->visit_pools(visitor);
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 
