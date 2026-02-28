@@ -103,6 +103,9 @@ namespace xo {
 
             psm_.on_token(tk);
 
+            log && log(xtag("parser", this));
+            log && log(xtag("result", psm_.result()));
+
             return psm_.result();
         } /*include_token*/
 
