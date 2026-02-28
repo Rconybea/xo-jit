@@ -188,7 +188,7 @@ namespace xo {
         // outer loop: fetch one line of interactive input
         while (replxx_getline(interactive_, vsm_.is_at_toplevel(), rx_, &input)) {
 
-            // inner lo9op: consume up to one expression at a time.
+            // inner loop: consume up to one expression at a time.
             while (!input.empty() && this->_read_eval_print(&input, false /*eof*/))
                 {
                     ;

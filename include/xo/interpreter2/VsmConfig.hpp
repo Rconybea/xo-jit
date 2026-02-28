@@ -25,6 +25,12 @@ namespace xo {
                 return retval;
             }
 
+            VsmConfig with_parser_debug_flag(bool x) const {
+                VsmConfig retval = *this;
+                retval.rdr_config_.parser_debug_flag_ = x;
+                return retval;
+            }
+
             /** true for interactive parser session; false for batch session **/
             bool interactive_flag_ = true;
 
