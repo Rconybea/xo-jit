@@ -159,10 +159,7 @@ namespace xo {
                  *     by rightparen. empty parentheses '()'
                  *     do not denote anything, in expression context
                  **/
-                DExpectExprSsm::start(p_psm->parser_alloc(),
-                                      false /*!allow_defs*/,
-                                      false /*cx_on_rightbrace*/,
-                                      p_psm);
+                DExpectExprSsm::start(p_psm);
 
                 return;
             }

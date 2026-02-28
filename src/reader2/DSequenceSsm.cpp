@@ -29,9 +29,9 @@ namespace xo {
             /* want to accept anything that starts an expression,
              * except that rightbrace '}' ends it
              */
-            DExpectExprSsm::start(p_psm->parser_alloc(),
-                                  true /*allow_defs*/,
+            DExpectExprSsm::start(true /*allow_defs*/,
                                   true /*cxl_on_rightbrace*/,
+                                  false /*!cxl_on_rightparen*/,
                                   p_psm);
         }
 

@@ -42,41 +42,48 @@ namespace xo {
     namespace scm {
 
         DExpectExprSsm::DExpectExprSsm(bool allow_defs,
-                                       bool cxl_on_rightbrace)
+                                       bool cxl_on_rightbrace,
+                                       bool cxl_on_rightparen)
             : allow_defs_{allow_defs},
-              cxl_on_rightbrace_{cxl_on_rightbrace}
+              cxl_on_rightbrace_{cxl_on_rightbrace},
+              cxl_on_rightparen_{cxl_on_rightparen}
         {
         }
 
         DExpectExprSsm *
         DExpectExprSsm::_make(DArena & mm,
                               bool allow_defs,
-                              bool cxl_on_rightbrace)
+                              bool cxl_on_rightbrace,
+                              bool cxl_on_rightparen)
         {
             void * mem = mm.alloc(typeseq::id<DExpectExprSsm>(),
                                   sizeof(DExpectExprSsm));
 
             return new (mem) DExpectExprSsm(allow_defs,
-                                            cxl_on_rightbrace);
+                                            cxl_on_rightbrace,
+                                            cxl_on_rightparen);
         }
 
         obj<ASyntaxStateMachine,DExpectExprSsm>
         DExpectExprSsm::make(DArena & mm,
                              bool allow_defs,
-                             bool cxl_on_rightbrace)
+                             bool cxl_on_rightbrace,
+                             bool cxl_on_rightparen)
         {
-            return obj<ASyntaxStateMachine,DExpectExprSsm>(_make(mm, allow_defs, cxl_on_rightbrace));
+            return obj<ASyntaxStateMachine,DExpectExprSsm>(_make(mm, allow_defs, cxl_on_rightbrace, cxl_on_rightparen));
         }
 
         void
-        DExpectExprSsm::start(DArena & mm,
-                              bool allow_defs,
+        DExpectExprSsm::start(bool allow_defs,
                               bool cxl_on_rightbrace,
+                              bool cxl_on_rightparen,
                               ParserStateMachine * p_psm)
         {
+            auto & mm = p_psm->parser_alloc();
+
             DArena::Checkpoint ckp = mm.checkpoint();
 
-            auto ssm = DExpectExprSsm::make(mm, allow_defs, cxl_on_rightbrace);
+            auto ssm = DExpectExprSsm::make(mm, allow_defs, cxl_on_rightbrace, cxl_on_rightparen);
 
             p_psm->push_ssm(ckp, ssm);
         }
@@ -84,9 +91,9 @@ namespace xo {
         void
         DExpectExprSsm::start(ParserStateMachine * p_psm)
         {
-            start(p_psm->parser_alloc(),
-                  false /*!allow_defs*/,
+            start(false /*!allow_defs*/,
                   false /*!cxl_on_rightbrace*/,
+                  false /*cxl_on_rightparen*/,
                   p_psm);
         }
 
@@ -115,6 +122,10 @@ namespace xo {
             switch (tk.tk_type()) {
             case tokentype::tk_leftparen:
                 this->on_leftparen_token(tk, p_psm);
+                return;
+
+            case tokentype::tk_rightparen:
+                this->on_rightparen_token(tk, p_psm);
                 return;
 
             case tokentype::tk_leftbrace:
@@ -158,7 +169,6 @@ namespace xo {
             case tokentype::tk_singleassign:
             case tokentype::tk_colon:
             case tokentype::tk_semicolon:
-            case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_rightbrace:
@@ -204,6 +214,21 @@ namespace xo {
             DProgressSsm::start(p_psm->parser_alloc(),
                                 p_psm);
             p_psm->on_token(tk);
+        }
+
+        void
+        DExpectExprSsm::on_rightparen_token(const Token & tk,
+                                            ParserStateMachine * p_psm)
+        {
+            if (cxl_on_rightparen_) {
+                /* abandon expression, delegate rightparen to parent */
+
+                p_psm->pop_ssm();
+                p_psm->on_token(tk);
+                return;
+            }
+
+            Super::on_token(tk, p_psm);
         }
 
         void
@@ -482,8 +507,8 @@ namespace xo {
                  "DExpectExprSsm",
                  refrtag("allow_defs", allow_defs_),
                  refrtag("cxl_on_rightbrace", cxl_on_rightbrace_),
-                 refrtag("expect", this->get_expect_str())
-                    );
+                 refrtag("cxl_on_rightparen", cxl_on_rightparen_),
+                 refrtag("expect", this->get_expect_str()));
         }
 
 #ifdef NOT_YET
@@ -492,18 +517,6 @@ namespace xo {
                                     parserstatemachine * p_psm)
         {
             if_else_xs::start(p_psm);
-        }
-
-        void
-        expect_expr_xs::on_leftparen_token(const token_type & /*tk*/,
-                                           parserstatemachine * p_psm)
-        {
-            scope log(XO_DEBUG(p_psm->debug_flag()));
-
-            //constexpr const char * self_name = "exprstate::on_leftparen";
-
-            /* push lparen_0 to remember to look for subsequent rightparen. */
-            paren_xs::start(p_psm);
         }
 
         void
@@ -560,14 +573,6 @@ namespace xo {
                << xtag("allow_defs", allow_defs_)
                << xtag("cxl_on_rightbrace", cxl_on_rightbrace_)
                << ">";
-        }
-
-        bool
-        expect_expr_xs::pretty_print(const xo::print::ppindentinfo & ppii) const
-        {
-            return ppii.pps()->pretty_struct(ppii, "expect_expr_xs",
-                                             refrtag("allow_defs", allow_defs_),
-                                             refrtag("cxl_on_rightbrace", cxl_on_rightbrace_));
         }
 #endif
 

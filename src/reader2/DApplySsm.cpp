@@ -116,7 +116,7 @@ namespace xo {
             case applyexprstatetype::invalid: return "invalid";
             case applyexprstatetype::apply_0: return "expr";
             case applyexprstatetype::apply_1: return "lparen";
-            case applyexprstatetype::apply_2: return "expr";
+            case applyexprstatetype::apply_2: return "expr|rparen";
             case applyexprstatetype::apply_3: return "comma|rparen";
             case applyexprstatetype::N: break;
             }
@@ -134,6 +134,9 @@ namespace xo {
             case tokentype::tk_leftparen:
                 this->on_leftparen_token(tk, p_psm);
                 return;
+            case tokentype::tk_rightparen:
+                this->on_rightparen_token(tk, p_psm);
+                return;
             case tokentype::tk_symbol:
             case tokentype::tk_def:
             case tokentype::tk_if:
@@ -147,7 +150,6 @@ namespace xo {
             case tokentype::tk_i64:
             case tokentype::tk_bool:
             case tokentype::tk_invalid:
-            case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
@@ -186,7 +188,25 @@ namespace xo {
             if (applystate_ == applyexprstatetype::apply_1) {
                 this->applystate_ = applyexprstatetype::apply_2;
 
-                DExpectExprSsm::start(p_psm);
+                DExpectExprSsm::start(false /*!allow_defs*/,
+                                      false /*!cxl_on_rightbrace*/,
+                                      true /*cxl_on_rightparen*/,
+                                      p_psm);
+                return;
+            }
+
+            Super::on_token(tk, p_psm);
+        }
+
+        void
+        DApplySsm::on_rightparen_token(const Token & tk,
+                                       ParserStateMachine * p_psm)
+        {
+            if (applystate_ == applyexprstatetype::apply_2) {
+                obj<AExpression> apply = this->assemble_expr(p_psm->expr_alloc());
+
+                p_psm->pop_ssm();
+                p_psm->on_parsed_expression(apply);
                 return;
             }
 
@@ -226,28 +246,7 @@ namespace xo {
                     args_expr_v_->push_back(expr_gco);
 
                 if (tk.tk_type() == tokentype::tk_rightparen) {
-                    // begin assemble_expr()..
-
-                    std::uint32_t n_args = args_expr_v_->size();
-
-                    DApplyExpr * apply
-                        = (DApplyExpr::scaffold
-                           (mm,
-                            TypeRef::dwim(TypeRef::prefix_type::from_chars("apply"),
-                                          nullptr),
-                            fn_expr_,
-                            n_args));
-
-                    for (std::uint32_t i_arg = 0; i_arg < n_args; ++i_arg) {
-                        auto arg_expr
-                            = args_expr_v_->at(i_arg).to_facet<AExpression>();
-
-                        apply->assign_arg(i_arg, arg_expr);
-                    }
-
-                    // ..end assemble_expr()
-
-                    obj<AExpression,DApplyExpr> apply_ex(apply);
+                    obj<AExpression> apply_ex = this->assemble_expr(p_psm->expr_alloc());
 
                     p_psm->pop_ssm();
                     p_psm->on_parsed_expression(apply_ex);
@@ -264,6 +263,35 @@ namespace xo {
             }
 
             Super::on_parsed_expression_with_token(expr, tk, p_psm);
+        }
+
+        obj<AExpression>
+        DApplySsm::assemble_expr(obj<AAllocator> mm)
+        {
+            // begin assemble_expr()..
+
+            std::uint32_t n_args = args_expr_v_->size();
+
+            DApplyExpr * apply
+                = (DApplyExpr::scaffold
+                   (mm,
+                    TypeRef::dwim(TypeRef::prefix_type::from_chars("apply"),
+                                  nullptr),
+                    fn_expr_,
+                    n_args));
+
+            for (std::uint32_t i_arg = 0; i_arg < n_args; ++i_arg) {
+                auto arg_expr
+                    = args_expr_v_->at(i_arg).to_facet<AExpression>();
+
+                apply->assign_arg(i_arg, arg_expr);
+            }
+
+            // ..end assemble_expr()
+
+            obj<AExpression,DApplyExpr> apply_ex(apply);
+
+            return apply_ex;
         }
 
 #ifdef NOT_YET

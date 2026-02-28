@@ -30,12 +30,13 @@ namespace xo {
          *   apply_0 --on_expr()--> apply_1
          *   apply_1 --on_leftparen()--> apply_2
          *   apply_2 --on_expr()--> apply_3
+         *           --on_rightparen()--> (done)
          *   apply_3 --on_comma()--> apply_2
-         *           --on_rightparen()-> (done)
+         *           --on_rightparen()--> (done)
          *
          *   apply_0: start
          *   apply_1: leftparen following expr allows parser to recognize apply
-         *   apply_2: expect next argument
+         *   apply_2: expect next argument, or rightparent to continue
          *   apply_3: got argument, expect comma or rightparen to continue
          *   (done): apply complete, pop exprstate from stack
          *
@@ -129,6 +130,15 @@ namespace xo {
             void on_leftparen_token(const Token & tk,
                                     ParserStateMachine * p_psm);
 
+            /** handle rightparen token @p tk for this ssm,
+             *  with overall parser state in @p p_psm.
+             *
+             *  Rightparen will complete apply-expression,
+             *  terminating this syntax.
+             **/
+            void on_rightparen_token(const Token & tk,
+                                     ParserStateMachine * p_psm);
+
             ///@}
             /** @defgroup ssm-applyssm-facet syntaxstatemachine facet methods **/
             ///@{
@@ -177,8 +187,13 @@ namespace xo {
             ///@}
 
         private:
-            /** @defgroup ssm-applyssm-mpl-methods **/
+            /** @defgroup ssm-applyssm-impl-methods **/
             ///@{
+
+            /** create final apply-expression for this syntax,
+             *  using @p mm for memory
+             **/
+            obj<AExpression> assemble_expr(obj<AAllocator> mm);
 
             ///@}
 

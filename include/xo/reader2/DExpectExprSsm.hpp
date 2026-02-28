@@ -22,21 +22,24 @@ namespace xo {
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
-            explicit DExpectExprSsm(bool allow_defs,
-                                    bool cxl_on_rightparen);
+            DExpectExprSsm(bool allow_defs,
+                           bool cxl_on_rightbrace,
+                           bool cxl_on_rightparen);
 
             static DExpectExprSsm * _make(DArena & parser_mm,
                                           bool allow_defs,
-                                          bool cxl_on_rightbrace);
+                                          bool cxl_on_rightbrace,
+                                          bool cxl_on_rightparen);
 
             /** create fop referring to new DExpectExprSsm **/
             static obj<ASyntaxStateMachine,DExpectExprSsm> make(DArena & parser_mm,
                                                                 bool allow_defs,
-                                                                bool cxl_on_rightbrace);
+                                                                bool cxl_on_rightbrace,
+                                                                bool cxl_on_rightparen);
 
-            static void start(DArena & parser_mm,
-                              bool allow_defs,
+            static void start(bool allow_defs,
                               bool cxl_on_rightbrace,
+                              bool cxl_on_rightparen,
                               ParserStateMachine * p_psm);
             static void start(ParserStateMachine * p_psm);
 
@@ -46,6 +49,7 @@ namespace xo {
             static const char * ssm_classname() { return "DExpectExprSsm"; }
             bool allow_defs() const noexcept { return allow_defs_; }
             bool cxl_on_rightbrace() const noexcept { return cxl_on_rightbrace_; }
+            bool cxl_on_rightparen() const noexcept { return cxl_on_rightparen_; }
 
             ///@}
             /** @defgroup scm-expectexpr-methods general methods **/
@@ -56,6 +60,15 @@ namespace xo {
              **/
             void on_leftparen_token(const Token & tk,
                                     ParserStateMachine * p_psm);
+
+            /** update state for this syntax on incoming rightparen token @p tk,
+             *  with overall parser state in @p p_psm.
+             *
+             *  Generally treats as illegal, but cancels gracefully when
+             *  @ref cxl_on_rightparen_ set.
+             **/
+            void on_rightparen_token(const Token & tk,
+                                     ParserStateMachine * p_psm);
 
             /** update state for this syntax on incoming leftbrace token @p tk,
              *  with overall parser state in @p p_psm
@@ -165,8 +178,11 @@ namespace xo {
              *  2a. expression
              **/
             bool cxl_on_rightbrace_ = false;
-
-
+            /** if true: expecting either:
+             *  1a. expression
+             *  1b. right paren ')', in which case no expression
+             **/
+            bool cxl_on_rightparen_ = false;
         };
     } /*namespace scm*/
 } /*namespace xo*/

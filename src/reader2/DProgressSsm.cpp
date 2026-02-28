@@ -218,7 +218,7 @@ namespace xo {
             if (!lhs_) {
                 return "expr1|leftparen";
             } else if (op_type_ == optype::invalid) {
-                return "oper|semicolon|rightparen|rightbrace";
+                return "oper|semicolon|leftparen|rightparen|rightbrace";
             } else {
                 return "expr2|leftparen";
             }
