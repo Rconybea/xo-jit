@@ -699,11 +699,24 @@ namespace xo {
 
                     // now i_arg is 0 -> evaluate that argument
 
-                    this->expr_ = apply_expr->arg(i_arg);
-                    this->pc_ = VsmInstr::c_eval;
-                    this->cont_ = VsmInstr::c_evalargs;
+                    if (i_arg >= static_cast<int32_t>(apply_expr->n_args())) {
+                        // corner case: function with 0 arguments
 
-                    return;
+                        this->fn_ = apply_frame->fn(); // = value;
+                        this->args_ = apply_frame->args(); // empty
+
+                        this->stack_ = apply_frame->parent();
+                        this->pc_ = VsmInstr::c_apply;
+                        this->cont_ = apply_frame->cont();
+
+                        return;
+                    } else {
+                        this->expr_ = apply_expr->arg(i_arg);
+                        this->pc_ = VsmInstr::c_eval;
+                        this->cont_ = VsmInstr::c_evalargs;
+
+                        return;
+                    }
                 } else {
                     // error - function position must deliver something with AProcedure?
                     // or DClosure, but we'll get to that.
