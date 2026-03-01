@@ -32,6 +32,8 @@ namespace xo {
         Tokenizer::is_1char_punctuation(CharT ch)
         {
             switch(ch) {
+            case '\'':
+                return true;
             case '(':
                 return true;
             case ')':
@@ -418,6 +420,15 @@ namespace xo {
 
                 break;
             }
+            case '\'':
+            {
+                log && log("quote token");
+
+                tk_type = tokentype::tk_quote;
+                ++ix;
+
+                break;
+            }
             case 'a': case 'A':
             case 'b': case 'B':
             case 'c': case 'C':
@@ -593,6 +604,8 @@ namespace xo {
                     tk_type = tokentype::tk_in;
                 } else if (tk_text == "end") {
                     tk_type = tokentype::tk_end;
+                } else if (tk_text == "#q") {
+                    tk_type = tokentype::tk_quote;
                 } else {
                     /* keep as symbol */
                     keep_text = true;

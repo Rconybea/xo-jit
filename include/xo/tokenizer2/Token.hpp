@@ -87,6 +87,8 @@ namespace xo {
             static Token symbol_token(const std::string & txt) {
                 return Token(tokentype::tk_symbol, txt);
             }
+            /** token representing quote @c "'" **/
+            static Token quote() { return Token(tokentype::tk_quote); }
             /** token representing left angle bracket @c "<" **/
             static Token leftangle() { return Token(tokentype::tk_leftangle); }
             /** token representing right angle bracket @c ">" **/

@@ -18,16 +18,17 @@ namespace xo {
                 CASE(tk_f64);
                 CASE(tk_string);
                 CASE(tk_symbol);
-                CASE(tk_leftparen);
 
+                CASE(tk_quote);
+                CASE(tk_leftparen);
                 CASE(tk_rightparen);
                 CASE(tk_leftbracket);
                 CASE(tk_rightbracket);
                 CASE(tk_leftbrace);
                 CASE(tk_rightbrace);
-
                 CASE(tk_leftangle);
                 CASE(tk_rightangle);
+
                 CASE(tk_lessequal);
                 CASE(tk_greatequal);
                 CASE(tk_dot);

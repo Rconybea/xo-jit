@@ -64,6 +64,9 @@ namespace xo {
             /** a symbol **/
             tk_symbol,
 
+            /** quote @c ' **/
+            tk_quote,
+
             /** left-hand parenthesis @c '(' **/
             tk_leftparen,
 
