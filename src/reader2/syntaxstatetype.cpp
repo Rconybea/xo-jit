@@ -27,6 +27,8 @@ namespace xo {
                 return "progress";
             case syntaxstatetype::paren:
                 return "paren";
+            case syntaxstatetype::quote:
+                return "quote";
             case syntaxstatetype::expect_toplevel_expression_sequence:
                 return "expect-toplevel-expression-sequence";
             case syntaxstatetype::expect_formal_arglist:

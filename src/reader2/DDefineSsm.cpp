@@ -531,6 +531,7 @@ namespace xo {
             case tokentype::tk_i64:
             case tokentype::tk_bool:
             case tokentype::tk_if:
+            case tokentype::tk_quote:
             case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:

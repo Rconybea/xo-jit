@@ -169,6 +169,7 @@ namespace xo {
             case tokentype::tk_singleassign:
             case tokentype::tk_colon:
             case tokentype::tk_semicolon:
+            case tokentype::tk_quote:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_rightbrace:

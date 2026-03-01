@@ -114,6 +114,7 @@ namespace xo {
             case tokentype::tk_bool:
             case tokentype::tk_semicolon:
             case tokentype::tk_invalid:
+            case tokentype::tk_quote:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:

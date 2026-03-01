@@ -78,6 +78,7 @@ namespace xo {
             case tokentype::tk_singleassign:
             case tokentype::tk_colon:
             case tokentype::tk_semicolon:
+            case tokentype::tk_quote:
             case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:

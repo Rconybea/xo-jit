@@ -39,6 +39,9 @@ namespace xo {
             /** expression enclosed in parentheses. See @ref DParenSsm **/
             paren,
 
+            /** quoted literal using #q{..} syntax.  See @ref DQuoteSsm **/
+            quote,
+
             /** toplevel of some translation unit. See @ref DToplevelSeqSsm **/
             expect_toplevel_expression_sequence,
 
