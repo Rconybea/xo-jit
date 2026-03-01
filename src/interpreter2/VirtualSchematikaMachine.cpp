@@ -27,6 +27,7 @@
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <cassert>
+#include <unistd.h> // for getcwd()
 
 namespace xo {
     using xo::print::APrintable;
@@ -862,6 +863,8 @@ namespace xo {
             }
          }
 
+        // ----- primitive: report_memory_use() -----
+
         obj<AGCObject>
         xfer_report_memory_use(obj<ARuntimeContext> rcx)
         {
@@ -883,6 +886,22 @@ namespace xo {
         static DPrimitive_gco_0 s_report_memory_use_pm("_report_memory_use",
                                                        &xfer_report_memory_use);
 
+        // ----- primitive: cwd() -----
+
+        obj<AGCObject>
+        xfer_cwd(obj<ARuntimeContext> rcx)
+        {
+            char buf[PATH_MAX];
+            ::getcwd(buf, sizeof(buf));
+
+            return obj<AGCObject,DString>(DString::from_cstr(rcx.allocator(), buf));
+        }
+
+        static DPrimitive_gco_0 s_cwd_pm("_cwd",
+                                         &xfer_cwd);
+
+        // ----- install primitives -----
+
         void
         VirtualSchematikaMachine::install_core_primitives()
         {
@@ -895,6 +914,17 @@ namespace xo {
                      name,
                      Reflect::require<DPrimitive_gco_0>(),
                      obj<AGCObject,DPrimitive_gco_0>(&s_report_memory_use_pm));
+            }
+
+            {
+                const DUniqueString * name
+                    = reader_.intern_string("cwd");
+
+                global_env_->_upsert_value
+                    (mm_.to_op(),
+                     name,
+                     Reflect::require<DPrimitive_gco_0>(),
+                     obj<AGCObject,DPrimitive_gco_0>(&s_cwd_pm));
             }
         }
 
