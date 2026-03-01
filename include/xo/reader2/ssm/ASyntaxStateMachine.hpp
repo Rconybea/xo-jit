@@ -44,6 +44,8 @@ public:
     using Opaque = void *;
     /** reflected c++ type **/
     using TypeDescr = xo::reflect::TypeDescr;
+    /** gc-aware object **/
+    using AGCObject = xo::mm::AGCObject;
     ///@}
 
     /** @defgroup scm-syntaxstatemachine-methods **/
@@ -71,10 +73,12 @@ public:
     virtual void on_parsed_formal_with_token(Opaque data, const DUniqueString * param_name, TypeDescr param_type, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** consume formal arglist emitted by nested ssm **/
     virtual void on_parsed_formal_arglist(Opaque data, DArray * arglist, ParserStateMachine * p_psm)  = 0;
-    /** update state machine for incoming parsed expression @p expr **/
+    /** update state machine for nested parsed expression @p expr **/
     virtual void on_parsed_expression(Opaque data, obj<AExpression> expr, ParserStateMachine * p_psm)  = 0;
     /** update state machine @p p_psm for incoming parsed expression @p expr followed by token @p tk **/
     virtual void on_parsed_expression_with_token(Opaque data, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm)  = 0;
+    /** update state machine for nested quoted literal @p lit **/
+    virtual void on_quoted_literal(Opaque data, obj<AGCObject> lit, ParserStateMachine * p_psm)  = 0;
     ///@}
 }; /*ASyntaxStateMachine*/
 

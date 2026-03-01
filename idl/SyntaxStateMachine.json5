@@ -25,6 +25,7 @@
     ],
     types: [
         { name: "TypeDescr", doc: [ "reflected c++ type" ], definition: "xo::reflect::TypeDescr" },
+        { name: "AGCObject", doc: [ "gc-aware object" ], definition: "xo::mm::AGCObject" },
         // { name: string, doc: [ string ], definition: string },
     ],
     const_methods: [
@@ -107,7 +108,7 @@
         },
         {
             name: "on_parsed_expression",
-            doc: ["update state machine for incoming parsed expression @p expr"],
+            doc: ["update state machine for nested parsed expression @p expr"],
             return_type: "void",
             args: [
                 {type: "obj<AExpression>", name: "expr"},
@@ -124,6 +125,15 @@
                 {type: "ParserStateMachine *", name: "p_psm"},
             ],
         },
+        {
+            name: "on_quoted_literal",
+            doc: ["update state machine for nested quoted literal @p lit"],
+            return_type: "void",
+            args: [
+                {type: "obj<AGCObject>", name: "lit"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        }
     ],
     router_facet_explicit_content: [ ],
 }

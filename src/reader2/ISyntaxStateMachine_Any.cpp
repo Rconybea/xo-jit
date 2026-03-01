@@ -83,6 +83,12 @@ ISyntaxStateMachine_Any::on_parsed_expression_with_token(Opaque, obj<AExpression
     _fatal();
 }
 
+auto
+ISyntaxStateMachine_Any::on_quoted_literal(Opaque, obj<AGCObject>, ParserStateMachine *)  -> void
+{
+    _fatal();
+}
+
 
 } /*namespace scm*/
 } /*namespace xo*/

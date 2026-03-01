@@ -37,6 +37,7 @@ namespace xo {
             using TypeDescr = xo::reflect::TypeDescr;
             using AAllocator = xo::mm::AAllocator;
             using ArenaConfig = xo::mm::ArenaConfig;
+            using AGCObject = xo::mm::AGCObject;
             using DArena = xo::mm::DArena;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
@@ -271,6 +272,13 @@ namespace xo {
                                                       obj<AExpression> expr,
                                                       const Token & tk,
                                                       std::string_view expect_str);
+
+            /** report illegal quoted literal @p lit from nested ssm @p ssm_name.
+             *  Possibly unreachable.
+             **/
+            void illegal_quoted_literal(std::string_view ssm_name,
+                                        obj<AGCObject> lit,
+                                        std::string_view expect_str);
 
             /** report error - no binding for variable @p sym
              **/

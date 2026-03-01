@@ -67,6 +67,11 @@ namespace xo {
         {
             self.on_parsed_expression_with_token(expr, tk, p_psm);
         }
+        auto
+        ISyntaxStateMachine_DExpectFormalArgSsm::on_quoted_literal(DExpectFormalArgSsm & self, obj<AGCObject> lit, ParserStateMachine * p_psm) -> void
+        {
+            self.on_quoted_literal(lit, p_psm);
+        }
 
     } /*namespace scm*/
 } /*namespace xo*/

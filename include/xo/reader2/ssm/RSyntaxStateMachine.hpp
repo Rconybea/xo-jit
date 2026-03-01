@@ -32,6 +32,7 @@ public:
     using DataPtr = Object::DataPtr;
     using typeseq = xo::reflect::typeseq;
     using TypeDescr = ASyntaxStateMachine::TypeDescr;
+    using AGCObject = ASyntaxStateMachine::AGCObject;
     ///@}
 
     /** @defgroup scm-syntaxstatemachine-router-ctors **/
@@ -84,6 +85,9 @@ public:
     }
     void on_parsed_expression_with_token(obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_expression_with_token(O::data(), expr, tk, p_psm);
+    }
+    void on_quoted_literal(obj<AGCObject> lit, ParserStateMachine * p_psm)  {
+        return O::iface()->on_quoted_literal(O::data(), lit, p_psm);
     }
 
     ///@}

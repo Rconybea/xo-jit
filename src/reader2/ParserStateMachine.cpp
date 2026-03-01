@@ -570,6 +570,32 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::illegal_quoted_literal(std::string_view ssm_name,
+                                                   obj<AGCObject> lit,
+                                                   std::string_view expect_str)
+        {
+            obj<APrintable> lit_pr
+                = FacetRegistry::instance().variant<APrintable,AGCObject>(lit);
+
+            /** TODO
+             *  problem here: we have pretty() support for obj<AExpression>,
+             *  but not "ordinary printing" support.  So expression doesn't get printed
+             **/
+            auto errmsg_string = tostr("Unexpected quoted literal",
+                                       xtag("lit", lit_pr),
+                                       xtag("expecting", expect_str),
+                                       xtag("ssm", ssm_name),
+                                       xtag("via", "ParserStateMachine::illegal_quoted_literal"));
+
+            assert(expr_alloc_);
+
+            auto errmsg = DString::from_view(expr_alloc_,
+                                             std::string_view(errmsg_string));
+
+            this->capture_error(ssm_name, errmsg);
+        }
+
+        void
         ParserStateMachine::error_unbound_variable(std::string_view ssm_name,
                                                    std::string_view sym)
         {

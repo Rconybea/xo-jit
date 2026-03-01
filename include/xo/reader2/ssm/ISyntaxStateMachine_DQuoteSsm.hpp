@@ -42,6 +42,7 @@ namespace xo {
             /** @defgroup scm-syntaxstatemachine-dquotessm-type-traits **/
             ///@{
             using TypeDescr = xo::scm::ASyntaxStateMachine::TypeDescr;
+            using AGCObject = xo::scm::ASyntaxStateMachine::AGCObject;
             using Copaque = xo::scm::ASyntaxStateMachine::Copaque;
             using Opaque = xo::scm::ASyntaxStateMachine::Opaque;
             ///@}
@@ -66,10 +67,12 @@ namespace xo {
             static void on_parsed_formal_with_token(DQuoteSsm & self, const DUniqueString * param_name, TypeDescr param_type, const Token & tk, ParserStateMachine * p_psm);
             /** consume formal arglist emitted by nested ssm **/
             static void on_parsed_formal_arglist(DQuoteSsm & self, DArray * arglist, ParserStateMachine * p_psm);
-            /** update state machine for incoming parsed expression @p expr **/
+            /** update state machine for nested parsed expression @p expr **/
             static void on_parsed_expression(DQuoteSsm & self, obj<AExpression> expr, ParserStateMachine * p_psm);
             /** update state machine @p p_psm for incoming parsed expression @p expr followed by token @p tk **/
             static void on_parsed_expression_with_token(DQuoteSsm & self, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm);
+            /** update state machine for nested quoted literal @p lit **/
+            static void on_quoted_literal(DQuoteSsm & self, obj<AGCObject> lit, ParserStateMachine * p_psm);
             ///@}
         };
 

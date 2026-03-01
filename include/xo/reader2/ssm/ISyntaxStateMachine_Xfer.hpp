@@ -32,6 +32,7 @@ namespace scm {
         /** integer identifying a type **/
         using typeseq = ASyntaxStateMachine::typeseq;
         using TypeDescr = ASyntaxStateMachine::TypeDescr;
+        using AGCObject = ASyntaxStateMachine::AGCObject;
         ///@}
 
         /** @defgroup scm-syntaxstatemachine-xfer-methods **/
@@ -78,6 +79,9 @@ namespace scm {
         }
         void on_parsed_expression_with_token(Opaque data, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm)  override {
             return I::on_parsed_expression_with_token(_dcast(data), expr, tk, p_psm);
+        }
+        void on_quoted_literal(Opaque data, obj<AGCObject> lit, ParserStateMachine * p_psm)  override {
+            return I::on_quoted_literal(_dcast(data), lit, p_psm);
         }
 
         ///@}

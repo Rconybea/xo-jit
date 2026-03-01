@@ -30,6 +30,19 @@ namespace xo {
         class DSyntaxStateMachine {
         public:
             using TypeDescr = xo::reflect::TypeDescr;
+            using AGCObject = xo::mm::AGCObject;
+
+            /** Explicit error path **/
+            void illegal_quoted_literal(obj<AGCObject> lit,
+                                        ParserStateMachine * p_psm)
+                {
+                    // starting with c++23 can use "this auto&& self" instead
+                    Derived & self = static_cast<Derived&>(*this);
+
+                    p_psm->illegal_quoted_literal(Derived::ssm_classname(),
+                                                  lit,
+                                                  self.get_expect_str());
+                }
 
             /** Default implementation for required SyntaxStateMachine facet method
              **/
@@ -148,6 +161,13 @@ namespace xo {
                                                             self.get_expect_str());
 
             }
+
+            /** Default impplementation for required SyntaxStateMachine facet method **/
+            void on_quoted_literal(obj<AGCObject> lit,
+                                   ParserStateMachine * p_psm)
+                {
+                    this->illegal_quoted_literal(lit, p_psm);
+                }
         };
 
     } /*namespace scm*/

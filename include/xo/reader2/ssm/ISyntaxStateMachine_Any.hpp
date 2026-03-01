@@ -45,6 +45,7 @@ namespace scm {
         /** integer identifying a type **/
         using typeseq = xo::facet::typeseq;
         using TypeDescr = ASyntaxStateMachine::TypeDescr;
+        using AGCObject = ASyntaxStateMachine::AGCObject;
 
         ///@}
         /** @defgroup scm-syntaxstatemachine-any-methods **/
@@ -71,6 +72,7 @@ namespace scm {
         [[noreturn]] void on_parsed_formal_arglist(Opaque, DArray *, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_expression(Opaque, obj<AExpression>, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_expression_with_token(Opaque, obj<AExpression>, const Token &, ParserStateMachine *)  override;
+        [[noreturn]] void on_quoted_literal(Opaque, obj<AGCObject>, ParserStateMachine *)  override;
 
         ///@}
 
