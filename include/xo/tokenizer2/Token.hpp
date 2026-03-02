@@ -88,7 +88,7 @@ namespace xo {
                 return Token(tokentype::tk_symbol, txt);
             }
             /** token representing quote @c "'" **/
-            static Token quote() { return Token(tokentype::tk_quote); }
+            static Token quote_token() { return Token(tokentype::tk_quote); }
             /** token representing left angle bracket @c "<" **/
             static Token leftangle() { return Token(tokentype::tk_leftangle); }
             /** token representing right angle bracket @c ">" **/

@@ -429,6 +429,7 @@ namespace xo {
 
                 break;
             }
+            case '#':
             case 'a': case 'A':
             case 'b': case 'B':
             case 'c': case 'C':
