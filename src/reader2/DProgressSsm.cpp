@@ -3,8 +3,7 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "DProgressSsm.hpp"
-#include "ssm/ISyntaxStateMachine_DProgressSsm.hpp"
+#include "ProgressSsm.hpp"
 
 #include "DExpectExprSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DExpectExprSsm.hpp"
@@ -188,6 +187,7 @@ namespace xo {
         {
             start(parser_mm, lhs, optype::invalid, p_psm);
         }
+
 
         void
         DProgressSsm::start(DArena & parser_mm,

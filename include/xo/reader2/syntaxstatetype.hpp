@@ -60,6 +60,9 @@ namespace xo {
             /** expecting a rhs expression. See @ref DExpectExprSsm **/
             expect_rhs_expression,
 
+            /** expecting a quoted literal. See @ref DExpectQLiteralSsm **/
+            expect_qliteral,
+
             /** comes lasts, counts number of valid enums **/
             N
         };

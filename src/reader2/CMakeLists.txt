@@ -65,6 +65,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DExpectExprSsm.cpp
     IPrintable_DExpectExprSsm.cpp
 
+    DExpectQLiteralSsm.cpp
+    ISyntaxStateMachine_DExpectQLiteralSsm.cpp
+    IPrintable_DExpectQLiteralSsm.cpp
+
     DProgressSsm.cpp
     ISyntaxStateMachine_DProgressSsm.cpp
     IPrintable_DProgressSsm.cpp
@@ -72,6 +76,7 @@ set(SELF_SRCS
     DQuoteSsm.cpp
     ISyntaxStateMachine_DQuoteSsm.cpp
     IPrintable_DQuoteSsm.cpp
+
     )
 
 xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 ${SELF_SRCS})

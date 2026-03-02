@@ -331,6 +331,12 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::on_quoted_literal(obj<AGCObject> lit)
+        {
+            this->top_ssm().on_quoted_literal(lit, this);
+        }
+
+        void
         ParserStateMachine::on_token(const Token & tk)
         {
             scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));

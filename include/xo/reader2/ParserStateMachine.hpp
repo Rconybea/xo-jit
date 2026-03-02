@@ -186,6 +186,9 @@ namespace xo {
             void on_parsed_expression_with_token(obj<AExpression> expr,
                                                  const Token & tk);
 
+            /** update state to consume quoted literal @p lit **/
+            void on_quoted_literal(obj<AGCObject> lit);
+
             /** update state to respond to input token @p tk.
              *  record output (if any) in @ref result_
              **/

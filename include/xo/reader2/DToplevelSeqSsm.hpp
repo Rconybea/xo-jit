@@ -119,6 +119,11 @@ namespace xo {
              **/
             void on_leftparen_token(const Token & tk, ParserStateMachine * p_psm);
 
+            /** update ssm for incoming quote token @p tk, overall parser state in @p p_psm
+             *  starts nested syntax for quoted literal
+             **/
+            void on_quote_token(const Token & tk, ParserStateMachine * p_psm);
+
             /** update state for this syntax on parsed expression @p expr
              *  from nested ssm.
              *  overall parser state in @p p_psm

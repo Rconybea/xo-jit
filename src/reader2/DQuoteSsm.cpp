@@ -4,8 +4,9 @@
  **/
 
 #include "QuoteSsm.hpp"
-#include "ExpectExprSsm.hpp"
+#include "ExpectQLiteralSsm.hpp"
 #include "syntaxstatetype.hpp"
+#include <xo/expression2/Constant.hpp>
 //#include <string_view>
 
 namespace xo {
@@ -88,6 +89,10 @@ namespace xo {
         {
             switch (tk.tk_type()) {
 
+            case tokentype::tk_quote:
+                this->on_quote_token(tk, p_psm);
+                return;
+
             case tokentype::tk_leftbrace:
                 this->on_leftbrace_token(tk, p_psm);
                 return;
@@ -108,7 +113,6 @@ namespace xo {
             case tokentype::tk_i64:
             case tokentype::tk_bool:
             case tokentype::tk_if:
-            case tokentype::tk_quote:
             case tokentype::tk_leftparen:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
@@ -143,15 +147,25 @@ namespace xo {
         }
 
         void
-        DQuoteSsm::on_leftbrace_token(const Token & tk,
-                                      ParserStateMachine * p_psm)
+        DQuoteSsm::on_quote_token(const Token & tk,
+                                  ParserStateMachine * p_psm)
         {
             if (quote_xst_.code() == QuoteXst::code::quote_0) {
                 this->quote_xst_ = QuoteXst(QuoteXst::code::quote_1);
+                return;
+            }
 
-                assert(false);
-                //DExpectQLiteralSsm::start(p_psm);
-                //return;
+            Super::on_token(tk, p_psm);
+        }
+
+        void
+        DQuoteSsm::on_leftbrace_token(const Token & tk,
+                                      ParserStateMachine * p_psm)
+        {
+            if (quote_xst_.code() == QuoteXst::code::quote_1) {
+                this->quote_xst_ = QuoteXst(QuoteXst::code::quote_2);
+                DExpectQLiteralSsm::start(p_psm);
+                return;
             }
 
             Super::on_token(tk, p_psm);
@@ -173,41 +187,24 @@ namespace xo {
         }
 
         void
-        DQuoteSsm::on_parsed_expression(obj<AExpression> expr,
-                                        ParserStateMachine * p_psm)
+        DQuoteSsm::on_quoted_literal(obj<AGCObject> literal,
+                                     ParserStateMachine * p_psm)
         {
             if (quote_xst_.code() == QuoteXst::code::quote_2) {
                 this->quote_xst_ = QuoteXst(QuoteXst::code::quote_3);
-                this->expr_ = expr;
+                this->expr_ = DConstant::make(p_psm->expr_alloc(), literal);
 
                 return;
             }
 
-            Super::on_parsed_expression(expr, p_psm);
-        }
-
-        void
-        DQuoteSsm::on_parsed_expression_with_token(obj<AExpression> expr,
-                                                   const Token & tk,
-                                                   ParserStateMachine * p_psm)
-        {
-            if (quote_xst_.code() == QuoteXst::code::quote_2) {
-                this->quote_xst_ = QuoteXst(QuoteXst::code::quote_3);
-                this->expr_ = expr;
-
-                this->on_token(tk, p_psm);
-
-                return;
-            }
-
-            Super::on_parsed_expression(expr, p_psm);
+            Super::illegal_quoted_literal(literal, p_psm);
         }
 
         bool
         DQuoteSsm::pretty(const ppindentinfo & ppii) const
         {
             return ppii.pps()->pretty_struct(ppii,
-                                             "DParenSsm",
+                                             "DQuoteSsm",
                                              refrtag("quote_xst", quote_xst_),
                                              refrtag("expect", this->get_expect_str()));
         }

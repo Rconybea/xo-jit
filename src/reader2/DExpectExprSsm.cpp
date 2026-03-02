@@ -7,10 +7,11 @@
 #include "ParserStateMachine.hpp"
 #include "ParserStack.hpp"
 #include "SyntaxStateMachine.hpp"
-#include "ssm/ISyntaxStateMachine_DProgressSsm.hpp"
+#include "ProgressSsm.hpp"
 #include "DSequenceSsm.hpp"
 #include "IfElseSsm.hpp"
 #include "LambdaSsm.hpp"
+#include "QuoteSsm.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/Variable.hpp>
 #include <xo/expression2/Constant.hpp>
@@ -22,14 +23,10 @@
 #include <xo/facet/facet_implementation.hpp>
 
 #ifdef NOT_YET
-#include "exprstatestack.hpp"
 #include "define_xs.hpp"
-#include "lambda_xs.hpp"
-#include "if_else_xs.hpp"
 #include "paren_xs.hpp"
 #include "sequence_xs.hpp"
 #include "progress_xs.hpp"
-#include "xo/expression/pretty_expression.hpp"
 #endif
 
 namespace xo {
@@ -140,6 +137,10 @@ namespace xo {
                 this->on_def_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_quote:
+                this->on_quote_token(tk, p_psm);
+                return;
+
             case tokentype::tk_string:
                 this->on_string_token(tk, p_psm);
                 return;
@@ -169,7 +170,6 @@ namespace xo {
             case tokentype::tk_singleassign:
             case tokentype::tk_colon:
             case tokentype::tk_semicolon:
-            case tokentype::tk_quote:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_rightbrace:
@@ -345,6 +345,17 @@ namespace xo {
         }
 
         void
+        DExpectExprSsm::on_quote_token(const Token & tk,
+                                       ParserStateMachine * p_psm)
+        {
+            (void)tk;
+
+            DProgressSsm::start(p_psm->parser_alloc(), p_psm);
+            DQuoteSsm::start(p_psm);
+            p_psm->on_token(Token::quote_token());
+        }
+
+        void
         DExpectExprSsm::on_bool_token(const Token & tk,
                                       ParserStateMachine * p_psm)
         {
@@ -499,6 +510,21 @@ namespace xo {
             p_psm->pop_ssm();
             p_psm->on_parsed_expression_with_token(expr, tk);
         }
+
+#ifdef NOT_YET
+        void
+        DExpectExprSsm::on_quoted_literal(obj<AGCObject> lit,
+                                          ParserStateMachine * p_psm)
+        {
+            // note: impl here parallels .on_f64_token() .on_i64_token() etc.
+
+            auto expr = DConstant::make(p_psm->expr_alloc(), lit);
+
+            DProgressSsm::start(p_psm->parser_alloc(),
+                                expr,
+                                p_psm);
+        }
+#endif
 
         bool
         DExpectExprSsm::pretty(const ppindentinfo & ppii) const

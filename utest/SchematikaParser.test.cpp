@@ -849,7 +849,7 @@ namespace xo {
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag),
                       xtag("test", testname));
 
@@ -1151,7 +1151,7 @@ namespace xo {
 
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ParserFixture fixture(testname, c_debug_flag);
@@ -1196,6 +1196,84 @@ namespace xo {
                 /* [ o] */     Token::rightparen_token(),
                 /* [ p] */     Token::rightbrace_token(),
                 /* [ q] */     Token::semicolon_token(),
+            };
+
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            log && fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("SchematikaParser-batch-qliteral1", "[reader2][SchematikaParser]")
+        {
+            // top-level recursive function definition
+
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    #q{ 4.5 } ;
+             *    ^ ^   ^ ^ ^
+             *    0 1   2 3 4
+             **/
+
+            std::vector<Token> tk_v{
+                /* [ 0] */ Token::quote_token(),
+
+                /* [ 1] */ Token::leftbrace_token(),
+                /* [ 2] */   Token::f64_token("4.5"),
+                /* [ 3] */ Token::rightbrace_token(),
+                /* [ 4] */ Token::semicolon_token(),
+            };
+
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            log && fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("SchematikaParser-batch-qliteral2", "[reader2][SchematikaParser]")
+        {
+            // top-level recursive function definition
+
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    #q{ 4.5 } + #q { 7.2 };
+             *    ^ ^ ^   ^ ^ ^  ^ ^   ^^
+             *    0 1 2   3 4 5  6 7   8|
+             *                          9
+             **/
+
+            std::vector<Token> tk_v{
+                /* [ 0] */ Token::quote_token(),
+                /* [ 1] */ Token::leftbrace_token(),
+                /* [ 2] */   Token::f64_token("4.5"),
+                /* [ 3] */ Token::rightbrace_token(),
+
+                /* [ 4] */ Token::plus_token(),
+
+                /* [ 5] */ Token::quote_token(),
+                /* [ 6] */ Token::leftbrace_token(),
+                /* [ 7] */   Token::f64_token("7.2"),
+                /* [ 8] */ Token::rightbrace_token(),
+
+                /* [ 9] */ Token::semicolon_token(),
             };
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);

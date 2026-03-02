@@ -76,6 +76,14 @@ namespace xo {
             void on_leftbrace_token(const Token & tk,
                                     ParserStateMachine * p_psm);
 
+            /** update state for this syntax on quote token @p tk,
+             *  with overall parser state in @p p_psm.
+             *
+             *  Starts nested {progress-ssm, quote-ssm} combination.
+             **/
+            void on_quote_token(const Token & tk,
+                                ParserStateMachine * p_psm);
+
             /** step state machine for this syntax on incoming boolean literal token @p tkk
              *  with overall parser state in @p p_psm
              **/
@@ -159,6 +167,15 @@ namespace xo {
             void on_parsed_expression_with_token(obj<AExpression> expr,
                                                  const Token & tk,
                                                  ParserStateMachine * p_psm);
+
+#ifdef NOT_YET
+            /** update state for literal @p lit with overall state in @p p_psm.
+             *  wraps literal as constant-expr + starts progress-ssm for possible
+             *  operator expression.
+             **/
+            void on_quoted_literal(obj<AGCObject> lit,
+                                   ParserStateMachine * p_psm);
+#endif
 
             ///@}
             /** @defgroup scm-define-printable-facet printable facet methods **/

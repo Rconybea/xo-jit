@@ -9,12 +9,13 @@
 #include "DLambdaSsm.hpp"
 #include "ProgressSsm.hpp"
 #include "DIfElseSsm.hpp"
+#include "QuoteSsm.hpp"
 #include "ParenSsm.hpp"
 #include "ExpectExprSsm.hpp"
 #include "VarRef.hpp"
 
-#include <xo/expression2/DConstant.hpp>
-#include <xo/expression2/detail/IExpression_DConstant.hpp>
+#include <xo/expression2/Constant.hpp>
+//#include <xo/expression2/detail/IExpression_DConstant.hpp>
 
 #include <xo/object2/DString.hpp>
 #include <xo/object2/string/IGCObject_DString.hpp>
@@ -160,9 +161,12 @@ namespace xo {
                 this->on_leftparen_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_quote:
+                this->on_quote_token(tk, p_psm);
+                return;
+
             // all the not-yet handled cases
             case tokentype::tk_invalid:
-            case tokentype::tk_quote:
             case tokentype::tk_rightparen:
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
@@ -411,6 +415,29 @@ namespace xo {
 
                 DProgressSsm::start(p_psm->parser_alloc(), p_psm);
                 p_psm->on_token(Token::leftparen_token());
+
+                return;
+            }
+            case exprseqtype::toplevel_batch:
+                break;
+            case exprseqtype::N:
+                assert(false); // unreachable
+                break;
+            }
+
+            Super::on_token(tk, p_psm);
+        }
+
+        void
+        DToplevelSeqSsm::on_quote_token(const Token & tk,
+                                        ParserStateMachine * p_psm)
+        {
+            switch (seqtype_) {
+            case exprseqtype::toplevel_interactive: {
+                DProgressSsm::start(p_psm->parser_alloc(),
+                                    p_psm);
+                DQuoteSsm::start(p_psm);
+                p_psm->on_token(Token::quote_token());
 
                 return;
             }

@@ -100,6 +100,13 @@ namespace xo {
             /** @defgroup scm-parenssm-admin-methods admin methods **/
             ///@{
 
+            /** update ssm for incoming quote token @p tk.
+             *  with overall parser state in @p p_psm.
+             *  advances from quote_0 -> quote_1.  Otherwise error
+             **/
+            void on_quote_token(const Token & tk,
+                                ParserStateMachine * p_psm);
+
             /** update ssm state for incoming leftparen token @p tk,
              *  with overall parser state in @p p_psm
              **/
@@ -129,16 +136,8 @@ namespace xo {
             /** update ssm for expression @p expr (emitted by nested ssm),
              *  with overall parser state in @p p_psm
              **/
-            void on_parsed_expression(obj<AExpression> expr,
+            void on_quoted_literal(obj<AGCObject> literal,
                                       ParserStateMachine * p_psm);
-
-            /** update ssm for expression @p expr (emitted by nested ssm)
-             *  that's immediately followed by token @p tk
-             *  with overall parser state in @p p_psm
-             **/
-            void on_parsed_expression_with_token(obj<AExpression> expr,
-                                                 const Token & tk,
-                                                 ParserStateMachine * p_psmn);
 
             ///@}
             /** @defgroup scm-parenssm-printable-facet printable facet methods **/
