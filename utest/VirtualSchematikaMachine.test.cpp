@@ -584,6 +584,44 @@ namespace xo {
             log && vsm_fixture.log_memory_layout(&log);
         }
 
+        TEST_CASE("VirtualSchematikaMachine-qliteral1", "[interpreter2][VSM]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            VsmFixture vsm_fixture(testname, c_debug_flag,
+                                   VsmConfig().with_parser_debug_flag(c_debug_flag));
+            auto & vsm = vsm_fixture.vsm_;
+
+            bool eof_flag = true;
+
+            vsm.begin_interactive_session();
+
+            span_type input = span_type::from_cstr("#q{ 4.5 };");
+
+            log && log(xtag("input", input));
+
+            VsmResultExt res
+                = vsm.read_eval_print(input, eof_flag);
+
+            REQUIRE(res.is_value());
+            REQUIRE(res.value());
+
+            log && log(xtag("res.tseq", res.value()->_typeseq()),
+                       xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
+
+            auto x = obj<AGCObject,DFloat>::from(*res.value());
+            REQUIRE(x);
+            REQUIRE(x->value() == 4.5);
+
+            REQUIRE(res.remaining_.size() == 1);
+            REQUIRE(*res.remaining_.lo() == '\n');
+
+            //log && vsm_fixture.log_memory_layout(&log);
+        }
+
         TEST_CASE("VirtualSchematikaMachine-report_memory_use", "[interpreter2][VSM]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
