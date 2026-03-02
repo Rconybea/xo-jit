@@ -33,6 +33,18 @@ namespace xo {
             using AGCObject = xo::mm::AGCObject;
 
             /** Explicit error path **/
+            void illegal_token(const Token & tk,
+                               ParserStateMachine * p_psm)
+                {
+                    // starting with c++23 can use "this auto&& self" instead
+                    Derived & self = reinterpret_cast<Derived&>(*this);
+
+                    p_psm->illegal_input_on_token(Derived::ssm_classname(),
+                                                  tk,
+                                                  self.get_expect_str());
+                }
+
+            /** Explicit error path **/
             void illegal_quoted_literal(obj<AGCObject> lit,
                                         ParserStateMachine * p_psm)
                 {
@@ -49,12 +61,7 @@ namespace xo {
             void on_token(const Token & tk,
                           ParserStateMachine * p_psm)
             {
-                // starting with c++23 can use "this auto&& self" instead
-                Derived & self = reinterpret_cast<Derived&>(*this);
-
-                p_psm->illegal_input_on_token(Derived::ssm_classname(),
-                                              tk,
-                                              self.get_expect_str());
+                this->illegal_token(tk, p_psm);
             }
 
             void on_parsed_symbol(std::string_view sym,

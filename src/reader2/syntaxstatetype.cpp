@@ -43,6 +43,8 @@ namespace xo {
                 return "expect-rhs-expression";
             case syntaxstatetype::expect_qliteral:
                 return "expect-qliteral";
+            case syntaxstatetype::expect_qlist:
+                return "expect-qlist";
             case syntaxstatetype::N:
                 break;
             }

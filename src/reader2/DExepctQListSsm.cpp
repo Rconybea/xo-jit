@@ -1,10 +1,9 @@
-/* @file DExpectQLiteralSsm.cpp
+/* @file DExpectQListSsm.cpp
  *
  * @author Roland Conybeare, Mar 2026
  */
 
 #include "ExpectQLiteralSsm.hpp"
-#include "ExpectQListSsm.hpp"
 #include <xo/object2/Float.hpp>
 //#include "DExpectFormalArgSsm.hpp"
 //#include "ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp"
@@ -25,56 +24,71 @@ namespace xo {
 //    using xo::reflect::typeseq;
 
     namespace scm {
-        DExpectQLiteralSsm::DExpectQLiteralSsm(bool cxl_on_rightparen)
-            : cxl_on_rightparen_{cxl_on_rightparen}
+#ifdef NOT_USING
+        const char *
+        formalarglstatetype_descr(formalarglstatetype x) {
+            switch (x) {
+            case formalarglstatetype::invalid:
+                return "invalid";
+            case formalarglstatetype::argl_0:
+                return "argl_0";
+            case formalarglstatetype::argl_1a:
+                return "argl_1a";
+            case formalarglstatetype::argl_1b:
+                return "argl_1b";
+            case formalarglstatetype::n_formalarglstatetype:
+                break;
+            }
+
+            return "?formalarglstatetype";
+        }
+#endif
+
+        DExpectQListSsm::DExpectQListSsm()
         {}
 
-        DExpectQLiteralSsm *
-        DExpectQLiteralSsm::_make(DArena & arena,
-                                  bool cxl_on_rightparen)
+        DExpectQListSsm *
+        DExpectQListSsm::_make(DArena & arena)
         {
             /* out-of-order so argl follows ssm in arena,
              * consistent with any subsequent arglist realloc.
              * Not a load-bearing choice however
              */
 
-            void * mem = arena.alloc_for<DExpectQLiteralSsm>();
+            void * mem = arena.alloc_for<DExpectQListSsm>();
 
-            return new (mem) DExpectQLiteralSsm(cxl_on_rightparen);
+            return new (mem) DExpectQListSsm();
         }
 
-        obj<ASyntaxStateMachine,DExpectQLiteralSsm>
-        DExpectQLiteralSsm::make(DArena & arena,
-                                 bool cxl_on_rightparen)
+        obj<ASyntaxStateMachine,DExpectQListSsm>
+        DExpectQListSsm::make(DArena & arena)
         {
-            obj<ASyntaxStateMachine,DExpectQLiteralSsm> retval(_make(arena,
-                                                                     cxl_on_rightparen));
+            obj<ASyntaxStateMachine,DExpectQListSsm> retval(_make(arena));
+
             return retval;
         }
 
         void
-        DExpectQLiteralSsm::start(ParserStateMachine * p_psm,
-                                  bool cxl_on_rightparen)
+        DExpectQListSsm::start(ParserStateMachine * p_psm)
         {
             DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
 
-            p_psm->push_ssm(ckp, DExpectQLiteralSsm::make(p_psm->parser_alloc(),
-                                                          cxl_on_rightparen));
+            p_psm->push_ssm(ckp, DExpectQListSsm::make(p_psm->parser_alloc()));
         }
 
         syntaxstatetype
-        DExpectQLiteralSsm::ssm_type() const noexcept {
+        DExpectQListSsm::ssm_type() const noexcept {
             return syntaxstatetype::expect_qliteral;
         }
 
         std::string_view
-        DExpectQLiteralSsm::get_expect_str() const
+        DExpectQListSsm::get_expect_str() const
         {
             return "leftparen|leftbracket|leftbrace|string|f64|i64|bool";
         }
 
         void
-        DExpectQLiteralSsm::on_token(const Token & tk,
+        DExpectQListSsm::on_token(const Token & tk,
                                      ParserStateMachine * p_psm)
         {
             switch (tk.tk_type()) {
@@ -83,14 +97,8 @@ namespace xo {
                 return;
 
             case tokentype::tk_leftparen:
-                this->on_leftparen_token(tk, p_psm);
-                return;
-
-            case tokentype::tk_rightparen:
-                this->on_rightparen_token(tk, p_psm);
-                return;
-
             case tokentype::tk_comma:
+            case tokentype::tk_rightparen:
             case tokentype::tk_lambda:
             case tokentype::tk_def:
             case tokentype::tk_if:
@@ -135,7 +143,7 @@ namespace xo {
         }
 
         void
-        DExpectQLiteralSsm::on_f64_token(const Token & tk,
+        DExpectQListSsm::on_f64_token(const Token & tk,
                                          ParserStateMachine * p_psm)
         {
             auto literal = DFloat::box<AGCObject>(p_psm->expr_alloc(),
@@ -147,7 +155,7 @@ namespace xo {
 
 #ifdef NOT_YET
         void
-        DExpectQLiteralSsm::_accept_formal(obj<AAllocator> expr_alloc,
+        DExpectQListSsm::_accept_formal(obj<AAllocator> expr_alloc,
                                                 DArena & parser_alloc,
                                                 const DUniqueString * param_name,
                                                 TypeDescr param_type)
@@ -164,7 +172,7 @@ namespace xo {
             // May want to have gc feature that allows it to use
             // FacetRegistry on memory that stores obj<AExpression,..>
             //
-            // In this case doesn't matter since DExpectQLiteralSsm not actually collected!
+            // In this case doesn't matter since DExpectQListSsm not actually collected!
 
             obj<AGCObject,DVariable> var_o(var);
 
@@ -189,20 +197,23 @@ namespace xo {
         }
 #endif
 
-        void
-        DExpectQLiteralSsm::on_leftparen_token(const Token & tk,
-                                               ParserStateMachine * p_psm)
-        {
-            // replace self with specialized version for parsing a literal list
-
-            p_psm->pop_ssm();
-            DExpectQListSsm::start(p_psm);
-            p_psm->on_token(tk);
-        }
-
 #ifdef NOT_YET
         void
-        DExpectQLiteralSsm::on_comma_token(const Token & tk,
+        DExpectQListSsm::on_leftparen_token(const Token & tk,
+                                                    ParserStateMachine * p_psm)
+        {
+            if (fastate_ == formalarglstatetype::argl_0) {
+                this->fastate_ = formalarglstatetype::argl_1a;
+
+                DExpectFormalArgSsm::start(p_psm);
+                return;
+            }
+
+            Super::on_token(tk, p_psm);
+        }
+
+        void
+        DExpectQListSsm::on_comma_token(const Token & tk,
                                                 ParserStateMachine * p_psm)
         {
             if (fastate_ == formalarglstatetype::argl_1b) {
@@ -214,30 +225,31 @@ namespace xo {
 
             Super::on_token(tk, p_psm);
         }
-#endif
 
         void
-        DExpectQLiteralSsm::on_rightparen_token(const Token & tk,
-                                                ParserStateMachine * p_psm)
+        DExpectQListSsm::on_rightparen_token(const Token & tk,
+                                                     ParserStateMachine * p_psm)
         {
-            if (cxl_on_rightparen_) {
+            if (fastate_ == formalarglstatetype::argl_1b) {
+                DArray * args = argl_;
+
                 p_psm->pop_ssm();
-                p_psm->on_token(tk);
+                p_psm->on_parsed_formal_arglist(args);
                 return;
             }
 
             Super::on_token(tk, p_psm);
         }
+#endif
 
         bool
-        DExpectQLiteralSsm::pretty(const ppindentinfo & ppii) const
+        DExpectQListSsm::pretty(const ppindentinfo & ppii) const
         {
             return ppii.pps()->pretty_struct(ppii,
-                                             "DExpectQLiteralSsm",
+                                             "DExpectQListSsm",
                                              refrtag("expect", this->get_expect_str()));
         }
     } /*namespace scm*/
 } /*namespace xo*/
 
-
-/* end DExpectQLiteralSsm.cpp */
+/* end DExpectQListSsm.cpp */

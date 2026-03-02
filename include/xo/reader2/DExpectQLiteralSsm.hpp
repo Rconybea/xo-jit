@@ -11,37 +11,7 @@
 
 namespace xo {
     namespace scm {
-#ifdef NOT_USING
-        /**
-         *  Already in quoted-literal context
-         *
-         *   #q{            }
-         *      ^
-         *      qliteral_0
-         *
-         *  qliteral_0 --on_leftparen_token()--> push QuotedListSsm
-         **/
-        enum class formalarglstatetype {
-            invalid = -1,
-
-            argl_0,
-            argl_1a,
-            argl_1b,
-
-            n_formalarglstatetype,
-        };
-
-        extern const char *
-        formalarglstatetype_descr(formalarglstatetype x);
-
-        inline std::ostream &
-        operator<< (std::ostream & os, formalarglstatetype x) {
-            os << formalarglstatetype_descr(x);
-            return os;
-        }
-#endif
-
-        /** @class expect_formal_arglist
+        /** @class DExpectQLiteralSsm
          *  @brief parser state-machine for a formal parameter list
          **/
         class DExpectQLiteralSsm : public DSyntaxStateMachine<DExpectQLiteralSsm> {
@@ -54,14 +24,17 @@ namespace xo {
             using size_type = std::uint32_t;
 
         public:
-            DExpectQLiteralSsm();
+            explicit DExpectQLiteralSsm(bool cxl_on_rightparen);
 
             /** create instance, using memory from @parser_mm **/
-            static obj<ASyntaxStateMachine,DExpectQLiteralSsm> make(DArena & parser_mm);
-            static DExpectQLiteralSsm * _make(DArena & parser_mm);
+            static obj<ASyntaxStateMachine,DExpectQLiteralSsm> make(DArena & parser_mm,
+                                                                    bool cxl_on_rightparen);
+            static DExpectQLiteralSsm * _make(DArena & parser_mm,
+                                              bool cxl_on_rightparen);
 
             /** start nested syntax for a quoted literal **/
-            static void start(ParserStateMachine * p_psm);
+            static void start(ParserStateMachine * p_psm,
+                              bool cxl_on_rightparen = false);
 
             /** @defgroup scm-expectformalarglistssm-methods general methods **/
             ///@{
@@ -126,16 +99,8 @@ namespace xo {
             ///@}
 
         private:
-#ifdef NOT_USING
-            /** parsing state-machine state **/
-            formalarglstatetype fastate_ = formalarglstatetype::argl_0;
-            /** populate with (parameter-name, parameter-type) list
-             *  as they're encountered.
-             *
-             *  Not using flexible array here since we don't know size at construction time
-             **/
-            DArray * argl_ = nullptr;
-#endif
+            /** if true rightparen pops + delegates to parent ssm **/
+            bool cxl_on_rightparen_ = false;
         };
     } /*namespace scm*/
 } /*namespace xo*/
