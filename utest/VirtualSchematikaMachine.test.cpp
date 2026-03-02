@@ -7,6 +7,7 @@
 #include <xo/interpreter2/VirtualSchematikaMachine.hpp>
 #include <xo/interpreter2/Closure.hpp>
 #include <xo/expression2/UniqueString.hpp>
+#include <xo/object2/List.hpp>
 #include <xo/object2/Float.hpp>
 #include <xo/object2/Integer.hpp>
 #include <xo/object2/Boolean.hpp>
@@ -24,6 +25,7 @@ namespace xo {
     using xo::scm::DClosure;
     using xo::scm::DString;
     using xo::scm::DUniqueString;  // aks Symbol in lisp
+    using xo::scm::DList;
     using xo::scm::DFloat;
     using xo::scm::DBoolean;
     using xo::scm::DInteger;
@@ -595,7 +597,7 @@ namespace xo {
                                    VsmConfig().with_parser_debug_flag(c_debug_flag));
             auto & vsm = vsm_fixture.vsm_;
 
-            bool eof_flag = true;
+            bool eof_flag = false;
 
             vsm.begin_interactive_session();
 
@@ -615,6 +617,50 @@ namespace xo {
             auto x = obj<AGCObject,DFloat>::from(*res.value());
             REQUIRE(x);
             REQUIRE(x->value() == 4.5);
+
+            REQUIRE(res.remaining_.size() == 1);
+            REQUIRE(*res.remaining_.lo() == '\n');
+
+            //log && vsm_fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("VirtualSchematikaMachine-qlist", "[interpreter2][VSM]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            VsmFixture vsm_fixture(testname, c_debug_flag,
+                                   VsmConfig().with_parser_debug_flag(c_debug_flag));
+            auto & vsm = vsm_fixture.vsm_;
+
+            bool eof_flag = true;
+
+            vsm.begin_interactive_session();
+
+            span_type input = span_type::from_cstr("#q{ (4.5 7.2) };");
+
+            log && log(xtag("input", input));
+
+            VsmResultExt res
+                = vsm.read_eval_print(input, eof_flag);
+
+            REQUIRE(res.is_value());
+            REQUIRE(res.value());
+
+            log && log(xtag("res.tseq", res.value()->_typeseq()),
+                       xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
+
+            auto x = obj<AGCObject,DList>::from(*res.value());
+            REQUIRE(x);
+            REQUIRE(x->size() == 2);
+            auto x0 = obj<AGCObject,DFloat>::from(x->at(0));
+            REQUIRE(x0);
+            REQUIRE(x0->value() == 4.5);
+            auto x1 = obj<AGCObject,DFloat>::from(x->at(1));
+            REQUIRE(x1);
+            REQUIRE(x1->value() == 7.2);
 
             REQUIRE(res.remaining_.size() == 1);
             REQUIRE(*res.remaining_.lo() == '\n');
