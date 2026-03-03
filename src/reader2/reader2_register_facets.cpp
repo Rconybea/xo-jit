@@ -23,6 +23,7 @@
 #include "ExpectExprSsm.hpp"
 #include "ExpectQLiteralSsm.hpp"
 #include "ExpectQListSsm.hpp"
+#include "ExpectQArraySsm.hpp"
 
 #include <xo/printable2/detail/APrintable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -87,6 +88,9 @@ namespace xo {
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectQListSsm>();
             FacetRegistry::register_impl<APrintable, DExpectQListSsm>();
 
+            FacetRegistry::register_impl<ASyntaxStateMachine, DExpectQArraySsm>();
+            FacetRegistry::register_impl<APrintable, DExpectQArraySsm>();
+
             // misc types showing up in aux arena
             TypeRegistry::register_type<SchematikaParser>();
             // misc types showing up in parser stack arena
@@ -103,6 +107,7 @@ namespace xo {
             log && log(xtag("DExpectExprSsm.tseq", typeseq::id<DExpectExprSsm>()));
             log && log(xtag("DExpectQLiteralSsm.tseq", typeseq::id<DExpectQLiteralSsm>()));
             log && log(xtag("DExpectQListSsm.tseq", typeseq::id<DExpectQListSsm>()));
+            log && log(xtag("DExpectQArraySsm.tseq", typeseq::id<DExpectQArraySsm>()));
 
             log && log(xtag("DProgressSsm.tseq", typeseq::id<DProgressSsm>()));
             log && log(xtag("DParenSsm.tseq", typeseq::id<DParenSsm>()));

@@ -24,17 +24,21 @@ namespace xo {
             using size_type = std::uint32_t;
 
         public:
-            explicit DExpectQLiteralSsm(bool cxl_on_rightparen);
+            explicit DExpectQLiteralSsm(bool cxl_on_rightparen,
+                                        bool cxl_on_rightbracket);
 
             /** create instance, using memory from @parser_mm **/
             static obj<ASyntaxStateMachine,DExpectQLiteralSsm> make(DArena & parser_mm,
-                                                                    bool cxl_on_rightparen);
+                                                                    bool cxl_on_rightparen,
+                                                                    bool cxl_on_rightbracket);
             static DExpectQLiteralSsm * _make(DArena & parser_mm,
-                                              bool cxl_on_rightparen);
+                                              bool cxl_on_rightparen,
+                                              bool cxl_on_rightbracket);
 
             /** start nested syntax for a quoted literal **/
             static void start(ParserStateMachine * p_psm,
-                              bool cxl_on_rightparen = false);
+                              bool cxl_on_rightparen = false,
+                              bool cxl_on_rightbracket = false);
 
             /** @defgroup scm-expectformalarglistssm-methods general methods **/
             ///@{
@@ -47,17 +51,37 @@ namespace xo {
             void on_f64_token(const Token & tk,
                               ParserStateMachine * p_psm);
 
-            /** update state on incoming token @p tk, with overall parser state in @p p_psm **/
+            /** update state on incoming token @p tk,
+             *  with overall parser state in @p p_psm.
+             *
+             *  Forward in-place to ExpectQListSsm.
+             **/
             void on_leftparen_token(const Token & tk,
                                     ParserStateMachine * p_psm);
 
-            /** update state on incoming token @p tk, with overall parser state in @p p_psm **/
-            void on_comma_token(const Token & tk,
-                                ParserStateMachine * p_psm);
-
-            /** update state on incoming rightparen token @p tk, with overall parser state in @p p_psm **/
+            /** update state on incoming rightparen token @p tk,
+             *  with overall parser state in @p p_psm
+             *
+             *  Error unless @ref cxl_on_rightparen_
+             **/
             void on_rightparen_token(const Token & tk,
                                      ParserStateMachine * p_psm);
+
+            /** update state on incoming leftbracket token @p tk,
+             *  with overall parser state in @p p_psm.
+             *
+             *  Forward in-place to ExpectQArraySsm
+             **/
+            void on_leftbracket_token(const Token &tk,
+                                      ParserStateMachine * p_psm);
+
+            /** update state on incoming rightbracket token @p tk,
+             *  with overall parser state in @p p_psm.
+             *
+             *  Error unless @ref cxl_on_rightbracket_
+             **/
+            void on_rightbracket_token(const Token & tk,
+                                       ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-expectformalarglistssm-ssm-facet syntaxstatemachine facet methods **/
@@ -101,6 +125,8 @@ namespace xo {
         private:
             /** if true rightparen pops + delegates to parent ssm **/
             bool cxl_on_rightparen_ = false;
+            /** if true rightbracket pops + delegates to parent ssm **/
+            bool cxl_on_rightbracket_ = false;
         };
     } /*namespace scm*/
 } /*namespace xo*/

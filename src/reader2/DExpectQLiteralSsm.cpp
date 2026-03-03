@@ -5,6 +5,7 @@
 
 #include "ExpectQLiteralSsm.hpp"
 #include "ExpectQListSsm.hpp"
+#include "ExpectQArraySsm.hpp"
 #include <xo/object2/Float.hpp>
 //#include "DExpectFormalArgSsm.hpp"
 //#include "ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp"
@@ -25,13 +26,16 @@ namespace xo {
 //    using xo::reflect::typeseq;
 
     namespace scm {
-        DExpectQLiteralSsm::DExpectQLiteralSsm(bool cxl_on_rightparen)
-            : cxl_on_rightparen_{cxl_on_rightparen}
+        DExpectQLiteralSsm::DExpectQLiteralSsm(bool cxl_on_rightparen,
+                                               bool cxl_on_rightbracket)
+            : cxl_on_rightparen_{cxl_on_rightparen},
+              cxl_on_rightbracket_{cxl_on_rightbracket}
         {}
 
         DExpectQLiteralSsm *
         DExpectQLiteralSsm::_make(DArena & arena,
-                                  bool cxl_on_rightparen)
+                                  bool cxl_on_rightparen,
+                                  bool cxl_on_rightbracket)
         {
             /* out-of-order so argl follows ssm in arena,
              * consistent with any subsequent arglist realloc.
@@ -40,26 +44,30 @@ namespace xo {
 
             void * mem = arena.alloc_for<DExpectQLiteralSsm>();
 
-            return new (mem) DExpectQLiteralSsm(cxl_on_rightparen);
+            return new (mem) DExpectQLiteralSsm(cxl_on_rightparen, cxl_on_rightbracket);
         }
 
         obj<ASyntaxStateMachine,DExpectQLiteralSsm>
         DExpectQLiteralSsm::make(DArena & arena,
-                                 bool cxl_on_rightparen)
+                                 bool cxl_on_rightparen,
+                                 bool cxl_on_rightbracket)
         {
             obj<ASyntaxStateMachine,DExpectQLiteralSsm> retval(_make(arena,
-                                                                     cxl_on_rightparen));
+                                                                     cxl_on_rightparen,
+                                                                     cxl_on_rightbracket));
             return retval;
         }
 
         void
         DExpectQLiteralSsm::start(ParserStateMachine * p_psm,
-                                  bool cxl_on_rightparen)
+                                  bool cxl_on_rightparen,
+                                  bool cxl_on_rightbracket)
         {
             DArena::Checkpoint ckp = p_psm->parser_alloc().checkpoint();
 
             p_psm->push_ssm(ckp, DExpectQLiteralSsm::make(p_psm->parser_alloc(),
-                                                          cxl_on_rightparen));
+                                                          cxl_on_rightparen,
+                                                          cxl_on_rightbracket));
         }
 
         syntaxstatetype
@@ -78,6 +86,7 @@ namespace xo {
                                      ParserStateMachine * p_psm)
         {
             switch (tk.tk_type()) {
+
             case tokentype::tk_f64:
                 this->on_f64_token(tk, p_psm);
                 return;
@@ -88,6 +97,14 @@ namespace xo {
 
             case tokentype::tk_rightparen:
                 this->on_rightparen_token(tk, p_psm);
+                return;
+
+            case tokentype::tk_leftbracket:
+                this->on_leftbracket_token(tk, p_psm);
+                return;
+
+            case tokentype::tk_rightbracket:
+                this->on_rightbracket_token(tk, p_psm);
                 return;
 
             case tokentype::tk_comma:
@@ -103,8 +120,6 @@ namespace xo {
             case tokentype::tk_semicolon:
             case tokentype::tk_invalid:
             case tokentype::tk_quote:
-            case tokentype::tk_leftbracket:
-            case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
             case tokentype::tk_rightbrace:
             case tokentype::tk_leftangle:
@@ -200,22 +215,6 @@ namespace xo {
             p_psm->on_token(tk);
         }
 
-#ifdef NOT_YET
-        void
-        DExpectQLiteralSsm::on_comma_token(const Token & tk,
-                                                ParserStateMachine * p_psm)
-        {
-            if (fastate_ == formalarglstatetype::argl_1b) {
-                this->fastate_ = formalarglstatetype::argl_1a;
-
-                DExpectFormalArgSsm::start(p_psm);
-                return;
-            }
-
-            Super::on_token(tk, p_psm);
-        }
-#endif
-
         void
         DExpectQLiteralSsm::on_rightparen_token(const Token & tk,
                                                 ParserStateMachine * p_psm)
@@ -226,7 +225,31 @@ namespace xo {
                 return;
             }
 
-            Super::on_token(tk, p_psm);
+            Super::illegal_token(tk, p_psm);
+        }
+
+        void
+        DExpectQLiteralSsm::on_leftbracket_token(const Token & tk,
+                                                 ParserStateMachine * p_psm)
+        {
+            // replace self with specialized version for parsing a literal array
+
+            p_psm->pop_ssm();
+            DExpectQArraySsm::start(p_psm);
+            p_psm->on_token(tk);
+        }
+
+        void
+        DExpectQLiteralSsm::on_rightbracket_token(const Token & tk,
+                                                  ParserStateMachine * p_psm)
+        {
+            if (cxl_on_rightbracket_) {
+                p_psm->pop_ssm();
+                p_psm->on_token(tk);
+                return;
+            }
+
+            Super::illegal_token(tk, p_psm);
         }
 
         bool

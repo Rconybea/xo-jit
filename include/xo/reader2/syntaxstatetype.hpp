@@ -63,10 +63,13 @@ namespace xo {
             /** expecting a quoted literal. See @ref DExpectQLiteralSsm **/
             expect_qliteral,
 
-            /** expecint a quoted list.  See @ref DExpectQListSsm **/
+            /** expecting a quoted list.  See @ref DExpectQListSsm **/
             expect_qlist,
 
-            /** comes lasts, counts number of valid enums **/
+            /** expecting a quoted array.  See @ref DExpectQArraySsm **/
+            expect_qarray,
+
+            /** comes last, counts number of valid enums **/
             N
         };
 

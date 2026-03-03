@@ -1,4 +1,4 @@
-/** @file DExpectQListSsm.hpp
+/** @file DExpectQArraySsm.hpp
  *
  *  @author Roland Conybeare, Mar 2026
  **/
@@ -15,28 +15,28 @@ namespace xo {
         /**
          *  Already in quoted-literal context
          *
-         *       ( quote-expr ... )
-         *      ^ ^                ^
-         *      | qlist_1a         qlist_2(done)
-         *      qlist_0
+         *       [ quote-expr ... ]
+         *      ^ ^              ^
+         *      | qarray_1a      qarray_2(done)
+         *      qarray_0
          *
-         *  qlist_0 --on_leftparen_token()--> qlist_1a [push ExpectQLiteralSsm]
-         *  qlist_1a --on_quoted_literal()--> qlist_1a [append literal]
-         *  qlist_1a --on_rightparen_token()--> qlist_2(done) [report quoted list]
+         *  qarray_0 --on_leftbrace_token()--> qarray_1a [push ExpectQLiteralSsm]
+         *  qarray_1a --on_quoted_literal()--> qarray_1a [append literal]
+         *  qarray_1a --on_rightbrace_token()--> qarray_2(done) [report quoted array]
          **/
-        class QListXst {
+        class QArrayXst {
         public:
             enum class code {
                 invalid = -1,
 
-                qlist_0,
-                qlist_1a,
-                qlist_2,
+                qarray_0,
+                qarray_1a,
+                qarray_2,
 
                 N
             };
 
-            explicit QListXst(code x) : code_{x} {}
+            explicit QArrayXst(code x) : code_{x} {}
 
             /** @return string representation for enum @p x **/
             static const char * _descr(code x);
@@ -47,17 +47,17 @@ namespace xo {
         };
 
         inline std::ostream &
-        operator<< (std::ostream & os, QListXst x) {
-            os << QListXst::_descr(x.code_);
+        operator<< (std::ostream & os, QArrayXst x) {
+            os << QArrayXst::_descr(x.code_);
             return os;
         }
 
-        /** @class DExpectQListSsm
-         *  @brief parser state-machine for a literal list
+        /** @class DExpectQArraySsm
+         *  @brief parser state-machine for a literal array
          **/
-        class DExpectQListSsm : public DSyntaxStateMachine<DExpectQListSsm> {
+        class DExpectQArraySsm : public DSyntaxStateMachine<DExpectQArraySsm> {
         public:
-            using Super = DSyntaxStateMachine<DExpectQListSsm>;
+            using Super = DSyntaxStateMachine<DExpectQArraySsm>;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
@@ -65,33 +65,33 @@ namespace xo {
             using size_type = std::uint32_t;
 
         public:
-            /** @defgroup scm-expectqlistssm-ctors constructors **/
+            /** @defgroup scm-expectqarrayssm-ctors constructors **/
             ///@{
 
-            DExpectQListSsm();
+            DExpectQArraySsm();
 
             /** create instance, using memory from @parser_mm **/
-            static obj<ASyntaxStateMachine,DExpectQListSsm> make(DArena & parser_mm);
-            static DExpectQListSsm * _make(DArena & parser_mm);
+            static obj<ASyntaxStateMachine,DExpectQArraySsm> make(DArena & parser_mm);
+            static DExpectQArraySsm * _make(DArena & parser_mm);
 
             /** start nested syntax for a quoted literal **/
             static void start(ParserStateMachine * p_psm);
 
             ///@}
-            /** @defgroup scm-expectformalarglistssm-methods general methods **/
+            /** @defgroup scm-expectformalargarrayssm-methods general methods **/
             ///@{
 
-            static const char * ssm_classname() { return "DExpectQListSsm"; }
+            static const char * ssm_classname() { return "DExpectQArraySsm"; }
 
             /** update state on incoming token @p tk, with overall parser state in @p p_psm **/
-            void on_leftparen_token(const Token & tk,
-                                    ParserStateMachine * p_psm);
+            void on_leftbracket_token(const Token & tk,
+                                      ParserStateMachine * p_psm);
 
-            void on_rightparen_token(const Token & tk,
-                                     ParserStateMachine * p_psm);
+            void on_rightbracket_token(const Token & tk,
+                                       ParserStateMachine * p_psm);
 
             ///@}
-            /** @defgroup scm-expectqlistssm-ssm-facet syntaxstatemachine facet methods **/
+            /** @defgroup scm-expectqarrayssm-ssm-facet syntaxstatemachine facet methods **/
             ///@{
 
             /** identifies the ssm implemented here **/
@@ -107,13 +107,13 @@ namespace xo {
                           ParserStateMachine * p_psm);
 
             /** update state for nested qliteral @p lit, with overall parser state in @p p_psm.
-             *  Appends @p lit to target list
+             *  Appends @p lit to target array
              **/
             void on_quoted_literal(obj<AGCObject> lit,
                                    ParserStateMachine * p_psm);
 
             ///@}
-            /** @defgroup scm-expectqlistssm-printable-facet printable facet methods **/
+            /** @defgroup scm-expectqarrayssm-printable-facet printable facet methods **/
             ///@{
 
             bool pretty(const ppindentinfo & ppii) const;
@@ -121,20 +121,18 @@ namespace xo {
             ///@}
 
         private:
-            /** @defgroup scm-expectqlistssm-member-vars **/
+            /** @defgroup scm-expectqarrayssm-member-vars **/
             ///@{
 
-            /** identifies qlist parsing state **/
-            QListXst state_;
+            /** identifies qarray parsing state **/
+            QArrayXst state_;
 
-            /** first node in literal list **/
-            DList * start_ = nullptr;
-            /** last node in literal list **/
-            DList * end_ = nullptr;
+            /** target array **/
+            DArray * array_ = nullptr;
 
             ///@}
         };
     } /*namespace scm*/
 } /*namespace xo*/
 
-/* end DExpectQListSsm.hpp */
+/* end DExpectQArraySsm.hpp */

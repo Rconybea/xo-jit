@@ -73,6 +73,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DExpectQListSsm.cpp
     IPrintable_DExpectQListSsm.cpp
 
+    DExpectQArraySsm.cpp
+    ISyntaxStateMachine_DExpectQArraySsm.cpp
+    IPrintable_DExpectQArraySsm.cpp
+
     DProgressSsm.cpp
     ISyntaxStateMachine_DProgressSsm.cpp
     IPrintable_DProgressSsm.cpp

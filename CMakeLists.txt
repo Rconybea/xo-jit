@@ -353,6 +353,26 @@ xo_add_genfacetimpl(
 
 # ----------------------------------------------------------------
 
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-syntaxstatemachine-expectqarrayssm
+    FACET_PKG xo_reader2
+    FACET SyntaxStateMachine
+    REPR ExpectQArraySsm
+    INPUT idl/ISyntaxStateMachine_DExpectQArraySsm.json5
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-printable-expectqarrayssm
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR ExpectQArraySsm
+    INPUT idl/IPrintable_DExpectQArraySsm.json5
+)
+
+# ----------------------------------------------------------------
+
 xo_add_genfacet_all(xo-reader2-genfacet-all)
 
 # ----------------------------------------------------------------
