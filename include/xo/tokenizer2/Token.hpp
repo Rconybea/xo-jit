@@ -98,9 +98,9 @@ namespace xo {
             /** Token representing right parenthesis @c ")" **/
             static Token rightparen_token() { return Token(tokentype::tk_rightparen); }
             /** token representing left bracket @c "[" **/
-            static Token leftbracket() { return Token(tokentype::tk_leftbracket); }
+            static Token leftbracket_token() { return Token(tokentype::tk_leftbracket); }
             /** token representing right bracket @c "]" **/
-            static Token rightbracket() { return Token(tokentype::tk_rightbracket); }
+            static Token rightbracket_token() { return Token(tokentype::tk_rightbracket); }
             /** token representing left brace @c "{" **/
             static Token leftbrace_token() { return Token(tokentype::tk_leftbrace); }
             /** token representing right brace @c "}" **/
