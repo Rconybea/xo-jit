@@ -18,6 +18,7 @@
 #include <xo/expression2/Constant.hpp>
 #include <xo/expression2/SequenceExpr.hpp>
 #include <xo/expression2/UniqueString.hpp>
+#include <xo/object2/Dictionary.hpp>
 #include <xo/object2/Boolean.hpp>
 #include <xo/procedure2/RuntimeContext.hpp>
 #include <xo/procedure2/Primitive_gco_0.hpp>
@@ -30,6 +31,7 @@
 #include <unistd.h> // for getcwd()
 
 namespace xo {
+    using xo::scm::DDictionary;
     using xo::print::APrintable;
     using xo::print::ppconfig;
     using xo::print::ppstate_standalone;
@@ -40,6 +42,7 @@ namespace xo {
     using xo::mm::DX1Collector;
     using xo::mm::DArena;
     using xo::facet::FacetRegistry;
+    using xo::facet::TypeRegistry;
     using std::cout;
 
     namespace scm {
@@ -878,6 +881,8 @@ namespace xo {
                            xtag("resv", info.reserved_));
             };
 
+            FacetRegistry::instance().visit_pools(visitor);
+            TypeRegistry::instance().visit_pools(visitor);
             rcx.visit_pools(visitor);
 
             return DBoolean::box<AGCObject>(rcx.allocator(), true);
@@ -900,11 +905,24 @@ namespace xo {
         static DPrimitive_gco_0 s_cwd_pm("_cwd",
                                          &xfer_cwd);
 
+        // ----- primitive: dict_make() -----
+
+        obj<AGCObject>
+        xfer_dict_make(obj<ARuntimeContext> rcx)
+        {
+            return obj<AGCObject,DDictionary>(DDictionary::empty(rcx.allocator(),
+                                                                 8 /*cap*/));
+        }
+
+        static DPrimitive_gco_0 s_dict_make_pm("_dict_make",
+                                               &xfer_dict_make);
+
         // ----- install primitives -----
 
         void
         VirtualSchematikaMachine::install_core_primitives()
         {
+            /* report_memory_use */
             {
                 const DUniqueString * name
                     = reader_.intern_string("report_memory_use");
@@ -916,6 +934,7 @@ namespace xo {
                      obj<AGCObject,DPrimitive_gco_0>(&s_report_memory_use_pm));
             }
 
+            /* cwd */
             {
                 const DUniqueString * name
                     = reader_.intern_string("cwd");
@@ -925,6 +944,18 @@ namespace xo {
                      name,
                      Reflect::require<DPrimitive_gco_0>(),
                      obj<AGCObject,DPrimitive_gco_0>(&s_cwd_pm));
+            }
+
+            /* dict_make */
+            {
+                const DUniqueString * name
+                    = reader_.intern_string("dict_make");
+
+                global_env_->_upsert_value
+                    (mm_.to_op(),
+                     name,
+                     Reflect::require<DPrimitive_gco_0>(),
+                     obj<AGCObject,DPrimitive_gco_0>(&s_dict_make_pm));
             }
         }
 
