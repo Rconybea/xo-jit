@@ -7,6 +7,7 @@
 #include <xo/interpreter2/VirtualSchematikaMachine.hpp>
 #include <xo/interpreter2/Closure.hpp>
 #include <xo/expression2/UniqueString.hpp>
+#include <xo/object2/Array.hpp>
 #include <xo/object2/List.hpp>
 #include <xo/object2/Float.hpp>
 #include <xo/object2/Integer.hpp>
@@ -26,6 +27,7 @@ namespace xo {
     using xo::scm::DString;
     using xo::scm::DUniqueString;  // aks Symbol in lisp
     using xo::scm::DList;
+    using xo::scm::DArray;
     using xo::scm::DFloat;
     using xo::scm::DBoolean;
     using xo::scm::DInteger;
@@ -628,7 +630,7 @@ namespace xo {
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            bool c_debug_flag = true;
+            bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             VsmFixture vsm_fixture(testname, c_debug_flag,
@@ -653,6 +655,50 @@ namespace xo {
                        xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
 
             auto x = obj<AGCObject,DList>::from(*res.value());
+            REQUIRE(x);
+            REQUIRE(x->size() == 2);
+            auto x0 = obj<AGCObject,DFloat>::from(x->at(0));
+            REQUIRE(x0);
+            REQUIRE(x0->value() == 4.5);
+            auto x1 = obj<AGCObject,DFloat>::from(x->at(1));
+            REQUIRE(x1);
+            REQUIRE(x1->value() == 7.2);
+
+            REQUIRE(res.remaining_.size() == 1);
+            REQUIRE(*res.remaining_.lo() == '\n');
+
+            //log && vsm_fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("VirtualSchematikaMachine-qarray", "[interpreter2][VSM]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            VsmFixture vsm_fixture(testname, c_debug_flag,
+                                   VsmConfig().with_parser_debug_flag(c_debug_flag));
+            auto & vsm = vsm_fixture.vsm_;
+
+            bool eof_flag = true;
+
+            vsm.begin_interactive_session();
+
+            span_type input = span_type::from_cstr("#q{ [4.5 7.2] };");
+
+            log && log(xtag("input", input));
+
+            VsmResultExt res
+                = vsm.read_eval_print(input, eof_flag);
+
+            REQUIRE(res.is_value());
+            REQUIRE(res.value());
+
+            log && log(xtag("res.tseq", res.value()->_typeseq()),
+                       xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
+
+            auto x = obj<AGCObject,DArray>::from(*res.value());
             REQUIRE(x);
             REQUIRE(x->size() == 2);
             auto x0 = obj<AGCObject,DFloat>::from(x->at(0));
