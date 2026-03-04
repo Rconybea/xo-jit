@@ -1,5 +1,5 @@
 /** @file DUniqueString.hpp
-*
+ *
  *  @author Roland Conybeare, Jan 2026
  **/
 
@@ -69,12 +69,7 @@ namespace xo {
             /** compare unique strings: return n with {n<0, n=0, n>0}
              *  when @p lhs lexicographically {before, at, after} @p rhs
              **/
-            static int compare(const DUniqueString & lhs, const DUniqueString & rhs) {
-                if (&lhs == &rhs)
-                    return 0;
-
-                return DString::compare(*(lhs._text()), *(rhs._text()));
-            }
+            static int compare(const DUniqueString & lhs, const DUniqueString & rhs);
 
             std::size_t hash() const noexcept { return _text()->hash(); }
             operator std::string_view() const noexcept { return std::string_view(*_text()); }
@@ -124,14 +119,6 @@ namespace xo {
             ///@}
 
             friend class StringTable;
-
-        private:
-#ifdef NOPE
-            /** interned string.  Note stringtable memory distinct from gc memory,
-             *  so gc will not (and should not) traverse this pointer.
-             **/
-            const DString * text_ = nullptr;
-#endif
         };
 
         /* since unique: just compare addresses */

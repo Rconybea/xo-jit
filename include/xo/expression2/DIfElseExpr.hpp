@@ -8,7 +8,7 @@
 #include "Expression.hpp"
 #include "TypeRef.hpp"
 #include "exprtype.hpp"
-#include <xo/gc/Collector.hpp>
+#include <xo/alloc2/Collector.hpp>
 #include <xo/alloc2/Allocator.hpp>
 //#include <vector>
 #include <string>

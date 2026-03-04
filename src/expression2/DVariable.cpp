@@ -5,8 +5,8 @@
 
 #include "DVariable.hpp"
 #include "exprtype.hpp"
-#include <cstddef>
 #include <xo/indentlog/print/quoted.hpp>
+#include <cstddef>
 
 namespace xo {
     using xo::mm::ACollector;

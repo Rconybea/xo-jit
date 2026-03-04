@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <xo/gc/Collector.hpp>
+#include <xo/alloc2/Collector.hpp>
 
 namespace xo {
     namespace scm {

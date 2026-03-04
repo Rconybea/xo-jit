@@ -5,7 +5,7 @@
 
 #include "DDefineExpr.hpp"
 #include "Variable.hpp"
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/gc/PolyForwarderUtil.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>

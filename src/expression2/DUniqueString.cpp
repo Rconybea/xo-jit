@@ -4,6 +4,7 @@
  **/
 
 #include "DUniqueString.hpp"
+#include "DString.hpp"
 #include <xo/arena/padding.hpp>
 #include <xo/indentlog/scope.hpp>
 #include <cstring>
@@ -13,6 +14,15 @@ namespace xo {
     using xo::facet::typeseq;
 
     namespace scm {
+        int
+        DUniqueString::compare(const DUniqueString & lhs, const DUniqueString & rhs)
+        {
+            if (&lhs == &rhs)
+                return 0;
+
+            return DString::compare(*(lhs._text()), *(rhs._text()));
+        }
+
         DString *
         DUniqueString::_text() const noexcept
         {

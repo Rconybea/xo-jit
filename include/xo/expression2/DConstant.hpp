@@ -8,8 +8,8 @@
 #include "Expression.hpp"
 #include "TypeRef.hpp"
 #include "exprtype.hpp"
-#include <xo/gc/Collector.hpp>
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/Collector.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/reflect/TaggedPtr.hpp>
 
 namespace xo {

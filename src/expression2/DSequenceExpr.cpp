@@ -7,7 +7,7 @@
 #include "detail/IExpression_DSequenceExpr.hpp"
 #include <xo/object2/array/IGCObject_DArray.hpp>
 #include <xo/object2/array/IPrintable_DArray.hpp>
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>

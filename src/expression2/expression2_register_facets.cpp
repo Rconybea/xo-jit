@@ -25,7 +25,7 @@
 #include <xo/expression2/GlobalSymtab.hpp>
 #include <xo/expression2/LocalSymtab.hpp>
 
-#include <xo/gc/detail/AGCObject.hpp>
+#include <xo/alloc2/gc/AGCObject.hpp>
 #include <xo/printable2/detail/APrintable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>

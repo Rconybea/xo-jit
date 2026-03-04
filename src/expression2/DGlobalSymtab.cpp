@@ -8,7 +8,7 @@
 #include <xo/expression2/Expression.hpp>
 #include <xo/expression2/Variable.hpp>
 #include <xo/object2/Array.hpp>
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>
 
