@@ -14,10 +14,10 @@
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/number/IGCObject_DFloat.hpp>
 
-#include <xo/gc/CollectorTypeRegistry.hpp>
-#include <xo/gc/DX1Collector.hpp>
-#include <xo/gc/detail/IAllocator_DX1Collector.hpp>
-#include <xo/gc/detail/ICollector_DX1Collector.hpp>
+#include <xo/alloc2/CollectorTypeRegistry.hpp>
+#include <xo/gc/X1Collector.hpp>
+//#include <xo/gc/detail/IAllocator_DX1Collector.hpp>
+//#include <xo/gc/detail/ICollector_DX1Collector.hpp>
 
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>

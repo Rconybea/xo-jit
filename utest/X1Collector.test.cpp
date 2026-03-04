@@ -12,14 +12,10 @@
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/DInteger.hpp>
 #include <xo/object2/DList.hpp>
-#include <xo/object2/DString.hpp>
+#include <xo/stringtable2/DString.hpp>
 
-#include <xo/gc/CollectorTypeRegistry.hpp>
-#include <xo/gc/DX1Collector.hpp>
-
-#include <xo/gc/detail/IAllocator_DX1Collector.hpp>
-#include <xo/gc/detail/ICollector_DX1Collector.hpp>
-
+#include <xo/gc/X1Collector.hpp>
+#include <xo/alloc2/CollectorTypeRegistry.hpp>
 #include <xo/subsys/Subsystem.hpp>
 
 #include <catch2/catch.hpp>

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <xo/object2/DString.hpp>
+#include <xo/stringtable2/DString.hpp>
 
 namespace xo {
     namespace scm {
