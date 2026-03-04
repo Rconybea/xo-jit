@@ -7,7 +7,7 @@
 
 #include "NumericOps.hpp"
 #include <xo/procedure2/RuntimeContext.hpp>
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/arena/DArenaHashMap.hpp>
 #include <xo/reflectutil/typeseq.hpp>
 

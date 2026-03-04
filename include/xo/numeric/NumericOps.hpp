@@ -7,7 +7,7 @@
 
 #include <xo/numeric/Numeric.hpp>
 #include <xo/procedure2/RuntimeContext.hpp>
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/obj.hpp>
 
 namespace xo {
