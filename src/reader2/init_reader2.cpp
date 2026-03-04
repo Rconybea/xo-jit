@@ -9,7 +9,7 @@
 
 #include <xo/expression2/init_expression2.hpp>
 #include <xo/numeric/init_numeric.hpp>
-#include <xo/gc/CollectorTypeRegistry.hpp>
+#include <xo/alloc2/CollectorTypeRegistry.hpp>
 
 namespace xo {
     using xo::scm::reader2_register_facets;

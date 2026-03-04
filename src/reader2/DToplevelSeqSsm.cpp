@@ -17,17 +17,17 @@
 #include <xo/expression2/Constant.hpp>
 //#include <xo/expression2/detail/IExpression_DConstant.hpp>
 
-#include <xo/object2/DString.hpp>
-#include <xo/object2/string/IGCObject_DString.hpp>
+#include <xo/stringtable2/String.hpp>
+//#include <xo/object2/string/IGCObject_DString.hpp>
 
-#include <xo/object2/DFloat.hpp>
-#include <xo/object2/number/IGCObject_DFloat.hpp>
+#include <xo/object2/Float.hpp>
+//#include <xo/object2/number/IGCObject_DFloat.hpp>
 
-#include <xo/object2/DInteger.hpp>
-#include <xo/object2/number/IGCObject_DInteger.hpp>
+#include <xo/object2/Integer.hpp>
+//#include <xo/object2/number/IGCObject_DInteger.hpp>
 
-#include <xo/object2/DBoolean.hpp>
-#include <xo/object2/boolean/IGCObject_DBoolean.hpp>
+#include <xo/object2/Boolean.hpp>
+//#include <xo/object2/boolean/IGCObject_DBoolean.hpp>
 
 #include <xo/alloc2/GCObject.hpp>
 

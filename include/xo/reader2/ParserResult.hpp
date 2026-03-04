@@ -6,7 +6,7 @@
 #pragma once
 
 #include <xo/expression2/Expression.hpp>
-#include <xo/object2/DString.hpp>
+#include <xo/stringtable2/DString.hpp>
 #include <xo/indentlog/print/pretty.hpp>
 #include <string_view>
 

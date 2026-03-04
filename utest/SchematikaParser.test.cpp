@@ -17,7 +17,7 @@
 #include <xo/procedure2/Primitive_gco_2_gco_gco.hpp>
 #include <xo/object2/Float.hpp>
 #include <xo/object2/Integer.hpp>
-#include <xo/object2/String.hpp>
+#include <xo/stringtable2/String.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
 #include <xo/facet/TypeRegistry.hpp>
 #include <catch2/catch.hpp>
@@ -25,10 +25,10 @@
 namespace xo {
     using xo::scm::ParserConfig;
     using xo::scm::SchematikaParser;
-    using xo::scm::ASyntaxStateMachine;
-    using xo::scm::syntaxstatetype;
+//    using xo::scm::ASyntaxStateMachine;
+//    using xo::scm::syntaxstatetype;
 //    using xo::scm::DDefineSsm;
-    using xo::scm::DExpectExprSsm;
+//    using xo::scm::DExpectExprSsm;
 
     using xo::scm::AExpression;
     using xo::scm::DDefineExpr;
@@ -51,7 +51,7 @@ namespace xo {
     using xo::mm::AAllocator;
     using xo::mm::DArena;
     using xo::mm::MemorySizeInfo;
-    using xo::facet::with_facet;
+//    using xo::facet::with_facet;
 
     static InitEvidence s_init = (InitSubsys<S_reader2_tag>::require());
 

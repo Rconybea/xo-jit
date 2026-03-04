@@ -18,15 +18,13 @@
 #include <xo/object2/Boolean.hpp>
 #include <xo/object2/Integer.hpp>
 #include <xo/object2/Float.hpp>
-#include <xo/object2/String.hpp>
+#include <xo/stringtable2/String.hpp>
 #include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/facet_implementation.hpp>
 
 #ifdef NOT_YET
 #include "define_xs.hpp"
 #include "paren_xs.hpp"
-#include "sequence_xs.hpp"
-#include "progress_xs.hpp"
 #endif
 
 namespace xo {
