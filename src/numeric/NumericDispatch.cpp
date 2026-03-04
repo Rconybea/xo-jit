@@ -38,8 +38,12 @@ namespace xo {
                 std::stringstream ss;
                 tosn(ss,
                      error_headline,
+                     xtag("x.tseq", x._typeseq()),
                      xtag("x.type", TypeRegistry::id2name(x._typeseq())),
-                     xtag("y.type", TypeRegistry::id2name(y._typeseq())));
+                     xtag("x.data", x.data()),
+                     xtag("y.tseq", y._typeseq()),
+                     xtag("y.type", TypeRegistry::id2name(y._typeseq())),
+                     xtag("y.data", y.data()));
 
                 return DRuntimeError::make(rcx.allocator(),
                                            caller,
@@ -59,18 +63,6 @@ namespace xo {
                             "incomparable types in x*y",
                             &AnonymizedNumericOps::multiply_,
                             x, y);
-
-#ifdef OBSOLETE
-            KeyType key(x._typeseq(), y._typeseq());
-
-            auto target_fn
-                = NumericDispatch::instance().dispatch_[key].multiply_;
-
-            if (!target_fn)
-                assert(false);
-
-            return (*target_fn)(rcx, x.data(), y.data());
-#endif
         }
 
         obj<AGCObject>
