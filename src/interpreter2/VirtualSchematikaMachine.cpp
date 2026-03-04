@@ -12,6 +12,7 @@
 #include "VsmSeqContFrame.hpp"
 #include "VsmRcx.hpp"
 #include "Closure.hpp"
+#include <xo/numeric/NumericDispatch.hpp>
 #include <xo/expression2/DefineExpr.hpp>
 #include <xo/expression2/ApplyExpr.hpp>
 #include <xo/expression2/LambdaExpr.hpp>
@@ -19,6 +20,7 @@
 #include <xo/expression2/SequenceExpr.hpp>
 #include <xo/expression2/UniqueString.hpp>
 #include <xo/object2/Dictionary.hpp>
+#include <xo/object2/Integer.hpp>
 #include <xo/object2/Boolean.hpp>
 #include <xo/procedure2/RuntimeContext.hpp>
 #include <xo/procedure2/Primitive_gco_0.hpp>
@@ -884,6 +886,7 @@ namespace xo {
 
             FacetRegistry::instance().visit_pools(visitor);
             TypeRegistry::instance().visit_pools(visitor);
+            NumericDispatch::instance().visit_pools(visitor);
             rcx.visit_pools(visitor);
 
             return DBoolean::box<AGCObject>(rcx.allocator(), true);
