@@ -4,6 +4,7 @@
  **/
 
 #include "VirtualSchematikaMachine.hpp"
+#include "DPrimitive_gco_3_dict_string_gco.hpp"
 #include "VsmDefContFrame.hpp"
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
@@ -25,6 +26,7 @@
 #include <xo/procedure2/RuntimeContext.hpp>
 #include <xo/procedure2/Primitive_gco_0.hpp>
 #include <xo/procedure2/Primitive_gco_1_gco.hpp>
+#include <xo/procedure2/Primitive_gco_3_dict_string_gco.hpp>
 #include <xo/gc/X1Collector.hpp>
 #include <xo/reflect/Reflect.hpp>
 #include <xo/alloc2/Arena.hpp>
@@ -942,6 +944,36 @@ namespace xo {
         static DPrimitive_gco_0 s_dict_make_pm("_dict_make",
                                                &xfer_dict_make);
 
+        // ----- primitive: dict_upsert() -----
+
+        obj<AGCObject>
+        xfer_dict_upsert(obj<ARuntimeContext> rcx,
+                         obj<AGCObject,DDictionary> dict,
+                         obj<AGCObject,DString> key,
+                         obj<AGCObject> value)
+        {
+            scope log(XO_DEBUG(true));
+
+            log && log(xtag("dict.tseq", dict._typeseq()),
+                       xtag("dict.tname", TypeRegistry::id2name(dict._typeseq())));
+            log && log(xtag("key.tseq", key._typeseq()),
+                       xtag("key.tname", TypeRegistry::id2name(key._typeseq())));
+            log && log(xtag("value.tseq", value._typeseq()),
+                       xtag("value.tname", TypeRegistry::id2name(value._typeseq())));
+
+            auto value_pr = FacetRegistry::instance().variant<APrintable>(value);
+
+            log && log(xtag("value", value_pr));
+
+            dict->upsert(rcx.allocator(),
+                         DDictionary::pair_type(key.data(), value));
+
+            return dict;
+        }
+
+        static DPrimitive_gco_3_dict_string_gco s_dict_upsert_pm("_dict_upsert",
+                                                                 &xfer_dict_upsert);
+
         // ----- install primitives -----
 
         void
@@ -993,6 +1025,18 @@ namespace xo {
                      name,
                      Reflect::require<DPrimitive_gco_0>(),
                      obj<AGCObject,DPrimitive_gco_0>(&s_dict_make_pm));
+            }
+
+            /* dict_upsert */
+            {
+                const DUniqueString * name
+                    = reader_.intern_string("dict_upsert");
+
+                global_env_->_upsert_value
+                    (mm_.to_op(),
+                     name,
+                     Reflect::require<DPrimitive_gco_3_dict_string_gco>(),
+                     obj<AGCObject,DPrimitive_gco_3_dict_string_gco>(&s_dict_upsert_pm));
             }
         }
 
