@@ -27,7 +27,7 @@ usage() {
     echo "          xo-mylib/cmake/xo-bootstrap-macros.cmake"
     echo "          xo-mylib/cmake/xo_mylibConfig.cmake.in"
     echo "          xo-mylib/include/xo/mylib/"
-    echo "          xo-mylib/src/CMakeLists.txt"
+    echo "          xo-mylib/src/mylib/CMakeLists.txt"
     exit 1
 }
 
@@ -92,7 +92,7 @@ mkdir -p "${TARGET_DIR}/cmake"
 mkdir -p "${TARGET_DIR}/include/xo/${NAME}"
 
 if [[ "$MODE" == "shared" ]]; then
-    mkdir -p "${TARGET_DIR}/src"
+    mkdir -p "${TARGET_DIR}/src/${NAME}"
 fi
 
 # Create CMakeLists.txt (different content based on mode)
@@ -196,10 +196,10 @@ include("\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 check_required_components("@PROJECT_NAME@")
 EOF
 
-# Create src/CMakeLists.txt for shared library mode
+# Create src/${NAME}/CMakeLists.txt for shared library mode
 if [[ "$MODE" == "shared" ]]; then
-    cat > "${TARGET_DIR}/src/CMakeLists.txt" << EOF
-# ${DIR_NAME}/src/CMakeLists.txt
+    cat > "${TARGET_DIR}/src/${NAME}/CMakeLists.txt" << EOF
+# ${DIR_NAME}/src/${NAME}/CMakeLists.txt
 
 set(SELF_LIB ${LIB_NAME})
 set(SELF_SRCS
@@ -232,7 +232,7 @@ echo "  ${DIR_NAME}/cmake/xo-bootstrap-macros.cmake"
 echo "  ${DIR_NAME}/cmake/${LIB_NAME}Config.cmake.in"
 echo "  ${DIR_NAME}/include/xo/${NAME}/"
 if [[ "$MODE" == "shared" ]]; then
-    echo "  ${DIR_NAME}/src/CMakeLists.txt"
+    echo "  ${DIR_NAME}/src/${NAME}/CMakeLists.txt"
 fi
 echo ""
 echo "Next steps:"
@@ -242,7 +242,7 @@ if [[ "$MODE" == "headeronly" ]]; then
     echo "  3. Uncomment dependencies as needed in CMakeLists.txt and Config.cmake.in"
 else
     echo "  1. Add header files to ${DIR_NAME}/include/xo/${NAME}/"
-    echo "  2. Add source files to ${DIR_NAME}/src/ and update src/CMakeLists.txt SELF_SRCS"
+    echo "  2. Add source files to ${DIR_NAME}/src/${NAME}/ and update src/${NAME}/CMakeLists.txt SELF_SRCS"
     echo "  3. Add ${DIR_NAME} to umbrella CMakeLists.txt"
-    echo "  4. Uncomment dependencies as needed in src/CMakeLists.txt and Config.cmake.in"
+    echo "  4. Uncomment dependencies as needed in src/${NAME}/CMakeLists.txt and Config.cmake.in"
 fi
