@@ -7,7 +7,7 @@
 
 #include "VsmInstr.hpp"
 #include <xo/expression2/SequenceExpr.hpp>
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 
 namespace xo {
     namespace scm {
@@ -50,7 +50,7 @@ namespace xo {
             ///@{
 
             uint32_t incr_i_seq() noexcept { return ++(this->i_seq_); }
-            
+
             ///@}
             /** @defgroup scm-vsmevalsequenceframe-gcobject-facet gcobject facet **/
             ///@{
@@ -66,7 +66,7 @@ namespace xo {
             bool pretty(const ppindentinfo & ppii) const noexcept;
 
             ///@}
-            
+
         private:
             /** @defgroup scm-vsmevalsequenceframe-members member variables **/
             ///@{

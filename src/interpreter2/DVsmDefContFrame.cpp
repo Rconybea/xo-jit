@@ -5,7 +5,7 @@
 
 #include "DVsmDefContFrame.hpp"
 #include <xo/expression2/DefineExpr.hpp>
-#include <xo/gc/Collector.hpp>
+#include <xo/alloc2/Collector.hpp>
 
 namespace xo {
     namespace scm {

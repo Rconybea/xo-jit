@@ -7,7 +7,7 @@
 
 #include "VsmInstr.hpp"
 #include <xo/expression2/IfElseExpr.hpp>
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 
 namespace xo {
     namespace scm {
@@ -61,7 +61,7 @@ namespace xo {
             bool pretty(const ppindentinfo & ppii) const noexcept;
 
             ///@}
-            
+
         private:
             /** @defgroup scm-vsmevalsequenceframe-members member variables **/
             ///@{

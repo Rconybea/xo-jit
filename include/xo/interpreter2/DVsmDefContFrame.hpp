@@ -7,7 +7,7 @@
 
 #include "VsmInstr.hpp"
 #include <xo/expression2/DefineExpr.hpp>
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 
 namespace xo {
     namespace scm {

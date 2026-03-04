@@ -13,7 +13,7 @@
 #include <xo/object2/RuntimeError.hpp>
 #include <xo/reader2/SchematikaReader.hpp>
 #include <xo/expression2/Expression.hpp>
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/alloc2/abox.hpp>
 #include <variant>
 
