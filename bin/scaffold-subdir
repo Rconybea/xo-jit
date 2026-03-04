@@ -101,8 +101,31 @@ XO_UMBRELLA_ROOT=$(git rev-parse --show-toplevel)
 
 TARGET_DIR="${XO_UMBRELLA_ROOT}/${DIR_NAME}"
 
-if [[ -d "$TARGET_DIR" ]]; then
-    echo "Error: ${TARGET_DIR} already exists"
+# Collect files that would be created
+WOULD_CREATE=(
+    "${TARGET_DIR}/CMakeLists.txt"
+    "${TARGET_DIR}/cmake/xo-bootstrap-macros.cmake"
+    "${TARGET_DIR}/cmake/${LIB_NAME}Config.cmake.in"
+)
+if [[ "$MODE" == "shared" ]]; then
+    WOULD_CREATE+=("${TARGET_DIR}/src/${NAME}/CMakeLists.txt")
+fi
+if [[ -n "$FACET" ]]; then
+    WOULD_CREATE+=("${TARGET_DIR}/idl/${FACET}.json5")
+fi
+
+# Error if any would-be-created file already exists
+CONFLICTS=()
+for f in "${WOULD_CREATE[@]}"; do
+    if [[ -e "$f" ]]; then
+        CONFLICTS+=("$f")
+    fi
+done
+if [[ ${#CONFLICTS[@]} -gt 0 ]]; then
+    echo "Error: the following files already exist:"
+    for f in "${CONFLICTS[@]}"; do
+        echo "  $f"
+    done
     exit 1
 fi
 
