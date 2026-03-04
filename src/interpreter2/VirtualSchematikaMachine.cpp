@@ -906,6 +906,27 @@ namespace xo {
         static DPrimitive_gco_0 s_cwd_pm("_cwd",
                                          &xfer_cwd);
 
+        // ----- primitive: fn_n_args() -----
+
+        obj<AGCObject>
+        xfer_fn_n_args(obj<ARuntimeContext> rcx,
+                       obj<AGCObject> fn_gco)
+        {
+            scope log(XO_DEBUG(true));
+
+            log && log(xtag("fn_gco.tseq", fn_gco._typeseq()));
+            log && log(xtag("fn_gco.tname", TypeRegistry::id2name(fn_gco._typeseq())));
+
+            auto fn_proc = FacetRegistry::instance().try_variant<AProcedure,AGCObject>(fn_gco);
+
+            assert(fn_proc);
+
+            return DInteger::box<AGCObject>(rcx.allocator(), fn_proc.n_args());
+        }
+
+        static DPrimitive_gco_1_gco s_fn_n_args_pm("_fn_n_args",
+                                                   &xfer_fn_n_args);
+
         // ----- primitive: dict_make() -----
 
         obj<AGCObject>
@@ -945,6 +966,18 @@ namespace xo {
                      name,
                      Reflect::require<DPrimitive_gco_0>(),
                      obj<AGCObject,DPrimitive_gco_0>(&s_cwd_pm));
+            }
+
+            /* fn_n_args */
+            {
+                const DUniqueString * name
+                    = reader_.intern_string("fn_n_args");
+
+                global_env_->_upsert_value
+                    (mm_.to_op(),
+                     name,
+                     Reflect::require<DPrimitive_gco_1_gco>(),
+                     obj<AGCObject,DPrimitive_gco_1_gco>(&s_fn_n_args_pm));
             }
 
             /* dict_make */
