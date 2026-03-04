@@ -9,12 +9,13 @@
 set -euo pipefail
 
 usage() {
-    echo "Usage: $0 [--mode=headeronly|shared] <name>"
+    echo "Usage: $0 [--mode=headeronly|shared] [--with-facet=FACET] <name>"
     echo "  Creates xo-<name>/ with library scaffolding"
     echo ""
     echo "Options:"
-    echo "  --mode=headeronly  Create header-only library (default)"
-    echo "  --mode=shared      Create shared library with src/ directory"
+    echo "  --mode=headeronly      Create header-only library (default)"
+    echo "  --mode=shared          Create shared library with src/ directory"
+    echo "  --with-facet=FACET     Add facet IDL scaffolding (requires --mode=shared)"
     echo ""
     echo "Example: $0 arena"
     echo "  Creates xo-arena/CMakeLists.txt"
@@ -28,11 +29,21 @@ usage() {
     echo "          xo-mylib/cmake/xo_mylibConfig.cmake.in"
     echo "          xo-mylib/include/xo/mylib/"
     echo "          xo-mylib/src/mylib/CMakeLists.txt"
+    echo ""
+    echo "Example: $0 --mode=shared --with-facet=Equable equable2"
+    echo "  Creates xo-equable2/CMakeLists.txt          (with xo_add_genfacet)"
+    echo "          xo-equable2/cmake/xo-bootstrap-macros.cmake"
+    echo "          xo-equable2/cmake/xo_equable2Config.cmake.in"
+    echo "          xo-equable2/idl/Equable.json5"
+    echo "          xo-equable2/include/xo/equable2/"
+    echo "          xo-equable2/include/xo/equable2/detail/"
+    echo "          xo-equable2/src/equable2/CMakeLists.txt"
     exit 1
 }
 
 # Default mode
 MODE="headeronly"
+FACET=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -43,6 +54,10 @@ while [[ $# -gt 0 ]]; do
                 echo "Error: --mode must be 'headeronly' or 'shared'"
                 exit 1
             fi
+            shift
+            ;;
+        --with-facet=*)
+            FACET="${1#--with-facet=}"
             shift
             ;;
         --help|-h)
@@ -62,6 +77,11 @@ if [[ $# -ne 1 ]]; then
     usage
 fi
 
+if [[ -n "$FACET" && "$MODE" == "headeronly" ]]; then
+    echo "Error: --with-facet requires --mode=shared"
+    exit 1
+fi
+
 NAME="$1"
 
 # Validate name: alphanumeric and underscores only
@@ -74,6 +94,7 @@ fi
 DIR_NAME="xo-${NAME}"
 LIB_NAME="xo_${NAME}"
 PROJECT_NAME="xo_${NAME}"
+FACET_LC="$(echo "$FACET" | tr '[:upper:]' '[:lower:]')"
 
 # Get script directory to find umbrella root
 XO_UMBRELLA_ROOT=$(git rev-parse --show-toplevel)
@@ -93,6 +114,11 @@ mkdir -p "${TARGET_DIR}/include/xo/${NAME}"
 
 if [[ "$MODE" == "shared" ]]; then
     mkdir -p "${TARGET_DIR}/src/${NAME}"
+fi
+
+if [[ -n "$FACET" ]]; then
+    mkdir -p "${TARGET_DIR}/idl"
+    mkdir -p "${TARGET_DIR}/include/xo/${NAME}/detail"
 fi
 
 # Create CMakeLists.txt (different content based on mode)
@@ -142,7 +168,8 @@ xo_export_cmake_config(\${PROJECT_NAME} \${PROJECT_VERSION} \${PROJECT_NAME}Targ
 EOF
 else
     # Shared library mode
-    cat > "${TARGET_DIR}/CMakeLists.txt" << EOF
+    if [[ -z "$FACET" ]]; then
+        cat > "${TARGET_DIR}/CMakeLists.txt" << EOF
 # ${DIR_NAME}/CMakeLists.txt
 
 cmake_minimum_required(VERSION 3.10)
@@ -165,7 +192,7 @@ add_definitions(\${PROJECT_CXX_FLAGS})
 # ----------------------------------------------------------------
 # output targets
 
-add_subdirectory(src)
+add_subdirectory(src/${NAME})
 #add_subdirectory(utest)
 
 # ----------------------------------------------------------------
@@ -175,13 +202,81 @@ xo_export_cmake_config(\${PROJECT_NAME} \${PROJECT_VERSION} \${PROJECT_NAME}Targ
 
 # end CMakeLists.txt
 EOF
+    else
+        cat > "${TARGET_DIR}/CMakeLists.txt" << EOF
+# ${DIR_NAME}/CMakeLists.txt
+
+cmake_minimum_required(VERSION 3.10)
+
+project(${PROJECT_NAME} VERSION 1.0)
+enable_language(CXX)
+
+include(GNUInstallDirs)
+include(cmake/xo-bootstrap-macros.cmake)
+
+xo_cxx_toplevel_options3()
+
+# ----------------------------------------------------------------
+# c++ settings
+
+# one-time project-specific c++ flags. usually empty
+set(PROJECT_CXX_FLAGS "")
+add_definitions(\${PROJECT_CXX_FLAGS})
+
+# ----------------------------------------------------------------
+# facet code generation
+
+xo_add_genfacet(
+    TARGET ${DIR_NAME}-facet-${FACET_LC}
+    FACET ${FACET}
+    INPUT idl/${FACET}.json5
+    OUTPUT_HPP_DIR include/xo/${NAME}
+    OUTPUT_IMPL_SUBDIR detail
+)
+
+install(DIRECTORY idl/
+    DESTINATION share/\${PROJECT_NAME}/idl
+    FILES_MATCHING PATTERN "*.json5")
+
+# ----------------------------------------------------------------
+# output targets
+
+add_subdirectory(src/${NAME})
+#add_subdirectory(utest)
+
+# ----------------------------------------------------------------
+# cmake export
+
+xo_export_cmake_config(\${PROJECT_NAME} \${PROJECT_VERSION} \${PROJECT_NAME}Targets)
+
+# end CMakeLists.txt
+EOF
+    fi
 fi
 
 # Copy cmake/xo-bootstrap-macros.cmake from xo-cmake/share
 cp "${XO_UMBRELLA_ROOT}/xo-cmake/share/xo-macros/xo-bootstrap-macros.cmake" "${TARGET_DIR}/cmake/"
 
 # Create cmake/xo_${NAME}Config.cmake.in
-cat > "${TARGET_DIR}/cmake/${LIB_NAME}Config.cmake.in" << EOF
+if [[ -n "$FACET" ]]; then
+    cat > "${TARGET_DIR}/cmake/${LIB_NAME}Config.cmake.in" << EOF
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(xo_facet)
+
+# note: changes to find_dependency() calls here
+#       must coordinate with xo_dependency() calls
+#       in src/${NAME}/CMakeLists.txt
+#
+#find_dependency(xo_indentlog)
+
+include("\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+include("\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Share.cmake")
+check_required_components("@PROJECT_NAME@")
+EOF
+else
+    cat > "${TARGET_DIR}/cmake/${LIB_NAME}Config.cmake.in" << EOF
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
@@ -196,10 +291,34 @@ include("\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 include("\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Share.cmake")
 check_required_components("@PROJECT_NAME@")
 EOF
+fi
 
 # Create src/${NAME}/CMakeLists.txt for shared library mode
 if [[ "$MODE" == "shared" ]]; then
-    cat > "${TARGET_DIR}/src/${NAME}/CMakeLists.txt" << EOF
+    if [[ -n "$FACET" ]]; then
+        cat > "${TARGET_DIR}/src/${NAME}/CMakeLists.txt" << EOF
+# ${DIR_NAME}/src/${NAME}/CMakeLists.txt
+
+set(SELF_LIB ${LIB_NAME})
+set(SELF_SRCS
+    I${FACET}_Any.cpp
+)
+
+xo_add_shared_library4(\${SELF_LIB} \${PROJECT_NAME}Targets \${PROJECT_VERSION} 1 \${SELF_SRCS})
+
+# ----------------------------------------------------------------
+# input dependencies
+#
+# NOTE: dependency set here must be kept consistent with
+#       ${DIR_NAME}/cmake/${LIB_NAME}Config.cmake.in
+
+xo_dependency(\${SELF_LIB} xo_facet)
+#xo_dependency(\${SELF_LIB} xo_indentlog)
+
+# end src/${NAME}/CMakeLists.txt
+EOF
+    else
+        cat > "${TARGET_DIR}/src/${NAME}/CMakeLists.txt" << EOF
 # ${DIR_NAME}/src/${NAME}/CMakeLists.txt
 
 set(SELF_LIB ${LIB_NAME})
@@ -219,7 +338,54 @@ xo_install_include_tree3(include/xo/${NAME})
 
 #xo_dependency(\${SELF_LIB} xo_indentlog)
 
-# end src/CMakeLists.txt
+# end src/${NAME}/CMakeLists.txt
+EOF
+    fi
+fi
+
+# Create idl/${FACET}.json5 stub for facet mode
+if [[ -n "$FACET" ]]; then
+    cat > "${TARGET_DIR}/idl/${FACET}.json5" << EOF
+{
+    mode: "facet",
+    output_cpp_dir: "src/${NAME}",
+    output_hpp_dir: "include/xo/${NAME}",
+    output_impl_subdir: "detail",
+    includes: [
+    ],
+    user_hpp_includes: [
+    ],
+    namespace1: "xo",
+    namespace2: "${FACET_LC}",   // TODO: change to project namespace if different
+    pretext: [],
+    facet: "${FACET}",
+    detail_subdir: "detail",
+    brief: "TODO brief description",
+    using_doxygen: true,
+    doc: [
+        "TODO: document facet ${FACET}"
+    ],
+    types: [
+        {
+            name: "obj_A${FACET}",
+            doc: [],
+            definition: "xo::facet::obj<A${FACET}>",
+        }
+    ],
+    const_methods: [
+        // TODO: define methods, e.g.:
+        // {
+        //     name: "my_method",
+        //     doc: ["description"],
+        //     return_type: "bool",
+        //     args: [],
+        //     const: true,
+        //     noexcept: true,
+        // },
+    ],
+    nonconst_methods: [],
+    router_facet_explicit_content: [],
+}
 EOF
 fi
 
@@ -235,12 +401,22 @@ echo "  ${DIR_NAME}/include/xo/${NAME}/"
 if [[ "$MODE" == "shared" ]]; then
     echo "  ${DIR_NAME}/src/${NAME}/CMakeLists.txt"
 fi
+if [[ -n "$FACET" ]]; then
+    echo "  ${DIR_NAME}/idl/${FACET}.json5"
+    echo "  ${DIR_NAME}/include/xo/${NAME}/detail/  (populated by genfacet at build time)"
+fi
 echo ""
 echo "Next steps:"
 if [[ "$MODE" == "headeronly" ]]; then
     echo "  1. Add header files to ${DIR_NAME}/include/xo/${NAME}/"
     echo "  2. Add ${DIR_NAME} to umbrella CMakeLists.txt"
     echo "  3. Uncomment dependencies as needed in CMakeLists.txt and Config.cmake.in"
+elif [[ -n "$FACET" ]]; then
+    echo "  1. Edit ${DIR_NAME}/idl/${FACET}.json5: define methods, set namespace2"
+    echo "  2. Build (or run genfacet manually) to generate detail/*.hpp and src/${NAME}/I${FACET}_Any.cpp"
+    echo "  3. Add header files to ${DIR_NAME}/include/xo/${NAME}/"
+    echo "  4. Add ${DIR_NAME} to umbrella CMakeLists.txt"
+    echo "  5. Uncomment dependencies as needed in src/${NAME}/CMakeLists.txt and Config.cmake.in"
 else
     echo "  1. Add header files to ${DIR_NAME}/include/xo/${NAME}/"
     echo "  2. Add source files to ${DIR_NAME}/src/${NAME}/ and update src/${NAME}/CMakeLists.txt SELF_SRCS"
