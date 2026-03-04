@@ -22,6 +22,7 @@
 #include <xo/object2/Boolean.hpp>
 #include <xo/procedure2/RuntimeContext.hpp>
 #include <xo/procedure2/Primitive_gco_0.hpp>
+#include <xo/procedure2/Primitive_gco_1_gco.hpp>
 #include <xo/gc/X1Collector.hpp>
 #include <xo/reflect/Reflect.hpp>
 #include <xo/alloc2/Arena.hpp>
