@@ -19,7 +19,7 @@
 #include <xo/object2/Integer.hpp>
 #include <xo/object2/Float.hpp>
 #include <xo/object2/String.hpp>
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/facet_implementation.hpp>
 
 #ifdef NOT_YET

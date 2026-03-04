@@ -29,7 +29,7 @@
 #include <xo/object2/DBoolean.hpp>
 #include <xo/object2/boolean/IGCObject_DBoolean.hpp>
 
-#include <xo/gc/GCObject.hpp>
+#include <xo/alloc2/GCObject.hpp>
 
 namespace xo {
     using xo::scm::DProgressSsm;
