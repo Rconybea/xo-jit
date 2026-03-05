@@ -63,12 +63,6 @@ set(SELF_SRCS
     IGCObject_DGlobalSymtab.cpp
     IPrintable_DGlobalSymtab.cpp
 
-    StringTable.cpp
-
-    DUniqueString.cpp
-    IGCObject_DUniqueString.cpp
-    IPrintable_DUniqueString.cpp
-
     )
 
 xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 ${SELF_SRCS})

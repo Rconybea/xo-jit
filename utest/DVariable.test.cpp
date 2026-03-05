@@ -4,17 +4,19 @@
  **/
 
 #include "init_expression2.hpp"
-#include <xo/expression2/DVariable.hpp>
-#include <xo/expression2/detail/IExpression_DVariable.hpp>
-#include <xo/expression2/detail/IPrintable_DVariable.hpp>
-#include <xo/expression2/StringTable.hpp>
+#include <xo/expression2/Variable.hpp>
+//#include <xo/expression2/detail/IExpression_DVariable.hpp>
+//#include <xo/expression2/detail/IPrintable_DVariable.hpp>
 
 #include <xo/gc/X1Collector.hpp>
+
+#include <xo/reflect/Reflect.hpp>
+#include <xo/stringtable2/StringTable.hpp>
+
 #include <xo/alloc2/CollectorTypeRegistry.hpp>
 
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
-#include <xo/reflect/Reflect.hpp>
 
 #include <xo/indentlog/scope.hpp>
 

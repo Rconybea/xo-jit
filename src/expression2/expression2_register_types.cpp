@@ -5,7 +5,8 @@
 
 #include "expression2_register_types.hpp"
 
-#include "detail/IGCObject_DConstant.hpp"
+#include "Constant.hpp"
+//#include "detail/IGCObject_DConstant.hpp"
 #include "detail/IGCObject_DVariable.hpp"
 //#include "detail/IGCObject_DDefineExpr.hpp"   // when avail
 //#include "detail/IGCObject_DApplyExpr.hpp"    // when avail
@@ -13,7 +14,7 @@
 #include "detail/IGCObject_DIfElseExpr.hpp"
 #include "detail/IGCObject_DSequenceExpr.hpp"
 //#include "detail/IGCObject_DLocalSymtab.hpp"  // when avail
-#include "detail/IGCObject_DUniqueString.hpp"
+//#include "detail/IGCObject_DUniqueString.hpp"
 
 //#include "detail/IPrintable_DUniqueString.hpp" // when avail
 
@@ -43,8 +44,6 @@ namespace xo {
             ok &= gc.install_type(impl_for<AGCObject, DSequenceExpr>());
 
             //ok &= gc.install_type(impl_for<AGCObject, DLocalSymtab>()); // when avail
-
-            ok &= gc.install_type(impl_for<AGCObject, DUniqueString>());
 
             return ok;
         }

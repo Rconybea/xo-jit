@@ -5,8 +5,6 @@
 
 #include "expression2_register_facets.hpp"
 
-#include <xo/expression2/UniqueString.hpp>
-
 #include <xo/expression2/detail/IExpression_DVariable.hpp>
 #include <xo/expression2/detail/IGCObject_DVariable.hpp>
 #include <xo/expression2/detail/IPrintable_DVariable.hpp>
@@ -42,9 +40,6 @@ namespace xo {
         expression2_register_facets()
         {
             scope log(XO_DEBUG(true));
-
-            FacetRegistry::register_impl<AGCObject, DUniqueString>();
-            FacetRegistry::register_impl<APrintable, DUniqueString>();
 
             // Expression
             // +- Constant

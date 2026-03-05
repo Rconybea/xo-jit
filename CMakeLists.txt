@@ -394,30 +394,6 @@ xo_add_genfacetimpl(
 
 # ----------------------------------------------------------------
 
-# note: manual target; generated code committed to git
-xo_add_genfacetimpl(
-    TARGET xo-expression2-facetimpl-gcobject-uniquestring
-    FACET_PKG xo_gc
-    FACET GCObject
-    REPR UniqueString
-    INPUT idl/IGCObject_DUniqueString.json5
-    OUTPUT_HPP_DIR include/xo/expression2
-    OUTPUT_IMPL_SUBDIR detail
-)
-
-# note: manual target; generated code committed to git
-xo_add_genfacetimpl(
-    TARGET xo-expression2-facetimpl-printable-uniquestring
-    FACET_PKG xo_printable2
-    FACET Printable
-    REPR UniqueString
-    INPUT idl/IPrintable_DUniqueString.json5
-    OUTPUT_HPP_DIR include/xo/expression2
-    OUTPUT_IMPL_SUBDIR detail
-)
-
-# ----------------------------------------------------------------
-
 xo_add_genfacet_all(xo-expression2-genfacet-all)
 
 # ----------------------------------------------------------------

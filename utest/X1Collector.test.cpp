@@ -6,15 +6,17 @@
  **/
 
 #include "init_expression2.hpp"
-#include "StringTable.hpp"
-#include "detail/IGCObject_DUniqueString.hpp"
 
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/DInteger.hpp>
 #include <xo/object2/DList.hpp>
-#include <xo/stringtable2/DString.hpp>
 
 #include <xo/gc/X1Collector.hpp>
+
+#include <xo/stringtable2/StringTable.hpp>
+#include <xo/stringtable2/UniqueString.hpp>
+#include <xo/stringtable2/String.hpp>
+
 #include <xo/alloc2/CollectorTypeRegistry.hpp>
 #include <xo/subsys/Subsystem.hpp>
 
