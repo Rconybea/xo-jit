@@ -19,7 +19,6 @@
 #include <xo/expression2/LambdaExpr.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/expression2/SequenceExpr.hpp>
-#include <xo/expression2/UniqueString.hpp>
 #include <xo/object2/Dictionary.hpp>
 #include <xo/object2/Integer.hpp>
 #include <xo/object2/Boolean.hpp>
@@ -29,6 +28,7 @@
 #include <xo/procedure2/Primitive_gco_3_dict_string_gco.hpp>
 #include <xo/gc/X1Collector.hpp>
 #include <xo/reflect/Reflect.hpp>
+#include <xo/stringtable2/UniqueString.hpp>
 #include <xo/alloc2/Arena.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
