@@ -841,6 +841,7 @@ macro(xo_add_shared_library3 target projectTargets targetversion soversion sourc
         TARGET all_libraries_${PROJECT_NAME}
         APPEND
         PROPERTY targets ${target})
+    add_dependencies(all_libraries_${PROJECT_NAME} ${target})
 
     set_target_properties(
         ${target}
@@ -876,6 +877,7 @@ macro(xo_add_shared_library target targetversion soversion sources)
         TARGET all_libraries_${PROJECT_NAME}
         APPEND
         PROPERTY targets ${target})
+    add_dependencies(all_libraries_${PROJECT_NAME} ${target})
 
     set_target_properties(
         ${target}
@@ -957,6 +959,7 @@ macro(xo_add_executable target sources)
         TARGET all_executables_${PROJECT_NAME}
         APPEND
         PROPERTY targets ${target})
+    add_dependencies(all_executables_${PROJECT_NAME} ${target})
 endmacro()
 
 # ----------------------------------------------------------------
@@ -978,6 +981,7 @@ macro(xo_add_utest_executable target sources)
         TARGET all_utest_executables_${PROJECT_NAME}
         APPEND
         PROPERTY targets ${target})
+    add_dependencies(all_utest_executables_${PROJECT_NAME} ${target})
 
 endmacro()
 
@@ -1597,6 +1601,7 @@ macro(xo_pybind11_library target projectTargets source_files)
         TARGET all_libraries_${PROJECT_NAME}
         APPEND
         PROPERTY targets ${target})
+    add_dependencies(all_libraries_${PROJECT_NAME} ${target})
 
     set_property(
         TARGET ${target}
