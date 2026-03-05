@@ -10,9 +10,9 @@
 #include <xo/expression2/DLocalSymtab.hpp>
 #include <xo/expression2/DVariable.hpp>
 #include <xo/expression2/VarRef.hpp>
-#include <xo/expression2/StringTable.hpp>
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/object2/DArray.hpp>
+#include <xo/stringtable2/StringTable.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/arena/ArenaHashMapConfig.hpp>
 #include <xo/arena/DArena.hpp>
