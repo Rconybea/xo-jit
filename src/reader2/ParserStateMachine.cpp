@@ -440,6 +440,29 @@ namespace xo {
         }
 
         void
+        ParserStateMachine::illegal_input_on_type(std::string_view ssm_name,
+                                                  obj<AType> type,
+                                                  std::string_view expect_str)
+        {
+            // TODO:
+            // - want to write error message using DArena
+            // - need something like log_streambuf and/or tostr() that's arena-aware
+
+            auto errmsg_string = tostr("Unexpected type for parsing state",
+                                       xtag("type", type),
+                                       xtag("expecting", expect_str),
+                                       xtag("ssm", ssm_name),
+                                       xtag("via", "ParserStateMachine::illegal_input_on_type"));
+
+            assert(expr_alloc_);
+
+            auto errmsg = DString::from_view(expr_alloc_,
+                                             std::string_view(errmsg_string));
+
+            this->capture_error(ssm_name, errmsg);
+        }
+
+        void
         ParserStateMachine::illegal_parsed_formal(std::string_view ssm_name,
                                                   const DUniqueString * param_name,
                                                   TypeDescr param_type,

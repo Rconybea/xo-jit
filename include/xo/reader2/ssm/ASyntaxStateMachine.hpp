@@ -16,6 +16,7 @@
 // includes (via {facet_includes})
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
+#include <xo/type/Type.hpp>
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/reflect/TypeDescr.hpp>
 #include <xo/facet/obj.hpp>
@@ -67,6 +68,8 @@ public:
     virtual void on_parsed_symbol(Opaque data, std::string_view sym, ParserStateMachine * p_psm)  = 0;
     /** operate state machine for incoming type description @p td **/
     virtual void on_parsed_typedescr(Opaque data, TypeDescr td, ParserStateMachine * p_psm)  = 0;
+    /** update state machine for type emitted by nested ssm **/
+    virtual void on_parsed_type(Opaque data, obj<AType> type, ParserStateMachine * p_psm)  = 0;
     /** operate state machine for formal emitted by nested ssm **/
     virtual void on_parsed_formal(Opaque data, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm)  = 0;
     /** operate state machine for formal emitted by nested ssm **/

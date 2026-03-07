@@ -45,6 +45,17 @@ namespace xo {
                 }
 
             /** Explicit error path **/
+            void illegal_type(obj<AType> type,
+                              ParserStateMachine * p_psm)
+                {
+                    Derived & self = static_cast<Derived &>(*this);
+
+                    p_psm->illegal_input_on_type(Derived::ssm_classname(),
+                                                 type,
+                                                 self.get_expect_str());
+                }
+
+            /** Explicit error path **/
             void illegal_quoted_literal(obj<AGCObject> lit,
                                         ParserStateMachine * p_psm)
                 {
@@ -87,6 +98,14 @@ namespace xo {
                                                   td,
                                                   self.get_expect_str());
             }
+
+            /** Default implementation for require SyntaxStateMachine facet method
+             **/
+            void on_parsed_type(obj<AType> type,
+                                ParserStateMachine * p_psm)
+                {
+                    this->illegal_type(type, p_psm);
+                }
 
             /** Default implementation for required SyntaxStateMachine facet method
              **/

@@ -11,6 +11,7 @@
 #include <xo/expression2/DVariable.hpp>
 #include <xo/expression2/VarRef.hpp>
 #include <xo/tokenizer2/Token.hpp>
+#include <xo/type/Type.hpp>
 #include <xo/object2/DArray.hpp>
 #include <xo/stringtable2/StringTable.hpp>
 #include <xo/alloc2/Allocator.hpp>
@@ -233,6 +234,14 @@ namespace xo {
             void illegal_input_on_typedescr(std::string_view ssm_name,
                                             TypeDescr td,
                                             std::string_view expect_str);
+
+            /** report illegal input arriving in syntax state machine (ssm) @p ssm_name
+             *  when receiving type definition @p ty.
+             *  @p expect_str sketches expected input in current ssm state
+             **/
+            void illegal_input_on_type(std::string_view ssm_name,
+                                       obj<AType> ty,
+                                       std::string_view expect_str);
 
             /** report illegal parsed formal (param_name, param_type) from nested ssm.
              *  Introducing as placeholder; not expected to be reachable in

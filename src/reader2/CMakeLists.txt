@@ -92,6 +92,7 @@ xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 $
 xo_dependency(${SELF_LIB} xo_numeric)
 xo_dependency(${SELF_LIB} xo_procedure2)
 xo_dependency(${SELF_LIB} xo_gc)
+xo_dependency(${SELF_LIB} xo_type)
 xo_dependency(${SELF_LIB} xo_tokenizer2)
 xo_dependency(${SELF_LIB} xo_expression2)
 #xo_dependency(${SELF_LIB} reflect)

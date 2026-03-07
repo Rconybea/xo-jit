@@ -61,6 +61,8 @@ namespace xo {
             static void on_parsed_symbol(DExpectQLiteralSsm & self, std::string_view sym, ParserStateMachine * p_psm);
             /** operate state machine for incoming type description @p td **/
             static void on_parsed_typedescr(DExpectQLiteralSsm & self, TypeDescr td, ParserStateMachine * p_psm);
+            /** update state machine for type emitted by nested ssm **/
+            static void on_parsed_type(DExpectQLiteralSsm & self, obj<AType> type, ParserStateMachine * p_psm);
             /** operate state machine for formal emitted by nested ssm **/
             static void on_parsed_formal(DExpectQLiteralSsm & self, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm);
             /** operate state machine for formal emitted by nested ssm **/

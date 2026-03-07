@@ -15,6 +15,7 @@
 
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
+#include <xo/type/Type.hpp>
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/reflect/TypeDescr.hpp>
 
@@ -64,6 +65,9 @@ namespace scm {
         }
         void on_parsed_typedescr(Opaque data, TypeDescr td, ParserStateMachine * p_psm)  override {
             return I::on_parsed_typedescr(_dcast(data), td, p_psm);
+        }
+        void on_parsed_type(Opaque data, obj<AType> type, ParserStateMachine * p_psm)  override {
+            return I::on_parsed_type(_dcast(data), type, p_psm);
         }
         void on_parsed_formal(Opaque data, const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm)  override {
             return I::on_parsed_formal(_dcast(data), param_name, param_type, p_psm);

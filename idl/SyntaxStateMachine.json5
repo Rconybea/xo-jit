@@ -7,6 +7,7 @@
     includes: [
         "\"ParserStateMachine.hpp\"",
         "\"syntaxstatetype.hpp\"",
+        "<xo/type/Type.hpp>",
         "<xo/tokenizer2/Token.hpp>",
         "<xo/reflect/TypeDescr.hpp>",
     ],
@@ -73,6 +74,15 @@
             return_type: "void",
             args: [
                 {type: "TypeDescr", name: "td"},
+                {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
+        {
+            name: "on_parsed_type",
+            doc: ["update state machine for type emitted by nested ssm"],
+            return_type: "void",
+            args: [
+                {type: "obj<AType>", name: "type"},
                 {type: "ParserStateMachine *", name: "p_psm"},
             ],
         },

@@ -54,6 +54,12 @@ ISyntaxStateMachine_Any::on_parsed_typedescr(Opaque, TypeDescr, ParserStateMachi
 }
 
 auto
+ISyntaxStateMachine_Any::on_parsed_type(Opaque, obj<AType>, ParserStateMachine *)  -> void
+{
+    _fatal();
+}
+
+auto
 ISyntaxStateMachine_Any::on_parsed_formal(Opaque, const DUniqueString *, TypeDescr, ParserStateMachine *)  -> void
 {
     _fatal();

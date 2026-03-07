@@ -71,6 +71,9 @@ public:
     void on_parsed_typedescr(TypeDescr td, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_typedescr(O::data(), td, p_psm);
     }
+    void on_parsed_type(obj<AType> type, ParserStateMachine * p_psm)  {
+        return O::iface()->on_parsed_type(O::data(), type, p_psm);
+    }
     void on_parsed_formal(const DUniqueString * param_name, TypeDescr param_type, ParserStateMachine * p_psm)  {
         return O::iface()->on_parsed_formal(O::data(), param_name, param_type, p_psm);
     }
