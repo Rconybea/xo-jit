@@ -1741,7 +1741,6 @@ function(xo_add_genfacetimpl)
         INPUT               # Input .json5 file
         OUTPUT_HPP_DIR      # Directory for .hpp files
         OUTPUT_IMPL_SUBDIR  # Subdirectory name for impl headers
-        OUTPUT_CPP_DIR      # Directory for .cpp files
     )
     set(multiValueArgs "")
 
