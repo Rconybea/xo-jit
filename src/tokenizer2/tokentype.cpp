@@ -51,6 +51,7 @@ namespace xo {
 
                 CASE(tk_type);
                 CASE(tk_def);
+                CASE(tk_deftype);
                 CASE(tk_lambda);
                 CASE(tk_if);
                 CASE(tk_then);

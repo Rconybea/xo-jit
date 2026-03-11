@@ -146,6 +146,9 @@ namespace xo {
             /** keyword @c 'def' **/
             tk_def,
 
+            /** keyword @c 'deftype' **/
+            tk_deftype,
+
             /** keyword @c 'lambda' **/
             tk_lambda,
 

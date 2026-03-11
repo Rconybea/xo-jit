@@ -111,8 +111,8 @@ namespace xo {
             static Token comma_token() { return Token(tokentype::tk_comma); }
             /** token representing colon @c ":" **/
             static Token colon_token() { return Token(tokentype::tk_colon); }
-            /** token representing double-colo @c "::" **/
-            static Token doublecolon() { return Token(tokentype::tk_doublecolon); }
+            /** token representing double-colon @c "::" **/
+            static Token doublecolon_token() { return Token(tokentype::tk_doublecolon); }
             /** token representing semicolon @c ";" **/
             static Token semicolon_token() { return Token(tokentype::tk_semicolon); }
             /** token representing single-assignment @c "=" (editor bait: equal_token) **/
@@ -138,6 +138,8 @@ namespace xo {
             static Token type() { return Token(tokentype::tk_type); }
             /** token representing keyword @c def **/
             static Token def_token() { return Token(tokentype::tk_def); }
+            /** token representing keyword @c deftype **/
+            static Token deftype_token() { return Token(tokentype::tk_deftype); }
             /** token representing keyword @c lambda **/
             static Token lambda_token() { return Token(tokentype::tk_lambda); }
             /** token representing keyword @c if **/

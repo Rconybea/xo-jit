@@ -591,6 +591,8 @@ namespace xo {
                     tk_type = tokentype::tk_type;
                 } else if (tk_text == "def") {
                     tk_type = tokentype::tk_def;
+                } else if (tk_text == "deftype") {
+                    tk_type = tokentype::tk_deftype;
                 } else if (tk_text == "lambda") {
                     tk_type = tokentype::tk_lambda;
                 } else if (tk_text == "if") {
