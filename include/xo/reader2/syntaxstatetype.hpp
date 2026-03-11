@@ -60,6 +60,9 @@ namespace xo {
             /** expecting a type. See @ref DExpectTypeSsm **/
             expect_type,
 
+            /** expecting a list type. See @ref DExpectListTypeSsm **/
+            expect_listtype,
+
             /** expecting a rhs expression. See @ref DExpectExprSsm **/
             expect_rhs_expression,
 

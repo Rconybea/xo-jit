@@ -227,6 +227,22 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-syntaxstatemachine-expectlisttypessm
+    FACET_PKG xo_reader2
+    INPUT idl/ISyntaxStateMachine_DExpectListTypeSsm.json5
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-printable-expectlisttypessm
+    FACET_PKG xo_printable2
+    INPUT idl/IPrintable_DExpectListTypeSsm.json5
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-expectexprssm
     FACET_PKG xo_reader2
     INPUT idl/ISyntaxStateMachine_DExpectExprSsm.json5

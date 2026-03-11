@@ -85,13 +85,13 @@ namespace xo {
                               obj<AAllocator> expr_mm,
                               ParserStateMachine * p_psm);
 
-            static const char * ssm_classname() { return "DIfElseSsm"; }
-
-            DSyntaxStateMachine<DIfElseSsm> * super() { return this; }
-
             ///@}
             /** @defgroup scm-ifelsessm-expression-methods general methods **/
             ///@{
+
+            static const char * ssm_classname() { return "DIfElseSsm"; }
+
+            DSyntaxStateMachine<DIfElseSsm> * super() { return this; }
 
             /** operate state machine on if-token input @p tk,
              *  with overall parser state in @p p_psm
@@ -178,6 +178,9 @@ namespace xo {
 #endif
 
         private:
+            /** @defgroup scm-expectlisttypessm-instance-vars instance variables **/
+            ///@{
+
             ifexprstatetype ifstate_ = ifexprstatetype::invalid;
             /** scaffold ifelse-expression here.
              *  This will eventually be the output of this ssm
@@ -185,6 +188,8 @@ namespace xo {
              *  TODO: can use DIfElseExpr* here.  See xo-object2//DList
              **/
             obj<AExpression,DIfElseExpr> if_expr_;
+
+            ///@}
 
         };
     } /*namespace scm*/

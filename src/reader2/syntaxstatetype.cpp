@@ -41,6 +41,8 @@ namespace xo {
                 return "expect-symbol";
             case syntaxstatetype::expect_type:
                 return "expect-type";
+            case syntaxstatetype::expect_listtype:
+                return "expect-listtype";
             case syntaxstatetype::expect_rhs_expression:
                 return "expect-rhs-expression";
             case syntaxstatetype::expect_qliteral:

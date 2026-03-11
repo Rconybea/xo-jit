@@ -21,6 +21,7 @@
 #include "ExpectFormalArgSsm.hpp"
 #include "ExpectSymbolSsm.hpp"
 #include "ExpectTypeSsm.hpp"
+#include "ExpectListTypeSsm.hpp"
 #include "ExpectExprSsm.hpp"
 #include "ExpectQLiteralSsm.hpp"
 #include "ExpectQListSsm.hpp"
@@ -57,6 +58,7 @@ namespace xo {
             FacetRegistry::register_impl<ASyntaxStateMachine, DIfElseSsm>();
             FacetRegistry::register_impl<APrintable, DIfElseSsm>();
 
+            FacetRegistry::register_impl<ASyntaxStateMachine, DApplySsm>();
             FacetRegistry::register_impl<APrintable, DApplySsm>();
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DSequenceSsm>();
@@ -73,6 +75,9 @@ namespace xo {
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectTypeSsm>();
             FacetRegistry::register_impl<APrintable, DExpectTypeSsm>();
+
+            FacetRegistry::register_impl<ASyntaxStateMachine, DExpectListTypeSsm>();
+            FacetRegistry::register_impl<APrintable, DExpectListTypeSsm>();
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectExprSsm>();
             FacetRegistry::register_impl<APrintable, DExpectExprSsm>();

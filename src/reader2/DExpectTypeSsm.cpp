@@ -4,7 +4,7 @@
  **/
 
 #include "ExpectTypeSsm.hpp"
-//#include "ssm/ISyntaxStateMachine_DExpectTypeSsm.hpp"
+#include "ExpectListTypeSsm.hpp"
 #include "SyntaxStateMachine.hpp"
 #include <xo/type/AtomicType.hpp>
 #include <xo/reflect/Reflect.hpp>
@@ -132,25 +132,32 @@ namespace xo {
                 obj<AType> type;
                 obj mm = p_psm->expr_alloc();
 
-                if (tk.text() == "unit")
-                    type = DAtomicType::make(mm, Metatype::t_unit());
-                if (tk.text() == "bool")
-                    type = DAtomicType::make(mm, Metatype::t_bool());
-                else if (tk.text() == "str")
-                    type = DAtomicType::make(mm, Metatype::t_str());
-                else if (tk.text() == "f64")
-                    type = DAtomicType::make(mm, Metatype::t_f64());
-                else if(tk.text() == "f32")
-                    type = DAtomicType::make(mm, Metatype::t_f32());
-                else if(tk.text() == "i16")
-                    type = DAtomicType::make(mm, Metatype::t_i16());
-                else if(tk.text() == "i32")
-                    type = DAtomicType::make(mm, Metatype::t_i32());
-                else if(tk.text() == "i64")
-                    type = DAtomicType::make(mm, Metatype::t_i64());
+                if (tk.text() == "list") {
+                    /* replace top ssm with specialized list-type ssm parser */
+                    p_psm->pop_ssm();
+                    DExpectListTypeSsm::start(p_psm);
+                    p_psm->on_token(tk);
+                } else {
+                    if (tk.text() == "unit")
+                        type = DAtomicType::make(mm, Metatype::t_unit());
+                    if (tk.text() == "bool")
+                        type = DAtomicType::make(mm, Metatype::t_bool());
+                    else if (tk.text() == "str")
+                        type = DAtomicType::make(mm, Metatype::t_str());
+                    else if (tk.text() == "f64")
+                        type = DAtomicType::make(mm, Metatype::t_f64());
+                    else if(tk.text() == "f32")
+                        type = DAtomicType::make(mm, Metatype::t_f32());
+                    else if(tk.text() == "i16")
+                        type = DAtomicType::make(mm, Metatype::t_i16());
+                    else if(tk.text() == "i32")
+                        type = DAtomicType::make(mm, Metatype::t_i32());
+                    else if(tk.text() == "i64")
+                        type = DAtomicType::make(mm, Metatype::t_i64());
 
-                p_psm->pop_ssm();
-                p_psm->on_parsed_type(type);
+                    p_psm->pop_ssm();
+                    p_psm->on_parsed_type(type);
+                }
             } else {
                 TypeDescr td = nullptr;
 

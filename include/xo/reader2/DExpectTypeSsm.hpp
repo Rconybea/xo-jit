@@ -14,12 +14,14 @@ namespace xo {
         /** @class DExpectTypeSsm
          *  @brief syntax state-machine for accepting a Schemtika typename-expression
          *
-         *  Jan 2026
-         *  Placeholder implementation at present.
-         *  Only types are a handful of baked-in values
-         *
          *  @pre
-         *
+         *    any                 universal polymorphic type
+         *    unit                empty type (like c/c++ void)
+         *    f64                 64-bit float
+         *    i32                 32-bit signed integer
+         *    list<T>             parameterized list (polymorphic if T is any)
+         *    array<T>            parameterized array (polymorphic if T is any)
+         *    function<T (U,..)>  function (U x ...) -> T
          *  @endpre
          **/
         class DExpectTypeSsm : public DSyntaxStateMachine<DExpectTypeSsm> {
@@ -30,17 +32,26 @@ namespace xo {
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
+            /** @defgroup scm-expecttype-ctors constructors **/
+            ///@{
+
             explicit DExpectTypeSsm(bool corrected);
 
+            /** create instance **/
             static DExpectTypeSsm * _make(DArena & parser_mm, bool corrected);
 
             /** create fop referring to new DExpectTypeSsm **/
             static obj<ASyntaxStateMachine,DExpectTypeSsm> make(DArena & parser_mm, bool corrected);
 
+            ///@}
+            /** @defgroup scm-expecttype-general-methods general methods **/
+            ///@{
+
             static void start(bool corrected, ParserStateMachine * p_psm);
 
             static const char * ssm_classname() { return "DExpectTypeSsm"; }
 
+            ///@}
             /** @defgroup scm-expecttype-ssm-facet syntaxstatemachine facet methods **/
             ///@{
 

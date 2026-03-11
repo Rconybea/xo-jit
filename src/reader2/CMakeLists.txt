@@ -65,6 +65,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DExpectTypeSsm.cpp
     IPrintable_DExpectTypeSsm.cpp
 
+    DExpectListTypeSsm.cpp
+    facet/ISyntaxStateMachine_DExpectListTypeSsm.cpp
+    facet/IPrintable_DExpectListTypeSsm.cpp
+
     DExpectExprSsm.cpp
     ISyntaxStateMachine_DExpectExprSsm.cpp
     IPrintable_DExpectExprSsm.cpp

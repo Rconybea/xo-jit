@@ -16,13 +16,13 @@ namespace xo {
          *  Already in quoted-literal context
          *
          *       [ quote-expr ... ]
-         *      ^ ^              ^
-         *      | qarray_1a      qarray_2(done)
-         *      qarray_0
+         *      ^ ^              ^ ^
+         *      | qarray_1a      | qarray_2(done)
+         *      qarray_0         qarray_1a
          *
-         *  qarray_0 --on_leftbrace_token()--> qarray_1a [push ExpectQLiteralSsm]
+         *  qarray_0 --on_leftbracket_token()--> qarray_1a [push ExpectQLiteralSsm]
          *  qarray_1a --on_quoted_literal()--> qarray_1a [append literal]
-         *  qarray_1a --on_rightbrace_token()--> qarray_2(done) [report quoted array]
+         *  qarray_1a --on_rightbracket_token()--> qarray_2(done) [report quoted array]
          **/
         class QArrayXst {
         public:
