@@ -40,7 +40,6 @@ xo_add_genfacetimpl(
     FACET SymbolTable
 #    REPR LocalSymtab
     INPUT idl/ISymbolTable_DLocalSymtab.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
 )
 
@@ -51,7 +50,6 @@ xo_add_genfacetimpl(
     FACET GCObject
 #    REPR LocalSymtab
     INPUT idl/IGCObject_DLocalSymtab.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
 )
 
@@ -62,7 +60,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR LocalSymtab
     INPUT idl/IPrintable_DLocalSymtab.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
 )
 
@@ -75,7 +72,6 @@ xo_add_genfacetimpl(
     FACET SymbolTable
 #    REPR GlobalSymtab
     INPUT idl/ISymbolTable_DGlobalSymtab.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
 )
 
@@ -86,7 +82,6 @@ xo_add_genfacetimpl(
     FACET GCObject
 #    REPR GlobalSymtab
     INPUT idl/IGCObject_DGlobalSymtab.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
 )
 
@@ -97,7 +92,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR GlobalSymtab
     INPUT idl/IPrintable_DGlobalSymtab.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
 )
 
@@ -121,7 +115,6 @@ xo_add_genfacetimpl(
     FACET Expression
 #    REPR Constant
     INPUT idl/IExpression_DConstant.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -132,7 +125,6 @@ xo_add_genfacetimpl(
     FACET GCObject
 #    REPR Constant
     INPUT idl/IGCObject_DConstant.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -143,7 +135,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR Constant
     INPUT idl/IPrintable_DConstant.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -156,7 +147,6 @@ xo_add_genfacetimpl(
     FACET Expression
 #    REPR Variable
     INPUT idl/IExpression_DVariable.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -167,7 +157,6 @@ xo_add_genfacetimpl(
     FACET GCObject
 #    REPR Variable
     INPUT idl/IGCObject_DVariable.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -178,7 +167,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR Variable
     INPUT idl/IPrintable_DVariable.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -191,7 +179,6 @@ xo_add_genfacetimpl(
     FACET GCObject
 #    REPR Typename
     INPUT idl/IGCObject_DTypename.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR typename
 )
 
@@ -202,7 +189,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR Typename
     INPUT idl/IPrintable_DTypename.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR typename
 )
 
@@ -215,7 +201,6 @@ xo_add_genfacetimpl(
     FACET Expression
 #    REPR VarRef
     INPUT idl/IExpression_DVarRef.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -226,7 +211,6 @@ xo_add_genfacetimpl(
     FACET GCObject
 #    REPR VarRef
     INPUT idl/IGCObject_DVarRef.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -237,7 +221,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR VarRef
     INPUT idl/IPrintable_DVarRef.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -250,7 +233,6 @@ xo_add_genfacetimpl(
     FACET Expression
 #    REPR DefineExpr
     INPUT idl/IExpression_DDefineExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -261,7 +243,6 @@ xo_add_genfacetimpl(
     FACET GCObject
 #    REPR DefineExpr
     INPUT idl/IGCObject_DDefineExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR define
 )
 
@@ -272,7 +253,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR DefineExpr
     INPUT idl/IPrintable_DDefineExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -285,7 +265,6 @@ xo_add_genfacetimpl(
     FACET Expression
 #    REPR ApplyExpr
     INPUT idl/IExpression_DApplyExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -296,7 +275,6 @@ xo_add_genfacetimpl(
     FACET GCObject
 #    REPR ApplyExpr
     INPUT idl/IGCObject_DApplyExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -307,7 +285,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR ApplyExpr
     INPUT idl/IPrintable_DApplyExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -320,7 +297,6 @@ xo_add_genfacetimpl(
     FACET Expression
 #    REPR LambdaExpr
     INPUT idl/IExpression_DLambdaExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -331,7 +307,6 @@ xo_add_genfacetimpl(
     FACET GCObject
 #    REPR LambdaExpr
     INPUT idl/IGCObject_DLambdaExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -342,7 +317,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR LambdaExpr
     INPUT idl/IPrintable_DLambdaExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -355,7 +329,6 @@ xo_add_genfacetimpl(
     FACET Expression
 #    REPR IfElseExpr
     INPUT idl/IExpression_DIfElseExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -366,7 +339,6 @@ xo_add_genfacetimpl(
     FACET GCObject
 #    REPR IfElseExpr
     INPUT idl/IGCObject_DIfElseExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -377,7 +349,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR IfElseExpr
     INPUT idl/IPrintable_DIfElseExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -390,7 +361,6 @@ xo_add_genfacetimpl(
     FACET Expression
 #    REPR SequenceExpr
     INPUT idl/IExpression_DSequenceExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -399,9 +369,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-sequenceexpr
     FACET_PKG xo_alloc2
     FACET GCObject
-#    REPR SequenceExpr
     INPUT idl/IGCObject_DSequenceExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
@@ -412,7 +380,6 @@ xo_add_genfacetimpl(
     FACET Printable
 #    REPR SequenceExpr
     INPUT idl/IPrintable_DSequenceExpr.json5
-    OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
 )
 
