@@ -1738,7 +1738,6 @@ function(xo_add_genfacetimpl)
         FACET_PKG           # package providing abstract interface
         FACET_DIR           # facet directory (instead of FACET_PKG)
         FACET               # facet name
-        REPR                # representation name
         INPUT               # Input .json5 file
         OUTPUT_HPP_DIR      # Directory for .hpp files
         OUTPUT_IMPL_SUBDIR  # Subdirectory name for impl headers
@@ -1753,9 +1752,6 @@ function(xo_add_genfacetimpl)
     endif()
     if(NOT DEFINED GF_FACET)
         message(FATAL_ERROR "xo_add_genfacetimpl: FACET is required")
-    endif()
-    if(NOT DEFINED GF_REPR)
-        message(FATAL_ERROR "xo_add_genfacetimpl: REPR is required")
     endif()
     if(NOT DEFINED GF_INPUT)
         message(FATAL_ERROR "xo_add_genfacetimpl: INPUT is required")
