@@ -90,9 +90,9 @@ namespace xo {
             /** token representing quote @c "'" **/
             static Token quote_token() { return Token(tokentype::tk_quote); }
             /** token representing left angle bracket @c "<" **/
-            static Token leftangle() { return Token(tokentype::tk_leftangle); }
+            static Token leftangle_token() { return Token(tokentype::tk_leftangle); }
             /** token representing right angle bracket @c ">" **/
-            static Token rightangle() { return Token(tokentype::tk_rightangle); }
+            static Token rightangle_token() { return Token(tokentype::tk_rightangle); }
             /** token representing left parenthesis @c "(" **/
             static Token leftparen_token() { return Token(tokentype::tk_leftparen); }
             /** Token representing right parenthesis @c ")" **/
