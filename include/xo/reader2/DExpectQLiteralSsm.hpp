@@ -51,6 +51,12 @@ namespace xo {
             void on_f64_token(const Token & tk,
                               ParserStateMachine * p_psm);
 
+            /** update state for i64 token @p tk, with overall parser state in @p p_psm.
+             *  delegates to parent ssm via @ref on_quoted_literal
+             **/
+            void on_i64_token(const Token & tk,
+                              ParserStateMachine * p_psm);
+
             /** update state on incoming token @p tk,
              *  with overall parser state in @p p_psm.
              *

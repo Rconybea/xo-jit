@@ -7,7 +7,7 @@
 #include "ExpectQListSsm.hpp"
 #include "ExpectQArraySsm.hpp"
 #include <xo/object2/Float.hpp>
-//#include "DExpectFormalArgSsm.hpp"
+#include <xo/object2/Integer.hpp>
 //#include "ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp"
 //#include <xo/expression2/DVariable.hpp>
 //#include <xo/expression2/detail/IGCObject_DVariable.hpp>
@@ -91,6 +91,10 @@ namespace xo {
                 this->on_f64_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_i64:
+                this->on_i64_token(tk, p_psm);
+                return;
+
             case tokentype::tk_leftparen:
                 this->on_leftparen_token(tk, p_psm);
                 return;
@@ -116,7 +120,6 @@ namespace xo {
             case tokentype::tk_colon:
             case tokentype::tk_singleassign:
             case tokentype::tk_string:
-            case tokentype::tk_i64:
             case tokentype::tk_bool:
             case tokentype::tk_semicolon:
             case tokentype::tk_invalid:
@@ -156,6 +159,17 @@ namespace xo {
         {
             auto literal = DFloat::box<AGCObject>(p_psm->expr_alloc(),
                                                   tk.f64_value());
+
+            p_psm->pop_ssm();
+            p_psm->on_quoted_literal(literal);
+        }
+
+        void
+        DExpectQLiteralSsm::on_i64_token(const Token & tk,
+                                         ParserStateMachine * p_psm)
+        {
+            auto literal = DInteger::box<AGCObject>(p_psm->expr_alloc(),
+                                                    tk.i64_value());
 
             p_psm->pop_ssm();
             p_psm->on_quoted_literal(literal);
