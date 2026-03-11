@@ -34,7 +34,7 @@ xo_add_genfacetimpl(
     TARGET xo-numeric-facetimpl-numeric-float
     FACET_PKG xo_numeric
     FACET Numeric
-    REPR Float
+#    REPR Float
     INPUT idl/INumeric_DFloat.json5
 )
 
@@ -43,7 +43,7 @@ xo_add_genfacetimpl(
     TARGET xo-numeric-facetimpl-numeric-integer
     FACET_PKG xo_numeric
     FACET Numeric
-    REPR Integer
+#    REPR Integer
     INPUT idl/INumeric_DInteger.json5
 )
 
