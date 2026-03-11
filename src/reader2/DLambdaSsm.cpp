@@ -3,33 +3,21 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "DLambdaSsm.hpp"
-#include "ssm/ISyntaxStateMachine_DLambdaSsm.hpp"
-#include "DExpectFormalArglistSsm.hpp"
-#include "ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp"
+#include "LambdaSsm.hpp"
+//#include "ssm/ISyntaxStateMachine_DLambdaSsm.hpp"
+#include "ExpectFormalArglistSsm.hpp"
+//#include "ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp"
 #include "DExpectTypeSsm.hpp"
 #include "DExpectExprSsm.hpp"
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/detail/IExpression_DLambdaExpr.hpp>
-#include <xo/expression2/DVariable.hpp>
-#include <xo/expression2/detail/IExpression_DVariable.hpp>
+#include <xo/expression2/Variable.hpp>
+//#include <xo/expression2/detail/IExpression_DVariable.hpp>
 //#include <xo/expression2/symtab/ISymbolTable_DLocalSymtab.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/arena/DArena.hpp>
-
-#ifdef NOT_YET
-#include "define_xs.hpp"
-#include "parserstatemachine.hpp"
-#include "exprstatestack.hpp"
-#include "expect_formal_arglist_xs.hpp"
-#include "expect_expr_xs.hpp"
-#include "expect_type_xs.hpp"
-#include "pretty_expression.hpp"
-#include "pretty_variable.hpp"
-#include "xo/expression/Lambda.hpp"
-#endif
 
 namespace xo {
     using xo::print::APrintable;
@@ -144,6 +132,7 @@ namespace xo {
 
                 // all the not-yet-handled cases
             case tokentype::tk_def:
+            case tokentype::tk_deftype:
             case tokentype::tk_if:
             case tokentype::tk_symbol:
             case tokentype::tk_colon:
@@ -209,7 +198,7 @@ namespace xo {
             if (lmstate_ == lambdastatetype::lm_2) {
                 this->lmstate_ = lambdastatetype::lm_3;
 
-                DExpectTypeSsm::start(p_psm);
+                DExpectTypeSsm::start(false /*!corrected*/, p_psm);
 
                 /* control reenters via .on_parsed_typedescr() */
                 return;
@@ -300,7 +289,8 @@ namespace xo {
                 DLocalSymtab * symtab
                     = DLocalSymtab::_make_empty(p_psm->expr_alloc(),
                                                 p_psm->local_symtab(),
-                                                arglist->size());
+                                                arglist->size(),
+                                                0 /*ntypes*/);
                 assert(symtab);
 
                 for (DArray::size_type i = 0, n = arglist->size(); i < n; ++i) {

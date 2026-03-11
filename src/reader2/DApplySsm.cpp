@@ -139,6 +139,7 @@ namespace xo {
                 return;
             case tokentype::tk_symbol:
             case tokentype::tk_def:
+            case tokentype::tk_deftype:
             case tokentype::tk_if:
             case tokentype::tk_then:
             case tokentype::tk_else:

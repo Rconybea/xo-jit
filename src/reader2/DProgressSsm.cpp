@@ -284,6 +284,7 @@ namespace xo {
             // all the not-yet handled cases
             case tokentype::tk_invalid:
             case tokentype::tk_def:
+            case tokentype::tk_deftype:
             case tokentype::tk_if:
             case tokentype::tk_quote:
             case tokentype::tk_leftbracket:

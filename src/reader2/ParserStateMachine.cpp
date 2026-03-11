@@ -25,7 +25,8 @@ namespace xo {
 
     namespace scm {
         ParserStateMachine::ParserStateMachine(const ArenaConfig & config,
-                                               const ArenaHashMapConfig & symtab_config,
+                                               const ArenaHashMapConfig & symtab_var_config,
+                                               const ArenaHashMapConfig & symtab_type_config,
                                                size_type max_stringtable_capacity,
                                                obj<AAllocator> expr_alloc,
                                                obj<AAllocator> aux_alloc)
@@ -33,7 +34,9 @@ namespace xo {
               parser_alloc_{DArena::map(config)},
               expr_alloc_{expr_alloc},
               aux_alloc_{aux_alloc},
-              global_symtab_{DGlobalSymtab::make(expr_alloc, aux_alloc, symtab_config)},
+              global_symtab_{DGlobalSymtab::make(expr_alloc, aux_alloc,
+                                                 symtab_var_config,
+                                                 symtab_type_config)},
               debug_flag_{config.debug_flag_}
         {
         }
@@ -273,6 +276,16 @@ namespace xo {
             assert(stack_);
 
             this->stack_->top().on_parsed_typedescr(td, this);
+        }
+
+        void
+        ParserStateMachine::on_parsed_type(obj<AType> type)
+        {
+            scope log(XO_DEBUG(debug_flag_));
+
+            assert(stack_);
+
+            this->stack_->top().on_parsed_type(type, this);
         }
 
         void

@@ -13,14 +13,6 @@
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 
-#ifdef NOT_YET
-#include "parserstatemachine.hpp"
-#include "expect_symbol_xs.hpp"
-#include "expect_expr_xs.hpp"
-#include "expect_type_xs.hpp"
-#include "pretty_expression.hpp"
-#endif
-
 namespace xo {
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
@@ -526,6 +518,7 @@ namespace xo {
 
             // all the not-yet handled cases
             case tokentype::tk_invalid:
+            case tokentype::tk_deftype:
             case tokentype::tk_string:
             case tokentype::tk_f64:
             case tokentype::tk_i64:
@@ -600,7 +593,7 @@ namespace xo {
             if (defstate_ == defexprstatetype::def_2) {
                 this->defstate_ = defexprstatetype::def_3;
 
-                DExpectTypeSsm::start(p_psm);
+                DExpectTypeSsm::start(false /*!corrected*/, p_psm);
 
                 return;
             }
@@ -688,7 +681,6 @@ namespace xo {
                 = FacetRegistry::instance().variant<APrintable,
                                                     AExpression>(def_expr_);
             assert(expr.data());
-            (void)expr;
 
             return ppii.pps()->pretty_struct(ppii,
                                              "DDefineSsm",

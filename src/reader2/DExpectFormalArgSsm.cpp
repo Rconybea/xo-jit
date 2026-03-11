@@ -105,6 +105,7 @@ namespace xo {
             case tokentype::tk_leftparen:
             case tokentype::tk_lambda:
             case tokentype::tk_def:
+            case tokentype::tk_deftype:
             case tokentype::tk_if:
             case tokentype::tk_symbol:
             case tokentype::tk_singleassign:
@@ -154,7 +155,7 @@ namespace xo {
             if (fstate_ == formalstatetype::formal_1) {
                 this->fstate_ = formalstatetype::formal_2;
 
-                DExpectTypeSsm::start(p_psm);
+                DExpectTypeSsm::start(false /*!corrected*/, p_psm);
 
                 /* control reenters via DExpectFormalArgSsm::on_parsed_typedescr() */
                 return;

@@ -15,6 +15,8 @@ namespace xo {
                 break;
             case syntaxstatetype::defexpr:
                 return "defexpr";
+            case syntaxstatetype::deftypeexpr:
+                return "deftypeexpr";
             case syntaxstatetype::lambdaexpr:
                 return "lambdaexpr";
             case syntaxstatetype::ifelseexpr:

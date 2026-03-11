@@ -30,14 +30,14 @@ namespace xo {
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
-            DExpectTypeSsm();
+            explicit DExpectTypeSsm(bool corrected);
 
-            static DExpectTypeSsm * _make(DArena & parser_mm);
+            static DExpectTypeSsm * _make(DArena & parser_mm, bool corrected);
 
             /** create fop referring to new DExpectTypeSsm **/
-            static obj<ASyntaxStateMachine,DExpectTypeSsm> make(DArena & parser_mm);
+            static obj<ASyntaxStateMachine,DExpectTypeSsm> make(DArena & parser_mm, bool corrected);
 
-            static void start(ParserStateMachine * p_psm);
+            static void start(bool corrected, ParserStateMachine * p_psm);
 
             static const char * ssm_classname() { return "DExpectTypeSsm"; }
 
@@ -72,6 +72,12 @@ namespace xo {
 
             ///@}
 
+        private:
+            /** temporary shim.
+             *  if true, construct obj<AType>
+             *  if false, construct TypeDescr
+             **/
+            bool corrected_ = false;
         };
     } /*namespace scm*/
 } /*namespace xo*/

@@ -8,6 +8,7 @@
 #include "SchematikaParser.hpp"
 #include "ToplevelSeqSsm.hpp"
 #include "DefineSsm.hpp"
+#include "DeftypeSsm.hpp"
 #include "LambdaSsm.hpp"
 #include "IfElseSsm.hpp"
 #include "ApplySsm.hpp"
@@ -46,6 +47,9 @@ namespace xo {
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DDefineSsm>();
             FacetRegistry::register_impl<APrintable, DDefineSsm>();
+
+            FacetRegistry::register_impl<ASyntaxStateMachine, DDeftypeSsm>();
+            FacetRegistry::register_impl<APrintable, DDeftypeSsm>();
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DLambdaSsm>();
             FacetRegistry::register_impl<APrintable, DLambdaSsm>();
@@ -98,6 +102,7 @@ namespace xo {
 
             log && log(xtag("DToplevelSeqSsm.tseq", typeseq::id<DToplevelSeqSsm>()));
             log && log(xtag("DDefineSsm.tseq", typeseq::id<DDefineSsm>()));
+            log && log(xtag("DDeftypeSsm.tseq", typeseq::id<DDeftypeSsm>()));
             log && log(xtag("DLambdaSsm.tseq", typeseq::id<DLambdaSsm>()));
             log && log(xtag("DIfElseSsm.tseq", typeseq::id<DIfElseSsm>()));
             log && log(xtag("DExpectFormalArglistSsm.tseq", typeseq::id<DExpectFormalArglistSsm>()));

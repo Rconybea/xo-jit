@@ -21,6 +21,9 @@ namespace xo {
             /** handle define-expression. See @ref DDefineSsm **/
             defexpr,
 
+            /** handle deftype-expression. See @ref DDeftypeSsm **/
+            deftypeexpr,
+
             /** handle lambda-expression. See @ref DLambdaSsm **/
             lambdaexpr,
 

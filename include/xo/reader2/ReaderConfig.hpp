@@ -37,7 +37,7 @@ namespace xo {
                                                .header_{},
                                                .debug_flag_ = false };
 
-            /** configuration for hash map for global symbol table
+            /** configuration for hash map for global symbol table (variables)
              *
              *  reminder: ownership chain
              *    SchematikaReader
@@ -45,9 +45,25 @@ namespace xo {
              *      ->ParserStateMachine
              *      ->DGlobalSymtab
              **/
-            ArenaHashMapConfig symtab_config_ { .name_ = "global-symtab",
-                                                .hint_max_capacity_ = 64*1024,
-                                                .debug_flag_ = false };
+            ArenaHashMapConfig symtab_var_config_ {
+                .name_ = "global-vars",
+                .hint_max_capacity_ = 64*1024,
+                .debug_flag_ = false,
+            };
+
+            /** configuration for hash map for global symbol table (types)
+             *
+             *  reminder: ownership chain
+             *    SchematikaReader
+             *      ->SchematikaParser
+             *      ->ParserStateMachine
+             *      ->DGlobalSymtab
+             **/
+            ArenaHashMapConfig symtab_types_config_ {
+                .name_ = "global-types",
+                .hint_max_capacity_ = 32*1024,
+                .debug_flag_ = false,
+            };
 
             /** debug flag for schematika parser **/
             bool parser_debug_flag_ = false;

@@ -6,6 +6,7 @@
 #include "DToplevelSeqSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DToplevelSeqSsm.hpp"
 #include "DDefineSsm.hpp"
+#include "DDeftypeSsm.hpp"
 #include "DLambdaSsm.hpp"
 #include "ProgressSsm.hpp"
 #include "DIfElseSsm.hpp"
@@ -15,20 +16,10 @@
 #include "VarRef.hpp"
 
 #include <xo/expression2/Constant.hpp>
-//#include <xo/expression2/detail/IExpression_DConstant.hpp>
-
 #include <xo/stringtable2/String.hpp>
-//#include <xo/object2/string/IGCObject_DString.hpp>
-
 #include <xo/object2/Float.hpp>
-//#include <xo/object2/number/IGCObject_DFloat.hpp>
-
 #include <xo/object2/Integer.hpp>
-//#include <xo/object2/number/IGCObject_DInteger.hpp>
-
 #include <xo/object2/Boolean.hpp>
-//#include <xo/object2/boolean/IGCObject_DBoolean.hpp>
-
 #include <xo/alloc2/GCObject.hpp>
 
 namespace xo {
@@ -131,6 +122,10 @@ namespace xo {
 
             case tokentype::tk_def:
                 this->on_def_token(tk, p_psm);
+                return;
+
+            case tokentype::tk_deftype:
+                this->on_deftype_token(tk, p_psm);
                 return;
 
             case tokentype::tk_lambda:
@@ -253,6 +248,17 @@ namespace xo {
              *   def pi : f64 = 3.14159265
              *   def sq(x : f64) -> f64 { (x * x) }
              */
+        }
+
+        void
+        DToplevelSeqSsm::on_deftype_token(const Token & tk,
+                                          ParserStateMachine * p_psm)
+        {
+            (void)tk;
+
+            DDeftypeSsm::start(p_psm->parser_alloc(),
+                               p_psm);
+            p_psm->on_token(Token::deftype_token());
         }
 
         void
@@ -462,8 +468,8 @@ namespace xo {
 
         void
         DToplevelSeqSsm::on_parsed_expression_with_token(obj<AExpression> expr,
-                                                       const Token & tk,
-                                                       ParserStateMachine * p_psm)
+                                                         const Token & tk,
+                                                         ParserStateMachine * p_psm)
         {
             if (tk.tk_type() == tokentype::tk_semicolon) {
                 p_psm->capture_result("DToplevelSeqSsm::on_parsed_expression_with_token", expr);

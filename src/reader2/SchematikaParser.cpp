@@ -23,11 +23,14 @@ namespace xo {
         SchematikaParser::SchematikaParser(const ParserConfig & cfg,
                                            obj<AAllocator> expr_alloc,
                                            obj<AAllocator> aux_alloc)
-        : psm_{cfg.parser_arena_config_,
-               cfg.symtab_config_,
-               cfg.max_stringtable_capacity_,
-               expr_alloc,
-               aux_alloc},
+        : psm_{
+                cfg.parser_arena_config_,
+                cfg.symtab_var_config_,
+                cfg.symtab_types_config_,
+                cfg.max_stringtable_capacity_,
+                expr_alloc,
+                aux_alloc
+            },
           debug_flag_{cfg.debug_flag_}
         {
         }

@@ -18,7 +18,7 @@ namespace xo {
         extern const char *
         QuoteXst::_descr(enum QuoteXst::code x)
         {
-            switch(x) {
+            switch (x) {
             case code::invalid: return "invalid";
             case code::quote_0: return "quote_0";
             case code::quote_1: return "quote_1";
@@ -104,6 +104,7 @@ namespace xo {
             // all the not-yet handled cases
             case tokentype::tk_symbol:
             case tokentype::tk_def:
+            case tokentype::tk_deftype:
             case tokentype::tk_colon:
             case tokentype::tk_singleassign:
             case tokentype::tk_semicolon:

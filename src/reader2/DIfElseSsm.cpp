@@ -147,6 +147,7 @@ namespace xo {
             switch (tk.tk_type()) {
             case tokentype::tk_symbol:
             case tokentype::tk_def:
+            case tokentype::tk_deftype:
                 break;
             case tokentype::tk_if:
                 this->on_if_token(tk, p_psm);

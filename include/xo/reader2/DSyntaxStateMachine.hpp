@@ -48,11 +48,24 @@ namespace xo {
             void illegal_type(obj<AType> type,
                               ParserStateMachine * p_psm)
                 {
+                    // starting with c++23 can use "this auto&& self" instead
                     Derived & self = static_cast<Derived &>(*this);
 
                     p_psm->illegal_input_on_type(Derived::ssm_classname(),
                                                  type,
                                                  self.get_expect_str());
+                }
+
+            /** Explicit error path **/
+            void illegal_parsed_symbol(std::string_view sym,
+                                       ParserStateMachine * p_psm)
+                {
+                    // starting with c++23 can use "this auto&& self" instead
+                    Derived & self = static_cast<Derived &>(*this);
+
+                    p_psm->illegal_input_on_symbol(Derived::ssm_classname(),
+                                                   sym,
+                                                   self.get_expect_str());
                 }
 
             /** Explicit error path **/
@@ -78,12 +91,7 @@ namespace xo {
             void on_parsed_symbol(std::string_view sym,
                                   ParserStateMachine * p_psm)
             {
-                // starting with c++23 can use "this auto&& self" instead
-                Derived & self = reinterpret_cast<Derived&>(*this);
-
-                p_psm->illegal_input_on_symbol(Derived::ssm_classname(),
-                                               sym,
-                                               self.get_expect_str());
+                this->illegal_parsed_symbol(sym, p_psm);
             }
 
             /** Default implementation for required SyntaxStateMachine facet method

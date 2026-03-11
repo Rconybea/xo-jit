@@ -74,6 +74,7 @@ namespace xo {
             case tokentype::tk_i64:
             case tokentype::tk_bool:
             case tokentype::tk_def:
+            case tokentype::tk_deftype:
             case tokentype::tk_if:
             case tokentype::tk_singleassign:
             case tokentype::tk_colon:

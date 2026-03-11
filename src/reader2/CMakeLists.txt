@@ -25,6 +25,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DDefineSsm.cpp
     IPrintable_DDefineSsm.cpp
 
+    DDeftypeSsm.cpp
+    ISyntaxStateMachine_DDeftypeSsm.cpp
+    IPrintable_DDeftypeSsm.cpp
+
     DIfElseSsm.cpp
     ISyntaxStateMachine_DIfElseSsm.cpp
     IPrintable_DIfElseSsm.cpp

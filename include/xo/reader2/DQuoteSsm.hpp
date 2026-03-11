@@ -32,7 +32,6 @@ namespace xo {
          *
          * @endpre
          **/
-
         class QuoteXst {
         public:
             enum class code {

@@ -135,6 +135,7 @@ namespace xo {
                 // all the not-yet-handled cases
             case tokentype::tk_lambda:
             case tokentype::tk_def:
+            case tokentype::tk_deftype:
             case tokentype::tk_if:
             case tokentype::tk_symbol:
             case tokentype::tk_colon:

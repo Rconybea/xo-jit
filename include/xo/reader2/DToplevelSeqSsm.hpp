@@ -84,6 +84,11 @@ namespace xo {
              **/
             void on_def_token(const Token & tk, ParserStateMachine * p_psm);
 
+            /** update state for this syntax on incoming @c deftype token @p tk,
+             *  with overall parser state in @p p_psm
+             **/
+            void on_deftype_token(const Token & tk, ParserStateMachine * p_psm);
+
             /** update state for this syntax on incoming lamdba token @p tk,
              *  overall parser state in @p p_psm
              **/

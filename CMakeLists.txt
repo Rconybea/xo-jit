@@ -75,6 +75,26 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-syntaxstatemachine-deftypessm
+    FACET_PKG xo_reader2
+    FACET SyntaxStateMachine
+    REPR DeftypeSsm
+    INPUT idl/ISyntaxStateMachine_DDeftypeSsm.json5
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-printable-deftypessm
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR DeftypeSsm
+    INPUT idl/IPrintable_DDeftypeSsm.json5
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-lambdassm
     FACET_PKG xo_reader2
     FACET SyntaxStateMachine

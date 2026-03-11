@@ -47,8 +47,10 @@ namespace xo {
         public:
             /**
              *  @p config        arena configuration for parser state
-             *  @p symtab_config configuration for global symtab
+             *  @p symtab_var_config configuration for global symtab variables
              *                   (maps separate dedicated memory)
+             *  @p symtab_type_config configuration for global symtab types
+             *                   (maps to separate dedicated memory)
              *  @p max_stringtable_capacity
              *                   hard max size for unique stringtable
              *  @p expr_alloc    allocator for schematika expressions.
@@ -59,7 +61,8 @@ namespace xo {
              *                   same as @p expr_alloc.
              **/
             ParserStateMachine(const ArenaConfig & config,
-                               const ArenaHashMapConfig & symtab_config,
+                               const ArenaHashMapConfig & symtab_var_config,
+                               const ArenaHashMapConfig & symtab_type_config,
                                size_type max_stringtable_capacity,
                                obj<AAllocator> expr_alloc,
                                obj<AAllocator> aux_alloc);
@@ -150,6 +153,9 @@ namespace xo {
              *  (from nested parsing state)
              **/
             void on_parsed_typedescr(TypeDescr td);
+
+            /** respond to type emitted by nested ssm **/
+            void on_parsed_type(obj<AType> type);
 
             /** update state to consume param (name, type) emitted by
              *  nested (expired) parsing state

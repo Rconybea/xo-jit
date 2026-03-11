@@ -102,6 +102,7 @@ namespace xo {
             // all the not-yet handled cases
             case tokentype::tk_symbol:
             case tokentype::tk_def:
+            case tokentype::tk_deftype:
             case tokentype::tk_colon:
             case tokentype::tk_singleassign:
             case tokentype::tk_semicolon:
