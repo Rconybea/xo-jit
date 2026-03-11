@@ -310,7 +310,6 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-ifelseexpr
     FACET_PKG xo_alloc2
     FACET GCObject
-#    REPR IfElseExpr
     INPUT idl/IGCObject_DIfElseExpr.json5
 )
 
@@ -319,7 +318,6 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-ifelseexpr
     FACET_PKG xo_printable2
     FACET Printable
-#    REPR IfElseExpr
     INPUT idl/IPrintable_DIfElseExpr.json5
 )
 
@@ -330,7 +328,6 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-sequenceexpr
     FACET_PKG xo_expression2
     FACET Expression
-#    REPR SequenceExpr
     INPUT idl/IExpression_DSequenceExpr.json5
 )
 
@@ -347,7 +344,6 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-sequenceexpr
     FACET_PKG xo_printable2
     FACET Printable
-#    REPR SequenceExpr
     INPUT idl/IPrintable_DSequenceExpr.json5
 )
 
