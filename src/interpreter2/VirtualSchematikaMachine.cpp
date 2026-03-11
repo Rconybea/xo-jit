@@ -5,6 +5,7 @@
 
 #include "VirtualSchematikaMachine.hpp"
 #include "DPrimitive_gco_3_dict_string_gco.hpp"
+#include "DPrimitive_gco_2_gco_gco.hpp"
 #include "VsmDefContFrame.hpp"
 #include "VsmApplyFrame.hpp"
 #include "VsmEvalArgsFrame.hpp"
@@ -13,6 +14,7 @@
 #include "VsmSeqContFrame.hpp"
 #include "VsmRcx.hpp"
 #include "Closure.hpp"
+#include <xo/object2/Sequence.hpp>
 #include <xo/numeric/NumericDispatch.hpp>
 #include <xo/expression2/DefineExpr.hpp>
 #include <xo/expression2/ApplyExpr.hpp>
@@ -25,6 +27,7 @@
 #include <xo/procedure2/RuntimeContext.hpp>
 #include <xo/procedure2/Primitive_gco_0.hpp>
 #include <xo/procedure2/Primitive_gco_1_gco.hpp>
+#include <xo/procedure2/Primitive_gco_2_gco_gco.hpp>
 #include <xo/procedure2/Primitive_gco_3_dict_string_gco.hpp>
 #include <xo/gc/X1Collector.hpp>
 #include <xo/reflect/Reflect.hpp>
@@ -911,6 +914,26 @@ namespace xo {
         static DPrimitive_gco_0 s_cwd_pm("_cwd",
                                          &xfer_cwd);
 
+        // ----- primitive: fn_nth() -----
+
+        // TODO: seq_gc -> obj<ASequence>
+        //       n_gco -> obj<AGCObject,DInteger>
+        //
+        obj<AGCObject>
+        xfer_nth(obj<ARuntimeContext> rcx,
+                 obj<AGCObject> seq_gco,
+                 obj<AGCObject> n_gco)
+        {
+            (void)rcx;
+
+            obj<ASequence> seq = seq_gco.to_facet<ASequence>();
+            auto n = obj<AGCObject,DInteger>::from(n_gco);
+
+            return seq.at(n->value());
+        }
+
+        static DPrimitive_gco_2_gco_gco s_nth_pm("_nth", &xfer_nth);
+
         // ----- primitive: fn_n_args() -----
 
         obj<AGCObject>
@@ -1001,6 +1024,18 @@ namespace xo {
                      name,
                      Reflect::require<DPrimitive_gco_0>(),
                      obj<AGCObject,DPrimitive_gco_0>(&s_cwd_pm));
+            }
+
+            /* nth */
+            {
+                const DUniqueString * name
+                    = reader_.intern_string("nth");
+
+                global_env_->_upsert_value
+                    (mm_.to_op(),
+                     name,
+                     Reflect::require<DPrimitive_gco_2_gco_gco>(),
+                     obj<AGCObject,DPrimitive_gco_2_gco_gco>(&s_nth_pm));
             }
 
             /* fn_n_args */
