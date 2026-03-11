@@ -37,7 +37,6 @@ xo_add_genfacet(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-toplevelseqssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ToplevelSeqSsm
     INPUT idl/ISyntaxStateMachine_DToplevelSeqSsm.json5
 )
@@ -46,7 +45,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-toplevelseqssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ToplevelSeqSsm
     INPUT idl/IPrintable_DToplevelSeqSsm.json5
 )
@@ -57,7 +55,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-definessm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR DefineSsm
     INPUT idl/ISyntaxStateMachine_DDefineSsm.json5
 )
@@ -66,7 +63,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-definessm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR DefineSsm
     INPUT idl/IPrintable_DDefineSsm.json5
 )
@@ -77,7 +73,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-deftypessm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR DeftypeSsm
     INPUT idl/ISyntaxStateMachine_DDeftypeSsm.json5
 )
@@ -86,7 +81,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-deftypessm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR DeftypeSsm
     INPUT idl/IPrintable_DDeftypeSsm.json5
 )
@@ -97,7 +91,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-lambdassm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR LambdaSsm
     INPUT idl/ISyntaxStateMachine_DLambdaSsm.json5
 )
@@ -106,7 +99,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-lambdassm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR LambdaSsm
     INPUT idl/IPrintable_DLambdaSsm.json5
 )
@@ -117,7 +109,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-parenssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ParenSsm
     INPUT idl/ISyntaxStateMachine_DParenSsm.json5
 )
@@ -126,7 +117,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-parenssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ParenSsm
     INPUT idl/IPrintable_DParenSsm.json5
 )
@@ -137,7 +127,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-expectformalarglistssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ExpectFormalArglistSsm
     INPUT idl/ISyntaxStateMachine_DExpectFormalArglistSsm.json5
 )
@@ -146,7 +135,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-expectformalarglistssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ExpectFormalArglistSsm
     INPUT idl/IPrintable_DExpectFormalArglistSsm.json5
 )
@@ -157,7 +145,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-expectformalargssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ExpectFormalArgSsm
     INPUT idl/ISyntaxStateMachine_DExpectFormalArgSsm.json5
 )
@@ -166,7 +153,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-expectformalargssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ExpectFormalArgSsm
     INPUT idl/IPrintable_DExpectFormalArgSsm.json5
 )
@@ -177,7 +163,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-ifelsessm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR IfElseSsm
     INPUT idl/ISyntaxStateMachine_DIfElseSsm.json5
 )
@@ -186,7 +171,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-ifelsessm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR IfElseSsm
     INPUT idl/IPrintable_DIfElseSsm.json5
 )
@@ -197,7 +181,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-sequencessm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR SequenceSsm
     INPUT idl/ISyntaxStateMachine_DSequenceSsm.json5
 )
@@ -206,7 +189,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-sequencessm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR SequenceSsm
     INPUT idl/IPrintable_DSequenceSsm.json5
 )
@@ -217,7 +199,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-applyssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ApplySsm
     INPUT idl/ISyntaxStateMachine_DApplySsm.json5
 )
@@ -226,7 +207,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-applyssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ApplySsm
     INPUT idl/IPrintable_DApplySsm.json5
 )
@@ -237,7 +217,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-expectsymbolssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ExpectSymbolSsm
     INPUT idl/ISyntaxStateMachine_DExpectSymbolSsm.json5
 )
@@ -246,7 +225,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-expectsymbolssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ExpectSymbolSsm
     INPUT idl/IPrintable_DExpectSymbolSsm.json5
 )
@@ -257,7 +235,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-expecttypessm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ExpectTypeSsm
     INPUT idl/ISyntaxStateMachine_DExpectTypeSsm.json5
 )
@@ -266,7 +243,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-expecttypessm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ExpectTypeSsm
     INPUT idl/IPrintable_DExpectTypeSsm.json5
 )
@@ -277,7 +253,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-expectexprssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ExpectExprSsm
     INPUT idl/ISyntaxStateMachine_DExpectExprSsm.json5
 )
@@ -286,7 +261,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-expectexprssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ExpectExprSsm
     INPUT idl/IPrintable_DExpectExprSsm.json5
 )
@@ -297,7 +271,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-progressssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ProgressSsm
     INPUT idl/ISyntaxStateMachine_DProgressSsm.json5
 )
@@ -306,7 +279,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-progressssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ProgressSsm
     INPUT idl/IPrintable_DProgressSsm.json5
 )
@@ -317,7 +289,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-quotessm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR QuoteSsm
     INPUT idl/ISyntaxStateMachine_DQuoteSsm.json5
 )
@@ -326,7 +297,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-quotessm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR QuoteSsm
     INPUT idl/IPrintable_DQuoteSsm.json5
 )
@@ -337,7 +307,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-expectqliteralssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ExpectQLiteralSsm
     INPUT idl/ISyntaxStateMachine_DExpectQLiteralSsm.json5
 )
@@ -346,7 +315,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-expectqliteralssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ExpectQLiteralSsm
     INPUT idl/IPrintable_DExpectQLiteralSsm.json5
 )
@@ -357,7 +325,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-expectqlistssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ExpectQListSsm
     INPUT idl/ISyntaxStateMachine_DExpectQListSsm.json5
 )
@@ -366,7 +333,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-expectqlistssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ExpectQListSsm
     INPUT idl/IPrintable_DExpectQListSsm.json5
 )
@@ -377,7 +343,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-syntaxstatemachine-expectqarrayssm
     FACET_PKG xo_reader2
-    FACET SyntaxStateMachine
 #    REPR ExpectQArraySsm
     INPUT idl/ISyntaxStateMachine_DExpectQArraySsm.json5
 )
@@ -386,7 +351,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-reader2-facetimpl-printable-expectqarrayssm
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ExpectQArraySsm
     INPUT idl/IPrintable_DExpectQArraySsm.json5
 )
