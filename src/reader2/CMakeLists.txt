@@ -26,8 +26,8 @@ set(SELF_SRCS
     IPrintable_DDefineSsm.cpp
 
     DDeftypeSsm.cpp
-    ISyntaxStateMachine_DDeftypeSsm.cpp
-    IPrintable_DDeftypeSsm.cpp
+    facet/ISyntaxStateMachine_DDeftypeSsm.cpp
+    facet/IPrintable_DDeftypeSsm.cpp
 
     DIfElseSsm.cpp
     facet/ISyntaxStateMachine_DIfElseSsm.cpp

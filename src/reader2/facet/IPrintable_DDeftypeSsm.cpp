@@ -11,7 +11,7 @@
  *       [idl/IPrintable_DDeftypeSsm.json5]
 **/
 
-#include "ssm/IPrintable_DDeftypeSsm.hpp"
+#include "deftype/IPrintable_DDeftypeSsm.hpp"
 
 namespace xo {
     namespace scm {

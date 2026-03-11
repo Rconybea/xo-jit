@@ -11,7 +11,7 @@
  *       [idl/ISyntaxStateMachine_DDeftypeSsm.json5]
 **/
 
-#include "ssm/ISyntaxStateMachine_DDeftypeSsm.hpp"
+#include "deftype/ISyntaxStateMachine_DDeftypeSsm.hpp"
 
 namespace xo {
     namespace scm {
