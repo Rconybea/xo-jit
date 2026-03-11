@@ -1806,7 +1806,22 @@ function(xo_add_genfacet_all target_name)
     get_property(genfacet_targets DIRECTORY PROPERTY XO_GENFACET_TARGETS)
     if(genfacet_targets)
         add_custom_target(${target_name} DEPENDS ${genfacet_targets})
+
+        if(XO_SUBMODULE_BUILD)
+            set_property(GLOBAL APPEND PROPERTY XO_UMBRELLA_GENFACET_TARGETS ${target_name})
+        endif()
     else()
         message(WARNING "xo_add_genfacet_all: no genfacet targets found")
+    endif()
+endfunction()
+
+# create umbrella target that depends on all per-satellite genfacet-all targets.
+# only meaningful in umbrella build (XO_SUBMODULE_BUILD=True).
+function(xo_umbrella_genfacet_all target_name)
+    get_property(all_targets GLOBAL PROPERTY XO_UMBRELLA_GENFACET_TARGETS)
+    if(all_targets)
+        add_custom_target(${target_name} DEPENDS ${all_targets})
+    else()
+        message(WARNING "xo_umbrella_genfacet_all: no umbrella genfacet targets found")
     endif()
 endfunction()
