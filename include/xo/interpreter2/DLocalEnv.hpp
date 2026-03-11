@@ -41,7 +41,8 @@ namespace xo {
             ///@{
 
             DLocalEnv * parent() const noexcept { return parent_; }
-            size_type size() const noexcept { return symtab_->size(); }
+            size_type n_vars() const noexcept { return symtab_->n_vars(); }
+            size_type n_types() const noexcept { return symtab_->n_types(); }
 
             /** lookup current value associated with binding @p ix **/
             obj<AGCObject> lookup_value(Binding ix) const noexcept;

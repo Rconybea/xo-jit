@@ -49,7 +49,7 @@ namespace xo {
             if (env) {
                 auto j = ix.j_slot();
 
-                if (j < static_cast<decltype(j)>(env->size())) {
+                if (j < static_cast<decltype(j)>(env->n_vars())) {
                     return (*(env->args_))[j];
                 } else {
                     assert(false);
@@ -78,7 +78,7 @@ namespace xo {
             if (env) {
                 auto j = ix.j_slot();
 
-                if (j < static_cast<decltype(j)>(env->size())) {
+                if (j < static_cast<decltype(j)>(env->n_vars())) {
                     log && log("STUB: need write barrier for GC here");
                     (*(env->args_))[j] = x;
                 } else {

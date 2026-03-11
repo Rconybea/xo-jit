@@ -47,8 +47,8 @@ namespace xo {
             /** @defgroup scm-globalenv-methods methods **/
             ///@{
 
-            /** symbol-table size.  Is the number of distinct global symbols **/
-            size_type size() const noexcept { return symtab_->size(); }
+            /** symbol-table size.  Is the number of distinct global variables **/
+            size_type n_vars() const noexcept { return symtab_->n_vars(); }
 
             /** lookup current value associated with binding @p ix **/
             obj<AGCObject> lookup_value(Binding ix) const noexcept;

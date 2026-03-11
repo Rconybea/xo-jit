@@ -21,7 +21,7 @@ namespace xo {
         DGlobalEnv::_make(obj<AAllocator> mm,
                           DGlobalSymtab * symtab)
         {
-            DArray * values = DArray::empty(mm, symtab->capacity());
+            DArray * values = DArray::empty(mm, symtab->var_capacity());
 
             void * mem = mm.alloc_for<DGlobalSymtab>();
 
@@ -136,7 +136,7 @@ namespace xo {
             return ppii.pps()->pretty_struct
                        (ppii,
                         "DGlobalEnv",
-                        refrtag("size", symtab_->size()));
+                        refrtag("n_vars", symtab_->n_vars()));
         }
 
     } /*namespace scm*/
