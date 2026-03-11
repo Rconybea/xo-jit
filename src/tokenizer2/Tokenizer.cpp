@@ -587,6 +587,8 @@ namespace xo {
                 if ((tk_text == "true") || (tk_text == "false")) {
                     tk_type = tokentype::tk_bool;
                     keep_text = true;
+                } else if (tk_text == "nil") {
+                    tk_type = tokentype::tk_nil;
                 } else if (tk_text == "type") {
                     tk_type = tokentype::tk_type;
                 } else if (tk_text == "def") {

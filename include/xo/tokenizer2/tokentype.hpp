@@ -140,6 +140,9 @@ namespace xo {
             /** operator @c '!=' **/
             tk_cmpne,
 
+            /** keyword @c 'nil' **/
+            tk_nil,
+
             /** keyword @c 'type' **/
             tk_type,
 

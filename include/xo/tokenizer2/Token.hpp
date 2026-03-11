@@ -134,6 +134,8 @@ namespace xo {
             /** token for @c "==" **/
             static Token cmpeq_token() { return Token(tokentype::tk_cmpeq); }
 
+            /** token representing keyword @c nil **/
+            static Token nil_token() { return Token(tokentype::tk_nil); }
             /** token representing keyword @c type **/
             static Token type() { return Token(tokentype::tk_type); }
             /** token representing keyword @c def **/
