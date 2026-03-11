@@ -38,7 +38,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-symboltable-localsymtab
     FACET_PKG xo_expression2
     FACET SymbolTable
-    REPR LocalSymtab
+#    REPR LocalSymtab
     INPUT idl/ISymbolTable_DLocalSymtab.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
@@ -49,7 +49,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-localsymtab
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR LocalSymtab
+#    REPR LocalSymtab
     INPUT idl/IGCObject_DLocalSymtab.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
@@ -60,7 +60,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-localsymtab
     FACET_PKG xo_printable2
     FACET Printable
-    REPR LocalSymtab
+#    REPR LocalSymtab
     INPUT idl/IPrintable_DLocalSymtab.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
@@ -73,7 +73,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-symboltable-globalsymtab
     FACET_PKG xo_expression2
     FACET SymbolTable
-    REPR GlobalSymtab
+#    REPR GlobalSymtab
     INPUT idl/ISymbolTable_DGlobalSymtab.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
@@ -84,7 +84,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-globalsymtab
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR GlobalSymtab
+#    REPR GlobalSymtab
     INPUT idl/IGCObject_DGlobalSymtab.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
@@ -95,7 +95,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-globalsymtab
     FACET_PKG xo_printable2
     FACET Printable
-    REPR GlobalSymtab
+#    REPR GlobalSymtab
     INPUT idl/IPrintable_DGlobalSymtab.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR symtab
@@ -119,7 +119,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-constant
     FACET_PKG xo_expression2
     FACET Expression
-    REPR Constant
+#    REPR Constant
     INPUT idl/IExpression_DConstant.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -130,7 +130,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-constant
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR Constant
+#    REPR Constant
     INPUT idl/IGCObject_DConstant.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -141,7 +141,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-constant
     FACET_PKG xo_printable2
     FACET Printable
-    REPR Constant
+#    REPR Constant
     INPUT idl/IPrintable_DConstant.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -154,7 +154,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-variable
     FACET_PKG xo_expression2
     FACET Expression
-    REPR Variable
+#    REPR Variable
     INPUT idl/IExpression_DVariable.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -165,7 +165,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-variable
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR Variable
+#    REPR Variable
     INPUT idl/IGCObject_DVariable.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -176,7 +176,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-variable
     FACET_PKG xo_printable2
     FACET Printable
-    REPR Variable
+#    REPR Variable
     INPUT idl/IPrintable_DVariable.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -189,7 +189,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-typename
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR Typename
+#    REPR Typename
     INPUT idl/IGCObject_DTypename.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR typename
@@ -200,7 +200,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-typename
     FACET_PKG xo_printable2
     FACET Printable
-    REPR Typename
+#    REPR Typename
     INPUT idl/IPrintable_DTypename.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR typename
@@ -213,7 +213,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-varref
     FACET_PKG xo_expression2
     FACET Expression
-    REPR VarRef
+#    REPR VarRef
     INPUT idl/IExpression_DVarRef.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -224,7 +224,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-varref
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR VarRef
+#    REPR VarRef
     INPUT idl/IGCObject_DVarRef.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -235,7 +235,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-varref
     FACET_PKG xo_printable2
     FACET Printable
-    REPR VarRef
+#    REPR VarRef
     INPUT idl/IPrintable_DVarRef.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -248,7 +248,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-defineexpr
     FACET_PKG xo_expression2
     FACET Expression
-    REPR DefineExpr
+#    REPR DefineExpr
     INPUT idl/IExpression_DDefineExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -259,7 +259,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-defineexpr
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR DefineExpr
+#    REPR DefineExpr
     INPUT idl/IGCObject_DDefineExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR define
@@ -270,7 +270,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-defineexpr
     FACET_PKG xo_printable2
     FACET Printable
-    REPR DefineExpr
+#    REPR DefineExpr
     INPUT idl/IPrintable_DDefineExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -283,7 +283,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-applyexpr
     FACET_PKG xo_expression2
     FACET Expression
-    REPR ApplyExpr
+#    REPR ApplyExpr
     INPUT idl/IExpression_DApplyExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -294,7 +294,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-applyexpr
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR ApplyExpr
+#    REPR ApplyExpr
     INPUT idl/IGCObject_DApplyExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -305,7 +305,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-applyexpr
     FACET_PKG xo_printable2
     FACET Printable
-    REPR ApplyExpr
+#    REPR ApplyExpr
     INPUT idl/IPrintable_DApplyExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -318,7 +318,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-lambdaexpr
     FACET_PKG xo_expression2
     FACET Expression
-    REPR LambdaExpr
+#    REPR LambdaExpr
     INPUT idl/IExpression_DLambdaExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -329,7 +329,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-lambdaexpr
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR LambdaExpr
+#    REPR LambdaExpr
     INPUT idl/IGCObject_DLambdaExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -340,7 +340,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-lambdaexpr
     FACET_PKG xo_printable2
     FACET Printable
-    REPR LambdaExpr
+#    REPR LambdaExpr
     INPUT idl/IPrintable_DLambdaExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -353,7 +353,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-ifelseexpr
     FACET_PKG xo_expression2
     FACET Expression
-    REPR IfElseExpr
+#    REPR IfElseExpr
     INPUT idl/IExpression_DIfElseExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -364,7 +364,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-ifelseexpr
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR IfElseExpr
+#    REPR IfElseExpr
     INPUT idl/IGCObject_DIfElseExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -375,7 +375,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-ifelseexpr
     FACET_PKG xo_printable2
     FACET Printable
-    REPR IfElseExpr
+#    REPR IfElseExpr
     INPUT idl/IPrintable_DIfElseExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -388,7 +388,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-sequenceexpr
     FACET_PKG xo_expression2
     FACET Expression
-    REPR SequenceExpr
+#    REPR SequenceExpr
     INPUT idl/IExpression_DSequenceExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -399,7 +399,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-sequenceexpr
     FACET_PKG xo_alloc2
     FACET GCObject
-    REPR SequenceExpr
+#    REPR SequenceExpr
     INPUT idl/IGCObject_DSequenceExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
@@ -410,7 +410,7 @@ xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-sequenceexpr
     FACET_PKG xo_printable2
     FACET Printable
-    REPR SequenceExpr
+#    REPR SequenceExpr
     INPUT idl/IPrintable_DSequenceExpr.json5
     OUTPUT_HPP_DIR include/xo/expression2
     OUTPUT_IMPL_SUBDIR detail
