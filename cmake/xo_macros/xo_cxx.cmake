@@ -1736,7 +1736,6 @@ function(xo_add_genfacetimpl)
     set(oneValueArgs
         TARGET              # Name for this generation target
         FACET_PKG           # package providing abstract interface
-        FACET               # facet name
         INPUT               # Input .json5 file
     )
     set(multiValueArgs "")
@@ -1745,9 +1744,6 @@ function(xo_add_genfacetimpl)
 
     if(NOT DEFINED GF_TARGET)
         message(FATAL_ERROR "xo_add_genfacetimpl: TARGET is required")
-    endif()
-    if(NOT DEFINED GF_FACET)
-        message(FATAL_ERROR "xo_add_genfacetimpl: FACET is required")
     endif()
     if(NOT DEFINED GF_INPUT)
         message(FATAL_ERROR "xo_add_genfacetimpl: INPUT is required")
