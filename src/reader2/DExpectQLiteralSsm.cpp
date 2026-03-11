@@ -140,6 +140,7 @@ namespace xo {
             case tokentype::tk_slash:
             case tokentype::tk_cmpeq:
             case tokentype::tk_cmpne:
+            case tokentype::tk_nil:
             case tokentype::tk_type:
             case tokentype::tk_then:
             case tokentype::tk_else:

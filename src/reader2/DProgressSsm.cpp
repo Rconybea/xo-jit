@@ -309,6 +309,7 @@ namespace xo {
                 this->on_operator_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_nil:
             case tokentype::tk_type:
             case tokentype::tk_lambda:
                 break;

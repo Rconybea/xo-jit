@@ -15,6 +15,7 @@
 #include <xo/expression2/VarRef.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/procedure2/Primitive_gco_2_gco_gco.hpp>
+#include <xo/object2/List.hpp>
 #include <xo/object2/Float.hpp>
 #include <xo/object2/Integer.hpp>
 #include <xo/stringtable2/String.hpp>
@@ -41,6 +42,7 @@ namespace xo {
     using xo::scm::Token;
     using xo::mm::AGCObject;
     using xo::scm::DPrimitive_gco_2_gco_gco;
+    using xo::scm::DList;
     using xo::scm::DString;
     using xo::scm::DFloat;
     using xo::scm::DInteger;
@@ -594,6 +596,67 @@ namespace xo {
                 REQUIRE(value_str);
 
                 REQUIRE(strcmp(value_str->chars(), "hello world") == 0);
+            }
+
+            //REQUIRE(result.is_error());
+            //// illegal input on token
+            //REQUIRE(result.error_description());
+
+            log && fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("SchematikaParser-interactive-nil", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = false;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    nil ;
+             *
+             **/
+
+            {
+                auto & result = parser.on_token(Token::nil_token());
+
+                log && log("after nil token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_incomplete());
+            }
+
+            {
+                auto & result = parser.on_token(Token::semicolon_token());
+
+                log && log("after semicolon token:");
+                log && log(xtag("parser", &parser));
+                log && log(xtag("result", result));
+
+                REQUIRE(parser.has_incomplete_expr() == false);
+                REQUIRE(!result.is_error());
+                REQUIRE(result.is_expression());
+                REQUIRE(result.result_expr());
+
+                auto expr = obj<AExpression,DConstant>::from(result.result_expr());
+                REQUIRE(expr);
+
+                REQUIRE(expr->value());
+
+                auto value_list = obj<AGCObject,DList>::from(expr->value());
+
+                REQUIRE(value_list);
+
+                REQUIRE(value_list->is_empty());
             }
 
             //REQUIRE(result.is_error());

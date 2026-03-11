@@ -18,6 +18,7 @@
 #include <xo/object2/Boolean.hpp>
 #include <xo/object2/Integer.hpp>
 #include <xo/object2/Float.hpp>
+#include <xo/object2/List.hpp>
 #include <xo/stringtable2/String.hpp>
 #include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/facet_implementation.hpp>
@@ -153,6 +154,10 @@ namespace xo {
 
             case tokentype::tk_bool:
                 this->on_bool_token(tk, p_psm);
+                return;
+
+            case tokentype::tk_nil:
+                this->on_nil_token(tk, p_psm);
                 return;
 
             case tokentype::tk_if:
@@ -366,6 +371,23 @@ namespace xo {
             // DProgressSsm responsible for resolving cases like
             //  true;
             //  true && false;
+
+            DProgressSsm::start(p_psm->parser_alloc(),
+                                expr,
+                                p_psm);
+        }
+
+        void
+        DExpectExprSsm::on_nil_token(const Token & tk,
+                                     ParserStateMachine * p_psm)
+        {
+            (void)tk;
+
+            auto nil = DList::nil();
+            auto expr = DConstant::make(p_psm->expr_alloc(), nil);
+
+            // DProgressSsm responsible for resolving cases like
+            //   nil ++ nil;
 
             DProgressSsm::start(p_psm->parser_alloc(),
                                 expr,

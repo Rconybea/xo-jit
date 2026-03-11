@@ -17,6 +17,7 @@
 
 #include <xo/expression2/Constant.hpp>
 #include <xo/stringtable2/String.hpp>
+#include <xo/object2/List.hpp>
 #include <xo/object2/Float.hpp>
 #include <xo/object2/Integer.hpp>
 #include <xo/object2/Boolean.hpp>
@@ -150,6 +151,10 @@ namespace xo {
 
             case tokentype::tk_bool:
                 this->on_bool_token(tk, p_psm);
+                return;
+
+            case tokentype::tk_nil:
+                this->on_nil_token(tk, p_psm);
                 return;
 
             case tokentype::tk_leftparen:
@@ -378,7 +383,7 @@ namespace xo {
                 break;
             }
 
-            Super::on_token(tk, p_psm);
+            Super::illegal_token(tk, p_psm);
         }
 
         void
@@ -404,7 +409,32 @@ namespace xo {
                 break;
             }
 
-            Super::on_token(tk, p_psm);
+            Super::illegal_token(tk, p_psm);
+        }
+
+        void
+        DToplevelSeqSsm::on_nil_token(const Token & tk,
+                                      ParserStateMachine * p_psm)
+        {
+            switch (seqtype_) {
+            case exprseqtype::toplevel_interactive:
+            {
+                auto dvalue = DList::nil();
+                auto expr = DConstant::make(p_psm->expr_alloc(), dvalue);
+
+                DProgressSsm::start(p_psm->parser_alloc(),
+                                    expr,
+                                    p_psm);
+                return;
+            }
+            case exprseqtype::toplevel_batch:
+                break;
+            case exprseqtype::N:
+                assert(false);
+                break;
+            }
+
+            Super::illegal_token(tk, p_psm);
         }
 
         void
@@ -431,7 +461,7 @@ namespace xo {
                 break;
             }
 
-            Super::on_token(tk, p_psm);
+            Super::illegal_token(tk, p_psm);
         }
 
         void
@@ -454,7 +484,7 @@ namespace xo {
                 break;
             }
 
-            Super::on_token(tk, p_psm);
+            Super::illegal_token(tk, p_psm);
         }
 
         void

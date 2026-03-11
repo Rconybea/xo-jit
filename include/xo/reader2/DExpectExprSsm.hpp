@@ -84,11 +84,17 @@ namespace xo {
             void on_quote_token(const Token & tk,
                                 ParserStateMachine * p_psm);
 
-            /** step state machine for this syntax on incoming boolean literal token @p tkk
+            /** step state machine for this syntax on incoming boolean literal token @p tk
              *  with overall parser state in @p p_psm
              **/
             void on_bool_token(const Token & tk,
                                ParserStateMachine * p_psm);
+
+            /** step state machine for this syntax on incoming nil literal token @p tk
+             *  with overall parser state in @p p_psm.
+             **/
+            void on_nil_token(const Token & tk,
+                              ParserStateMachine * p_psm);
 
             /** update state for this syntax on incoming f64 token @p tk,
              *  overall parser state in @p p_psm
