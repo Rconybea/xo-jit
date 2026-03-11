@@ -31,7 +31,7 @@ namespace xo {
     using xo::scm::DFloat;
     using xo::scm::DBoolean;
     using xo::scm::DInteger;
-    using xo::scm::DRuntimeError;
+//    using xo::scm::DRuntimeError;
     using xo::mm::AGCObject;
     using xo::mm::MemorySizeInfo;
     using xo::mm::AAllocator;

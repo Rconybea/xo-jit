@@ -15,6 +15,7 @@
 #include "VsmRcx.hpp"
 #include "Closure.hpp"
 #include <xo/object2/Sequence.hpp>
+#include <xo/object2/List.hpp>
 #include <xo/numeric/NumericDispatch.hpp>
 #include <xo/expression2/DefineExpr.hpp>
 #include <xo/expression2/ApplyExpr.hpp>
@@ -914,7 +915,7 @@ namespace xo {
         static DPrimitive_gco_0 s_cwd_pm("_cwd",
                                          &xfer_cwd);
 
-        // ----- primitive: fn_nth() -----
+        // ----- primitive: nth() -----
 
         // TODO: seq_gc -> obj<ASequence>
         //       n_gco -> obj<AGCObject,DInteger>
@@ -933,6 +934,24 @@ namespace xo {
         }
 
         static DPrimitive_gco_2_gco_gco s_nth_pm("_nth", &xfer_nth);
+
+        // ----- primitive: cons() -----
+
+        obj<AGCObject>
+        xfer_cons(obj<ARuntimeContext> rcx,
+                  obj<AGCObject> car,
+                  obj<AGCObject> cdr)
+        {
+            (void)rcx;
+
+            auto cdr_list = obj<AGCObject,DList>::from(cdr);
+
+            return DList::cons(rcx.allocator(),
+                               car,
+                               cdr_list.data());
+        }
+
+        static DPrimitive_gco_2_gco_gco s_cons_pm("_cons", &xfer_cons);
 
         // ----- primitive: fn_n_args() -----
 
@@ -1036,6 +1055,18 @@ namespace xo {
                      name,
                      Reflect::require<DPrimitive_gco_2_gco_gco>(),
                      obj<AGCObject,DPrimitive_gco_2_gco_gco>(&s_nth_pm));
+            }
+
+            /* cons */
+            {
+                const DUniqueString * name
+                    = reader_.intern_string("cons");
+
+                global_env_->_upsert_value
+                    (mm_.to_op(),
+                     name,
+                     Reflect::require<DPrimitive_gco_2_gco_gco>(),
+                     obj<AGCObject,DPrimitive_gco_2_gco_gco>(&s_cons_pm));
             }
 
             /* fn_n_args */
