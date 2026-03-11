@@ -7,7 +7,8 @@
 #include "ssm/ISyntaxStateMachine_DToplevelSeqSsm.hpp"
 #include "DDefineSsm.hpp"
 #include "DDeftypeSsm.hpp"
-#include "DLambdaSsm.hpp"
+#include "LambdaSsm.hpp"
+//#include "lambda/DLambdaSsm.hpp"
 #include "ProgressSsm.hpp"
 #include "IfElseSsm.hpp"
 //#include "ifelse/DIfElseSsm.hpp"
@@ -24,13 +25,13 @@
 #include <xo/alloc2/GCObject.hpp>
 
 namespace xo {
-    using xo::scm::DProgressSsm;
+    //using xo::scm::DProgressSsm;
     using xo::scm::DConstant;
-    using xo::scm::DFloat;
+    //using xo::scm::DFloat;
     using xo::mm::AGCObject;
-    using xo::mm::AAllocator;
+    //using xo::mm::AAllocator;
     using xo::mm::DArena;
-    using xo::facet::with_facet;
+    //using xo::facet::with_facet;
     using xo::reflect::typeseq;
 
     namespace scm {

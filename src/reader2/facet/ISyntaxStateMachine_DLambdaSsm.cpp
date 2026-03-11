@@ -11,7 +11,7 @@
  *       [idl/ISyntaxStateMachine_DLambdaSsm.json5]
 **/
 
-#include "ssm/ISyntaxStateMachine_DLambdaSsm.hpp"
+#include "lambda/ISyntaxStateMachine_DLambdaSsm.hpp"
 
 namespace xo {
     namespace scm {

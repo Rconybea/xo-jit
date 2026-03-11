@@ -11,7 +11,7 @@
  *       [idl/IPrintable_DLambdaSsm.json5]
 **/
 
-#include "ssm/IPrintable_DLambdaSsm.hpp"
+#include "lambda/IPrintable_DLambdaSsm.hpp"
 
 namespace xo {
     namespace scm {
