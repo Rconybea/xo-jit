@@ -11,7 +11,7 @@
  *       [idl/IPrintable_DApplySsm.json5]
 **/
 
-#include "ssm/IPrintable_DApplySsm.hpp"
+#include "apply/IPrintable_DApplySsm.hpp"
 
 namespace xo {
     namespace scm {

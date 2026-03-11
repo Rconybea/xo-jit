@@ -11,7 +11,7 @@
  *       [idl/ISyntaxStateMachine_DApplySsm.json5]
 **/
 
-#include "ssm/ISyntaxStateMachine_DApplySsm.hpp"
+#include "apply/ISyntaxStateMachine_DApplySsm.hpp"
 
 namespace xo {
     namespace scm {

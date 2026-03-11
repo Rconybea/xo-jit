@@ -42,8 +42,8 @@ set(SELF_SRCS
     facet/IPrintable_DLambdaSsm.cpp
 
     DApplySsm.cpp
-    ISyntaxStateMachine_DApplySsm.cpp
-    IPrintable_DApplySsm.cpp
+    facet/ISyntaxStateMachine_DApplySsm.cpp
+    facet/IPrintable_DApplySsm.cpp
 
     DParenSsm.cpp
     ISyntaxStateMachine_DParenSsm.cpp

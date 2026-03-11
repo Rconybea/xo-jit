@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "DApplySsm.hpp"
-#include "ssm/ISyntaxStateMachine_DApplySsm.hpp"
-#include "ssm/IPrintable_DApplySsm.hpp"
+#include "apply/DApplySsm.hpp"
+#include "apply/ISyntaxStateMachine_DApplySsm.hpp"
+#include "apply/IPrintable_DApplySsm.hpp"
 
 /* end ApplySsm.hpp */
