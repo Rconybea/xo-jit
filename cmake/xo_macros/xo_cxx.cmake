@@ -1739,7 +1739,6 @@ function(xo_add_genfacetimpl)
         FACET_DIR           # facet directory (instead of FACET_PKG)
         FACET               # facet name
         INPUT               # Input .json5 file
-        OUTPUT_HPP_DIR      # Directory for .hpp files
         OUTPUT_IMPL_SUBDIR  # Subdirectory name for impl headers
     )
     set(multiValueArgs "")
