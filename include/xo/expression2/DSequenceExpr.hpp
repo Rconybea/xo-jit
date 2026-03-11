@@ -29,8 +29,8 @@ namespace xo {
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
-            DSequenceExpr() = default;
-            DSequenceExpr(DArray * xv) : expr_v_{xv} {}
+            DSequenceExpr() ;
+            DSequenceExpr(DArray * xv);
 
             /** create empty sequence using memory from @p mm **/
             static obj<AExpression,DSequenceExpr> make_empty(obj<AAllocator> mm);

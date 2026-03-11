@@ -5,38 +5,52 @@
 
 #include "LocalSymtab.hpp"
 #include "Variable.hpp"
+#include "Typename.hpp"
 #include "DUniqueString.hpp"
+#include <xo/object2/Array.hpp>
 #include <xo/printable2/Printable.hpp>
+#include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>
 
 namespace xo {
     using xo::mm::AGCObject;
     using xo::print::APrintable;
-    using xo::facet::typeseq;
+    //using xo::facet::typeseq;
     using xo::print::ppstate;
 
     namespace scm {
 
         DLocalSymtab::DLocalSymtab(DLocalSymtab * p,
-                                   size_type n) : parent_{p},
-                                                  capacity_{n},
-                                                  size_{0}
+                                   DArray * vars, DArray * types)
+            : parent_{p}, vars_{vars}, types_{types}
         {
-            for (size_type i = 0; i < n; ++i) {
-                void * mem = &slots_[i];
-                new (mem) Slot();
-            }
         }
 
         DLocalSymtab *
         DLocalSymtab::_make_empty(obj<AAllocator> mm,
                                   DLocalSymtab * p,
-                                  size_type n)
+                                  size_type nv,
+                                  size_type nt)
         {
-            void * mem = mm.alloc(typeseq::id<DLocalSymtab>(),
-                                  sizeof(DLocalSymtab) + (n * sizeof(Slot)));
+            void * mem = mm.alloc_for<DLocalSymtab>();
 
-            return new (mem) DLocalSymtab(p, n);
+            DArray * vars = DArray::empty(mm, nv);
+            DArray * types = DArray::empty(mm, nt);
+
+            return new (mem) DLocalSymtab(p, vars, types);
+        }
+
+        DVariable *
+        DLocalSymtab::lookup_var(Binding ix) noexcept
+        {
+            assert(ix.i_link() == 0);
+            assert(ix.j_slot() < static_cast<int32_t>(vars_->size()));
+
+            auto var = obj<AGCObject,DVariable>::from((*vars_)[ix.j_slot()]);
+
+            assert(var);
+
+            return var.data();
         }
 
         Binding
@@ -46,18 +60,34 @@ namespace xo {
         {
             assert(name);
 
-            if (size_ >= capacity_ || !name) {
+            if (vars_->size() >= vars_->capacity() || !name) {
                 assert(false);
 
                 return Binding::null();
             } else {
-                size_type i_slot = (this->size_)++;
-                Binding binding = Binding::local(i_slot);
-                DVariable * var = DVariable::make(mm, name, typeref, binding);
+                //size_type i_slot = (this->size_)++;
+                Binding binding = Binding::local(vars_->size());
 
-                this->slots_[i_slot] = Slot(var);
+                DVariable * var = DVariable::make(mm, name, typeref, binding);
+                vars_->push_back(obj<AGCObject,DVariable>(var));
 
                 return binding;
+            }
+        }
+
+        void
+        DLocalSymtab::append_type(obj<AAllocator> mm,
+                                  const DUniqueString * name,
+                                  obj<AType> type)
+        {
+            assert(name);
+
+            if (types_->size() >= types_->capacity() || !name) {
+                assert(false);
+            } else {
+                obj<AGCObject> tname = DTypename::make(mm, name, type);
+
+                types_->push_back(tname);
             }
         }
 
@@ -67,11 +97,13 @@ namespace xo {
             assert(sym);
 
             if (sym) {
-                for (size_type i = 0; i < size_; ++i) {
-                    const Slot & slot = slots_[i];
+                for (size_type i = 0, n = vars_->size(); i < n; ++i) {
+                    auto var_i = obj<AGCObject,DVariable>::from((*vars_)[i]);
 
-                    if (*sym == *(slot.var_->name()))
-                        return slot.var_->path();
+                    assert(var_i);
+
+                    if (*sym == *(var_i->name()))
+                        return var_i->path();
                 }
             }
 
@@ -83,39 +115,21 @@ namespace xo {
         std::size_t
         DLocalSymtab::shallow_size() const noexcept
         {
-            return (sizeof(DLocalSymtab) + (capacity_ * sizeof(Slot)));
+            return sizeof(DLocalSymtab);
         }
 
         DLocalSymtab *
         DLocalSymtab::shallow_copy(obj<AAllocator> mm) const noexcept
         {
-            DLocalSymtab * copy = (DLocalSymtab *)mm.alloc_copy((std::byte *)this);
-
-            if (copy) {
-                *copy = *this;
-
-                ::memcpy((void*)&(copy->slots_[0]),
-                         (void*)&(slots_[0]),
-                         capacity_ * sizeof(Slot));
-            }
-
-            return copy;
+            return mm.std_copy_for(this);
         }
 
         std::size_t
         DLocalSymtab::forward_children(obj<ACollector> gc) noexcept
         {
-            {
-                auto iface
-                    = xo::facet::impl_for<AGCObject,DLocalSymtab>();
-                gc.forward_inplace(&iface, (void **)(&parent_));
-            }
-
-            auto iface
-                = xo::facet::impl_for<AGCObject,DVariable>();
-            for (size_type i = 0; i < size_; ++i) {
-                gc.forward_inplace(&iface, (void **)(&(slots_[i].var_)));
-            }
+            gc.forward_inplace(&parent_);
+            gc.forward_inplace(&vars_);
+            gc.forward_inplace(&types_);
 
             return shallow_size();
         }
@@ -127,22 +141,36 @@ namespace xo {
         {
             ppstate * pps = ppii.pps();
 
+            (void)pps;
+
             if (ppii.upto()) {
                 /* perhaps print on one line */
                 if (!pps->print_upto("<LocalSymtab"))
                     return false;
-                if (!pps->print_upto(xrefrtag("size", size_)))
+
+                if (!pps->print_upto(xrefrtag("nvars", vars_->size())))
                     return false;
 
-                for (size_type i = 0; i < size_; ++i) {
+                for (size_type i = 0, n = vars_->size(); i <n; ++i) {
                     char buf[32];
                     snprintf(buf, sizeof(buf), "[%u]", i);
 
-                    assert(slots_[i].var_);
-
-                    obj<APrintable,DVariable> arg_pr(const_cast<DVariable*>(slots_[i].var_));
+                    obj<APrintable> arg_pr = (*vars_)[i].to_facet<APrintable>();
 
                     if (!pps->print_upto(xrefrtag(buf, arg_pr)))
+                        return false;
+                }
+
+                if (!pps->print_upto(xrefrtag("ntypes", types_->size())))
+                    return false;
+
+                for (size_type i = 0, n = types_->size(); i < n; ++i) {
+                    char buf[32];
+                    snprintf(buf, sizeof(buf), "[%u]", i);
+
+                    obj<APrintable> type_pr = (*types_)[i].to_facet<APrintable>();
+
+                    if (!pps->print_upto(xrefrtag(buf, type_pr)))
                         return false;
                 }
 
@@ -152,20 +180,30 @@ namespace xo {
                 /* with line breaks */
 
                 pps->write("<LocalSymtab");
-                pps->newline_pretty_tag(ppii.ci1(), "size", size_);
+                pps->newline_pretty_tag(ppii.ci1(), "nvars", vars_->size());
 
-                for (size_type i = 0; i < size_; ++i) {
+                for (size_type i = 0, n = vars_->size(); i < n; ++i) {
                     char buf[32];
                     snprintf(buf, sizeof(buf), "[%u]", i);
 
-                    assert(slots_[i].var_);
-
-                    obj<APrintable,DVariable> arg_pr(const_cast<DVariable *>(slots_[i].var_));
+                    obj<APrintable> arg_pr = (*vars_)[i].to_facet<APrintable>();
 
                     pps->newline_pretty_tag(ppii.ci1(), buf, arg_pr);
                 }
 
+                pps->newline_pretty_tag(ppii.ci1(), "ntypes", types_->size());
+
+                for (size_type i = 0, n = types_->size(); i < n; ++i) {
+                    char buf[32];
+                    snprintf(buf, sizeof(buf), "[%u]", i);
+
+                    obj<APrintable> type_pr = (*types_)[i].to_facet<APrintable>();
+
+                    pps->newline_pretty_tag(ppii.ci1(), buf, type_pr);
+                }
+
                 pps->write(">");
+
                 return false;
             }
         }

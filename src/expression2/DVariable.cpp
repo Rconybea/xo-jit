@@ -57,12 +57,9 @@ namespace xo {
         }
 
         size_t
-        DVariable::forward_children(obj<ACollector>) noexcept
+        DVariable::forward_children(obj<ACollector> gc) noexcept
         {
-            // nothing to collect.
-            //  - DUniqueString never in GC space
-            //  - TypeDescr not in GC space
-            //  - path only integers
+            typeref_.forward_children(gc);
 
             return shallow_size();
         }

@@ -76,7 +76,7 @@ namespace xo {
 
         private:
             /** symbol name **/
-            const DUniqueString * name_;
+            const DUniqueString * name_ = nullptr;
             /** variable value always has type consistent
              *  with this description
              **/

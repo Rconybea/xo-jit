@@ -8,9 +8,7 @@
 #include "Binding.hpp"
 #include "DVariable.hpp"
 #include "DUniqueString.hpp"
-//#include "exprtype.hpp"
-//#include <xo/reflect/TaggedPtr.hpp>
-//#include <xo/gc/GCObject.hpp>
+#include <xo/object2/DArray.hpp>
 
 namespace xo {
     namespace scm {
@@ -19,14 +17,11 @@ namespace xo {
          **/
         struct DLocalSymtab {
         public:
-//            using TaggedPtr = xo::reflect::TaggedPtr;
-//            using TypeDescr = xo::reflect::TypeDescr;
-//            using AGCObject = xo::mm::AGCObject;
-//            using typeseq = xo::reflect::typeseq;
-
+            using DArray = xo::scm::DArray;
             using ppindentinfo = xo::print::ppindentinfo;
             using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
+            using AGCObject = xo::mm::AGCObject;
             /* note: uint16_t would be fine too */
             using size_type = std::uint32_t;
 
@@ -46,32 +41,31 @@ namespace xo {
             /** @defgroup scm-lambdaexpr-constructors **/
             ///@{
 
-            /** empty instance with parent @p p and capacity for @p n slots.
-             *  Caller must ensure that slots_[0..n) are actually addressable
+            /** empty instance with parent @p p, using arrays @p vars for variables
+             *  and @p types for type definitions.
              **/
-            DLocalSymtab(DLocalSymtab * p, size_type n);
+            DLocalSymtab(DLocalSymtab * p, DArray * nv, DArray * nt);
 
             /** scaffold empty symtab instance,
-             *  with capacity for @p n slots, using memory from allocator @p mm
+             *  capacity for @p nv vars and @p nt types,
+             *  using memory from allocator @p mm.
+             *  Symtab chains to parent @p p.
              **/
             static DLocalSymtab * _make_empty(obj<AAllocator> mm,
                                               DLocalSymtab * p,
-                                              size_type n);
+                                              size_type nv,
+                                              size_type nt);
 
             ///@}
             /** @defgroup scm-lambdaexpr-methods **/
             ///@{
 
             DLocalSymtab * parent() const noexcept { return parent_; }
-            size_type capacity() const noexcept { return capacity_; }
-            size_type size() const noexcept { return size_; }
+            //size_type capacity() const noexcept { return capacity_; }
+            size_type n_vars() const noexcept { return vars_->size(); }
+            size_type n_types() const noexcept { return types_->size(); }
 
-             DVariable * lookup_var(Binding ix) noexcept {
-                assert(ix.i_link() == 0);
-                assert(ix.j_slot() < static_cast<int32_t>(size_));
-
-                return slots_[ix.j_slot()].var_;
-            }
+            DVariable * lookup_var(Binding ix) noexcept;
 
             /** increase slot size (provided below capacity) to append
              *  binding for one local variable.  Local variable will be allocated
@@ -80,6 +74,14 @@ namespace xo {
             Binding append_var(obj<AAllocator> mm,
                                const DUniqueString * name,
                                TypeRef typeref);
+
+            /** increase slot size (provided below capacity) to append
+             *  binding for one local type.  Local type will be allocated
+             *  from @p mm, named @p name, with type described by @p type.
+             **/
+            void append_type(obj<AAllocator> mm,
+                             const DUniqueString * name,
+                             obj<AType> type);
 
             ///@}
             /** @defgroup xo-localsymtab-symboltable-facet symboltable facet**/
@@ -110,12 +112,23 @@ namespace xo {
         private:
             /** parent symbol table from scoping surrounding this one **/
             DLocalSymtab * parent_ = nullptr;
+            /** variables owned by (declared in) this symbol table
+             *   vars_[i] is convertible to obj<AGCObject>
+             **/
+            DArray * vars_ = nullptr;
+            /** types owned by (defined in) this symbol table
+             *   types_[i] is convertible to obj<AType>
+             **/
+            DArray * types_ = nullptr;
+
+#ifdef OBSOLETE
             /** actual range of slots_[] array.  Can use indices in [0,..,n) **/
             size_type capacity_ = 0;
             /** number of slots in use **/
             size_type size_ = 0;
             /** memory for names and bindings **/
             Slot slots_[];
+#endif
         };
     } /*namespace scm*/
 } /*namespace xo*/

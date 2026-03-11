@@ -5,14 +5,17 @@
 
 #include "expression2_register_types.hpp"
 
+#include "DefineExpr.hpp"
 #include "Constant.hpp"
-//#include "detail/IGCObject_DConstant.hpp"
-#include "detail/IGCObject_DVariable.hpp"
+#include "Variable.hpp"
+#include "Typename.hpp"
 //#include "detail/IGCObject_DDefineExpr.hpp"   // when avail
 //#include "detail/IGCObject_DApplyExpr.hpp"    // when avail
-//#include "detail/IGCObject_DLambdaExpr.hpp"   // when avail
-#include "detail/IGCObject_DIfElseExpr.hpp"
-#include "detail/IGCObject_DSequenceExpr.hpp"
+#include "LambdaExpr.hpp"
+#include "IfElseExpr.hpp"
+#include "SequenceExpr.hpp"
+#include "LocalSymtab.hpp"
+#include "GlobalSymtab.hpp"
 //#include "detail/IGCObject_DLocalSymtab.hpp"  // when avail
 //#include "detail/IGCObject_DUniqueString.hpp"
 
@@ -24,7 +27,6 @@ namespace xo {
     using xo::mm::ACollector;
     using xo::mm::AGCObject;
     using xo::facet::impl_for;
-    using xo::facet::typeseq;
     using xo::scope;
 
     namespace scm {
@@ -37,13 +39,15 @@ namespace xo {
 
             ok &= gc.install_type(impl_for<AGCObject, DConstant>());
             ok &= gc.install_type(impl_for<AGCObject, DVariable>());
-            //ok &= gc.install_type(impl_for<AGCObject, DDefineExpr>());  // when avail
+            ok &= gc.install_type(impl_for<AGCObject, DTypename>());
+            ok &= gc.install_type(impl_for<AGCObject, DDefineExpr>());
             //ok &= gc.install_type(impl_for<AGCObject, DApplyExpr>());   // when avail
-            //ok &= gc.install_type(impl_for<AGCObject, DLambdaExpr>());  // when avail
+            ok &= gc.install_type(impl_for<AGCObject, DLambdaExpr>());
             ok &= gc.install_type(impl_for<AGCObject, DIfElseExpr>());
             ok &= gc.install_type(impl_for<AGCObject, DSequenceExpr>());
 
-            //ok &= gc.install_type(impl_for<AGCObject, DLocalSymtab>()); // when avail
+            ok &= gc.install_type(impl_for<AGCObject, DLocalSymtab>());
+            ok &= gc.install_type(impl_for<AGCObject, DGlobalSymtab>());
 
             return ok;
         }

@@ -63,11 +63,16 @@ set(SELF_SRCS
     IGCObject_DGlobalSymtab.cpp
     IPrintable_DGlobalSymtab.cpp
 
+    DTypename.cpp
+    IGCObject_DTypename.cpp
+    IPrintable_DTypename.cpp
+
     )
 
 xo_add_shared_library4(${SELF_LIB} ${PROJECT_NAME}Targets ${PROJECT_VERSION} 1 ${SELF_SRCS})
 # note: deps here must also appear in cmake/xo_expression2Config.cmake.in
 xo_dependency(${SELF_LIB} xo_gc)
+xo_dependency(${SELF_LIB} xo_type)
 xo_dependency(${SELF_LIB} reflect)
 xo_dependency(${SELF_LIB} xo_procedure2)
 xo_dependency(${SELF_LIB} xo_printable2)

@@ -6,6 +6,7 @@ include(CMakeFindDependencyMacro)
 #       must coordinate with xo_dependency() calls
 #       in CMakeLists.txt
 #
+find_dependency(xo_type)
 find_dependency(xo_gc)
 find_dependency(reflect)
 find_dependency(xo_procedure2)

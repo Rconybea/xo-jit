@@ -4,6 +4,8 @@
  **/
 
 #include "DGlobalSymtab.hpp"
+#include "Typename.hpp"
+#include "Binding.hpp"
 #include "DUniqueString.hpp"
 #include <xo/expression2/Expression.hpp>
 #include <xo/expression2/Variable.hpp>
@@ -18,25 +20,40 @@ namespace xo {
 
     namespace scm {
 
-        DGlobalSymtab::DGlobalSymtab(dp<repr_type> map,
-                                     DArray * vars)
-        : map_{std::move(map)}, vars_{vars}
+        DGlobalSymtab::DGlobalSymtab(dp<repr_type> var_map,
+                                     DArray * vars,
+                                     dp<repr_type> type_map,
+                                     DArray * types)
+            : var_map_{std::move(var_map)}, vars_{vars},
+              type_map_{std::move(type_map)}, types_{types}
         {
         }
 
         dp<DGlobalSymtab>
         DGlobalSymtab::make(obj<AAllocator> mm,
                             obj<AAllocator> aux_mm,
-                            const ArenaHashMapConfig & cfg)
+                            const ArenaHashMapConfig & var_cfg,
+                            const ArenaHashMapConfig & type_cfg)
         {
-            auto map = dp<repr_type>::make(aux_mm, cfg);
-            assert(map);
+            /* note: using aux_mm for DArenaHashMap superstructure.
+             * {variable, type} storage allocated from mm.
+             */
+
+            auto var_map = dp<repr_type>::make(aux_mm, var_cfg);
+            assert(var_map);
 
             /* choosing same capacity for hash, vars */
-            DArray * vars = DArray::empty(mm, map->capacity());
+            DArray * vars = DArray::empty(mm, var_map->capacity());
             assert(vars);
 
-            auto symtab = dp<DGlobalSymtab>::make(mm, std::move(map), vars);
+            auto type_map = dp<repr_type>::make(aux_mm, type_cfg);
+            assert(type_map);
+
+            DArray * types = DArray::empty(mm, type_map->capacity());
+
+            auto symtab = dp<DGlobalSymtab>::make(mm,
+                                                  std::move(var_map), vars,
+                                                  std::move(type_map), types);
             assert(symtab);
 
             return symtab;
@@ -45,8 +62,10 @@ namespace xo {
         void
         DGlobalSymtab::visit_pools(const MemorySizeVisitor & visitor) const
         {
-            if (map_)
-                map_->visit_pools(visitor);
+            if (var_map_)
+                var_map_->visit_pools(visitor);
+            if (type_map_)
+                type_map_->visit_pools(visitor);
         }
 
         DVariable *
@@ -58,11 +77,11 @@ namespace xo {
                 return nullptr;
 
             auto var_gco = obj<AGCObject,DVariable>::from((*vars_)[existing.j_slot()]);
-            auto var = var_gco.to_facet<AExpression>();
 
-            assert(var.data());
+            //auto var = var_gco.to_facet<AExpression>();
+            //assert(var.data());
 
-            return var.data();
+            return var_gco.data();
         }
 
         void
@@ -93,6 +112,7 @@ namespace xo {
                 // stash new definition (possibly has different type),
                 // replacing previous one
                 //
+                log && log("STUB: need write barrier");
                 (*vars_)[existing->path().j_slot()] = obj<AGCObject,DVariable>(var);
             } else {
                 log && log("variable is new");
@@ -123,9 +143,67 @@ namespace xo {
                 var->assign_path(binding);
 
                 // need slot# in .map_ for this unique symbol
-                (*map_)[var->name()] = binding.j_slot();
+                (*var_map_)[var->name()] = binding.j_slot();
 
                 vars_->push_back(obj<AGCObject,DVariable>(var));
+            }
+        }
+
+        DTypename *
+        DGlobalSymtab::lookup_typename(const DUniqueString * sym) const noexcept
+        {
+            auto ix = type_map_->find(sym);
+
+            if (ix == type_map_->end())
+                return nullptr;
+
+            Binding::slot_type i_slot = ix->second;
+
+            auto tname_gco = obj<AGCObject,DTypename>::from((*types_)[i_slot]);
+
+            return tname_gco.data();
+        }
+
+        void
+        DGlobalSymtab::upsert_typename(obj<AAllocator> mm,
+                                       DTypename * tname)
+        {
+            scope log(XO_DEBUG(true),
+                      std::string_view(*tname->name()));
+
+            auto ix = type_map_->find(tname->name());
+
+            if (ix == type_map_->end()) {
+                log && log("typename is new");
+
+                DArray::size_type n = types_->size();
+
+                /** make sure types_ has room **/
+                if (n == types_->capacity()) {
+                    // DArray is out of room.
+                    // Reallocate with more capacity
+                    DArray * types_2x = DArray::copy(mm, types_, types_->capacity() * 2);
+
+                    if (!types_2x) {
+                        assert(false);
+
+                        // in any case, we can't make progress
+                        return;
+                    }
+
+                    log && log("STUB: need write barrier");
+                    this->types_ = types_2x;
+                }
+
+                (*type_map_)[tname->name()] = n;
+
+                log && log("STUB: need write barrier");
+                types_->push_back(obj<AGCObject,DTypename>(tname));
+            } else {
+                Binding::slot_type i_slot = ix->second;
+
+                log && log("STUB: need write barrier");
+                (*types_)[i_slot] = obj<AGCObject,DTypename>(tname);
             }
         }
 
@@ -154,9 +232,9 @@ namespace xo {
 
             scope log(XO_DEBUG(true), std::string_view(*sym));
 
-            auto ix = map_->find(sym);
+            auto ix = var_map_->find(sym);
 
-            if (ix == map_->end())
+            if (ix == var_map_->end())
                 return Binding::null();
 
             return Binding::global(ix->second);
@@ -185,7 +263,8 @@ namespace xo {
             if (copy_mem) {
                 DGlobalSymtab * self = const_cast<DGlobalSymtab*>(this);
 
-                return new (copy_mem) DGlobalSymtab(std::move(self->map_), vars_);
+                return new (copy_mem) DGlobalSymtab(std::move(self->var_map_), vars_,
+                                                    std::move(self->type_map_), types_);
             }
 
             return nullptr;
@@ -197,6 +276,7 @@ namespace xo {
             // map_ doesn't contain any gc-owned data, can skip
 
             gc.forward_inplace(&vars_);
+            gc.forward_inplace(&types_);
 
             return this->shallow_size();
         }
@@ -209,8 +289,10 @@ namespace xo {
             return ppii.pps()->pretty_struct
                        (ppii,
                         "DGlobalSymtab",
-                        refrtag("nsym", vars_->size()),
-                        refrtag("capacity", vars_->capacity()));
+                        refrtag("nvar", vars_->size()),
+                        refrtag("var_capacity", vars_->capacity()),
+                        refrtag("ntype", types_->size()),
+                        refrtag("type_capacity", types_->capacity()));
         }
 
     } /*namespace scm*/

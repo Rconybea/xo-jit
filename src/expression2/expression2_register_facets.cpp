@@ -5,11 +5,13 @@
 
 #include "expression2_register_facets.hpp"
 
-#include <xo/expression2/detail/IExpression_DVariable.hpp>
-#include <xo/expression2/detail/IGCObject_DVariable.hpp>
-#include <xo/expression2/detail/IPrintable_DVariable.hpp>
+//#include <xo/expression2/detail/IExpression_DVariable.hpp>
+//#include <xo/expression2/detail/IGCObject_DVariable.hpp>
+//#include <xo/expression2/detail/IPrintable_DVariable.hpp>
 
 #include <xo/expression2/DefineExpr.hpp>
+#include <xo/expression2/Variable.hpp>
+#include <xo/expression2/Typename.hpp>
 #include <xo/expression2/VarRef.hpp>
 #include <xo/expression2/Constant.hpp>
 #include <xo/expression2/ApplyExpr.hpp>
@@ -83,6 +85,11 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DSequenceExpr>();
             FacetRegistry::register_impl<APrintable, DSequenceExpr>();
 
+            // Typename
+
+            FacetRegistry::register_impl<AGCObject, DTypename>();
+            FacetRegistry::register_impl<APrintable, DTypename>();
+
             // SymbolTable
             // +- LocalSymtab
             // \- GlobalSymtab
@@ -103,6 +110,7 @@ namespace xo {
             log && log(xtag("DUniqueString.tseq", typeseq::id<DUniqueString>()));
             log && log(xtag("DDefineExpr.tseq", typeseq::id<DDefineExpr>()));
             log && log(xtag("DVariable.tseq", typeseq::id<DVariable>()));
+            log && log(xtag("DTypename.tseq", typeseq::id<DTypename>()));
             log && log(xtag("DVarRef.tseq", typeseq::id<DVarRef>()));
             log && log(xtag("DConstant.tseq", typeseq::id<DConstant>()));
             log && log(xtag("DApplyExpr.tseq", typeseq::id<DApplyExpr>()));

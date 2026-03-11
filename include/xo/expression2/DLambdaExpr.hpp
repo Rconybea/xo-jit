@@ -62,7 +62,7 @@ namespace xo {
             ///@{
 
             DLocalSymtab * local_symtab() const noexcept { return local_symtab_; }
-            size_type n_args() const noexcept { return local_symtab_->size(); }
+            size_type n_args() const noexcept { return local_symtab_->n_vars(); }
             obj<AExpression> body_expr() const noexcept { return body_expr_; }
 
             // get_free_variables()

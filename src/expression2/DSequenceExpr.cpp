@@ -22,6 +22,12 @@ namespace xo {
 
     namespace scm {
 
+        DSequenceExpr::DSequenceExpr() = default;
+
+        DSequenceExpr::DSequenceExpr(DArray * xv)
+            : expr_v_{xv}
+        {}
+
         obj<AExpression,DSequenceExpr>
         DSequenceExpr::make_empty(obj<AAllocator> mm)
         {
@@ -127,13 +133,13 @@ namespace xo {
         std::size_t
         DSequenceExpr::forward_children(obj<ACollector> gc) noexcept
         {
-            // WARNING.
-            //   if this proves problematic,
-            //   may resort to obj<AGCObject,DArray> for expr_v_ member
+            typeref_.forward_children(gc);
 
-            auto iface = facet::impl_for<AGCObject,DArray>();
-
-            gc.forward_inplace(&iface, (void**)&expr_v_);
+            {
+                //auto iface = facet::impl_for<AGCObject,DArray>();
+                //gc.forward_inplace(&iface, (void**)&expr_v_);
+                gc.forward_inplace(&expr_v_);
+            }
 
             return this->shallow_size();
         }

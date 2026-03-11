@@ -129,6 +129,13 @@ namespace xo {
         std::size_t
         DApplyExpr::forward_children(obj<ACollector> gc) noexcept
         {
+            typeref_.forward_children(gc);
+
+            {
+                obj<AGCObject> fn_gco = fn_.to_facet<AGCObject>();
+                gc.forward_inplace(fn_gco.iface(), (void **)&fn_.data_);
+            }
+
             for (size_type i = 0; i < n_args_; ++i) {
                 obj<AExpression> & arg = args_[i];
 

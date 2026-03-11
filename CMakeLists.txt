@@ -47,7 +47,7 @@ xo_add_genfacetimpl(
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-localsymtab
-    FACET_PKG xo_gc
+    FACET_PKG xo_alloc2
     FACET GCObject
     REPR LocalSymtab
     INPUT idl/IGCObject_DLocalSymtab.json5
@@ -82,7 +82,7 @@ xo_add_genfacetimpl(
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-globalsymtab
-    FACET_PKG xo_gc
+    FACET_PKG xo_alloc2
     FACET GCObject
     REPR GlobalSymtab
     INPUT idl/IGCObject_DGlobalSymtab.json5
@@ -128,7 +128,7 @@ xo_add_genfacetimpl(
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-constant
-    FACET_PKG xo_gc
+    FACET_PKG xo_alloc2
     FACET GCObject
     REPR Constant
     INPUT idl/IGCObject_DConstant.json5
@@ -163,7 +163,7 @@ xo_add_genfacetimpl(
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-variable
-    FACET_PKG xo_gc
+    FACET_PKG xo_alloc2
     FACET GCObject
     REPR Variable
     INPUT idl/IGCObject_DVariable.json5
@@ -186,6 +186,30 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-gcobject-typename
+    FACET_PKG xo_alloc2
+    FACET GCObject
+    REPR Typename
+    INPUT idl/IGCObject_DTypename.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR typename
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-expression2-facetimpl-printable-typename
+    FACET_PKG xo_printable2
+    FACET Printable
+    REPR Typename
+    INPUT idl/IPrintable_DTypename.json5
+    OUTPUT_HPP_DIR include/xo/expression2
+    OUTPUT_IMPL_SUBDIR typename
+)
+
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-varref
     FACET_PKG xo_expression2
     FACET Expression
@@ -198,7 +222,7 @@ xo_add_genfacetimpl(
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-varref
-    FACET_PKG xo_gc
+    FACET_PKG xo_alloc2
     FACET GCObject
     REPR VarRef
     INPUT idl/IGCObject_DVarRef.json5
@@ -233,7 +257,7 @@ xo_add_genfacetimpl(
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-defineexpr
-    FACET_PKG xo_gc
+    FACET_PKG xo_alloc2
     FACET GCObject
     REPR DefineExpr
     INPUT idl/IGCObject_DDefineExpr.json5
@@ -268,7 +292,7 @@ xo_add_genfacetimpl(
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-applyexpr
-    FACET_PKG xo_gc
+    FACET_PKG xo_alloc2
     FACET GCObject
     REPR ApplyExpr
     INPUT idl/IGCObject_DApplyExpr.json5
@@ -303,7 +327,7 @@ xo_add_genfacetimpl(
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-lambdaexpr
-    FACET_PKG xo_gc
+    FACET_PKG xo_alloc2
     FACET GCObject
     REPR LambdaExpr
     INPUT idl/IGCObject_DLambdaExpr.json5
@@ -338,7 +362,7 @@ xo_add_genfacetimpl(
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-ifelseexpr
-    FACET_PKG xo_gc
+    FACET_PKG xo_alloc2
     FACET GCObject
     REPR IfElseExpr
     INPUT idl/IGCObject_DIfElseExpr.json5
@@ -373,7 +397,7 @@ xo_add_genfacetimpl(
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-sequenceexpr
-    FACET_PKG xo_gc
+    FACET_PKG xo_alloc2
     FACET GCObject
     REPR SequenceExpr
     INPUT idl/IGCObject_DSequenceExpr.json5

@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include <xo/type/Type.hpp>
 #include <xo/reflect/TypeDescr.hpp>
+#include <xo/alloc2/Collector.hpp>
 #include <xo/flatstring/flatstring.hpp>
 #include <xo/indentlog/print/pretty.hpp>
 
@@ -23,16 +25,27 @@ namespace xo {
             using TypeDescr = xo::reflect::TypeDescr;
             using type_var = flatstring<20>;
             using prefix_type = flatstring<8>;
+            using ACollector = xo::mm::ACollector;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
             TypeRef() = default;
-            TypeRef(const type_var & id, TypeDescr td);
+            TypeRef(const type_var & id, obj<AType> type);
 
             /** trivial typeref, where already resolved.
              *  Require: @p td non-null
              **/
             static TypeRef resolved(TypeDescr td);
+
+            /** trivial typeref, where already resolved **/
+            static TypeRef resolved(obj<AType> type);
+
+            /** if @p type is non-null
+             *   -> type already resolved
+             *  else
+             *   -> generate unique typevar name, starting with @p prefix
+             **/
+            static TypeRef dwim(prefix_type prefix, obj<AType> type);
 
             /** if @p td is non-null
              *   -> type is already resolved
@@ -59,9 +72,19 @@ namespace xo {
             /** pretty-printer support **/
             bool pretty(const ppindentinfo & ppii) const;
 
+            /** gc support **/
+            void forward_children(obj<ACollector> gc) noexcept;
+
+        private:
+            TypeRef(const type_var & id, TypeDescr td);
+
         private:
             /** unique (probably generated) name for type at this location **/
             type_var id_;
+
+            /** Type, when resolved **/
+            obj<AType> type_;
+
             /** Description for concrete type, once resolved.
              *  May be null when this TypeRef created,
              *  but expected to be immutable once established.

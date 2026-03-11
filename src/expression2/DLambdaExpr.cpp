@@ -95,7 +95,7 @@ namespace xo {
 
             std::vector<TypeDescr> arg_td_v;
             {
-                DLocalSymtab::size_type z = symtab->size();
+                DLocalSymtab::size_type z = symtab->n_vars();
 
                 arg_td_v.reserve(z);
 
@@ -152,7 +152,10 @@ namespace xo {
 
         std::size_t
         DLambdaExpr::forward_children(obj<ACollector> gc) noexcept {
+            typeref_.forward_children(gc);
+
             {
+                //gc.forward_inplace(&name_);  // doesn't compile for const ptr
                 auto iface = xo::facet::impl_for<AGCObject,DUniqueString>();
                 gc.forward_inplace(&iface, (void **)(&name_));
             }
@@ -160,8 +163,9 @@ namespace xo {
             // type_name_str_
 
             {
-                auto iface = xo::facet::impl_for<AGCObject,DLocalSymtab>();
-                gc.forward_inplace(&iface, (void **)(&local_symtab_));
+                gc.forward_inplace(&local_symtab_);
+                //auto iface = xo::facet::impl_for<AGCObject,DLocalSymtab>();
+                //gc.forward_inplace(&iface, (void **)(&local_symtab_));
             }
 
             {

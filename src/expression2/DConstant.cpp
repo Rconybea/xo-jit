@@ -91,7 +91,10 @@ namespace xo {
         std::size_t
         DConstant::forward_children(obj<ACollector> gc) noexcept
         {
-            gc.forward_inplace(value_.iface(), (void **)&(value_.data_));
+            typeref_.forward_children(gc);
+
+            gc.forward_inplace(&value_);
+            //gc.forward_inplace(value_.iface(), (void **)&(value_.data_));
 
             return shallow_size();
         }

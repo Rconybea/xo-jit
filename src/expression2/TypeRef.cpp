@@ -4,15 +4,33 @@
  **/
 
 #include "TypeRef.hpp"
+#include <xo/alloc2/GCObject.hpp>
+#include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/print/cond.hpp>
 #include <xo/indentlog/print/pretty.hpp>
 #include <xo/indentlog/print/quoted.hpp>
 
 namespace xo {
+    using xo::mm::AGCObject;
+    using xo::facet::FacetRegistry;
+
     namespace scm {
+        TypeRef::TypeRef(const type_var & id, obj<AType> type)
+                : id_{id}, type_{type}
+        {}
+
         TypeRef::TypeRef(const type_var & id, TypeDescr td)
                 : id_{id}, td_{td}
         {}
+
+        TypeRef
+        TypeRef::resolved(obj<AType> type)
+        {
+            assert(type);
+
+            type_var null;
+            return TypeRef(null, type);
+        }
 
         TypeRef
         TypeRef::resolved(TypeDescr td)
@@ -21,6 +39,23 @@ namespace xo {
 
             type_var null;
             return TypeRef(null, td);
+        }
+
+        TypeRef
+        TypeRef::dwim(prefix_type prefix, obj<AType> type)
+        {
+            if (type) {
+                /* type already resolved
+                 *  -> we don't need a type variable name
+                 */
+                return TypeRef::resolved(type);
+            } else {
+                /* type is not resolved yet.
+                 *  -> give it a unique name,
+                 *     to seed unification
+                 */
+                return TypeRef(generate_unique(prefix), type);
+            }
         }
 
         TypeRef
@@ -63,6 +98,15 @@ namespace xo {
         TypeRef::is_resolved() const noexcept
         {
             return (td_ != nullptr);
+        }
+
+        void
+        TypeRef::forward_children(obj<ACollector> gc) noexcept
+        {
+            {
+                auto e = FacetRegistry::instance().variant<AGCObject,AType>(type_);
+                gc.forward_inplace(e.iface(), (void **)&(type_.data_));
+            }
         }
 
         bool
