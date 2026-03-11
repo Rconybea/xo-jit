@@ -30,8 +30,8 @@ set(SELF_SRCS
     IPrintable_DDeftypeSsm.cpp
 
     DIfElseSsm.cpp
-    ISyntaxStateMachine_DIfElseSsm.cpp
-    IPrintable_DIfElseSsm.cpp
+    facet/ISyntaxStateMachine_DIfElseSsm.cpp
+    facet/IPrintable_DIfElseSsm.cpp
 
     DSequenceSsm.cpp
     ISyntaxStateMachine_DSequenceSsm.cpp

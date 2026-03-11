@@ -11,7 +11,7 @@
  *       [idl/ISyntaxStateMachine_DIfElseSsm.json5]
 **/
 
-#include "ssm/ISyntaxStateMachine_DIfElseSsm.hpp"
+#include "ifelse/ISyntaxStateMachine_DIfElseSsm.hpp"
 
 namespace xo {
     namespace scm {

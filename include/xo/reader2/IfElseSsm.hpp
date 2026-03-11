@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "DIfElseSsm.hpp"
-#include "ssm/ISyntaxStateMachine_DIfElseSsm.hpp"
-#include "ssm/IPrintable_DIfElseSsm.hpp"
+#include "ifelse/DIfElseSsm.hpp"
+#include "ifelse/ISyntaxStateMachine_DIfElseSsm.hpp"
+#include "ifelse/IPrintable_DIfElseSsm.hpp"
 
 /* end IfElseSsm.hpp */

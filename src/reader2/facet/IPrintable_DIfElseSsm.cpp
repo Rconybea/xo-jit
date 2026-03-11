@@ -11,7 +11,7 @@
  *       [idl/IPrintable_DIfElseSsm.json5]
 **/
 
-#include "ssm/IPrintable_DIfElseSsm.hpp"
+#include "ifelse/IPrintable_DIfElseSsm.hpp"
 
 namespace xo {
     namespace scm {

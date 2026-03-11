@@ -3,22 +3,18 @@
  *  @author Roland Conybeare, Jul 2025
  **/
 
-#include "DIfElseSsm.hpp"
-#include "ssm/ISyntaxStateMachine_DIfElseSsm.hpp"
+#include "ifelse/DIfElseSsm.hpp"
+#include "ifelse/ISyntaxStateMachine_DIfElseSsm.hpp"
 #include "ssm/IPrintable_DDefineSsm.hpp"
 #include "DExpectExprSsm.hpp"
 #include <xo/expression2/detail/IPrintable_DIfElseExpr.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
-//#include "exprstatestack.hpp"
-//#include "parserstatemachine.hpp"
-//#include "expect_expr_xs.hpp"
-//#include "xo/indentlog/print/ppdetail_atomic.hpp"
 
 namespace xo {
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
-    using xo::facet::with_facet;
+//    using xo::facet::with_facet;
     using xo::reflect::typeseq;
 
     namespace scm {
