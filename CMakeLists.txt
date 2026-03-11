@@ -37,7 +37,6 @@ xo_add_genfacet(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-symboltable-localsymtab
     FACET_PKG xo_expression2
-    FACET SymbolTable
 #    REPR LocalSymtab
     INPUT idl/ISymbolTable_DLocalSymtab.json5
 )
@@ -46,7 +45,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-localsymtab
     FACET_PKG xo_alloc2
-    FACET GCObject
 #    REPR LocalSymtab
     INPUT idl/IGCObject_DLocalSymtab.json5
 )
@@ -55,7 +53,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-localsymtab
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR LocalSymtab
     INPUT idl/IPrintable_DLocalSymtab.json5
 )
@@ -66,7 +63,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-symboltable-globalsymtab
     FACET_PKG xo_expression2
-    FACET SymbolTable
 #    REPR GlobalSymtab
     INPUT idl/ISymbolTable_DGlobalSymtab.json5
 )
@@ -75,7 +71,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-globalsymtab
     FACET_PKG xo_alloc2
-    FACET GCObject
 #    REPR GlobalSymtab
     INPUT idl/IGCObject_DGlobalSymtab.json5
 )
@@ -84,7 +79,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-globalsymtab
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR GlobalSymtab
     INPUT idl/IPrintable_DGlobalSymtab.json5
 )
@@ -106,7 +100,6 @@ xo_add_genfacet(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-constant
     FACET_PKG xo_expression2
-    FACET Expression
 #    REPR Constant
     INPUT idl/IExpression_DConstant.json5
 )
@@ -115,7 +108,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-constant
     FACET_PKG xo_alloc2
-    FACET GCObject
 #    REPR Constant
     INPUT idl/IGCObject_DConstant.json5
 )
@@ -124,7 +116,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-constant
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR Constant
     INPUT idl/IPrintable_DConstant.json5
 )
@@ -135,7 +126,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-variable
     FACET_PKG xo_expression2
-    FACET Expression
 #    REPR Variable
     INPUT idl/IExpression_DVariable.json5
 )
@@ -144,7 +134,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-variable
     FACET_PKG xo_alloc2
-    FACET GCObject
 #    REPR Variable
     INPUT idl/IGCObject_DVariable.json5
 )
@@ -153,7 +142,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-variable
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR Variable
     INPUT idl/IPrintable_DVariable.json5
 )
@@ -164,7 +152,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-typename
     FACET_PKG xo_alloc2
-    FACET GCObject
 #    REPR Typename
     INPUT idl/IGCObject_DTypename.json5
 )
@@ -173,7 +160,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-typename
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR Typename
     INPUT idl/IPrintable_DTypename.json5
 )
@@ -184,7 +170,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-varref
     FACET_PKG xo_expression2
-    FACET Expression
 #    REPR VarRef
     INPUT idl/IExpression_DVarRef.json5
 )
@@ -193,7 +178,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-varref
     FACET_PKG xo_alloc2
-    FACET GCObject
 #    REPR VarRef
     INPUT idl/IGCObject_DVarRef.json5
 )
@@ -202,7 +186,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-varref
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR VarRef
     INPUT idl/IPrintable_DVarRef.json5
 )
@@ -213,7 +196,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-defineexpr
     FACET_PKG xo_expression2
-    FACET Expression
 #    REPR DefineExpr
     INPUT idl/IExpression_DDefineExpr.json5
 )
@@ -222,7 +204,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-defineexpr
     FACET_PKG xo_alloc2
-    FACET GCObject
 #    REPR DefineExpr
     INPUT idl/IGCObject_DDefineExpr.json5
 )
@@ -231,7 +212,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-defineexpr
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR DefineExpr
     INPUT idl/IPrintable_DDefineExpr.json5
 )
@@ -242,7 +222,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-applyexpr
     FACET_PKG xo_expression2
-    FACET Expression
 #    REPR ApplyExpr
     INPUT idl/IExpression_DApplyExpr.json5
 )
@@ -251,7 +230,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-applyexpr
     FACET_PKG xo_alloc2
-    FACET GCObject
 #    REPR ApplyExpr
     INPUT idl/IGCObject_DApplyExpr.json5
 )
@@ -260,7 +238,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-applyexpr
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR ApplyExpr
     INPUT idl/IPrintable_DApplyExpr.json5
 )
@@ -271,7 +248,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-lambdaexpr
     FACET_PKG xo_expression2
-    FACET Expression
 #    REPR LambdaExpr
     INPUT idl/IExpression_DLambdaExpr.json5
 )
@@ -280,7 +256,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-lambdaexpr
     FACET_PKG xo_alloc2
-    FACET GCObject
 #    REPR LambdaExpr
     INPUT idl/IGCObject_DLambdaExpr.json5
 )
@@ -289,7 +264,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-lambdaexpr
     FACET_PKG xo_printable2
-    FACET Printable
 #    REPR LambdaExpr
     INPUT idl/IPrintable_DLambdaExpr.json5
 )
@@ -300,7 +274,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-ifelseexpr
     FACET_PKG xo_expression2
-    FACET Expression
 #    REPR IfElseExpr
     INPUT idl/IExpression_DIfElseExpr.json5
 )
@@ -309,7 +282,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-ifelseexpr
     FACET_PKG xo_alloc2
-    FACET GCObject
     INPUT idl/IGCObject_DIfElseExpr.json5
 )
 
@@ -317,7 +289,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-ifelseexpr
     FACET_PKG xo_printable2
-    FACET Printable
     INPUT idl/IPrintable_DIfElseExpr.json5
 )
 
@@ -327,7 +298,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-expression-sequenceexpr
     FACET_PKG xo_expression2
-    FACET Expression
     INPUT idl/IExpression_DSequenceExpr.json5
 )
 
@@ -335,7 +305,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-gcobject-sequenceexpr
     FACET_PKG xo_alloc2
-    FACET GCObject
     INPUT idl/IGCObject_DSequenceExpr.json5
 )
 
@@ -343,7 +312,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-expression2-facetimpl-printable-sequenceexpr
     FACET_PKG xo_printable2
-    FACET Printable
     INPUT idl/IPrintable_DSequenceExpr.json5
 )
 
