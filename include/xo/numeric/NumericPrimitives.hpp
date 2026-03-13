@@ -14,21 +14,25 @@ namespace xo {
          **/
         class NumericPrimitives {
         public:
-            /** polymorphic (in both arguments) multiply **/
-            static DPrimitive_gco_2_gco_gco s_mul_gco_gco_pm;
+            using AAllocator = xo::mm::AAllocator;
+
+        public:
+            /** polymorphic (in both arguments1) multiply **/
+            static DPrimitive_gco_2_gco_gco * make_multiply_pm(obj<AAllocator> mm);
+
             /** polymorphic (in both arguments) divide **/
-            static DPrimitive_gco_2_gco_gco s_div_gco_gco_pm;
+            static DPrimitive_gco_2_gco_gco * make_divide_pm(obj<AAllocator> mm);
             /** polymorphic (in both arguments) add **/
-            static DPrimitive_gco_2_gco_gco s_add_gco_gco_pm;
+            static DPrimitive_gco_2_gco_gco * make_add_pm(obj<AAllocator> mm);
             /** polymorphic (in both arguments) subtract **/
-            static DPrimitive_gco_2_gco_gco s_sub_gco_gco_pm;
+            static DPrimitive_gco_2_gco_gco * make_subtract_pm(obj<AAllocator> mm);
 
             /** polymorphic (in both arguments) compare (==) **/
-            static DPrimitive_gco_2_gco_gco s_cmpeq_gco_gco_pm;
+            static DPrimitive_gco_2_gco_gco * make_cmpeq_pm(obj<AAllocator> mm);
             /** polymorphic (in both arguments) compare (!=) **/
-            static DPrimitive_gco_2_gco_gco s_cmpne_gco_gco_pm;
+            static DPrimitive_gco_2_gco_gco * make_cmpne_pm(obj<AAllocator> mm);
             /** polymorphic (in both arguments) compare (<) **/
-            static DPrimitive_gco_2_gco_gco s_cmplt_gco_gco_pm;
+            static DPrimitive_gco_2_gco_gco * make_cmplt_pm(obj<AAllocator> mm);
         };
     }
 }

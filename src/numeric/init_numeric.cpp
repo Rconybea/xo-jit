@@ -7,14 +7,20 @@
 #include <xo/procedure2/init_procedure2.hpp>
 #include "Subsystem.hpp"
 #include "numeric_register_facets.hpp"
+#include "numeric_register_primitives.hpp"
 
 namespace xo {
     using xo::scm::numeric_register_facets;
+    using xo::scm::numeric_register_primitives;
+    using xo::scm::PrimitiveRegistry;
 
     void
     InitSubsys<S_numeric_tag>::init()
     {
         numeric_register_facets();
+
+        PrimitiveRegistry::instance().register_primitives(&numeric_register_primitives);
+
     }
 
     InitEvidence

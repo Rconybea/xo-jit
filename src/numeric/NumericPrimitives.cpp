@@ -7,38 +7,59 @@
 #include "NumericDispatch.hpp"
 
 namespace xo {
-    using xo::mm::AGCObject;
+    using xo::mm::AAllocator;
+    //using xo::mm::AGCObject;
 
     namespace scm {
 
-        DPrimitive_gco_2_gco_gco
-        NumericPrimitives::s_mul_gco_gco_pm("_mul",
-                                            &NumericDispatch::multiply);
+        DPrimitive_gco_2_gco_gco *
+        NumericPrimitives::make_multiply_pm(obj<AAllocator> mm)
+        {
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_mul",
+                                                   &NumericDispatch::multiply);
+        }
 
-        DPrimitive_gco_2_gco_gco
-        NumericPrimitives::s_div_gco_gco_pm("_div",
-                                            &NumericDispatch::divide);
+        DPrimitive_gco_2_gco_gco *
+        NumericPrimitives::make_divide_pm(obj<AAllocator> mm)
+        {
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_div",
+                                                   &NumericDispatch::divide);
+        }
 
-        DPrimitive_gco_2_gco_gco
-        NumericPrimitives::s_add_gco_gco_pm("_add",
-                                            &NumericDispatch::add);
+        DPrimitive_gco_2_gco_gco *
+        NumericPrimitives::make_add_pm(obj<AAllocator> mm)
+        {
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_add",
+                                                   &NumericDispatch::add);
+        }
 
-        DPrimitive_gco_2_gco_gco
-        NumericPrimitives::s_sub_gco_gco_pm("_sub",
-                                            &NumericDispatch::subtract);
+        DPrimitive_gco_2_gco_gco *
+        NumericPrimitives::make_subtract_pm(obj<AAllocator> mm)
+        {
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_sub",
+                                                   &NumericDispatch::subtract);
+        }
 
-        DPrimitive_gco_2_gco_gco
-        NumericPrimitives::s_cmpeq_gco_gco_pm("_cmpeq",
-                                              &NumericDispatch::cmp_equal);
+        DPrimitive_gco_2_gco_gco *
+        NumericPrimitives::make_cmpeq_pm(obj<AAllocator> mm)
+        {
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmpeq",
+                                                   &NumericDispatch::cmp_equal);
+        }
 
-        DPrimitive_gco_2_gco_gco
-        NumericPrimitives::s_cmpne_gco_gco_pm("_cmpne",
-                                              &NumericDispatch::cmp_notequal);
+        DPrimitive_gco_2_gco_gco *
+        NumericPrimitives::make_cmpne_pm(obj<AAllocator> mm)
+        {
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmpne",
+                                                   &NumericDispatch::cmp_notequal);
+        }
 
-        DPrimitive_gco_2_gco_gco
-        NumericPrimitives::s_cmplt_gco_gco_pm("_cmplt",
-                                              &NumericDispatch::cmp_less);
-
+        DPrimitive_gco_2_gco_gco *
+        NumericPrimitives::make_cmplt_pm(obj<AAllocator> mm)
+        {
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmplt",
+                                                   &NumericDispatch::cmp_less);
+        }
 
     } /*namespace scm*/
 } /*namespace xo*/
