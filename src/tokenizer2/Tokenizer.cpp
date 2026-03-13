@@ -486,7 +486,7 @@ namespace xo {
                 log && log("leftangle or lessequal token");
 
                 if (*(ix + 1) == '=') {
-                    tk_type = tokentype::tk_lessequal;
+                    tk_type = tokentype::tk_cmple;
                     ++ix;
                     ++ix;
                 } else {

@@ -92,7 +92,7 @@ namespace xo {
             tk_rightangle,
 
             /** less-equal @c '<=' **/
-            tk_lessequal,
+            tk_cmple,
 
             /** great-equal @c '>=' **/
             tk_greatequal,
