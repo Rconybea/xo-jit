@@ -856,6 +856,75 @@ namespace xo {
             log && fixture.log_memory_layout(&log);
         }
 
+        TEST_CASE("SchematikaParser-interactive-arith4", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    7 + 2 / 3;
+             *
+             **/
+
+            std::vector<Token> tk_v{
+                Token::i64_token("7"),
+                Token::plus_token(),
+                Token::i64_token("2"),
+                Token::slash_token(),
+                Token::i64_token("3"),
+                Token::semicolon_token(),
+            };
+
+            INFO(testname);
+
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            const auto & result = parser.result();
+            {
+                auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
+                REQUIRE(expr);
+                REQUIRE(expr->n_args() == 2);
+
+                auto fn = obj<AExpression,DConstant>::from(expr->fn());
+                REQUIRE(fn);
+
+                auto pm = obj<AGCObject,DPrimitive_gco_2_gco_gco>::from(fn->value());
+                REQUIRE(pm);
+                REQUIRE(pm->name() == "_add");
+
+                auto lhs = obj<AExpression,DConstant>::from(expr->arg(0));
+                REQUIRE(lhs);
+
+                auto lhs_i64 = obj<AGCObject,DInteger>::from(lhs->value());
+                REQUIRE(lhs_i64->value() == 7);
+
+                auto rhs = obj<AExpression,DApplyExpr>::from(expr->arg(1));
+                REQUIRE(rhs);
+
+                auto rhs_lhs = obj<AExpression,DConstant>::from(rhs->arg(0));
+                REQUIRE(rhs_lhs);
+                auto rhs_lhs_i64 = obj<AGCObject,DInteger>::from(rhs_lhs->value());
+                REQUIRE(rhs_lhs_i64);
+                REQUIRE(rhs_lhs_i64->value() == 2);
+
+                auto rhs_rhs = obj<AExpression,DConstant>::from(rhs->arg(1));
+                REQUIRE(rhs_rhs);
+                auto rhs_rhs_i64 = obj<AGCObject,DInteger>::from(rhs_rhs->value());
+                REQUIRE(rhs_rhs_i64);
+                REQUIRE(rhs_rhs_i64->value() == 3);
+            }
+
+            log && fixture.log_memory_layout(&log);
+        }
+
 #ifdef OBSOLETE
         TEST_CASE("SchematikaParser-interactive-arith3-bad", "[reader2][SchematikaParser]")
         {
