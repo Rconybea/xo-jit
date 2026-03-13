@@ -108,6 +108,8 @@ namespace xo {
             obj<AGCObject> cmplt_pm() const;
             /** polymorphic less-or-equal comparison. Use to implement infix op<= **/
             obj<AGCObject> cmple_pm() const;
+            /** polymorphic greater comparison. Use to implement infix op> **/
+            obj<AGCObject> cmpgt_pm() const;
             /** polymorphic greater-or-equal comparison. Use to implement infix op>= **/
             obj<AGCObject> cmpge_pm() const;
 
@@ -423,6 +425,7 @@ namespace xo {
             Binding cmpne_binding_;
             Binding cmplt_binding_;
             Binding cmple_binding_;
+            Binding cmpgt_binding_;
             Binding cmpge_binding_;
 
             /** current output from parser **/

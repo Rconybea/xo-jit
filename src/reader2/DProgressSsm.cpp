@@ -136,7 +136,7 @@ namespace xo {
                     return optype::op_less;
                 case tokentype::tk_cmple:        // [<=]
                     return optype::op_less_equal;
-                case tokentype::tk_rightangle:
+                case tokentype::tk_rightangle:   // [>]
                     return optype::op_great;
                 case tokentype::tk_cmpge:        // [>=]
                     return optype::op_great_equal;
@@ -290,7 +290,6 @@ namespace xo {
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
-            case tokentype::tk_rightangle:
             case tokentype::tk_dot:
             case tokentype::tk_doublecolon:
             case tokentype::tk_assign:
@@ -304,6 +303,7 @@ namespace xo {
             case tokentype::tk_cmpeq:
             case tokentype::tk_cmpne:
             case tokentype::tk_leftangle:
+            case tokentype::tk_rightangle:
             case tokentype::tk_cmple:
             case tokentype::tk_cmpge:
                 this->on_operator_token(tk, p_psm);
@@ -1170,7 +1170,11 @@ namespace xo {
                      lhs_, rhs_);
 
             case optype::op_great:
-                assert(false);
+                return assemble_numeric_expr_aux
+                    (p_psm->expr_alloc(),
+                     TypeRef::prefix_type::from_chars("_cmpgt_gco"),
+                     p_psm->cmpgt_pm(),
+                     lhs_, rhs_);
                 break;
 
             case optype::op_great_equal:
@@ -1184,14 +1188,14 @@ namespace xo {
                 return assemble_numeric_expr_aux
                     (p_psm->expr_alloc(),
                      TypeRef::prefix_type::from_chars("_mul_gco"),
-                     p_psm->multiply_pm(), //&NumericPrimitives::s_mul_gco_gco_pm
+                     p_psm->multiply_pm(),
                      lhs_, rhs_);
 
             case optype::op_divide:
                 return assemble_numeric_expr_aux
                     (p_psm->expr_alloc(),
                      TypeRef::prefix_type::from_chars("_div_gco"),
-                     p_psm->divide_pm(), // &NumericPrimitives::s_div_gco_gco_pm
+                     p_psm->divide_pm(),
                      lhs_, rhs_);
 
             case optype::op_add:
@@ -1200,39 +1204,6 @@ namespace xo {
                      TypeRef::prefix_type::from_chars("_add_gco"),
                      p_psm->add_pm(),
                      lhs_, rhs_);
-#ifdef OBSOLETE
-                {
-                    auto pm_obj  = (with_facet<AGCObject>::mkobj
-                                    (&NumericPrimitives::s_add_gco_gco_pm));
-                    auto fn_expr = (DConstant::make
-                                    (p_psm->expr_alloc(), pm_obj));
-
-                    /* note:
-                     * 1. don't assume we know lhs_ / rhs_ value types yet.
-                     *    perhaps have expression like
-                     *      f(..) * g(..)
-                     *    where f is the function that contains current ssm.
-                     *
-                     * 2. consequence: we need representation for
-                     *    polymorphic multiply on unknown numeric arguments.
-                     *
-                     * 3. TypeRef::dwim(..) is a placeholder.
-                     *    Plan to later provide abstract interpreter
-                     *    (ie compiler pass :) to drive type inference/unification
-                     *
-                     * 4. Alternatively could supply type-annotation syntax
-                     *    so human can assist inference; context here is we want
-                     *    to automate the boring stuff
-                     */
-
-                    TypeRef tref = TypeRef::dwim
-                                       (TypeRef::prefix_type::from_chars("_add_gco"),
-                                        nullptr);
-
-                    return DApplyExpr::make2(p_psm->expr_alloc(),
-                                             tref, fn_expr, lhs_, rhs_);
-                }
-#endif
 
                 break;
 
@@ -1260,122 +1231,6 @@ case optype::op_assign:
                                 this->rhs_);
     }
 
-case optype::op_equal:
-    if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-        return Apply::make_cmp_eq_i64(lhs_, rhs_);
-    } else {
-
-        this->apply_type_error(c_self_name,
-                               op_type_, lhs_, rhs_, p_psm);
-        return nullptr;
-    }
-    break;
-
-case optype::op_not_equal:
-    if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-        return Apply::make_cmp_ne_i64(lhs_, rhs_);
-    } else {
-        this->apply_type_error(c_self_name,
-                               op_type_, lhs_, rhs_, p_psm);
-        return nullptr;
-    }
-    break;
-
-case optype::op_less:
-    // TODO: floating-point less-than
-
-    if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-        return Apply::make_cmp_lt_i64(lhs_, rhs_);
-    } else {
-        this->apply_type_error(c_self_name,
-                               op_type_, lhs_, rhs_, p_psm);
-        return nullptr;
-    }
-    break;
-
-case optype::op_less_equal:
-    if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-        return Apply::make_cmp_le_i64(lhs_, rhs_);
-    } else {
-        this->apply_type_error(c_self_name,
-                               op_type_, lhs_, rhs_, p_psm);
-        return nullptr;
-    }
-    break;
-
-case optype::op_great:
-    if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-        return Apply::make_cmp_gt_i64(lhs_, rhs_);
-    } else {
-        this->apply_type_error(c_self_name,
-                               op_type_, lhs_, rhs_, p_psm);
-        return nullptr;
-    }
-    break;
-
-case optype::op_great_equal:
-    // TODO: upconvert integer->double
-    if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-        return Apply::make_cmp_ge_i64(lhs_, rhs_);
-    } else {
-        this->apply_type_error(c_self_name,
-                               op_type_, lhs_, rhs_, p_psm);
-        return nullptr;
-    }
-
-    assert(false);
-
-case optype::op_add:
-    // TODO: upconvert integer->double
-    if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-        return Apply::make_add2_i64(lhs_, rhs_);
-    } else if (lhs_->valuetype()->is_f64() && rhs_->valuetype()->is_f64()) {
-        return Apply::make_add2_f64(lhs_, rhs_);
-    } else {
-        this->apply_type_error(c_self_name,
-                               op_type_, lhs_, rhs_, p_psm);
-        return nullptr;
-    }
-    break;
-case optype::op_subtract:
-    // TODO: upconvert integer->double
-    if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-        return Apply::make_sub2_i64(lhs_, rhs_);
-    } else if (lhs_->valuetype()->is_f64() && rhs_->valuetype()->is_f64()) {
-        return Apply::make_sub2_f64(lhs_, rhs_);
-    } else {
-        this->apply_type_error(c_self_name,
-                               op_type_, lhs_, rhs_, p_psm);
-        return nullptr;
-    }
-    break;
-
-case optype::op_multiply:
-    // TODO: upconvert integer->double
-    if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-        return Apply::make_mul2_i64(lhs_, rhs_);
-    } else if (lhs_->valuetype()->is_f64() && rhs_->valuetype()->is_f64()) {
-        return Apply::make_mul2_f64(lhs_, rhs_);
-    } else {
-        this->apply_type_error(c_self_name,
-                               op_type_, lhs_, rhs_, p_psm);
-        return nullptr;
-    }
-
-    break;
-
-case optype::op_divide:
-    // TODO: upconvert integer->double
-    if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-        return Apply::make_div2_i64(lhs_, rhs_);
-    } else if (lhs_->valuetype()->is_f64() && rhs_->valuetype()->is_f64()) {
-        return Apply::make_div2_f64(lhs_, rhs_);
-    } else {
-        this->apply_type_error(c_self_name,
-                               op_type_, lhs_, rhs_, p_psm);
-        return nullptr;
-    }
-    break;
 #endif
 
             case optype::n_optype:
