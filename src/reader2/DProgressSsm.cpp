@@ -410,17 +410,25 @@ namespace xo {
                      *  a + b * ...        (a + (b * ...))
                      */
 
+                    obj<AExpression> lhs1 = lhs_;
+                    optype op_type1 = op_type_;
+                    obj<AExpression> rhs1 = rhs_;
+
+                    assert(lhs1);
+                    assert(op_type1 != optype::invalid);
+                    assert(rhs1);
+
                     p_psm->pop_ssm();
 
                     /* (a + ..) */
                     DProgressSsm::start(p_psm->parser_alloc(),
-                                        lhs_,
-                                        op_type_,
+                                        lhs1,
+                                        op_type1,
                                         p_psm);
                     DExpectExprSsm::start(p_psm);
                     /* (b * ..) */
                     DProgressSsm::start(p_psm->parser_alloc(),
-                                        rhs_,
+                                        rhs1,
                                         op_type2,
                                         p_psm);
                     DExpectExprSsm::start(p_psm);
