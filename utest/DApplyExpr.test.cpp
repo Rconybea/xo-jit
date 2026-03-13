@@ -92,7 +92,7 @@ namespace ut {
         REQUIRE(ok);
 
         // wrap primitive as GCObject, then as expression
-        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(&NumericPrimitives::s_mul_gco_gco_pm);
+        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
         REQUIRE(fn_expr.data() != nullptr);
 
@@ -131,7 +131,8 @@ namespace ut {
         bool ok = CollectorTypeRegistry::instance().install_types(coll);
         REQUIRE(ok);
 
-        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(&NumericPrimitives::s_mul_gco_gco_pm);
+        obj<AGCObject> prim_gco
+            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
 
         obj<AGCObject> val1 = DFloat::box<AGCObject>(alloc, 3.0);
@@ -166,7 +167,7 @@ namespace ut {
         bool ok = CollectorTypeRegistry::instance().install_types(coll);
         REQUIRE(ok);
 
-        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(&NumericPrimitives::s_mul_gco_gco_pm);
+        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
 
         obj<AGCObject> val1 = DFloat::box<AGCObject>(alloc, 3.0);
@@ -201,7 +202,7 @@ namespace ut {
         bool ok = CollectorTypeRegistry::instance().install_types(coll);
         REQUIRE(ok);
 
-        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(&NumericPrimitives::s_mul_gco_gco_pm);
+        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
 
         obj<AGCObject> val1 = DFloat::box<AGCObject>(alloc, 3.0);
@@ -283,7 +284,8 @@ namespace ut {
         bool ok = CollectorTypeRegistry::instance().install_types(coll);
         REQUIRE(ok);
 
-        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(&NumericPrimitives::s_mul_gco_gco_pm);
+        obj<AGCObject> prim_gco
+            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
 
         obj<AGCObject> val1 = DFloat::box<AGCObject>(alloc, 3.0);
