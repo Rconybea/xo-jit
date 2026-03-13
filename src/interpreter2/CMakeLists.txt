@@ -36,10 +36,6 @@ set(SELF_SRCS
     IGCObject_DClosure.cpp
     IPrintable_DClosure.cpp
 
-    DGlobalEnv.cpp
-    IGCObject_DGlobalEnv.cpp
-    IPrintable_DGlobalEnv.cpp
-
     DLocalEnv.cpp
     IGCObject_DLocalEnv.cpp
     IPrintable_DLocalEnv.cpp

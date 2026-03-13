@@ -63,12 +63,7 @@ namespace xo {
             FacetRegistry::register_impl<AGCObject, DVsmSeqContFrame>();
             FacetRegistry::register_impl<APrintable, DVsmSeqContFrame>();
 
-            // GlobalEnv
-
-            FacetRegistry::register_impl<AGCObject, DGlobalEnv>();
-            FacetRegistry::register_impl<APrintable, DGlobalEnv>();
-
-            // LocalEnv
+            // LocalEnv (see xo-reader2/ for GlobalEnv)
 
             FacetRegistry::register_impl<AGCObject, DLocalEnv>();
             FacetRegistry::register_impl<APrintable, DLocalEnv>();

@@ -27,6 +27,8 @@ namespace xo {
     InitEvidence
     InitSubsys<S_interpreter2_tag>::require()
     {
+        scope log(XO_DEBUG(true));
+
         InitEvidence retval;
 
         /* direct subsystem deps for xo-interpreter2/ */

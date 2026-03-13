@@ -110,13 +110,15 @@ namespace xo {
         //using X1CollectorConfig = xo::mm::X1CollectorConfig;
         //using DArena = xo::mm::DArena;
         //using ArenaConfig = xo::mm::ArenaConfig;
+        using VsmConfig = xo::scm::VsmConfig;
         using Replxx = replxx::Replxx;
         using span_type = VirtualSchematikaMachine::span_type;
 
         App(const AppConfig & cfg = AppConfig())
         : repl_config_{cfg.repl_config_},
           app_arena_{cfg.app_arena_config_},
-          vsm_{cfg.vsm_config_, obj<AAllocator,DArena>(&app_arena_)}
+          vsm_config_{cfg.vsm_config_}
+          //vsm_{cfg.vsm_config_, obj<AAllocator,DArena>(&app_arena_)}
         {
             this->interactive_ = isatty(STDIN_FILENO);
 
@@ -148,7 +150,8 @@ namespace xo {
         /** arena with same lifetime as this application **/
         DArena app_arena_;
         /** schematika virtual machine **/
-        VirtualSchematikaMachine vsm_;
+        VsmConfig vsm_config_;
+        std::unique_ptr<VirtualSchematikaMachine> vsm_;
     };
 
     void
@@ -162,13 +165,16 @@ namespace xo {
     void
     App::_init()
     {
-        // window to contorl size of registries ends as soon as we init other subsystems
+        // window to control size of registries ends as soon as we init other subsystems
         TypeRegistry::instance(1024);
         FacetRegistry::instance(1024);
 
         InitEvidence init_evidence_ = (InitSubsys<S_interpreter2_tag>::require());
 
         Subsystem::initialize_all();
+
+        vsm_.reset(new VirtualSchematikaMachine(vsm_config_,
+                                                obj<AAllocator,DArena>(&app_arena_)));
     }
 
     void
@@ -176,7 +182,7 @@ namespace xo {
     {
         welcome(cerr);
 
-        vsm_.begin_interactive_session();
+        vsm_->begin_interactive_session();
     }
 
     void
@@ -186,7 +192,7 @@ namespace xo {
         span_type input;
 
         // outer loop: fetch one line of interactive input
-        while (replxx_getline(interactive_, vsm_.is_at_toplevel(), rx_, &input)) {
+        while (replxx_getline(interactive_, vsm_->is_at_toplevel(), rx_, &input)) {
 
             // inner loop: consume up to one expression at a time.
             while (!input.empty() && this->_read_eval_print(&input, false /*eof*/))
@@ -218,7 +224,7 @@ namespace xo {
         if (!p_input || p_input->empty())
             return true;
 
-        VsmResultExt res = vsm_.read_eval_print(*p_input, eof);
+        VsmResultExt res = vsm_->read_eval_print(*p_input, eof);
 
         *p_input = res.remaining_;
 

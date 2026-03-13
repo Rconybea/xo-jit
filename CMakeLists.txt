@@ -163,24 +163,6 @@ xo_add_genfacetimpl(
 
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
-    TARGET xo-interpreter2-facetimpl-gcobject-globalenv
-    FACET_PKG xo_alloc2
-#    REPR GlobalEnv
-    INPUT idl/IGCObject_DGlobalEnv.json5
-)
-
-# note: manual target; generated code committed to git
-xo_add_genfacetimpl(
-    TARGET xo-interpreter2-facetimpl-printable-globalenv
-    FACET_PKG xo_printable2
-#    REPR GlobalEnv
-    INPUT idl/IPrintable_DGlobalEnv.json5
-)
-
-# ----------------------------------------------------------------
-
-# note: manual target; generated code committed to git
-xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-gcobject-localenv
     FACET_PKG xo_alloc2
 #    REPR LocalEnv
