@@ -6,11 +6,13 @@
 #pragma once
 
 #include "ParserResult.hpp"
+#include "GlobalEnv.hpp"
 #include <xo/expression2/DGlobalSymtab.hpp>
 #include <xo/expression2/DLocalSymtab.hpp>
 #include <xo/expression2/DVariable.hpp>
 #include <xo/expression2/VarRef.hpp>
 #include <xo/tokenizer2/Token.hpp>
+#include <xo/procedure2/PrimitiveRegistry.hpp>
 #include <xo/type/Type.hpp>
 #include <xo/object2/DArray.hpp>
 #include <xo/stringtable2/StringTable.hpp>
@@ -45,6 +47,9 @@ namespace xo {
             using size_type = std::size_t;
 
         public:
+            /** @defgroup scm-parserstatemachine-ctors constructors **/
+            ///@{
+
             /**
              *  @p config        arena configuration for parser state
              *  @p symtab_var_config configuration for global symtab variables
@@ -53,6 +58,8 @@ namespace xo {
              *                   (maps to separate dedicated memory)
              *  @p max_stringtable_capacity
              *                   hard max size for unique stringtable
+             *  @p pm_install_flags
+             *                   flags controlling primitives to install
              *  @p expr_alloc    allocator for schematika expressions.
              *                   Probably shared with execution.
              *  @p aux_alloc     auxiliary allocator for non-copyable memory
@@ -64,12 +71,17 @@ namespace xo {
                                const ArenaHashMapConfig & symtab_var_config,
                                const ArenaHashMapConfig & symtab_type_config,
                                size_type max_stringtable_capacity,
+                               InstallFlags pm_install_flags,
                                obj<AAllocator> expr_alloc,
                                obj<AAllocator> aux_alloc);
 
-            /** non-trivial dtor for @ref global_symtab_ **/
-            ~ParserStateMachine() = default;
+            /** not copyable (need to put global_env into gc **/
+            ParserStateMachine(const ParserStateMachine & other) = delete;
 
+            /** non-trivial dtor for @ref global_symtab_ **/
+            ~ParserStateMachine();
+
+            ///@}
             /** @defgroup scm-parserstatemachine-accessors accessor methods **/
             ///@{
 
@@ -79,6 +91,21 @@ namespace xo {
             DGlobalSymtab * global_symtab() const noexcept { return global_symtab_.data(); }
             DLocalSymtab * local_symtab() const noexcept { return local_symtab_; }
             const ParserResult & result() const noexcept { return result_; }
+
+            /** polymoprhihc multiply primitive. Use to implement infix op* **/
+            obj<AGCObject> multiply_pm() const;
+            /** polymorphic divide primitive. Use to implement infix op/ **/
+            obj<AGCObject> divide_pm() const;
+            /** polymorphic add primitive. Use to implement infix op+ **/
+            obj<AGCObject> add_pm() const;
+            /** polymorphic subtract primitive. Use to implement infix op- **/
+            obj<AGCObject> subtract_pm() const;
+            /** polymorphic equality comparison. Use to implement infix op== **/
+            obj<AGCObject> cmpeq_pm() const;
+            /** polymorphic inequality comparison. Use to implement infix op!= **/
+            obj<AGCObject> cmpne_pm() const;
+            /** polymorphich less-than comparison. Use to implement infix op< **/
+            obj<AGCObject> cmplt_pm() const;
 
             /** true iff state machine is currently idle (at top-level) **/
             bool is_at_toplevel() const noexcept;
@@ -377,6 +404,20 @@ namespace xo {
              *  during the body of a lambda expression.
              **/
             DLocalSymtab * local_symtab_ = nullptr;
+
+            /** global variable bindings (builtin primitives) **/
+            obj<AGCObject,DGlobalEnv> global_env_;
+
+            /** bindings for special builtin primitives
+             *  (asociated with hardwired operator syntax)
+             **/
+            Binding multiply_binding_;
+            Binding divide_binding_;
+            Binding add_binding_;
+            Binding subtract_binding_;
+            Binding cmpeq_binding_;
+            Binding cmpne_binding_;
+            Binding cmplt_binding_;
 
             /** current output from parser **/
             ParserResult result_;

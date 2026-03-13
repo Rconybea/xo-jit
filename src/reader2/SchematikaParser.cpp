@@ -28,6 +28,7 @@ namespace xo {
                 cfg.symtab_var_config_,
                 cfg.symtab_types_config_,
                 cfg.max_stringtable_capacity_,
+                cfg.pm_install_flags_,
                 expr_alloc,
                 aux_alloc
             },

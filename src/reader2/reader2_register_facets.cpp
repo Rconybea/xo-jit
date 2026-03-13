@@ -33,6 +33,7 @@
 
 namespace xo {
     using xo::print::APrintable;
+    using xo::mm::AGCObject;
     using xo::facet::FacetRegistry;
     using xo::facet::TypeRegistry;
     using xo::facet::typeseq;
@@ -42,6 +43,13 @@ namespace xo {
         reader2_register_facets()
         {
             scope log(XO_DEBUG(true));
+
+            // GlobalEnv
+
+            FacetRegistry::register_impl<AGCObject, DGlobalEnv>();
+            FacetRegistry::register_impl<APrintable, DGlobalEnv>();
+
+            // SyntaxStateMachine
 
             FacetRegistry::register_impl<ASyntaxStateMachine, DToplevelSeqSsm>();
             FacetRegistry::register_impl<APrintable, DToplevelSeqSsm>();
@@ -105,6 +113,7 @@ namespace xo {
             // misc types showing up in parser stack arena
             TypeRegistry::register_type<ParserStack>();
 
+            log && log(xtag("DGlobalEnv.tseq", typeseq::id<DGlobalEnv>()));
             log && log(xtag("DToplevelSeqSsm.tseq", typeseq::id<DToplevelSeqSsm>()));
             log && log(xtag("DDefineSsm.tseq", typeseq::id<DDefineSsm>()));
             log && log(xtag("DDeftypeSsm.tseq", typeseq::id<DDeftypeSsm>()));

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <xo/procedure2/PrimitiveRegistry.hpp>
 #include <xo/arena/ArenaHashMapConfig.hpp>
 #include <xo/arena/ArenaConfig.hpp>
 
@@ -54,6 +55,9 @@ namespace xo {
 
             /** max capacity for unique string table **/
             size_t max_stringtable_capacity_ = 4096;
+
+            /** flags controlling which primitives to install **/
+            InstallFlags pm_install_flags_ = InstallFlags::f_all;
 
             /** control SchematikaParser debug logging **/
             bool debug_flag_ = false;

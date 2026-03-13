@@ -603,173 +603,6 @@ namespace xo {
             p_psm->on_error(self_name, std::move(errmsg));
         }
 
-        rp<Expression>
-        progress_xs::assemble_expr(parserstatemachine * p_psm) {
-            /* need to defer building Apply incase expr followed by higher-precedence operator:
-             * consider input like
-             *   3.14 + 2.0 * ...
-             */
-
-            constexpr const char * c_self_name = "progress_xs::assemble_expr";
-
-            if ((op_type_ != optype::invalid) && (rhs_.get() == nullptr)) {
-                std::string errmsg = tostr("expected expression on rhs of operator op",
-                                           xtag("lhs", lhs_),
-                                           xtag("op", op_type_));
-
-                p_psm->on_error(c_self_name, errmsg);
-            }
-
-            /* consecutive expressions not legal, e.g:
-             *   3.14 6.28
-             * but expressions surrounding an infix operators is:
-             *   3.14 / 6.28
-             */
-            switch (op_type_) {
-            case optype::invalid:
-                return this->lhs_;
-
-            case optype::op_assign:
-            {
-                bp<Variable> lhs = Variable::from(this->lhs_);
-
-                if (!lhs) {
-                    throw std::runtime_error
-                        (tostr("progress_xs::assemble_expr",
-                               " expect variable on lhs of assignment operator :=",
-                               xtag("lhs", lhs_),
-                               xtag("rhs", rhs_)));
-                }
-
-                return AssignExpr::make(lhs.promote(),
-                                        this->rhs_);
-            }
-
-            case optype::op_equal:
-                if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-                    return Apply::make_cmp_eq_i64(lhs_, rhs_);
-                } else {
-                    this->apply_type_error(c_self_name,
-                                           op_type_, lhs_, rhs_, p_psm);
-                    return nullptr;
-                }
-                break;
-
-            case optype::op_not_equal:
-                if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-                    return Apply::make_cmp_ne_i64(lhs_, rhs_);
-                } else {
-                    this->apply_type_error(c_self_name,
-                                           op_type_, lhs_, rhs_, p_psm);
-                    return nullptr;
-                }
-                break;
-
-            case optype::op_less:
-                // TODO: floating-point less-than
-
-                if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-                    return Apply::make_cmp_lt_i64(lhs_, rhs_);
-                } else {
-                    this->apply_type_error(c_self_name,
-                                           op_type_, lhs_, rhs_, p_psm);
-                    return nullptr;
-                }
-                break;
-
-            case optype::op_less_equal:
-                if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-                    return Apply::make_cmp_le_i64(lhs_, rhs_);
-                } else {
-                    this->apply_type_error(c_self_name,
-                                           op_type_, lhs_, rhs_, p_psm);
-                    return nullptr;
-                }
-                break;
-
-            case optype::op_great:
-                if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-                    return Apply::make_cmp_gt_i64(lhs_, rhs_);
-                } else {
-                    this->apply_type_error(c_self_name,
-                                           op_type_, lhs_, rhs_, p_psm);
-                    return nullptr;
-                }
-                break;
-
-            case optype::op_great_equal:
-                // TODO: upconvert integer->double
-                if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-                    return Apply::make_cmp_ge_i64(lhs_, rhs_);
-                } else {
-                    this->apply_type_error(c_self_name,
-                                           op_type_, lhs_, rhs_, p_psm);
-                    return nullptr;
-                }
-
-                assert(false);
-
-            case optype::op_add:
-                // TODO: upconvert integer->double
-                if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-                    return Apply::make_add2_i64(lhs_, rhs_);
-                } else if (lhs_->valuetype()->is_f64() && rhs_->valuetype()->is_f64()) {
-                    return Apply::make_add2_f64(lhs_, rhs_);
-                } else {
-                    this->apply_type_error(c_self_name,
-                                           op_type_, lhs_, rhs_, p_psm);
-                    return nullptr;
-                }
-                break;
-            case optype::op_subtract:
-                // TODO: upconvert integer->double
-                if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-                    return Apply::make_sub2_i64(lhs_, rhs_);
-                } else if (lhs_->valuetype()->is_f64() && rhs_->valuetype()->is_f64()) {
-                    return Apply::make_sub2_f64(lhs_, rhs_);
-                } else {
-                    this->apply_type_error(c_self_name,
-                                           op_type_, lhs_, rhs_, p_psm);
-                    return nullptr;
-                }
-                break;
-
-            case optype::op_multiply:
-                // TODO: upconvert integer->double
-                if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-                    return Apply::make_mul2_i64(lhs_, rhs_);
-                } else if (lhs_->valuetype()->is_f64() && rhs_->valuetype()->is_f64()) {
-                    return Apply::make_mul2_f64(lhs_, rhs_);
-                } else {
-                    this->apply_type_error(c_self_name,
-                                           op_type_, lhs_, rhs_, p_psm);
-                    return nullptr;
-                }
-
-                break;
-
-            case optype::op_divide:
-                // TODO: upconvert integer->double
-                if (lhs_->valuetype()->is_i64() && rhs_->valuetype()->is_i64()) {
-                    return Apply::make_div2_i64(lhs_, rhs_);
-                } else if (lhs_->valuetype()->is_f64() && rhs_->valuetype()->is_f64()) {
-                    return Apply::make_div2_f64(lhs_, rhs_);
-                } else {
-                    this->apply_type_error(c_self_name,
-                                           op_type_, lhs_, rhs_, p_psm);
-                    return nullptr;
-                }
-                break;
-
-            case optype::n_optype:
-                /* unreachable */
-                assert(false);
-                return nullptr;
-            }
-
-            return nullptr;
-        }
-
         void
         progress_xs::on_expr(bp<Expression> expr,
                              parserstatemachine * p_psm)
@@ -1216,11 +1049,10 @@ namespace xo {
             obj<AExpression>
             assemble_numeric_expr_aux(obj<AAllocator> expr_alloc,
                                       const TypeRef::prefix_type & prefix,
-                                      DPrimitive_gco_2_gco_gco * p_gco_pm,
+                                      obj<AGCObject> pm_obj,
                                       obj<AExpression> lhs,
                                       obj<AExpression> rhs)
             {
-                auto pm_obj  = with_facet<AGCObject>::mkobj(p_gco_pm);
                 auto fn_expr = DConstant::make(expr_alloc, pm_obj);
 
                 /* note:
@@ -1247,6 +1079,23 @@ namespace xo {
                                          tref, fn_expr, lhs, rhs);
 
             }
+
+#ifdef OBSOLETE
+            obj<AExpression>
+            assemble_numeric_expr_aux(obj<AAllocator> expr_alloc,
+                                      const TypeRef::prefix_type & prefix,
+                                      DPrimitive_gco_2_gco_gco * p_gco_pm,
+                                      obj<AExpression> lhs,
+                                      obj<AExpression> rhs)
+            {
+                auto pm_obj  = with_facet<AGCObject>::mkobj(p_gco_pm);
+
+                return assemble_numeric_expr_aux(expr_alloc,
+                                                 prefix,
+                                                 pm_obj,
+                                                 lhs, rhs);
+            }
+#endif
         }
 
         obj<AExpression>
@@ -1288,41 +1137,21 @@ namespace xo {
                 return assemble_numeric_expr_aux
                     (p_psm->expr_alloc(),
                      TypeRef::prefix_type::from_chars("_cmpeq_gco"),
-                     &NumericPrimitives::s_cmpeq_gco_gco_pm,
+                     p_psm->cmpeq_pm(),
                      lhs_, rhs_);
-
-#ifdef OBSOLETE
-                {
-                    auto pm_obj = (with_facet<AGCObject>::mkobj
-                                       (&NumericPrimitives::s_cmpeq_gco_gco_pm));
-                    auto fn_expr = (DConstant::make
-                                        (p_psm->expr_alloc(), pm_obj));
-
-                    // see note on op_multiply
-
-                    TypeRef tref = TypeRef::dwim
-                                       (TypeRef::prefix_type::from_chars("_equal_gco"),
-                                        nullptr);
-
-                    return DApplyExpr::make2(p_psm->expr_alloc(),
-                                             tref,
-                                             fn_expr, lhs_, rhs_);
-                }
-                break;
-#endif
 
             case optype::op_not_equal:
                 return assemble_numeric_expr_aux
                     (p_psm->expr_alloc(),
                      TypeRef::prefix_type::from_chars("_cmpne_gco"),
-                     &NumericPrimitives::s_cmpne_gco_gco_pm,
+                     p_psm->cmpne_pm(),
                      lhs_, rhs_);
 
             case optype::op_less:
                 return assemble_numeric_expr_aux
                     (p_psm->expr_alloc(),
                      TypeRef::prefix_type::from_chars("_cmplt_gco"),
-                     &NumericPrimitives::s_cmplt_gco_gco_pm,
+                     p_psm->cmplt_pm(),
                      lhs_, rhs_);
 
             case optype::op_less_equal:
@@ -1335,45 +1164,18 @@ namespace xo {
                 return assemble_numeric_expr_aux
                     (p_psm->expr_alloc(),
                      TypeRef::prefix_type::from_chars("_mul_gco"),
-                     &NumericPrimitives::s_mul_gco_gco_pm,
+                     p_psm->multiply_pm(), //&NumericPrimitives::s_mul_gco_gco_pm
                      lhs_, rhs_);
-
-#ifdef OBSOLETE
-                {
-                    auto pm_obj  = (with_facet<AGCObject>::mkobj
-                                    (&NumericPrimitives::s_mul_gco_gco_pm));
-                    auto fn_expr = (DConstant::make
-                                    (p_psm->expr_alloc(), pm_obj));
-
-                    /* note:
-                     * 1. don't assume we know lhs_ / rhs_ value types yet.
-                     *    perhaps have expression like
-                     *      f(..) * g(..)
-                     *    where f is the function that contains current ssm.
-                     *
-                     * 2. consequence: we need representation for
-                     *    polymorphic multiply on unknown numeric arguments.
-                     *
-                     * 3. TypeRef::dwim(..) is a placeholder.
-                     *    Plan to later provide abstract interpreter
-                     *    (ie compiler pass :) to drive type inference/unification
-                     *
-                     * 4. Alternatively could supply type-annotation syntax
-                     *    so human can assist inference; context here is we want
-                     *    to automate the boring stuff
-                     */
-
-                    TypeRef tref = TypeRef::dwim
-                                       (TypeRef::prefix_type::from_chars("_mul_gco"),
-                                        nullptr);
-
-                    return DApplyExpr::make2(p_psm->expr_alloc(),
-                                             tref, fn_expr, lhs_, rhs_);
-                }
-#endif
 
                 break;
             case optype::op_divide:
+                return assemble_numeric_expr_aux
+                    (p_psm->expr_alloc(),
+                     TypeRef::prefix_type::from_chars("_div_gco"),
+                     p_psm->divide_pm(), // &NumericPrimitives::s_div_gco_gco_pm
+                     lhs_, rhs_);
+
+#ifdef OBSOLETE
                 {
                     auto pm_obj  = (with_facet<AGCObject>::mkobj
                                     (&NumericPrimitives::s_div_gco_gco_pm));
@@ -1405,10 +1207,17 @@ namespace xo {
                     return DApplyExpr::make2(p_psm->expr_alloc(),
                                              tref, fn_expr, lhs_, rhs_);
                 }
+#endif
 
                 break;
 
             case optype::op_add:
+                return assemble_numeric_expr_aux
+                    (p_psm->expr_alloc(),
+                     TypeRef::prefix_type::from_chars("_add_gco"),
+                     p_psm->add_pm(),
+                     lhs_, rhs_);
+#ifdef OBSOLETE
                 {
                     auto pm_obj  = (with_facet<AGCObject>::mkobj
                                     (&NumericPrimitives::s_add_gco_gco_pm));
@@ -1440,10 +1249,18 @@ namespace xo {
                     return DApplyExpr::make2(p_psm->expr_alloc(),
                                              tref, fn_expr, lhs_, rhs_);
                 }
+#endif
 
                 break;
 
             case optype::op_subtract: /* editor bait: op_minus */
+                return assemble_numeric_expr_aux
+                    (p_psm->expr_alloc(),
+                     TypeRef::prefix_type::from_chars("_sub_gco"),
+                     p_psm->subtract_pm(),
+                     lhs_, rhs_);
+
+#ifdef OBSOLETE
                 {
                     auto pm_obj = (with_facet<AGCObject>::mkobj
                                        (&NumericPrimitives::s_sub_gco_gco_pm));
@@ -1459,6 +1276,7 @@ namespace xo {
                     return DApplyExpr::make2(p_psm->expr_alloc(),
                                              tref, fn_expr, lhs_, rhs_);
                 }
+#endif
 
                 break;
 

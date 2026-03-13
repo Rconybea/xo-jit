@@ -1,0 +1,16 @@
+{
+    mode: "implementation",
+    output_cpp_dir: "src/interpreter2/facet",
+    output_hpp_dir: "include/xo/interpreter2",
+    output_impl_subdir: "env",
+    includes: [ "<xo/printable2/Printable.hpp>",
+                "<xo/printable2/detail/IPrintable_Xfer.hpp>" ],
+    local_types: [ ],
+    namespace1: "xo",
+    namespace2: "scm",
+    facet_idl: "idl/Printable.json5",
+    brief: "provide APrintable interface for DGlobalEnv",
+    using_doxygen: true,
+    repr: "DGlobalEnv",
+    doc: [ "implement APrintable for DGlobalEnv" ],
+}

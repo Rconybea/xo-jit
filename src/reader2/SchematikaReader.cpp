@@ -18,6 +18,7 @@ namespace xo {
                                        config.symtab_var_config_,
                                        config.symtab_types_config_,
                                        config.max_stringtable_cap_,
+                                       config.pm_install_flags_,
                                        config.parser_debug_flag_),
                           expr_alloc,
                           aux_alloc},

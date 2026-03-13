@@ -8,8 +8,10 @@
 #include "SyntaxStateMachine.hpp"
 #include "ToplevelSeqSsm.hpp"
 #include "DefineSsm.hpp"
+#include <xo/procedure2/PrimitiveRegistry.hpp>
 #include <xo/object2/array/IPrintable_DArray.hpp>
 #include <xo/printable2/Printable.hpp>
+#include <xo/alloc2/Collector.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>

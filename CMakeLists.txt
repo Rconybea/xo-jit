@@ -337,6 +337,22 @@ xo_add_genfacetimpl(
 
 # ----------------------------------------------------------------
 
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-gcobject-globalenv
+    FACET_PKG xo_alloc2
+    INPUT idl/IGCObject_DGlobalEnv.json5
+)
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-printable-globalenv
+    FACET_PKG xo_printable2
+    INPUT idl/IPrintable_DGlobalEnv.json5
+)
+
+# ----------------------------------------------------------------
+
 xo_add_genfacet_all(xo-reader2-genfacet-all)
 
 # ----------------------------------------------------------------

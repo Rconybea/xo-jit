@@ -4,22 +4,25 @@
  **/
 
 #include "reader2_register_types.hpp"
+#include "GlobalEnv.hpp"
 
 #include <xo/indentlog/scope.hpp>
 
 namespace xo {
     using xo::mm::ACollector;
+    using xo::mm::AGCObject;
+    using xo::facet::impl_for;
     using xo::scope;
 
     namespace scm {
         bool
-        reader2_register_types(obj<ACollector> /*gc*/)
+        reader2_register_types(obj<ACollector> gc)
         {
             scope log(XO_DEBUG(true));
 
             bool ok = true;
 
-            /* no gc-aware types yet; scaffold for future use */
+            ok &= gc.install_type(impl_for<AGCObject, DGlobalEnv>());
 
             return ok;
         }

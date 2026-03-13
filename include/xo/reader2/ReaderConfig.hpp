@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <xo/procedure2/PrimitiveRegistry.hpp>
 #include <xo/arena/CircularBufferConfig.hpp>
 #include <xo/arena/ArenaHashMapConfig.hpp>
 #include <xo/arena/ArenaConfig.hpp>
@@ -70,6 +71,9 @@ namespace xo {
 
             /** max size (in bytes) of stringtable **/
             size_t max_stringtable_cap_ = 64*1024;
+
+            /** flags controlling which primitives to install **/
+            InstallFlags pm_install_flags_ = InstallFlags::f_all;
 
             /** debug flag for schematika_reader **/
             bool reader_debug_flag_ = false;

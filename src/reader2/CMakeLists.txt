@@ -14,6 +14,10 @@ set(SELF_SRCS
     ParserStack.cpp
     ParserResult.cpp
 
+    DGlobalEnv.cpp
+    facet/IGCObject_DGlobalEnv.cpp
+    facet/IPrintable_DGlobalEnv.cpp
+
     syntaxstatetype.cpp
     ISyntaxStateMachine_Any.cpp
 
