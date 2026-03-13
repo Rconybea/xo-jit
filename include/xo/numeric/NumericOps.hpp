@@ -30,9 +30,12 @@ namespace xo {
                                           BinaryOp cmpne,
                                           BinaryOp cmplt,
                                           BinaryOp cmple,
+                                          BinaryOp cmpgt,
                                           BinaryOp cmpge)
                 : multiply_{multiply}, divide_{divide}, add_{add}, subtract_{subtract},
-                  cmpeq_{cmpeq}, cmpne_{cmpne}, cmplt_{cmplt}, cmple_{cmple}, cmpge_{cmpge} {}
+                  cmpeq_{cmpeq}, cmpne_{cmpne},
+                  cmplt_{cmplt}, cmple_{cmple},
+                  cmpgt_{cmpgt}, cmpge_{cmpge} {}
 
             BinaryOp multiply_ = nullptr;
             BinaryOp divide_ = nullptr;
@@ -47,6 +50,8 @@ namespace xo {
             BinaryOp cmplt_ = nullptr;
             /** compare numerics (<=) **/
             BinaryOp cmple_ = nullptr;
+            /** compare numerics (>) **/
+            BinaryOp cmpgt_ = nullptr;
             /** compare numerics (>=) **/
             BinaryOp cmpge_ = nullptr;
         };
@@ -68,6 +73,7 @@ namespace xo {
                                              BinaryOp_Impl cmpne,
                                              BinaryOp_Impl cmplt,
                                              BinaryOp_Impl cmple,
+                                             BinaryOp_Impl cmpgt,
                                              BinaryOp_Impl cmpge) {
                 return AnonymizedNumericOps(reinterpret_cast<BinaryOp_Anon>(multiply),
                                             reinterpret_cast<BinaryOp_Anon>(divide),
@@ -77,6 +83,7 @@ namespace xo {
                                             reinterpret_cast<BinaryOp_Anon>(cmpne),
                                             reinterpret_cast<BinaryOp_Anon>(cmplt),
                                             reinterpret_cast<BinaryOp_Anon>(cmple),
+                                            reinterpret_cast<BinaryOp_Anon>(cmpgt),
                                             reinterpret_cast<BinaryOp_Anon>(cmpge));
             }
         };

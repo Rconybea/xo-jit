@@ -43,6 +43,7 @@ namespace xo {
                  &FloatOps::cmp_notequal,
                  &FloatOps::cmp_less,
                  &FloatOps::cmp_lessequal,
+                 &FloatOps::cmp_greater,
                  &FloatOps::cmp_greatequal);
 
             NumericDispatch::instance().register_impl<DFloat, DInteger>
@@ -54,6 +55,7 @@ namespace xo {
                  &FloatIntegerOps::cmp_notequal,
                  &FloatIntegerOps::cmp_less,
                  &FloatIntegerOps::cmp_lessequal,
+                 &FloatIntegerOps::cmp_greater,
                  &FloatIntegerOps::cmp_greatequal);
 
             NumericDispatch::instance().register_impl<DInteger, DFloat>
@@ -65,6 +67,7 @@ namespace xo {
                  &IntegerFloatOps::cmp_notequal,
                  &IntegerFloatOps::cmp_less,
                  &IntegerFloatOps::cmp_lessequal,
+                 &IntegerFloatOps::cmp_greater,
                  &IntegerFloatOps::cmp_greatequal);
 
             NumericDispatch::instance().register_impl<DInteger, DInteger>
@@ -76,6 +79,7 @@ namespace xo {
                  &IntegerOps::cmp_notequal,
                  &IntegerOps::cmp_less,
                  &IntegerOps::cmp_lessequal,
+                 &IntegerOps::cmp_greater,
                  &IntegerOps::cmp_greatequal);
 
             log && log(xtag("ANumeric.tseq", typeseq::id<ANumeric>()));

@@ -163,12 +163,24 @@ namespace xo {
         }
 
         obj<AGCObject>
+        NumericDispatch::cmp_greater(obj<ARuntimeContext> rcx,
+                                     obj<AGCObject> x,
+                                     obj<AGCObject> y)
+        {
+            return dispatch(rcx,
+                            "NumericDispatch::cmp_greater",
+                            "incomparable types in x>y",
+                            &AnonymizedNumericOps::cmpgt_,
+                            x, y);
+        }
+
+        obj<AGCObject>
         NumericDispatch::cmp_greatequal(obj<ARuntimeContext> rcx,
                                         obj<AGCObject> x,
                                         obj<AGCObject> y)
         {
             return dispatch(rcx,
-                            "NumericDispatch::cmp_great",
+                            "NumericDispatch::cmp_greatequal",
                             "incomparable types in x>=y",
                             &AnonymizedNumericOps::cmpge_,
                             x, y);

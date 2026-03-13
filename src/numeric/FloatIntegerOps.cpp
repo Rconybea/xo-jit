@@ -75,6 +75,14 @@ namespace xo {
         }
 
         obj<AGCObject>
+        FloatIntegerOps::cmp_greater(obj<ARuntimeContext> rcx,
+                                     DFloat * x, DInteger * y)
+        {
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            x->value() > DFloat::value_type(y->value()));
+        }
+
+        obj<AGCObject>
         FloatIntegerOps::cmp_greatequal(obj<ARuntimeContext> rcx,
                                         DFloat * x, DInteger * y)
         {
@@ -142,6 +150,14 @@ namespace xo {
         {
             return DBoolean::box<AGCObject>(rcx.allocator(),
                                             DFloat::value_type(x->value()) <= y->value());
+        }
+
+        obj<AGCObject>
+        IntegerFloatOps::cmp_greater(obj<ARuntimeContext> rcx,
+                                     DInteger * x, DFloat * y)
+        {
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            DFloat::value_type(x->value()) > y->value());
         }
 
         obj<AGCObject>

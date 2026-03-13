@@ -36,6 +36,8 @@ namespace xo {
                                            DFloat * x, DInteger * y);
             static obj<AGCObject> cmp_lessequal(obj<ARuntimeContext> rcx,
                                                 DFloat * x, DInteger * y);
+            static obj<AGCObject> cmp_greater(obj<ARuntimeContext> rcx,
+                                                 DFloat * x, DInteger * y);
             static obj<AGCObject> cmp_greatequal(obj<ARuntimeContext> rcx,
                                                  DFloat * x, DInteger * y);
         };
@@ -62,6 +64,8 @@ namespace xo {
                                            DInteger * x, DFloat * y);
             static obj<AGCObject> cmp_lessequal(obj<ARuntimeContext> rcx,
                                                 DInteger * x, DFloat * y);
+            static obj<AGCObject> cmp_greater(obj<ARuntimeContext> rcx,
+                                              DInteger * x, DFloat * y);
             static obj<AGCObject> cmp_greatequal(obj<ARuntimeContext> rcx,
                                                  DInteger * x, DFloat * y);
         };

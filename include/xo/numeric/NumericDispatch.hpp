@@ -93,27 +93,32 @@ namespace xo {
                                            obj<AGCObject> x,
                                            obj<AGCObject> y);
 
-            /** compare two numeric values for equality **/
+            /** compare two numeric values for equality (==) **/
             static obj<AGCObject> cmp_equal(obj<ARuntimeContext> rcx,
                                             obj<AGCObject> x,
                                             obj<AGCObject> y);
 
-            /** compare two numeric values for inequality **/
+            /** compare two numeric values for inequality (!~=) **/
             static obj<AGCObject> cmp_notequal(obj<ARuntimeContext> rcx,
                                                obj<AGCObject> x,
                                                obj<AGCObject> y);
 
-            /** compare two numeric values for less **/
+            /** compare two numeric values for less (<) **/
             static obj<AGCObject> cmp_less(obj<ARuntimeContext> rcx,
                                            obj<AGCObject> x,
                                            obj<AGCObject> y);
 
-            /** compare two numeric values for less-or-equal **/
+            /** compare two numeric values for less-or-equal (<=) **/
             static obj<AGCObject> cmp_lessequal(obj<ARuntimeContext> rcx,
                                                 obj<AGCObject> x,
                                                 obj<AGCObject> y);
 
-            /** compare two numeric values for greater-or-equal **/
+            /** compare two numeric values for greater (>) **/
+            static obj<AGCObject> cmp_greater(obj<ARuntimeContext> rcx,
+                                              obj<AGCObject> x,
+                                              obj<AGCObject> y);
+
+            /** compare two numeric values for greater-or-equal (>=) **/
             static obj<AGCObject> cmp_greatequal(obj<ARuntimeContext> rcx,
                                                  obj<AGCObject> x,
                                                  obj<AGCObject> y);
@@ -135,6 +140,7 @@ namespace xo {
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpne_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmplt_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmple_fn,
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpgt_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpge_fn) {
 
                 KeyType key(typeseq::id<DRepr1>().seqno(),
@@ -150,6 +156,7 @@ namespace xo {
                                                        cmpne_fn,
                                                        cmplt_fn,
                                                        cmple_fn,
+                                                       cmpgt_fn,
                                                        cmpge_fn);
             }
 
