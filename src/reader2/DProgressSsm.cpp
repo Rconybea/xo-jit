@@ -134,7 +134,7 @@ namespace xo {
                     return optype::op_not_equal;
                 case tokentype::tk_leftangle:    // [<]
                     return optype::op_less;
-                case tokentype::tk_lessequal:
+                case tokentype::tk_cmple:        // [<=]
                     return optype::op_less_equal;
                 case tokentype::tk_rightangle:
                     return optype::op_great;
@@ -291,7 +291,6 @@ namespace xo {
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
             case tokentype::tk_rightangle:
-            case tokentype::tk_lessequal:
             case tokentype::tk_greatequal:
             case tokentype::tk_dot:
             case tokentype::tk_doublecolon:
@@ -306,6 +305,7 @@ namespace xo {
             case tokentype::tk_cmpeq:
             case tokentype::tk_cmpne:
             case tokentype::tk_leftangle:
+            case tokentype::tk_cmple:
                 this->on_operator_token(tk, p_psm);
                 return;
 
@@ -1163,6 +1163,12 @@ namespace xo {
                      lhs_, rhs_);
 
             case optype::op_less_equal:
+                return assemble_numeric_expr_aux
+                    (p_psm->expr_alloc(),
+                     TypeRef::prefix_type::from_chars("_cmple_gco"),
+                     p_psm->cmple_pm(),
+                     lhs_, rhs_);
+
             case optype::op_great:
             case optype::op_great_equal:
                 assert(false);
@@ -1175,49 +1181,12 @@ namespace xo {
                      p_psm->multiply_pm(), //&NumericPrimitives::s_mul_gco_gco_pm
                      lhs_, rhs_);
 
-                break;
             case optype::op_divide:
                 return assemble_numeric_expr_aux
                     (p_psm->expr_alloc(),
                      TypeRef::prefix_type::from_chars("_div_gco"),
                      p_psm->divide_pm(), // &NumericPrimitives::s_div_gco_gco_pm
                      lhs_, rhs_);
-
-#ifdef OBSOLETE
-                {
-                    auto pm_obj  = (with_facet<AGCObject>::mkobj
-                                    (&NumericPrimitives::s_div_gco_gco_pm));
-                    auto fn_expr = (DConstant::make
-                                    (p_psm->expr_alloc(), pm_obj));
-
-                    /* note:
-                     * 1. don't assume we know lhs_ / rhs_ value types yet.
-                     *    perhaps have expression like
-                     *      f(..) * g(..)
-                     *    where f is the function that contains current ssm.
-                     *
-                     * 2. consequence: we need representation for
-                     *    polymorphic multiply on unknown numeric arguments.
-                     *
-                     * 3. TypeRef::dwim(..) is a placeholder.
-                     *    Plan to later provide abstract interpreter
-                     *    (ie compiler pass :) to drive type inference/unification
-                     *
-                     * 4. Alternatively could supply type-annotation syntax
-                     *    so human can assist inference; context here is we want
-                     *    to automate the boring stuff
-                     */
-
-                    TypeRef tref = TypeRef::dwim
-                                       (TypeRef::prefix_type::from_chars("_div_gco"),
-                                        nullptr);
-
-                    return DApplyExpr::make2(p_psm->expr_alloc(),
-                                             tref, fn_expr, lhs_, rhs_);
-                }
-#endif
-
-                break;
 
             case optype::op_add:
                 return assemble_numeric_expr_aux
@@ -1267,26 +1236,6 @@ namespace xo {
                      TypeRef::prefix_type::from_chars("_sub_gco"),
                      p_psm->subtract_pm(),
                      lhs_, rhs_);
-
-#ifdef OBSOLETE
-                {
-                    auto pm_obj = (with_facet<AGCObject>::mkobj
-                                       (&NumericPrimitives::s_sub_gco_gco_pm));
-                    auto fn_expr = (DConstant::make
-                                        (p_psm->expr_alloc(), pm_obj));
-
-                    // see comment on op_multiply re need for poly impl
-
-                    TypeRef tref = TypeRef::dwim
-                                       (TypeRef::prefix_type::from_chars("_sub_gco"),
-                                        nullptr);
-
-                    return DApplyExpr::make2(p_psm->expr_alloc(),
-                                             tref, fn_expr, lhs_, rhs_);
-                }
-#endif
-
-                break;
 
 #ifdef NOT_YET
 case optype::op_assign:
