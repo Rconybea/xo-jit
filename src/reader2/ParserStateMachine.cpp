@@ -20,16 +20,69 @@
 #include <stdexcept>
 
 namespace xo {
-    using xo::mm::MemorySizeInfo;
+    using xo::mm::ACollector;
+    using xo::mm::AAllocator;
+    using xo::mm::AGCObject;
     using xo::print::APrintable;
+    using xo::reflect::TypeDescr;
     using xo::facet::FacetRegistry;
-    using xo::facet::with_facet;
 
     namespace scm {
+        namespace {
+            /** Create global environment and populate with builtin primitives.
+             *  Get memory from @p mm, with symbol names in @p stringtable.
+             *  Stash symbol names in @p global_symtab, which coordinates with
+             *  new global environment.
+             *  @p pm_install_flags controls which primitives to install
+             **/
+            obj<AGCObject,DGlobalEnv>
+            global_env_setup(StringTable & stringtable,
+                             obj<AAllocator> mm,
+                             DGlobalSymtab * global_symtab,
+                             InstallFlags pm_install_flags)
+            {
+                DGlobalEnv * env = DGlobalEnv::_make(mm,
+                                                     global_symtab);
+
+                InstallSink sink = ([env, mm, &stringtable]
+                                    (std::string_view name,
+                                     TypeDescr fn_td,
+                                     obj<AProcedure> pm,
+                                     InstallFlags flags)
+                    {
+                        scope log(XO_DEBUG(false));
+
+                        log && log(xtag("name", name));
+
+                        (void)flags;
+
+                        obj<AGCObject> pm_gco = pm.to_facet<AGCObject>();
+
+                        const DUniqueString * sym
+                            = stringtable.intern(name);
+
+                        env->_upsert_value(mm,
+                                           sym,
+                                           fn_td,
+                                           pm_gco);
+
+                        return true;
+                    });
+
+                PrimitiveRegistry::instance()
+                    .install_primitives(mm,
+                                        sink,
+                                        pm_install_flags);
+
+                return obj<AGCObject,DGlobalEnv>(env);
+            }
+        }
+
         ParserStateMachine::ParserStateMachine(const ArenaConfig & config,
                                                const ArenaHashMapConfig & symtab_var_config,
                                                const ArenaHashMapConfig & symtab_type_config,
                                                size_type max_stringtable_capacity,
+                                               InstallFlags pm_install_flags,
                                                obj<AAllocator> expr_alloc,
                                                obj<AAllocator> aux_alloc)
             : stringtable_{max_stringtable_capacity},
@@ -39,14 +92,138 @@ namespace xo {
               global_symtab_{DGlobalSymtab::make(expr_alloc, aux_alloc,
                                                  symtab_var_config,
                                                  symtab_type_config)},
+              global_env_{global_env_setup(stringtable_,
+                                           expr_alloc_,
+                                           global_symtab_.data(),
+                                           pm_install_flags)},
               debug_flag_{config.debug_flag_}
         {
+            obj<ACollector> gc = expr_alloc_.try_to_facet<ACollector>();
+            if (gc) {
+                gc.add_gc_root(&global_env_);
+            }
+
+            {
+                const DUniqueString * name = stringtable_.lookup("_mul");
+                assert(name);
+                this->multiply_binding_ = global_symtab_->lookup_binding(name);
+            }
+
+            {
+                const DUniqueString * name = stringtable_.lookup("_div");
+                assert(name);
+                this->divide_binding_ = global_symtab_->lookup_binding(name);
+            }
+
+            {
+                const DUniqueString * name = stringtable_.lookup("_add");
+                assert(name);
+                this->add_binding_ = global_symtab_->lookup_binding(name);
+            }
+
+            {
+                const DUniqueString * name = stringtable_.lookup("_sub");
+                assert(name);
+                this->subtract_binding_ = global_symtab_->lookup_binding(name);
+            }
+
+            {
+                const DUniqueString * name = stringtable_.lookup("_cmpeq");
+                assert(name);
+                this->cmpeq_binding_ = global_symtab_->lookup_binding(name);
+            }
+
+            {
+                const DUniqueString * name = stringtable_.lookup("_cmpne");
+                assert(name);
+                this->cmpne_binding_ = global_symtab_->lookup_binding(name);
+            }
+
+            {
+                const DUniqueString * name = stringtable_.lookup("_cmplt");
+                assert(name);
+                this->cmplt_binding_ = global_symtab_->lookup_binding(name);
+            }
+        }
+
+        ParserStateMachine::~ParserStateMachine()
+        {
+            obj<ACollector> gc = expr_alloc_.try_to_facet<ACollector>();
+
+            if (gc) {
+                scope log(XO_DEBUG(true), "remove_gc_root not implemented");
+
+                gc.remove_gc_root(&global_env_);
+            }
+        }
+
+        obj<AGCObject>
+        ParserStateMachine::multiply_pm() const
+        {
+            obj<AGCObject> retval = global_env_->lookup_value(multiply_binding_);
+            assert(retval);
+
+            return retval;
+        }
+
+        obj<AGCObject>
+        ParserStateMachine::divide_pm() const
+        {
+            obj<AGCObject> retval = global_env_->lookup_value(divide_binding_);
+            assert(retval);
+
+            return retval;
+        }
+
+        obj<AGCObject>
+        ParserStateMachine::add_pm() const
+        {
+            obj<AGCObject> retval = global_env_->lookup_value(add_binding_);
+            assert(retval);
+
+            return retval;
+        }
+
+        obj<AGCObject>
+        ParserStateMachine::subtract_pm() const
+        {
+            obj<AGCObject> retval = global_env_->lookup_value(subtract_binding_);
+            assert(retval);
+
+            return retval;
+        }
+
+        obj<AGCObject>
+        ParserStateMachine::cmpeq_pm() const
+        {
+            obj<AGCObject> retval = global_env_->lookup_value(cmpeq_binding_);
+            assert(retval);
+
+            return retval;
+        }
+
+        obj<AGCObject>
+        ParserStateMachine::cmpne_pm() const
+        {
+            obj<AGCObject> retval = global_env_->lookup_value(cmpne_binding_);
+            assert(retval);
+
+            return retval;
+        }
+
+        obj<AGCObject>
+        ParserStateMachine::cmplt_pm() const
+        {
+            obj<AGCObject> retval = global_env_->lookup_value(cmplt_binding_);
+            assert(retval);
+
+            return retval;
         }
 
         bool
         ParserStateMachine::is_at_toplevel() const noexcept
         {
-            /* top-level alwyas has DToplevelSeqSsm */
+            /* top-level always has DToplevelSeqSsm */
 
             ParserStack * s = stack_;
 
