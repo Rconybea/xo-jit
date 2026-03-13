@@ -279,7 +279,7 @@ namespace xo {
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ParserFixture fixture(testname, c_debug_flag);
@@ -318,7 +318,7 @@ namespace xo {
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ParserFixture fixture(testname, c_debug_flag);
