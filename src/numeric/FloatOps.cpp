@@ -60,6 +60,13 @@ namespace xo {
         {
             return DBoolean::box<AGCObject>(rcx.allocator(), x->value() < y->value());
         }
+
+        obj<AGCObject>
+        FloatOps::cmp_lessequal(obj<ARuntimeContext> rcx,
+                                DFloat * x, DFloat * y)
+        {
+            return DBoolean::box<AGCObject>(rcx.allocator(), x->value() <= y->value());
+        }
     }
 }
 

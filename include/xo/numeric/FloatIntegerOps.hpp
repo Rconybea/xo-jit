@@ -34,6 +34,8 @@ namespace xo {
                                                DFloat * x, DInteger * y);
             static obj<AGCObject> cmp_less(obj<ARuntimeContext> rcx,
                                            DFloat * x, DInteger * y);
+            static obj<AGCObject> cmp_lessequal(obj<ARuntimeContext> rcx,
+                                                DFloat * x, DInteger * y);
         };
 
         class IntegerFloatOps {
@@ -56,6 +58,8 @@ namespace xo {
                                                DInteger * x, DFloat * y);
             static obj<AGCObject> cmp_less(obj<ARuntimeContext> rcx,
                                            DInteger * x, DFloat * y);
+            static obj<AGCObject> cmp_lessequal(obj<ARuntimeContext> rcx,
+                                                DInteger * x, DFloat * y);
         };
 
     }

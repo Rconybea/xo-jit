@@ -33,6 +33,8 @@ namespace xo {
             static DPrimitive_gco_2_gco_gco * make_cmpne_pm(obj<AAllocator> mm);
             /** polymorphic (in both arguments) compare (<) **/
             static DPrimitive_gco_2_gco_gco * make_cmplt_pm(obj<AAllocator> mm);
+            /** polymorphic (in both arguments) compare (<=) **/
+            static DPrimitive_gco_2_gco_gco * make_cmple_pm(obj<AAllocator> mm);
         };
     }
 }

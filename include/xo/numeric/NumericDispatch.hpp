@@ -103,10 +103,15 @@ namespace xo {
                                                obj<AGCObject> x,
                                                obj<AGCObject> y);
 
-            /** compare two numeric values for inequality **/
+            /** compare two numeric values for less **/
             static obj<AGCObject> cmp_less(obj<ARuntimeContext> rcx,
                                            obj<AGCObject> x,
                                            obj<AGCObject> y);
+
+            /** compare two numeric values for less-or-equal **/
+            static obj<AGCObject> cmp_lessequal(obj<ARuntimeContext> rcx,
+                                                obj<AGCObject> x,
+                                                obj<AGCObject> y);
 
             /** report memory use for owned arenas to @p visitor **/
             void visit_pools(const MemorySizeVisitor & visitor);
@@ -123,7 +128,8 @@ namespace xo {
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl sub_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpeq_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpne_fn,
-                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmplt_fn) {
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmplt_fn,
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmple_fn) {
 
                 KeyType key(typeseq::id<DRepr1>().seqno(),
                             typeseq::id<DRepr2>().seqno());
@@ -136,7 +142,8 @@ namespace xo {
                                                        sub_fn,
                                                        cmpeq_fn,
                                                        cmpne_fn,
-                                                       cmplt_fn);
+                                                       cmplt_fn,
+                                                       cmple_fn);
             }
 
         private:

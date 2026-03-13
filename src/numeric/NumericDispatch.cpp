@@ -99,18 +99,6 @@ namespace xo {
                             "incomparable types in x+y",
                             &AnonymizedNumericOps::add_,
                             x, y);
-
-#ifdef OBSOLETE
-            KeyType key(x._typeseq(), y._typeseq());
-
-            auto target_fn
-                = NumericDispatch::instance().dispatch_[key].add_;
-
-            if (!target_fn)
-                assert(false);
-
-            return (*target_fn)(rcx, x.data(), y.data());
-#endif
         }
 
         obj<AGCObject>
@@ -123,18 +111,6 @@ namespace xo {
                             "incomparable types in x-y",
                             &AnonymizedNumericOps::subtract_,
                             x, y);
-
-#ifdef OBSOLETE
-            KeyType key(x._typeseq(), y._typeseq());
-
-            auto target_fn
-                = NumericDispatch::instance().dispatch_[key].subtract_;
-
-            if (!target_fn)
-                assert(false);
-
-            return (*target_fn)(rcx, x.data(), y.data());
-#endif
         }
 
         obj<AGCObject>
@@ -148,27 +124,6 @@ namespace xo {
                             &AnonymizedNumericOps::cmpeq_,
                             x, y);
 
-#ifdef OBSOLETE
-            KeyType key(x._typeseq(), y._typeseq());
-
-            auto target_fn
-                = NumericDispatch::instance().dispatch_[key].cmpeq_;
-
-            if (!target_fn) {
-                // FIXME: use {fmt} here
-                std::stringstream ss;
-                tosn(ss,
-                     "incomparable types in x==y",
-                     xtag("x.type", TypeRegistry::id2name(x._typeseq())),
-                     xtag("y.type", TypeRegistry::id2name(y._typeseq())));
-
-                return DRuntimeError::make(rcx.allocator(),
-                                           "NumericDispatch::cmp_equal",
-                                           ss.str().c_str());
-            }
-
-            return (*target_fn)(rcx, x.data(), y.data());
-#endif
         }
 
         obj<AGCObject>
@@ -192,6 +147,18 @@ namespace xo {
                             "NumericDispatch::cmp_less",
                             "incomparable types in x<y",
                             &AnonymizedNumericOps::cmplt_,
+                            x, y);
+        }
+
+        obj<AGCObject>
+        NumericDispatch::cmp_lessequal(obj<ARuntimeContext> rcx,
+                                       obj<AGCObject> x,
+                                       obj<AGCObject> y)
+        {
+            return dispatch(rcx,
+                            "NumericDispatch::cmp_lessequal",
+                            "incomparable types in x<=y",
+                            &AnonymizedNumericOps::cmple_,
                             x, y);
         }
 

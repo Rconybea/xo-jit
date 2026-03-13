@@ -61,6 +61,13 @@ namespace xo {
                                                    &NumericDispatch::cmp_less);
         }
 
+        DPrimitive_gco_2_gco_gco *
+        NumericPrimitives::make_cmple_pm(obj<AAllocator> mm)
+        {
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmple",
+                                                   &NumericDispatch::cmp_lessequal);
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 
