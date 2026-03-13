@@ -47,7 +47,7 @@ namespace xo {
         void
         DGlobalEnv::assign_value(obj<AAllocator> mm, Binding ix, obj<AGCObject> x)
         {
-            scope log(XO_DEBUG(true),
+            scope log(XO_DEBUG(false),
                       xtag("ix.j_slot", ix.j_slot()),
                       xtag("values.cap", values_->capacity()));
 
