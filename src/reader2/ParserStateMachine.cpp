@@ -144,6 +144,12 @@ namespace xo {
                 assert(name);
                 this->cmplt_binding_ = global_symtab_->lookup_binding(name);
             }
+
+            {
+                const DUniqueString * name = stringtable_.lookup("_cmple");
+                assert(name);
+                this->cmple_binding_ = global_symtab_->lookup_binding(name);
+            }
         }
 
         ParserStateMachine::~ParserStateMachine()
@@ -215,6 +221,15 @@ namespace xo {
         ParserStateMachine::cmplt_pm() const
         {
             obj<AGCObject> retval = global_env_->lookup_value(cmplt_binding_);
+            assert(retval);
+
+            return retval;
+        }
+
+        obj<AGCObject>
+        ParserStateMachine::cmple_pm() const
+        {
+            obj<AGCObject> retval = global_env_->lookup_value(cmple_binding_);
             assert(retval);
 
             return retval;

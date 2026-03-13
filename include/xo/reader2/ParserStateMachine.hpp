@@ -106,6 +106,8 @@ namespace xo {
             obj<AGCObject> cmpne_pm() const;
             /** polymorphich less-than comparison. Use to implement infix op< **/
             obj<AGCObject> cmplt_pm() const;
+            /** polymorphich less-or-equal comparison. Use to implement infix op<= **/
+            obj<AGCObject> cmple_pm() const;
 
             /** true iff state machine is currently idle (at top-level) **/
             bool is_at_toplevel() const noexcept;
@@ -418,6 +420,7 @@ namespace xo {
             Binding cmpeq_binding_;
             Binding cmpne_binding_;
             Binding cmplt_binding_;
+            Binding cmple_binding_;
 
             /** current output from parser **/
             ParserResult result_;
