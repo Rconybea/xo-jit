@@ -88,7 +88,7 @@ namespace xo {
         DGlobalSymtab::upsert_variable(obj<AAllocator> mm,
                                        DVariable * var)
         {
-            scope log(XO_DEBUG(true), std::string_view(*var->name()));
+            scope log(XO_DEBUG(false), std::string_view(*var->name()));
 
             // It's possible there's already a global variable
             // with the same name.
@@ -230,7 +230,7 @@ namespace xo {
         {
             assert(sym);
 
-            scope log(XO_DEBUG(true), std::string_view(*sym));
+            scope log(XO_DEBUG(false), std::string_view(*sym));
 
             auto ix = var_map_->find(sym);
 
