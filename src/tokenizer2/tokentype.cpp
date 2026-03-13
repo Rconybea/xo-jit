@@ -30,7 +30,7 @@ namespace xo {
                 CASE(tk_rightangle);
 
                 CASE(tk_cmple);
-                CASE(tk_greatequal);
+                CASE(tk_cmpge);
                 CASE(tk_dot);
                 CASE(tk_comma);
                 CASE(tk_colon);

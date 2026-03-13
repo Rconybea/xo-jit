@@ -500,7 +500,7 @@ namespace xo {
                 log && log("rightangle or greatequal token");
 
                 if (*(ix + 1) == '=') {
-                    tk_type = tokentype::tk_greatequal;
+                    tk_type = tokentype::tk_cmpge;
                     ++ix;
                     ++ix;
                 } else {

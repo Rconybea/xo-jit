@@ -95,7 +95,7 @@ namespace xo {
             tk_cmple,
 
             /** great-equal @c '>=' **/
-            tk_greatequal,
+            tk_cmpge,
 
             /** dot @c '.' **/
             tk_dot,
