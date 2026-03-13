@@ -129,7 +129,7 @@ namespace xo {
             case tokentype::tk_leftangle:
             case tokentype::tk_rightangle:
             case tokentype::tk_cmple:
-            case tokentype::tk_greatequal:
+            case tokentype::tk_cmpge:
             case tokentype::tk_dot:
             case tokentype::tk_doublecolon:
             case tokentype::tk_assign:

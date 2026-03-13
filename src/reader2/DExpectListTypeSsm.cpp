@@ -115,7 +115,7 @@ namespace xo {
             case tokentype::tk_leftbracket:
             case tokentype::tk_rightbracket:
             case tokentype::tk_cmple:
-            case tokentype::tk_greatequal:
+            case tokentype::tk_cmpge:
             case tokentype::tk_dot:
             case tokentype::tk_comma:
             case tokentype::tk_doublecolon:

@@ -138,7 +138,7 @@ namespace xo {
                     return optype::op_less_equal;
                 case tokentype::tk_rightangle:
                     return optype::op_great;
-                case tokentype::tk_greatequal:
+                case tokentype::tk_cmpge:        // [>=]
                     return optype::op_great_equal;
                 default:
                     assert(false);
@@ -291,7 +291,6 @@ namespace xo {
             case tokentype::tk_rightbracket:
             case tokentype::tk_leftbrace:
             case tokentype::tk_rightangle:
-            case tokentype::tk_greatequal:
             case tokentype::tk_dot:
             case tokentype::tk_doublecolon:
             case tokentype::tk_assign:
@@ -306,6 +305,7 @@ namespace xo {
             case tokentype::tk_cmpne:
             case tokentype::tk_leftangle:
             case tokentype::tk_cmple:
+            case tokentype::tk_cmpge:
                 this->on_operator_token(tk, p_psm);
                 return;
 
@@ -1170,9 +1170,15 @@ namespace xo {
                      lhs_, rhs_);
 
             case optype::op_great:
-            case optype::op_great_equal:
                 assert(false);
                 break;
+
+            case optype::op_great_equal:
+                return assemble_numeric_expr_aux
+                    (p_psm->expr_alloc(),
+                     TypeRef::prefix_type::from_chars("_cmpge_gco"),
+                     p_psm->cmpge_pm(),
+                     lhs_, rhs_);
 
             case optype::op_multiply:
                 return assemble_numeric_expr_aux
