@@ -37,6 +37,8 @@ namespace xo {
                                                DInteger * x, DInteger * y);
             static obj<AGCObject> cmp_lessequal(obj<ARuntimeContext> rcx,
                                                 DInteger * x, DInteger * y);
+            static obj<AGCObject> cmp_greatequal(obj<ARuntimeContext> rcx,
+                                                 DInteger * x, DInteger * y);
 
         };
 

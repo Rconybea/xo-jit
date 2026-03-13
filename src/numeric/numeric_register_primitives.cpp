@@ -74,6 +74,8 @@ namespace xo {
                                   flags & InstallFlags::f_essential);
             ok = ok & install_aux(sink, mm, "_cmple", &NumericDispatch::cmp_lessequal,
                                   flags & InstallFlags::f_essential);
+            ok = ok & install_aux(sink, mm, "_cmpge", &NumericDispatch::cmp_greatequal,
+                                  flags & InstallFlags::f_essential);
 
             return ok;
         }

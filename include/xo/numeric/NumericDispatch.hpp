@@ -113,6 +113,11 @@ namespace xo {
                                                 obj<AGCObject> x,
                                                 obj<AGCObject> y);
 
+            /** compare two numeric values for greater-or-equal **/
+            static obj<AGCObject> cmp_greatequal(obj<ARuntimeContext> rcx,
+                                                 obj<AGCObject> x,
+                                                 obj<AGCObject> y);
+
             /** report memory use for owned arenas to @p visitor **/
             void visit_pools(const MemorySizeVisitor & visitor);
 
@@ -129,7 +134,8 @@ namespace xo {
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpeq_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpne_fn,
                                typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmplt_fn,
-                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmple_fn) {
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmple_fn,
+                               typename NumericOps<DRepr1, DRepr2>::BinaryOp_Impl cmpge_fn) {
 
                 KeyType key(typeseq::id<DRepr1>().seqno(),
                             typeseq::id<DRepr2>().seqno());
@@ -143,7 +149,8 @@ namespace xo {
                                                        cmpeq_fn,
                                                        cmpne_fn,
                                                        cmplt_fn,
-                                                       cmple_fn);
+                                                       cmple_fn,
+                                                       cmpge_fn);
             }
 
         private:

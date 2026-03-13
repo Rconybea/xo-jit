@@ -23,49 +23,64 @@ namespace xo {
         FloatOps::divide(obj<ARuntimeContext> rcx,
                            DFloat * x, DFloat * y)
         {
-            return DFloat::box<AGCObject>(rcx.allocator(), x->value() / y->value());
+            return DFloat::box<AGCObject>(rcx.allocator(),
+                                          x->value() / y->value());
         }
 
         obj<AGCObject>
         FloatOps::add(obj<ARuntimeContext> rcx,
                       DFloat * x, DFloat * y)
         {
-            return DFloat::box<AGCObject>(rcx.allocator(), x->value() + y->value());
+            return DFloat::box<AGCObject>(rcx.allocator(),
+                                          x->value() + y->value());
         }
 
         obj<AGCObject>
         FloatOps::subtract(obj<ARuntimeContext> rcx,
                            DFloat * x, DFloat * y)
         {
-            return DFloat::box<AGCObject>(rcx.allocator(), x->value() - y->value());
+            return DFloat::box<AGCObject>(rcx.allocator(),
+                                          x->value() - y->value());
         }
 
         obj<AGCObject>
         FloatOps::cmp_equal(obj<ARuntimeContext> rcx,
                             DFloat * x, DFloat * y)
         {
-            return DBoolean::box<AGCObject>(rcx.allocator(), x->value() == y->value());
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            x->value() == y->value());
         }
 
         obj<AGCObject>
         FloatOps::cmp_notequal(obj<ARuntimeContext> rcx,
                                DFloat * x, DFloat * y)
         {
-            return DBoolean::box<AGCObject>(rcx.allocator(), x->value() != y->value());
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            x->value() != y->value());
         }
 
         obj<AGCObject>
         FloatOps::cmp_less(obj<ARuntimeContext> rcx,
                            DFloat * x, DFloat * y)
         {
-            return DBoolean::box<AGCObject>(rcx.allocator(), x->value() < y->value());
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            x->value() < y->value());
         }
 
         obj<AGCObject>
         FloatOps::cmp_lessequal(obj<ARuntimeContext> rcx,
                                 DFloat * x, DFloat * y)
         {
-            return DBoolean::box<AGCObject>(rcx.allocator(), x->value() <= y->value());
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            x->value() <= y->value());
+        }
+
+        obj<AGCObject>
+        FloatOps::cmp_greatequal(obj<ARuntimeContext> rcx,
+                                 DFloat * x, DFloat * y)
+        {
+            return DBoolean::box<AGCObject>(rcx.allocator(),
+                                            x->value() >= y->value());
         }
     }
 }

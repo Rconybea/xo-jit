@@ -29,9 +29,10 @@ namespace xo {
                                           BinaryOp cmpeq,
                                           BinaryOp cmpne,
                                           BinaryOp cmplt,
-                                          BinaryOp cmple)
+                                          BinaryOp cmple,
+                                          BinaryOp cmpge)
                 : multiply_{multiply}, divide_{divide}, add_{add}, subtract_{subtract},
-                  cmpeq_{cmpeq}, cmpne_{cmpne}, cmplt_{cmplt}, cmple_{cmple} {}
+                  cmpeq_{cmpeq}, cmpne_{cmpne}, cmplt_{cmplt}, cmple_{cmple}, cmpge_{cmpge} {}
 
             BinaryOp multiply_ = nullptr;
             BinaryOp divide_ = nullptr;
@@ -46,6 +47,8 @@ namespace xo {
             BinaryOp cmplt_ = nullptr;
             /** compare numerics (<=) **/
             BinaryOp cmple_ = nullptr;
+            /** compare numerics (>=) **/
+            BinaryOp cmpge_ = nullptr;
         };
 
         template <typename DRepr1, typename DRepr2>
@@ -64,7 +67,8 @@ namespace xo {
                                              BinaryOp_Impl cmpeq,
                                              BinaryOp_Impl cmpne,
                                              BinaryOp_Impl cmplt,
-                                             BinaryOp_Impl cmple) {
+                                             BinaryOp_Impl cmple,
+                                             BinaryOp_Impl cmpge) {
                 return AnonymizedNumericOps(reinterpret_cast<BinaryOp_Anon>(multiply),
                                             reinterpret_cast<BinaryOp_Anon>(divide),
                                             reinterpret_cast<BinaryOp_Anon>(add),
@@ -72,7 +76,8 @@ namespace xo {
                                             reinterpret_cast<BinaryOp_Anon>(cmpeq),
                                             reinterpret_cast<BinaryOp_Anon>(cmpne),
                                             reinterpret_cast<BinaryOp_Anon>(cmplt),
-                                            reinterpret_cast<BinaryOp_Anon>(cmple));
+                                            reinterpret_cast<BinaryOp_Anon>(cmple),
+                                            reinterpret_cast<BinaryOp_Anon>(cmpge));
             }
         };
 
