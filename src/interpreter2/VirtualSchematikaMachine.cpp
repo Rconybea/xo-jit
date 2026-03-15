@@ -206,7 +206,8 @@ namespace xo {
                 log && log(xtag("expr", expr_pr));
 
             if (value_.value()) {
-                auto value_pr = const_cast<obj<AGCObject> *>(value_.value())->to_facet<APrintable>();
+                auto value_pr
+                    = const_cast<obj<AGCObject> *>(value_.value())->to_facet<APrintable>();
                 if (value_pr)
                     log && log(xtag("value", value_pr));
             } else {
@@ -954,48 +955,6 @@ namespace xo {
         static DPrimitive_gco_1_gco s_fn_n_args_pm("_fn_n_args",
                                                    &xfer_fn_n_args);
 
-        // ----- primitive: dict_make() -----
-
-        obj<AGCObject>
-        xfer_dict_make(obj<ARuntimeContext> rcx)
-        {
-            return obj<AGCObject,DDictionary>(DDictionary::empty(rcx.allocator(),
-                                                                 8 /*cap*/));
-        }
-
-        static DPrimitive_gco_0 s_dict_make_pm("_dict_make",
-                                               &xfer_dict_make);
-
-        // ----- primitive: dict_upsert() -----
-
-        obj<AGCObject>
-        xfer_dict_upsert(obj<ARuntimeContext> rcx,
-                         obj<AGCObject,DDictionary> dict,
-                         obj<AGCObject,DString> key,
-                         obj<AGCObject> value)
-        {
-            scope log(XO_DEBUG(true));
-
-            log && log(xtag("dict.tseq", dict._typeseq()),
-                       xtag("dict.tname", TypeRegistry::id2name(dict._typeseq())));
-            log && log(xtag("key.tseq", key._typeseq()),
-                       xtag("key.tname", TypeRegistry::id2name(key._typeseq())));
-            log && log(xtag("value.tseq", value._typeseq()),
-                       xtag("value.tname", TypeRegistry::id2name(value._typeseq())));
-
-            auto value_pr = FacetRegistry::instance().variant<APrintable>(value);
-
-            log && log(xtag("value", value_pr));
-
-            dict->upsert(rcx.allocator(),
-                         DDictionary::pair_type(key.data(), value));
-
-            return dict;
-        }
-
-        static DPrimitive_gco_3_dict_string_gco s_dict_upsert_pm("_dict_upsert",
-                                                                 &xfer_dict_upsert);
-
         // ----- install primitives -----
 
         void
@@ -1047,30 +1006,6 @@ namespace xo {
                      name,
                      Reflect::require<DPrimitive_gco_1_gco>(),
                      obj<AGCObject,DPrimitive_gco_1_gco>(&s_fn_n_args_pm));
-            }
-
-            /* dict_make */
-            {
-                const DUniqueString * name
-                    = reader_.intern_string("dict_make");
-
-                global_env_->_upsert_value
-                    (mm_.to_op(),
-                     name,
-                     Reflect::require<DPrimitive_gco_0>(),
-                     obj<AGCObject,DPrimitive_gco_0>(&s_dict_make_pm));
-            }
-
-            /* dict_upsert */
-            {
-                const DUniqueString * name
-                    = reader_.intern_string("dict_upsert");
-
-                global_env_->_upsert_value
-                    (mm_.to_op(),
-                     name,
-                     Reflect::require<DPrimitive_gco_3_dict_string_gco>(),
-                     obj<AGCObject,DPrimitive_gco_3_dict_string_gco>(&s_dict_upsert_pm));
             }
         }
 
