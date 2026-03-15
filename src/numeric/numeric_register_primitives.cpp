@@ -61,18 +61,24 @@ namespace xo {
             ok = ok & install_aux(sink,
                                   NumericPrimitives::make_divide_pm(mm),
                                   flags & InstallFlags::f_essential);
-            ok = ok & install_aux(sink, mm, "_add", &NumericDispatch::add,
+            ok = ok & install_aux(sink,
+                                  NumericPrimitives::make_add_pm(mm),
                                   flags & InstallFlags::f_essential);
-            ok = ok & install_aux(sink, mm, "_sub", &NumericDispatch::subtract,
+            ok = ok & install_aux(sink,
+                                  NumericPrimitives::make_subtract_pm(mm),
                                   flags & InstallFlags::f_essential);
 
-            ok = ok & install_aux(sink, mm, "_cmpeq", &NumericDispatch::cmp_equal,
+            ok = ok & install_aux(sink,
+                                  NumericPrimitives::make_cmpeq_pm(mm),
                                   flags & InstallFlags::f_essential);
-            ok = ok & install_aux(sink, mm, "_cmpne", &NumericDispatch::cmp_notequal,
+            ok = ok & install_aux(sink,
+                                  NumericPrimitives::make_cmpne_pm(mm),
                                   flags & InstallFlags::f_essential);
-            ok = ok & install_aux(sink, mm, "_cmplt", &NumericDispatch::cmp_less,
+            ok = ok & install_aux(sink,
+                                  NumericPrimitives::make_cmplt_pm(mm),
                                   flags & InstallFlags::f_essential);
-            ok = ok & install_aux(sink, mm, "_cmple", &NumericDispatch::cmp_lessequal,
+            ok = ok & install_aux(sink,
+                                  NumericPrimitives::make_cmple_pm(mm),
                                   flags & InstallFlags::f_essential);
             ok = ok & install_aux(sink, mm, "_cmpgt", &NumericDispatch::cmp_greater,
                                   flags & InstallFlags::f_essential);

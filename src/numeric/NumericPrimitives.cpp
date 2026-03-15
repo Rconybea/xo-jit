@@ -68,6 +68,22 @@ namespace xo {
                                                    &NumericDispatch::cmp_lessequal);
         }
 
+        DPrimitive_gco_2_gco_gco *
+        NumericPrimitives::make_cmpgt_pm(obj<AAllocator> mm)
+        {
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmpgt",
+                                                   &NumericDispatch::cmp_greater);
+        }
+
+        DPrimitive_gco_2_gco_gco *
+        NumericPrimitives::make_cmpge_pm(obj<AAllocator> mm)
+        {
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmpge",
+                                                   &NumericDispatch::cmp_greatequal);
+        }
+
+
+
     } /*namespace scm*/
 } /*namespace xo*/
 
