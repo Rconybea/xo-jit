@@ -280,7 +280,7 @@ namespace xo {
             obj<AExpression> expr_;
 
             /** environment pointer.  Maintains bindings
-             *  for global variables.
+             *  for global variables.  Obtained from reader
              **/
             DGlobalEnv * global_env_ = nullptr;
 

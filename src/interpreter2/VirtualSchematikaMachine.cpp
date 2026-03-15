@@ -86,7 +86,7 @@ namespace xo {
                 this->error_mm_.adopt(obj<AAllocator,DArena>(arena));
             }
 
-            this->global_env_ = DGlobalEnv::_make(mm_.to_op(), reader_.global_symtab());
+            this->global_env_ = reader_.global_env();
 
             this->install_core_primitives();
         }
@@ -915,26 +915,6 @@ namespace xo {
         static DPrimitive_gco_0 s_cwd_pm("_cwd",
                                          &xfer_cwd);
 
-        // ----- primitive: nth() -----
-
-        // TODO: seq_gc -> obj<ASequence>
-        //       n_gco -> obj<AGCObject,DInteger>
-        //
-        obj<AGCObject>
-        xfer_nth(obj<ARuntimeContext> rcx,
-                 obj<AGCObject> seq_gco,
-                 obj<AGCObject> n_gco)
-        {
-            (void)rcx;
-
-            obj<ASequence> seq = seq_gco.to_facet<ASequence>();
-            auto n = obj<AGCObject,DInteger>::from(n_gco);
-
-            return seq.at(n->value());
-        }
-
-        static DPrimitive_gco_2_gco_gco s_nth_pm("_nth", &xfer_nth);
-
         // ----- primitive: cons() -----
 
         obj<AGCObject>
@@ -1043,18 +1023,6 @@ namespace xo {
                      name,
                      Reflect::require<DPrimitive_gco_0>(),
                      obj<AGCObject,DPrimitive_gco_0>(&s_cwd_pm));
-            }
-
-            /* nth */
-            {
-                const DUniqueString * name
-                    = reader_.intern_string("nth");
-
-                global_env_->_upsert_value
-                    (mm_.to_op(),
-                     name,
-                     Reflect::require<DPrimitive_gco_2_gco_gco>(),
-                     obj<AGCObject,DPrimitive_gco_2_gco_gco>(&s_nth_pm));
             }
 
             /* cons */
