@@ -86,8 +86,6 @@ namespace xo {
             }
 
             this->global_env_ = reader_.global_env();
-
-            this->install_core_primitives();
         }
 
         obj<AAllocator>
@@ -874,45 +872,6 @@ namespace xo {
                 return;
             }
          }
-
-        // ----- primitive: fn_n_args() -----
-
-        obj<AGCObject>
-        xfer_fn_n_args(obj<ARuntimeContext> rcx,
-                       obj<AGCObject> fn_gco)
-        {
-            scope log(XO_DEBUG(true));
-
-            log && log(xtag("fn_gco.tseq", fn_gco._typeseq()));
-            log && log(xtag("fn_gco.tname", TypeRegistry::id2name(fn_gco._typeseq())));
-
-            auto fn_proc = FacetRegistry::instance().try_variant<AProcedure,AGCObject>(fn_gco);
-
-            assert(fn_proc);
-
-            return DInteger::box<AGCObject>(rcx.allocator(), fn_proc.n_args());
-        }
-
-        static DPrimitive_gco_1_gco s_fn_n_args_pm("_fn_n_args",
-                                                   &xfer_fn_n_args);
-
-        // ----- install primitives -----
-
-        void
-        VirtualSchematikaMachine::install_core_primitives()
-        {
-            /* fn_n_args */
-            {
-                const DUniqueString * name
-                    = reader_.intern_string("fn_n_args");
-
-                global_env_->_upsert_value
-                    (mm_.to_op(),
-                     name,
-                     Reflect::require<DPrimitive_gco_1_gco>(),
-                     obj<AGCObject,DPrimitive_gco_1_gco>(&s_fn_n_args_pm));
-            }
-        }
 
     } /*namespace scm*/
 } /*namespace xo*/

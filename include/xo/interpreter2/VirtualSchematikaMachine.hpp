@@ -100,9 +100,6 @@ namespace xo {
             /** visit vsm-owned memory pools; call visitor(info) for each **/
             void visit_pools(const MemorySizeVisitor & visitor) const;
 
-            /** install hardwired functions into global {symtab,env} **/
-            void install_core_primitives();
-
             /** begin interactive session. **/
             void begin_interactive_session();
             /** begin batch session **/
