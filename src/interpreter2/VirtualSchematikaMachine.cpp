@@ -918,21 +918,6 @@ namespace xo {
 
         // ----- primitive: cons() -----
 
-        obj<AGCObject>
-        xfer_cons(obj<ARuntimeContext> rcx,
-                  obj<AGCObject> car,
-                  obj<AGCObject> cdr)
-        {
-            (void)rcx;
-
-            auto cdr_list = obj<AGCObject,DList>::from(cdr);
-
-            return DList::cons(rcx.allocator(),
-                               car,
-                               cdr_list.data());
-        }
-
-        static DPrimitive_gco_2_gco_gco s_cons_pm("_cons", &xfer_cons);
 
         // ----- primitive: fn_n_args() -----
 
@@ -982,18 +967,6 @@ namespace xo {
                      name,
                      Reflect::require<DPrimitive_gco_0>(),
                      obj<AGCObject,DPrimitive_gco_0>(&s_cwd_pm));
-            }
-
-            /* cons */
-            {
-                const DUniqueString * name
-                    = reader_.intern_string("cons");
-
-                global_env_->_upsert_value
-                    (mm_.to_op(),
-                     name,
-                     Reflect::require<DPrimitive_gco_2_gco_gco>(),
-                     obj<AGCObject,DPrimitive_gco_2_gco_gco>(&s_cons_pm));
             }
 
             /* fn_n_args */
