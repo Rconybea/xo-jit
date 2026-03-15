@@ -37,7 +37,6 @@
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <cassert>
-#include <unistd.h> // for getcwd()
 
 namespace xo {
     using xo::scm::DDictionary;
@@ -876,20 +875,6 @@ namespace xo {
             }
          }
 
-        // ----- primitive: cwd() -----
-
-        obj<AGCObject>
-        xfer_cwd(obj<ARuntimeContext> rcx)
-        {
-            char buf[PATH_MAX];
-            ::getcwd(buf, sizeof(buf));
-
-            return obj<AGCObject,DString>(DString::from_cstr(rcx.allocator(), buf));
-        }
-
-        static DPrimitive_gco_0 s_cwd_pm("_cwd",
-                                         &xfer_cwd);
-
         // ----- primitive: fn_n_args() -----
 
         obj<AGCObject>
@@ -916,18 +901,6 @@ namespace xo {
         void
         VirtualSchematikaMachine::install_core_primitives()
         {
-            /* cwd */
-            {
-                const DUniqueString * name
-                    = reader_.intern_string("cwd");
-
-                global_env_->_upsert_value
-                    (mm_.to_op(),
-                     name,
-                     Reflect::require<DPrimitive_gco_0>(),
-                     obj<AGCObject,DPrimitive_gco_0>(&s_cwd_pm));
-            }
-
             /* fn_n_args */
             {
                 const DUniqueString * name
