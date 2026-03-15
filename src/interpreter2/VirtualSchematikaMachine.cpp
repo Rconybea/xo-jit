@@ -876,32 +876,6 @@ namespace xo {
             }
          }
 
-        // ----- primitive: report_memory_use() -----
-
-        obj<AGCObject>
-        xfer_report_memory_use(obj<ARuntimeContext> rcx)
-        {
-            scope log(XO_DEBUG(true));
-
-            auto visitor = [&log](const MemorySizeInfo & info) {
-                log && log(xtag("resource", info.resource_name_),
-                           xtag("used", info.used_),
-                           xtag("alloc", info.allocated_),
-                           xtag("commit", info.committed_),
-                           xtag("resv", info.reserved_));
-            };
-
-            FacetRegistry::instance().visit_pools(visitor);
-            TypeRegistry::instance().visit_pools(visitor);
-            NumericDispatch::instance().visit_pools(visitor);
-            rcx.visit_pools(visitor);
-
-            return DBoolean::box<AGCObject>(rcx.allocator(), true);
-        }
-
-        static DPrimitive_gco_0 s_report_memory_use_pm("_report_memory_use",
-                                                       &xfer_report_memory_use);
-
         // ----- primitive: cwd() -----
 
         obj<AGCObject>
@@ -915,9 +889,6 @@ namespace xo {
 
         static DPrimitive_gco_0 s_cwd_pm("_cwd",
                                          &xfer_cwd);
-
-        // ----- primitive: cons() -----
-
 
         // ----- primitive: fn_n_args() -----
 
@@ -945,18 +916,6 @@ namespace xo {
         void
         VirtualSchematikaMachine::install_core_primitives()
         {
-            /* report_memory_use */
-            {
-                const DUniqueString * name
-                    = reader_.intern_string("report_memory_use");
-
-                global_env_->_upsert_value
-                    (mm_.to_op(),
-                     name,
-                     Reflect::require<DPrimitive_gco_0>(),
-                     obj<AGCObject,DPrimitive_gco_0>(&s_report_memory_use_pm));
-            }
-
             /* cwd */
             {
                 const DUniqueString * name

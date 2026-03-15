@@ -5,6 +5,7 @@
 
 #include "init_interpreter2.hpp"
 
+#include "interpreter2_register_primitives.hpp"
 #include "interpreter2_register_facets.hpp"
 #include "interpreter2_register_types.hpp"
 
@@ -12,8 +13,10 @@
 #include <xo/alloc2/CollectorTypeRegistry.hpp>
 
 namespace xo {
+    using xo::scm::interpreter2_register_primitives;
     using xo::scm::interpreter2_register_facets;
     using xo::scm::interpreter2_register_types;
+    using xo::scm::PrimitiveRegistry;
     using xo::mm::CollectorTypeRegistry;
 
     void
@@ -22,6 +25,7 @@ namespace xo {
         interpreter2_register_facets();
 
         CollectorTypeRegistry::instance().register_types(&interpreter2_register_types);
+        PrimitiveRegistry::instance().register_primitives(&interpreter2_register_primitives);
     }
 
     InitEvidence
