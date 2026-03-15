@@ -42,6 +42,12 @@ namespace xo {
             return psm_.global_symtab();
         }
 
+        DGlobalEnv *
+        SchematikaParser::global_env() const noexcept
+        {
+            return psm_.global_env();
+        }
+
         bool
         SchematikaParser::is_at_toplevel() const
         {

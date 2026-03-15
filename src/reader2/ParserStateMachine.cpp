@@ -41,25 +41,25 @@ namespace xo {
                              DGlobalSymtab * global_symtab,
                              InstallFlags pm_install_flags)
             {
+                scope log(XO_DEBUG(true));
+
                 DGlobalEnv * env = DGlobalEnv::_make(mm,
                                                      global_symtab);
 
-                InstallSink sink = ([env, mm, &stringtable]
+                InstallSink sink = ([env, mm, &stringtable, &log]
                                     (std::string_view name,
                                      TypeDescr fn_td,
                                      obj<AProcedure> pm,
                                      InstallFlags flags)
                     {
-                        scope log(XO_DEBUG(false));
-
-                        log && log(xtag("name", name));
-
                         (void)flags;
 
                         obj<AGCObject> pm_gco = pm.to_facet<AGCObject>();
 
                         const DUniqueString * sym
                             = stringtable.intern(name);
+
+                        log && log("upsert", xtag("sym", std::string_view(*sym)));
 
                         env->_upsert_value(mm,
                                            sym,

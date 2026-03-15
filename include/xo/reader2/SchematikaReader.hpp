@@ -57,6 +57,9 @@ namespace xo {
             /** top-level symbol table **/
             DGlobalSymtab * global_symtab() const noexcept;
 
+            /** top-level global environment (e.g. contains built-in primitives) **/
+            DGlobalEnv * global_env() const noexcept;
+
             /** visit reader-owned memory pools; call visitor(info) for each.
              *  Specifically exclude expr_alloc, since we don't consider
              *  that reader-owned
