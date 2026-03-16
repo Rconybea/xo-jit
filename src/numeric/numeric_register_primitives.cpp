@@ -51,10 +51,12 @@ namespace xo {
         }
 
         bool
-        numeric_register_primitives(obj<AAllocator> mm, StringTable * stbl,
+        numeric_register_primitives(obj<ARuntimeContext> rcx,
+                                    //obj<AAllocator> mm, StringTable * stbl,
                                     InstallSink sink, InstallFlags flags)
         {
-            (void)stbl;
+            obj<AAllocator> mm = rcx.allocator();
+            StringTable * stbl = rcx.stringtable();
 
             scope log(XO_DEBUG(true));
 

@@ -11,8 +11,9 @@
 namespace xo {
     namespace scm {
         /** Register primitive factories with primitive registry **/
-        bool numeric_register_primitives(obj<xo::mm::AAllocator> mm,
-                                         StringTable * stbl,
+        bool numeric_register_primitives(obj<ARuntimeContext> rcx,
+                                         //obj<xo::mm::AAllocator> mm,
+                                         //StringTable * stbl,
                                          InstallSink sink,
                                          InstallFlags flags);
     }
