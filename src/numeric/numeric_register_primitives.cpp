@@ -29,6 +29,7 @@ namespace xo {
                 }
             }
 
+#ifdef OBSOLETE
             bool install_aux(InstallSink sink,
                              obj<AAllocator> mm,
                              std::string_view name,
@@ -46,6 +47,7 @@ namespace xo {
                     return true;
                 }
             }
+#endif
         }
 
         bool
@@ -62,30 +64,32 @@ namespace xo {
                                   NumericPrimitives::make_multiply_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
             ok = ok & install_aux(sink,
-                                  NumericPrimitives::make_divide_pm(mm),
+                                  NumericPrimitives::make_divide_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
             ok = ok & install_aux(sink,
-                                  NumericPrimitives::make_add_pm(mm),
+                                  NumericPrimitives::make_add_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
             ok = ok & install_aux(sink,
-                                  NumericPrimitives::make_subtract_pm(mm),
+                                  NumericPrimitives::make_subtract_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
 
             ok = ok & install_aux(sink,
-                                  NumericPrimitives::make_cmpeq_pm(mm),
+                                  NumericPrimitives::make_cmpeq_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
             ok = ok & install_aux(sink,
-                                  NumericPrimitives::make_cmpne_pm(mm),
+                                  NumericPrimitives::make_cmpne_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
             ok = ok & install_aux(sink,
-                                  NumericPrimitives::make_cmplt_pm(mm),
+                                  NumericPrimitives::make_cmplt_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
             ok = ok & install_aux(sink,
-                                  NumericPrimitives::make_cmple_pm(mm),
+                                  NumericPrimitives::make_cmple_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
-            ok = ok & install_aux(sink, mm, "_cmpgt", &NumericDispatch::cmp_greater,
+            ok = ok & install_aux(sink,
+                                  NumericPrimitives::make_cmpgt_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
-            ok = ok & install_aux(sink, mm, "_cmpge", &NumericDispatch::cmp_greatequal,
+            ok = ok & install_aux(sink,
+                                  NumericPrimitives::make_cmpge_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
 
             return ok;
