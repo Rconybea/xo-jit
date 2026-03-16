@@ -51,16 +51,22 @@ namespace xo {
         }
 
         bool
-        interpreter2_register_primitives(obj<xo::mm::AAllocator> mm,
-                                         StringTable * stbl,
+        interpreter2_register_primitives(obj<ARuntimeContext> rcx,
+                                         //obj<xo::mm::AAllocator> mm,
+                                         //StringTable * stbl,
                                          InstallSink sink,
                                          InstallFlags flags)
         {
             scope log(XO_DEBUG(true));
 
+            obj<AAllocator> mm = rcx.allocator();
+            StringTable * stbl = rcx.stringtable();
+
             bool ok = true;
 
-            ok = ok & install_aux(sink, VsmPrimitives::make_report_memory_use_pm(mm, stbl), flags);
+            ok = ok & install_aux(sink,
+                                  VsmPrimitives::make_report_memory_use_pm(mm, stbl),
+                                  flags);
 
             return ok;
         }
