@@ -9,6 +9,7 @@
 #include "ToplevelSeqSsm.hpp"
 #include "DefineSsm.hpp"
 #include <xo/procedure2/PrimitiveRegistry.hpp>
+#include <xo/procedure2/SimpleRcx.hpp>
 #include <xo/object2/array/IPrintable_DArray.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/alloc2/Collector.hpp>
@@ -26,6 +27,7 @@ namespace xo {
     using xo::print::APrintable;
     using xo::reflect::TypeDescr;
     using xo::facet::FacetRegistry;
+    using xo::facet::with_facet;
 
     namespace scm {
         namespace {
@@ -46,7 +48,9 @@ namespace xo {
                 DGlobalEnv * env = DGlobalEnv::_make(mm,
                                                      global_symtab);
 
-                InstallSink sink = ([env, mm, &stringtable, &log]
+                DSimpleRcx rcx(mm, &stringtable);
+
+                InstallSink sink = ([env, rcx, &log]
                                     (std::string_view name,
                                      TypeDescr fn_td,
                                      obj<AProcedure> pm,
@@ -57,11 +61,11 @@ namespace xo {
                         obj<AGCObject> pm_gco = pm.to_facet<AGCObject>();
 
                         const DUniqueString * sym
-                            = stringtable.intern(name);
+                            = rcx.stringtable()->intern(name);
 
                         log && log("upsert", xtag("sym", std::string_view(*sym)));
 
-                        env->_upsert_value(mm,
+                        env->_upsert_value(rcx.allocator(),
                                            sym,
                                            fn_td,
                                            pm_gco);
@@ -70,8 +74,7 @@ namespace xo {
                     });
 
                 PrimitiveRegistry::instance()
-                    .install_primitives(mm,
-                                        &stringtable,
+                    .install_primitives(with_facet<ARuntimeContext>::mkobj(&rcx),
                                         sink,
                                         pm_install_flags);
 
