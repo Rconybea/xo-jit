@@ -52,12 +52,11 @@ namespace xo {
 
         bool
         interpreter2_register_primitives(obj<xo::mm::AAllocator> mm,
+                                         StringTable * stbl,
                                          InstallSink sink,
                                          InstallFlags flags)
         {
-            (void)mm;
-            (void)sink;
-            (void)flags;
+            (void)stbl;
 
             scope log(XO_DEBUG(true));
 
