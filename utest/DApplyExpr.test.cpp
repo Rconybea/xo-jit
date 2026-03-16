@@ -20,6 +20,8 @@
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/number/IGCObject_DFloat.hpp>
 
+#include <xo/stringtable2/StringTable.hpp>
+
 #include <xo/alloc2/CollectorTypeRegistry.hpp>
 #include <xo/gc/X1Collector.hpp>
 //#include <xo/gc/detail/IAllocator_DX1Collector.hpp>
@@ -45,6 +47,7 @@ namespace ut {
     using xo::scm::NumericPrimitives;
     using xo::scm::Primitives;
     using xo::scm::DPrimitive_gco_2_gco_gco;
+    using xo::scm::StringTable;
     using xo::mm::CollectorTypeRegistry;
     using xo::mm::AAllocator;
     using xo::mm::ACollector;
@@ -87,12 +90,14 @@ namespace ut {
         DX1Collector gc(cfg);
         auto alloc = with_facet<AAllocator>::mkobj(&gc);
         auto coll = with_facet<ACollector>::mkobj(&gc);
+        auto stbl = StringTable(1024 /*hint_max_capacity*/, false /*!debug_flag*/);
 
         bool ok = CollectorTypeRegistry::instance().install_types(coll);
         REQUIRE(ok);
 
         // wrap primitive as GCObject, then as expression
-        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
+        obj<AGCObject> prim_gco
+            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc, &stbl));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
         REQUIRE(fn_expr.data() != nullptr);
 
@@ -127,12 +132,13 @@ namespace ut {
         DX1Collector gc(cfg);
         auto alloc = with_facet<AAllocator>::mkobj(&gc);
         auto coll = with_facet<ACollector>::mkobj(&gc);
+        auto stbl = StringTable(1024 /*hint_max_capacity*/, false /*!debug_flag*/);
 
         bool ok = CollectorTypeRegistry::instance().install_types(coll);
         REQUIRE(ok);
 
         obj<AGCObject> prim_gco
-            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
+            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc, &stbl));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
 
         obj<AGCObject> val1 = DFloat::box<AGCObject>(alloc, 3.0);
@@ -163,11 +169,13 @@ namespace ut {
         DX1Collector gc(cfg);
         auto alloc = with_facet<AAllocator>::mkobj(&gc);
         auto coll = with_facet<ACollector>::mkobj(&gc);
+        auto stbl = StringTable(1024 /*hint_max_capacity*/, false /*!debug_flag*/);
 
         bool ok = CollectorTypeRegistry::instance().install_types(coll);
         REQUIRE(ok);
 
-        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
+        obj<AGCObject> prim_gco
+            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc, &stbl));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
 
         obj<AGCObject> val1 = DFloat::box<AGCObject>(alloc, 3.0);
@@ -198,11 +206,13 @@ namespace ut {
         DX1Collector gc(cfg);
         auto alloc = with_facet<AAllocator>::mkobj(&gc);
         auto coll = with_facet<ACollector>::mkobj(&gc);
+        auto stbl = StringTable(1024 /*hint_max_capacity*/, false /*!debug_flag*/);
 
         bool ok = CollectorTypeRegistry::instance().install_types(coll);
         REQUIRE(ok);
 
-        obj<AGCObject> prim_gco = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
+        obj<AGCObject> prim_gco
+            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc, &stbl));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
 
         obj<AGCObject> val1 = DFloat::box<AGCObject>(alloc, 3.0);
@@ -236,12 +246,13 @@ namespace ut {
         DX1Collector gc(cfg);
         auto alloc = with_facet<AAllocator>::mkobj(&gc);
         auto coll = with_facet<ACollector>::mkobj(&gc);
+        auto stbl = StringTable(1024 /*hint_max_capacity*/, false /*!debug_flag*/);
 
         bool ok = CollectorTypeRegistry::instance().install_types(coll);
         REQUIRE(ok);
 
         obj<AGCObject> prim_gco
-            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
+            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc, &stbl));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
 
         obj<AGCObject> val1 = DFloat::box<AGCObject>(alloc, 3.0);
@@ -281,12 +292,13 @@ namespace ut {
         DX1Collector gc(cfg);
         auto alloc = with_facet<AAllocator>::mkobj(&gc);
         auto coll = with_facet<ACollector>::mkobj(&gc);
+        auto stbl = StringTable(1024 /*hint_max_capacity*/, false /*!debug_flag*/);
 
         bool ok = CollectorTypeRegistry::instance().install_types(coll);
         REQUIRE(ok);
 
         obj<AGCObject> prim_gco
-            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc));
+            = with_facet<AGCObject>::mkobj(NumericPrimitives::make_multiply_pm(alloc, &stbl));
         obj<AExpression,DConstant> fn_expr = DConstant::make(alloc, prim_gco);
 
         obj<AGCObject> val1 = DFloat::box<AGCObject>(alloc, 3.0);
