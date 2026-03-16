@@ -49,8 +49,11 @@ namespace xo {
         }
 
         bool
-        numeric_register_primitives(obj<AAllocator> mm, InstallSink sink, InstallFlags flags)
+        numeric_register_primitives(obj<AAllocator> mm, StringTable * stbl,
+                                    InstallSink sink, InstallFlags flags)
         {
+            (void)stbl;
+
             scope log(XO_DEBUG(true));
 
             bool ok = true;
