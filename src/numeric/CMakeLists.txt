@@ -3,8 +3,7 @@
 set(SELF_LIB xo_numeric)
 set(SELF_SRCS
     init_numeric.cpp
-    numeric_register_facets.cpp
-    numeric_register_primitives.cpp
+    SetupNumeric.cpp
     NumericPrimitives.cpp
     NumericDispatch.cpp
     INumeric_Any.cpp
