@@ -100,6 +100,12 @@ namespace xo {
             return error_mm_.to_op();
         }
 
+        StringTable *
+        VirtualSchematikaMachine::stringtable() noexcept
+        {
+            return reader_.stringtable();
+        }
+
         bool
         VirtualSchematikaMachine::is_at_toplevel() const noexcept
         {

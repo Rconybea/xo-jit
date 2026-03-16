@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <xo/stringtable2/StringTable.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/arena/MemorySizeInfo.hpp>
 
@@ -19,6 +20,7 @@ namespace xo {
          **/
         class DVsmRcx {
         public:
+            using StringTable = xo::scm::StringTable;
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
 
@@ -26,6 +28,7 @@ namespace xo {
             DVsmRcx(VirtualSchematikaMachine * vsm);
 
             obj<AAllocator> allocator() const noexcept;
+            StringTable * stringtable() const noexcept;
             obj<AAllocator> error_allocator() const noexcept;
             void visit_pools(const MemorySizeVisitor & visitor) const;
 

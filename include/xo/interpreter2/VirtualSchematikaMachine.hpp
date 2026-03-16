@@ -91,6 +91,8 @@ namespace xo {
             obj<AAllocator> allocator() const noexcept;
             /** allocator for runtime errors **/
             obj<AAllocator> error_allocator() const noexcept;
+            /** global unique-string table **/
+            StringTable * stringtable() noexcept;
 
             /** true iff parser is at top-level -> does not contain
              *  state for a incomplete/partial expression

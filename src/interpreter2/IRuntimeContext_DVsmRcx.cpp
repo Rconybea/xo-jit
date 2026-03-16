@@ -22,6 +22,12 @@ namespace xo {
         }
 
         auto
+        IRuntimeContext_DVsmRcx::stringtable(const DVsmRcx & self) noexcept -> StringTable *
+        {
+            return self.stringtable();
+        }
+
+        auto
         IRuntimeContext_DVsmRcx::visit_pools(const DVsmRcx & self, MemorySizeVisitor visitor) -> void
         {
             self.visit_pools(visitor);

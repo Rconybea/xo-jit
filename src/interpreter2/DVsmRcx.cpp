@@ -25,6 +25,12 @@ namespace xo {
             return vsm_->error_allocator();
         }
 
+        StringTable *
+        DVsmRcx::stringtable() const noexcept
+        {
+            return vsm_->stringtable();
+        }
+
         void
         DVsmRcx::visit_pools(const MemorySizeVisitor & visitor) const
         {
