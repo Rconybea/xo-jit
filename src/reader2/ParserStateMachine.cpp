@@ -71,6 +71,7 @@ namespace xo {
 
                 PrimitiveRegistry::instance()
                     .install_primitives(mm,
+                                        &stringtable,
                                         sink,
                                         pm_install_flags);
 
