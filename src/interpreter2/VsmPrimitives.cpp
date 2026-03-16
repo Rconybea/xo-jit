@@ -6,6 +6,8 @@
 #include "VsmPrimitives.hpp"
 #include <xo/numeric/NumericDispatch.hpp>
 #include <xo/object2/Boolean.hpp>
+#include <xo/type/AtomicType.hpp>
+#include <xo/type/FunctionType.hpp>
 
 namespace xo {
     //using xo::scm::NumericDispatch;
@@ -38,10 +40,18 @@ namespace xo {
         }
 
         DPrimitive_gco_0 *
-        VsmPrimitives::make_report_memory_use_pm(obj<AAllocator> mm)
+        VsmPrimitives::make_report_memory_use_pm(obj<AAllocator> mm,
+                                                 StringTable * stbl)
         {
+            (void)stbl;
+
+            auto bool_ty = DAtomicType::make(mm, Metatype::t_bool());
+            // report_memory_use: () -> bool
+            auto pm_ty = obj<AType,DFunctionType>(DFunctionType::_make(mm, bool_ty));
+
             return DPrimitive_gco_0::_make(mm,
                                            "report_memory_use",
+                                           pm_ty,
                                            &xfer_report_memory_use);
         }
 

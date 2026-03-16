@@ -18,7 +18,8 @@ namespace xo {
 
         public:
             /** create primitive: report memory use to console **/
-            static DPrimitive_gco_0 * make_report_memory_use_pm(obj<AAllocator> mm);
+            static DPrimitive_gco_0 * make_report_memory_use_pm(obj<AAllocator> mm,
+                                                                StringTable * stbl);
         };
 
     } /*namespace scm*/

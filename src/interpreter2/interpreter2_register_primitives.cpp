@@ -56,13 +56,11 @@ namespace xo {
                                          InstallSink sink,
                                          InstallFlags flags)
         {
-            (void)stbl;
-
             scope log(XO_DEBUG(true));
 
             bool ok = true;
 
-            ok = ok & install_aux(sink, VsmPrimitives::make_report_memory_use_pm(mm), flags);
+            ok = ok & install_aux(sink, VsmPrimitives::make_report_memory_use_pm(mm, stbl), flags);
 
             return ok;
         }
