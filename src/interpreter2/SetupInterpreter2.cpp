@@ -1,10 +1,10 @@
-/** @file interpreter2_register_facets.cpp
+/** @file SetupInterpreter2.cpp
  *
- *  @author Roland Conybeare, Feb 2026
+ *  @author Roland Conybeare, Mar 2026
  **/
 
-#include "interpreter2_register_facets.hpp"
-
+#include "SetupInterpreter2.hpp"
+#include "VsmPrimitives.hpp"
 #include "DPrimitive_gco_2_gco_gco.hpp"
 #include "VsmDefContFrame.hpp"
 #include "VsmApplyFrame.hpp"
@@ -24,15 +24,77 @@
 #include <xo/indentlog/scope.hpp>
 
 namespace xo {
+    using xo::mm::ACollector;
+    using xo::mm::AAllocator;
     using xo::mm::AGCObject;
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
+    using xo::facet::impl_for;
     using xo::reflect::typeseq;
     using xo::xtag;
 
     namespace scm {
+        /** TODO: MOVE THESE install_aux() remplates SOMEWHERE COMMON **/
+
+        template <typename PrimitiveRepr>
+        bool install_aux(InstallSink sink,
+                         PrimitiveRepr * pm,
+                         InstallFlags flags)
+        {
+            scope log(XO_DEBUG(true));
+
+            if ((flags & InstallFlags::f_generalpurpose) == InstallFlags::f_generalpurpose) {
+                log && log("create primitive", xtag("name", pm->name()));
+
+                return sink(pm->name(),
+                            pm->fn_td(),
+                            obj<AProcedure,PrimitiveRepr>(pm),
+                            flags);
+            } else {
+                log && log("skip primitive", xtag("name", pm->name()));
+
+                return true;
+            }
+        }
+
+        template <typename Primitive>
+        bool install_aux(InstallSink sink,
+                         obj<AAllocator> mm,
+                         std::string_view name,
+                         typename Primitive::FunctionPtrType impl,
+                         InstallFlags flags)
+        {
+            if (flags != InstallFlags::f_none) {
+                auto pm
+                    = Primitive::_make(mm, name, impl);
+
+                return install_aux(sink, pm, flags);
+            } else {
+                return true;
+            }
+        }
+
         bool
-        interpreter2_register_facets()
+        SetupInterpreter2::register_primitives(obj<ARuntimeContext> rcx,
+                                               InstallSink sink,
+                                               InstallFlags flags)
+        {
+            scope log(XO_DEBUG(true));
+
+            obj<AAllocator> mm = rcx.allocator();
+            StringTable * stbl = rcx.stringtable();
+
+            bool ok = true;
+
+            ok = ok & install_aux(sink,
+                                  VsmPrimitives::make_report_memory_use_pm(mm, stbl),
+                                  flags);
+
+            return ok;
+        }
+
+        bool
+        SetupInterpreter2::register_facets()
         {
             scope log(XO_DEBUG(true));
 
@@ -101,7 +163,21 @@ namespace xo {
 
             return true;
         }
+
+        bool
+        SetupInterpreter2::register_types(obj<ACollector> gc)
+        {
+            scope log(XO_DEBUG(true));
+
+            bool ok = true;
+
+            ok &= gc.install_type(impl_for<AGCObject, DVsmApplyFrame>());
+            ok &= gc.install_type(impl_for<AGCObject, DVsmEvalArgsFrame>());
+
+            return ok;
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 
-/* end interpreter2_register_facets.cpp */
+/* end SetupInterpreter2.cpp */

@@ -4,28 +4,22 @@
  **/
 
 #include "init_interpreter2.hpp"
-
-#include "interpreter2_register_primitives.hpp"
-#include "interpreter2_register_facets.hpp"
-#include "interpreter2_register_types.hpp"
+#include "SetupInterpreter2.hpp"
 
 #include <xo/reader2/init_reader2.hpp>
 #include <xo/alloc2/CollectorTypeRegistry.hpp>
 
 namespace xo {
-    using xo::scm::interpreter2_register_primitives;
-    using xo::scm::interpreter2_register_facets;
-    using xo::scm::interpreter2_register_types;
+    using xo::scm::SetupInterpreter2;
     using xo::scm::PrimitiveRegistry;
     using xo::mm::CollectorTypeRegistry;
 
     void
     InitSubsys<S_interpreter2_tag>::init()
     {
-        interpreter2_register_facets();
-
-        CollectorTypeRegistry::instance().register_types(&interpreter2_register_types);
-        PrimitiveRegistry::instance().register_primitives(&interpreter2_register_primitives);
+        SetupInterpreter2::register_facets();
+        CollectorTypeRegistry::instance().register_types(&SetupInterpreter2::register_types);
+        PrimitiveRegistry::instance().register_primitives(&SetupInterpreter2::register_primitives);
     }
 
     InitEvidence

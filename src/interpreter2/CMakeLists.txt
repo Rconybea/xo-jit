@@ -3,9 +3,7 @@
 set(SELF_LIB xo_interpreter2)
 set(SELF_SRCS
     init_interpreter2.cpp
-    interpreter2_register_primitives.cpp
-    interpreter2_register_facets.cpp
-    interpreter2_register_types.cpp
+    SetupInterpreter2.cpp
 
     VirtualSchematikaMachine.cpp
     VsmPrimitives.cpp
