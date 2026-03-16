@@ -59,7 +59,7 @@ namespace xo {
             bool ok = true;
 
             ok = ok & install_aux(sink,
-                                  NumericPrimitives::make_multiply_pm(mm),
+                                  NumericPrimitives::make_multiply_pm(mm, stbl),
                                   flags & InstallFlags::f_essential);
             ok = ok & install_aux(sink,
                                   NumericPrimitives::make_divide_pm(mm),

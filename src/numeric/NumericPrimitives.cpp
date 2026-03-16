@@ -5,6 +5,8 @@
 
 #include "NumericPrimitives.hpp"
 #include "NumericDispatch.hpp"
+#include <xo/type/AtomicType.hpp>
+#include <xo/type/FunctionType.hpp>
 
 namespace xo {
     using xo::mm::AAllocator;
@@ -13,9 +15,21 @@ namespace xo {
     namespace scm {
 
         DPrimitive_gco_2_gco_gco *
-        NumericPrimitives::make_multiply_pm(obj<AAllocator> mm)
+        NumericPrimitives::make_multiply_pm(obj<AAllocator> mm,
+                                            StringTable * stbl)
         {
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_mul",
+            (void)stbl;
+
+            // TODO: want to expand this to record schedule based on argument types.
+            //
+            // e.g. f64 x f64 -> f64
+
+            auto numeric_ty = DAtomicType::make(mm, Metatype::t_numeric());
+            // #op+: numeric x numeric -> numeric
+            auto pm_ty = obj<AType,DFunctionType>
+                (DFunctionType::_make(mm, numeric_ty, numeric_ty, numeric_ty));
+
+            return DPrimitive_gco_2_gco_gco::_make(mm, "_mul", pm_ty,
                                                    &NumericDispatch::multiply);
         }
 

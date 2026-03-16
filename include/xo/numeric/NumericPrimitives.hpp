@@ -18,7 +18,8 @@ namespace xo {
 
         public:
             /** polymorphic (in both arguments1) multiply **/
-            static DPrimitive_gco_2_gco_gco * make_multiply_pm(obj<AAllocator> mm);
+            static DPrimitive_gco_2_gco_gco * make_multiply_pm(obj<AAllocator> mm,
+                                                               StringTable * stbl);
 
             /** polymorphic (in both arguments) divide **/
             static DPrimitive_gco_2_gco_gco * make_divide_pm(obj<AAllocator> mm);
