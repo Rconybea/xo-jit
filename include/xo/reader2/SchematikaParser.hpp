@@ -185,6 +185,7 @@ namespace xo {
 
             DGlobalSymtab * global_symtab() const noexcept;
             DGlobalEnv * global_env() const noexcept;
+            StringTable * stringtable() noexcept { return psm_.stringtable(); }
 
             bool debug_flag() const { return debug_flag_; }
 

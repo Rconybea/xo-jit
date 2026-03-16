@@ -38,6 +38,12 @@ namespace xo {
             return parser_.global_env();
         }
 
+        StringTable *
+        SchematikaReader::stringtable() noexcept
+        {
+            return parser_.stringtable();
+        }
+
         void
         SchematikaReader::visit_pools(const MemorySizeVisitor & visitor) const
         {

@@ -88,6 +88,7 @@ namespace xo {
             bool debug_flag() const noexcept { return debug_flag_; }
             ParserStack * stack() const noexcept { return stack_; }
             obj<AAllocator> expr_alloc() const noexcept { return expr_alloc_; }
+            StringTable * stringtable()  noexcept { return &stringtable_; }
             DGlobalSymtab * global_symtab() const noexcept { return global_symtab_.data(); }
             DLocalSymtab * local_symtab() const noexcept { return local_symtab_; }
             DGlobalEnv * global_env() const noexcept { return global_env_.data(); }

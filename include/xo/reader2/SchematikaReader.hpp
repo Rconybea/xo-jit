@@ -60,6 +60,9 @@ namespace xo {
             /** top-level global environment (e.g. contains built-in primitives) **/
             DGlobalEnv * global_env() const noexcept;
 
+            /** global unique-string table **/
+            StringTable * stringtable() noexcept;
+
             /** visit reader-owned memory pools; call visitor(info) for each.
              *  Specifically exclude expr_alloc, since we don't consider
              *  that reader-owned
