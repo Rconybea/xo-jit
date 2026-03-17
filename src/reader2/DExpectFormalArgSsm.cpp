@@ -3,16 +3,9 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "DExpectFormalArgSsm.hpp"
-#include "ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp"
-#include "DExpectSymbolSsm.hpp"
-#include "ssm/ISyntaxStateMachine_DExpectSymbolSsm.hpp"
-#include "DExpectTypeSsm.hpp"
-#include "ssm/ISyntaxStateMachine_DExpectTypeSsm.hpp"
-
-#ifdef NOT_YET
-#include "xo/expression/Variable.hpp"
-#endif
+#include "ExpectFormalArgSsm.hpp"
+#include "ExpectSymbolSsm.hpp"
+#include "ExpectTypeSsm.hpp"
 
 namespace xo {
     using xo::scm::DVariable;

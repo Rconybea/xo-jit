@@ -57,8 +57,8 @@ set(SELF_SRCS
     IPrintable_DExpectFormalArglistSsm.cpp
 
     DExpectFormalArgSsm.cpp
-    ISyntaxStateMachine_DExpectFormalArgSsm.cpp
-    IPrintable_DExpectFormalArgSsm.cpp
+    facet/ISyntaxStateMachine_DExpectFormalArgSsm.cpp
+    facet/IPrintable_DExpectFormalArgSsm.cpp
 
     DExpectSymbolSsm.cpp
     ISyntaxStateMachine_DExpectSymbolSsm.cpp

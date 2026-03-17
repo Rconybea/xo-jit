@@ -11,7 +11,7 @@
  *       [idl/IPrintable_DExpectFormalArgSsm.json5]
 **/
 
-#include "ssm/IPrintable_DExpectFormalArgSsm.hpp"
+#include "expect_formal_arg/IPrintable_DExpectFormalArgSsm.hpp"
 
 namespace xo {
     namespace scm {
