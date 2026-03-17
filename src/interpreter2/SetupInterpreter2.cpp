@@ -34,70 +34,10 @@ namespace xo {
     using xo::xtag;
 
     namespace scm {
-        /** TODO: MOVE THESE install_aux() remplates SOMEWHERE COMMON **/
-
-        template <typename PrimitiveRepr>
-        bool install_aux(InstallSink sink,
-                         PrimitiveRepr * pm,
-                         InstallFlags flags)
-        {
-            scope log(XO_DEBUG(true));
-
-            if ((flags & InstallFlags::f_generalpurpose) == InstallFlags::f_generalpurpose) {
-                log && log("create primitive", xtag("name", pm->name()));
-
-                return sink(pm->name(),
-                            pm->fn_td(),
-                            obj<AProcedure,PrimitiveRepr>(pm),
-                            flags);
-            } else {
-                log && log("skip primitive", xtag("name", pm->name()));
-
-                return true;
-            }
-        }
-
-        template <typename Primitive>
-        bool install_aux(InstallSink sink,
-                         obj<AAllocator> mm,
-                         std::string_view name,
-                         typename Primitive::FunctionPtrType impl,
-                         InstallFlags flags)
-        {
-            if (flags != InstallFlags::f_none) {
-                auto pm
-                    = Primitive::_make(mm, name, impl);
-
-                return install_aux(sink, pm, flags);
-            } else {
-                return true;
-            }
-        }
-
-        bool
-        SetupInterpreter2::register_primitives(obj<ARuntimeContext> rcx,
-                                               InstallSink sink,
-                                               InstallFlags flags)
-        {
-            scope log(XO_DEBUG(true));
-
-            obj<AAllocator> mm = rcx.allocator();
-            StringTable * stbl = rcx.stringtable();
-
-            bool ok = true;
-
-            ok = ok & install_aux(sink,
-                                  VsmPrimitives::make_report_memory_use_pm(mm, stbl),
-                                  flags);
-
-            return ok;
-        }
-
         bool
         SetupInterpreter2::register_facets()
         {
             scope log(XO_DEBUG(true));
-
 
             // VsmStqackFrame
             // +- VsmApplyFrame
@@ -173,6 +113,26 @@ namespace xo {
 
             ok &= gc.install_type(impl_for<AGCObject, DVsmApplyFrame>());
             ok &= gc.install_type(impl_for<AGCObject, DVsmEvalArgsFrame>());
+
+            return ok;
+        }
+
+        bool
+        SetupInterpreter2::register_primitives(obj<ARuntimeContext> rcx,
+                                               InstallSink sink,
+                                               InstallFlags flags)
+        {
+            scope log(XO_DEBUG(true));
+
+            obj<AAllocator> mm = rcx.allocator();
+            StringTable * stbl = rcx.stringtable();
+
+            bool ok = true;
+
+            ok = ok & (PrimitiveRegistry::install_aux
+                       (sink,
+                        VsmPrimitives::make_report_memory_use_pm(mm, stbl),
+                        flags & InstallFlags::f_generalpurpose));
 
             return ok;
         }
