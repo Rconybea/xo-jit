@@ -50,7 +50,7 @@ namespace xo {
             auto pm_ty = obj<AType,DFunctionType>(DFunctionType::_make(mm, bool_ty));
 
             return DPrimitive_gco_0::_make(mm,
-                                           "report_memory_use",
+                                           "report-memory-use",
                                            pm_ty,
                                            &xfer_report_memory_use);
         }
