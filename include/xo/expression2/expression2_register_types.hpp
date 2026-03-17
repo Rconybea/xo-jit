@@ -9,8 +9,6 @@
 
 namespace xo {
     namespace scm {
-        /** Register expression2 (facet,impl) combinations with FacetRegistry **/
-        bool expression2_register_types(obj<xo::mm::ACollector> gc);
     }
 }
 

@@ -3,8 +3,7 @@
 set(SELF_LIB xo_expression2)
 set(SELF_SRCS
     init_expression2.cpp
-    expression2_register_facets.cpp
-    expression2_register_types.cpp
+    SetupExpression2.cpp
 
     DConstant.cpp
     DVariable.cpp

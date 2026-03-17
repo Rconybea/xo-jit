@@ -1,13 +1,9 @@
-/** @file expression2_register_facets.cpp
+/** @file SetupExpression2.cpp
  *
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "expression2_register_facets.hpp"
-
-//#include <xo/expression2/detail/IExpression_DVariable.hpp>
-//#include <xo/expression2/detail/IGCObject_DVariable.hpp>
-//#include <xo/expression2/detail/IPrintable_DVariable.hpp>
+#include "SetupExpression2.hpp"
 
 #include <xo/expression2/DefineExpr.hpp>
 #include <xo/expression2/Variable.hpp>
@@ -17,8 +13,8 @@
 #include <xo/expression2/ApplyExpr.hpp>
 #include <xo/expression2/LambdaExpr.hpp>
 #include <xo/expression2/IfElseExpr.hpp>
+#include <xo/expression2/SequenceExpr.hpp>
 
-#include <xo/expression2/detail/IExpression_DSequenceExpr.hpp>
 #include <xo/expression2/detail/IGCObject_DSequenceExpr.hpp>
 #include <xo/expression2/detail/IPrintable_DSequenceExpr.hpp>
 
@@ -36,10 +32,11 @@ namespace xo {
     using xo::facet::FacetRegistry;
     using xo::facet::TypeRegistry;
     using xo::facet::typeseq;
+    using xo::facet::impl_for;
 
     namespace scm {
         bool
-        expression2_register_facets()
+        SetupExpression2::register_facets()
         {
             scope log(XO_DEBUG(true));
 
@@ -126,7 +123,28 @@ namespace xo {
 
             return true;
         }
-    } /*namespace scm*/
+
+        bool
+        SetupExpression2::register_types(obj<ACollector> gc)
+        {
+            scope log(XO_DEBUG(true));
+
+            bool ok = true;
+
+            ok &= gc.install_type(impl_for<AGCObject, DConstant>());
+            ok &= gc.install_type(impl_for<AGCObject, DVariable>());
+            ok &= gc.install_type(impl_for<AGCObject, DTypename>());
+            ok &= gc.install_type(impl_for<AGCObject, DDefineExpr>());
+            //ok &= gc.install_type(impl_for<AGCObject, DApplyExpr>());   // when avail
+            ok &= gc.install_type(impl_for<AGCObject, DLambdaExpr>());
+            ok &= gc.install_type(impl_for<AGCObject, DIfElseExpr>());
+            ok &= gc.install_type(impl_for<AGCObject, DSequenceExpr>());
+
+            ok &= gc.install_type(impl_for<AGCObject, DLocalSymtab>());
+            ok &= gc.install_type(impl_for<AGCObject, DGlobalSymtab>());
+
+            return ok;
+        }    } /*namespace scm*/
 } /*namespace xo*/
 
-/* end expression2_register_facets.cpp */
+/* end SetupExpression2.cpp */

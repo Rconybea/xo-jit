@@ -4,23 +4,22 @@
  **/
 
 #include "init_expression2.hpp"
-#include "expression2_register_facets.hpp"
+#include "SetupExpression2.hpp"
 #include "expression2_register_types.hpp"
 
 #include <xo/procedure2/init_procedure2.hpp>
 #include <xo/alloc2/CollectorTypeRegistry.hpp>
 
 namespace xo {
-    using xo::scm::expression2_register_facets;
-    using xo::scm::expression2_register_types;
+    using xo::scm::SetupExpression2;
     using xo::mm::CollectorTypeRegistry;
 
     void
     InitSubsys<S_expression2_tag>::init()
         {
-            expression2_register_facets();
+            SetupExpression2::register_facets();
 
-            CollectorTypeRegistry::instance().register_types(&expression2_register_types);
+            CollectorTypeRegistry::instance().register_types(&SetupExpression2::register_types);
         }
 
     InitEvidence
