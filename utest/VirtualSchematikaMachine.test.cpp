@@ -729,7 +729,7 @@ namespace xo {
 
             vsm.begin_interactive_session();
 
-            span_type input = span_type::from_cstr("report_memory_use();");
+            span_type input = span_type::from_cstr("report-memory-use();");
 
             log && log(xtag("input", input));
 
