@@ -3,8 +3,7 @@
 set(SELF_LIB xo_reader2)
 set(SELF_SRCS
     init_reader2.cpp
-    reader2_register_facets.cpp
-    reader2_register_types.cpp
+    SetupReader2.cpp
 
     SchematikaReader.cpp
     ReaderConfig.cpp

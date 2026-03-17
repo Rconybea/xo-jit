@@ -1,9 +1,9 @@
-/** @file reader2_register_facets.cpp
+/** @file SetupReader2.cpp
  *
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "reader2_register_facets.hpp"
+#include "SetupReader2.hpp"
 
 #include "SchematikaParser.hpp"
 #include "ToplevelSeqSsm.hpp"
@@ -33,14 +33,16 @@
 
 namespace xo {
     using xo::print::APrintable;
+    using xo::mm::ACollector;
     using xo::mm::AGCObject;
     using xo::facet::FacetRegistry;
     using xo::facet::TypeRegistry;
     using xo::facet::typeseq;
+    using xo::facet::impl_for;
 
     namespace scm {
         bool
-        reader2_register_facets()
+        SetupReader2::register_facets()
         {
             scope log(XO_DEBUG(true));
 
@@ -135,7 +137,19 @@ namespace xo {
 
             return true;
         }
+
+        bool
+        SetupReader2::register_types(obj<ACollector> gc)
+        {
+            scope log(XO_DEBUG(true));
+
+            bool ok = true;
+
+            ok &= gc.install_type(impl_for<AGCObject, DGlobalEnv>());
+
+            return ok;
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 
-/* end reader2_register_facets.cpp */
+/* end SetupReader2.cpp */

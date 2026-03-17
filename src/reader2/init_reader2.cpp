@@ -4,24 +4,22 @@
  **/
 
 #include "init_reader2.hpp"
-#include "reader2_register_facets.hpp"
-#include "reader2_register_types.hpp"
+#include "SetupReader2.hpp"
 
 #include <xo/expression2/init_expression2.hpp>
 #include <xo/numeric/init_numeric.hpp>
 #include <xo/alloc2/CollectorTypeRegistry.hpp>
 
 namespace xo {
-    using xo::scm::reader2_register_facets;
-    using xo::scm::reader2_register_types;
+    using xo::scm::SetupReader2;
     using xo::mm::CollectorTypeRegistry;
 
     void
     InitSubsys<S_reader2_tag>::init()
     {
-        reader2_register_facets();
+        SetupReader2::register_facets();
 
-        CollectorTypeRegistry::instance().register_types(&reader2_register_types);
+        CollectorTypeRegistry::instance().register_types(&SetupReader2::register_types);
     }
 
     InitEvidence
