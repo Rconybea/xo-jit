@@ -77,7 +77,11 @@ namespace ut {
 
         //REQUIRE(sbuf.lo() == sbuf.pbase());
 
+#ifdef __linux__
+        auto expected = string_view("empty log_streambuf :sbuf.lo 0 :sbuf.hi 0 :sbuf.color_escape_chars 0");
+#else        
         auto expected = string_view("empty log_streambuf :sbuf.lo 0x0 :sbuf.hi 0x0 :sbuf.color_escape_chars 0");
+#endif
 
         REQUIRE(string_view(sbuf) == expected);
 
