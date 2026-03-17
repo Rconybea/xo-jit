@@ -11,7 +11,7 @@
  *       [idl/IPrintable_DParenSsm.json5]
 **/
 
-#include "ssm/IPrintable_DParenSsm.hpp"
+#include "paren/IPrintable_DParenSsm.hpp"
 
 namespace xo {
     namespace scm {

@@ -11,7 +11,7 @@
  *       [idl/ISyntaxStateMachine_DParenSsm.json5]
 **/
 
-#include "ssm/ISyntaxStateMachine_DParenSsm.hpp"
+#include "paren/ISyntaxStateMachine_DParenSsm.hpp"
 
 namespace xo {
     namespace scm {

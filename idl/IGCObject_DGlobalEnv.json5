@@ -1,7 +1,7 @@
 {
     mode: "implementation",
     output_cpp_dir: "src/reader2/facet",
-    output_hpp_dir: "include/xo/interpreter2",
+    output_hpp_dir: "include/xo/reader2",
     output_impl_subdir: "env",
     includes: [
         "<xo/alloc2/GCObject.hpp>",

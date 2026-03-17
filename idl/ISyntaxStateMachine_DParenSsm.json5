@@ -2,7 +2,7 @@
     mode: "implementation",
     output_cpp_dir: "src/reader2",
     output_hpp_dir: "include/xo/reader2",
-    output_impl_subdir: "ssm",
+    output_impl_subdir: "paren",
     includes: [ "\"SyntaxStateMachine.hpp\"",
                 "\"ssm/ISyntaxStateMachine_Xfer.hpp\"" ],
     local_types: [ ],

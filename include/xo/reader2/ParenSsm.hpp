@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "DParenSsm.hpp"
+#include "paren/DParenSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DParenSsm.hpp"
 #include "ssm/IPrintable_DParenSsm.hpp"
 

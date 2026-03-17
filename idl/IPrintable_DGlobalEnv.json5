@@ -1,7 +1,7 @@
 {
     mode: "implementation",
-    output_cpp_dir: "src/interpreter2/facet",
-    output_hpp_dir: "include/xo/interpreter2",
+    output_cpp_dir: "src/reader2/facet",
+    output_hpp_dir: "include/xo/reader2",
     output_impl_subdir: "env",
     includes: [ "<xo/printable2/Printable.hpp>",
                 "<xo/printable2/detail/IPrintable_Xfer.hpp>" ],
