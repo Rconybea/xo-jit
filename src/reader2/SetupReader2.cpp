@@ -25,6 +25,7 @@
 #include "ExpectExprSsm.hpp"
 #include "ExpectQLiteralSsm.hpp"
 #include "ExpectQListSsm.hpp"
+#include "ExpectQDictSsm.hpp"
 #include "ExpectQArraySsm.hpp"
 
 #include <xo/printable2/detail/APrintable.hpp>
@@ -107,6 +108,9 @@ namespace xo {
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectQListSsm>();
             FacetRegistry::register_impl<APrintable, DExpectQListSsm>();
 
+            FacetRegistry::register_impl<ASyntaxStateMachine, DExpectQDictSsm>();
+            FacetRegistry::register_impl<APrintable, DExpectQDictSsm>();
+
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectQArraySsm>();
             FacetRegistry::register_impl<APrintable, DExpectQArraySsm>();
 
@@ -128,6 +132,7 @@ namespace xo {
             log && log(xtag("DExpectExprSsm.tseq", typeseq::id<DExpectExprSsm>()));
             log && log(xtag("DExpectQLiteralSsm.tseq", typeseq::id<DExpectQLiteralSsm>()));
             log && log(xtag("DExpectQListSsm.tseq", typeseq::id<DExpectQListSsm>()));
+            log && log(xtag("DExpectQDictSsm.tseq", typeseq::id<DExpectQDictSsm>()));
             log && log(xtag("DExpectQArraySsm.tseq", typeseq::id<DExpectQArraySsm>()));
 
             log && log(xtag("DProgressSsm.tseq", typeseq::id<DProgressSsm>()));

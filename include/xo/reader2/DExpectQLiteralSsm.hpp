@@ -6,8 +6,6 @@
 #pragma once
 
 #include "DSyntaxStateMachine.hpp"
-//#include <xo/object2/DArray.hpp>
-//#include <xo/arena/DArena.hpp>
 
 namespace xo {
     namespace scm {
@@ -46,16 +44,22 @@ namespace xo {
             static const char * ssm_classname() { return "DExpectQLiteralSsm"; }
 
             /** update state for f64 token @p tk, with overall parser state in @p p_psm.
-             *  delegates to parent ssm via @ref on_quoted_literal
+             *  completes syntax + delegates to parent ssm via @ref on_quoted_literal
              **/
             void on_f64_token(const Token & tk,
                               ParserStateMachine * p_psm);
 
             /** update state for i64 token @p tk, with overall parser state in @p p_psm.
-             *  delegates to parent ssm via @ref on_quoted_literal
+             *  completes syntax + delegates to parent ssm via @ref on_quoted_literal
              **/
             void on_i64_token(const Token & tk,
                               ParserStateMachine * p_psm);
+
+            /** update state for string token @p tk, with overall parser state in @p p_psm.
+             *  completes syntax + delegates to parent ssm via @ref on_quoted_literal
+             **/
+            void on_string_token(const Token & tk,
+                                 ParserStateMachine * p_psm);
 
             /** update state on incoming token @p tk,
              *  with overall parser state in @p p_psm.
@@ -88,6 +92,14 @@ namespace xo {
              **/
             void on_rightbracket_token(const Token & tk,
                                        ParserStateMachine * p_psm);
+
+            /** update state on incoming leftbrace token @p tk,
+             *  with overall parser state in @p p_psm.
+             *
+             *  Forward in-place to ExpectQDictSsm
+             **/
+            void on_leftbrace_token(const Token & tk,
+                                    ParserStateMachine * p_psm);
 
             ///@}
             /** @defgroup scm-expectformalarglistssm-ssm-facet syntaxstatemachine facet methods **/

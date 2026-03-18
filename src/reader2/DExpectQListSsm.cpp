@@ -132,6 +132,8 @@ namespace xo {
             case tokentype::N:
                 break;
             }
+
+            Super::illegal_token(tk, p_psm);
         }
 
         void

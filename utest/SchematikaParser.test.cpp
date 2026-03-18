@@ -1609,6 +1609,96 @@ namespace xo {
             log && fixture.log_memory_layout(&log);
         }
 
+        TEST_CASE("SchematikaParser-batch-qdict0", "[reader2][SchematikaParser]")
+        {
+            // top-level recursive function definition
+
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = true;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    #q{ {} };
+             *    ^ ^ ^^ ^^
+             *    0 1 2| 4|
+             *         3  5
+             **/
+
+            std::vector<Token> tk_v{
+                /* [ 0] */ Token::quote_token(),
+                /* [ 1] */ Token::leftbrace_token(),
+
+                /* [ 2] */   Token::leftbrace_token(),
+                /* [ 3] */   Token::rightbrace_token(),
+
+                /* [ 4] */ Token::rightbrace_token(),
+                /* [ 5] */ Token::semicolon_token(),
+            };
+
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            log && fixture.log_memory_layout(&log);
+        }
+
+        TEST_CASE("SchematikaParser-batch-qdict1", "[reader2][SchematikaParser]")
+        {
+            // top-level recursive function definition
+
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = false;
+            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+
+            ParserFixture fixture(testname, c_debug_flag);
+            auto & parser = *(fixture.parser_);
+
+            parser.begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    #q{ {name: "kobold"; alignment: "chaotic evil"; hp: 15} };
+             *    ^ ^ ^^   ^ ^       ^ ^        ^ ^             ^ ^ ^ ^ ^ ^^
+             *    0 1 2|   4 5       6 7        8 9             a b c d e f|
+             *         3                                                   g
+             **/
+
+            std::vector<Token> tk_v{
+                /* [ 0] */ Token::quote_token(),
+                /* [ 1] */ Token::leftbrace_token(),
+
+                /* [ 2] */   Token::leftbrace_token(),
+
+                /* [ 3] */     Token::symbol_token("name"),
+                /* [ 4] */     Token::colon_token(),
+                /* [ 5] */     Token::string_token("kobold"),
+                /* [ 6] */     Token::semicolon_token(),
+
+                /* [ 7] */     Token::symbol_token("alignment"),
+                /* [ 8] */     Token::colon_token(),
+                /* [ 9] */     Token::string_token("chaotic evil"),
+                /* [ a] */     Token::semicolon_token(),
+
+                /* [ b] */     Token::symbol_token("hp"),
+                /* [ c] */     Token::colon_token(),
+                /* [ d] */     Token::i64_token("15"),
+
+                /* [ e] */   Token::rightbrace_token(),
+                /* [ f] */ Token::rightbrace_token(),
+                /* [ g] */ Token::semicolon_token(),
+            };
+
+            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+
+            log && fixture.log_memory_layout(&log);
+        }
+
     } /*namespace ut*/
 } /*namespace xo*/
 

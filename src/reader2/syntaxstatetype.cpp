@@ -51,6 +51,8 @@ namespace xo {
                 return "expect-qlist";
             case syntaxstatetype::expect_qarray:
                 return "expect-qarray";
+            case syntaxstatetype::expect_qdict:
+                return "expect-qdict";
             case syntaxstatetype::N:
                 break;
             }

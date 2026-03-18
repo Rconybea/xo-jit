@@ -88,6 +88,10 @@ set(SELF_SRCS
     ISyntaxStateMachine_DExpectQArraySsm.cpp
     IPrintable_DExpectQArraySsm.cpp
 
+    DExpectQDictSsm.cpp
+    facet/ISyntaxStateMachine_DExpectQDictSsm.cpp
+    facet/IPrintable_DExpectQDictSsm.cpp
+
     DProgressSsm.cpp
     ISyntaxStateMachine_DProgressSsm.cpp
     IPrintable_DProgressSsm.cpp
@@ -107,8 +111,6 @@ xo_dependency(${SELF_LIB} xo_type)
 xo_dependency(${SELF_LIB} xo_tokenizer2)
 xo_dependency(${SELF_LIB} xo_expression2)
 #xo_dependency(${SELF_LIB} reflect)
-#xo_dependency(${SELF_LIB} xo_object2)
-#xo_dependency(${SELF_LIB} xo_printable2)
 #xo_dependency(${SELF_LIB} xo_flatstring)
 xo_dependency(${SELF_LIB} subsys)
 #xo_dependency(${SELF_LIB} indentlog)

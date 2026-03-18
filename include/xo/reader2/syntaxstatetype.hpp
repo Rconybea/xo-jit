@@ -75,6 +75,9 @@ namespace xo {
             /** expecting a quoted array.  See @ref DExpectQArraySsm **/
             expect_qarray,
 
+            /** expecting a quoted dictionary.  See @ref DExpectQDictSsm **/
+            expect_qdict,
+
             /** comes last, counts number of valid enums **/
             N
         };

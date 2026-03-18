@@ -7,7 +7,6 @@
 
 #include "DSyntaxStateMachine.hpp"
 #include <xo/object2/ListOps.hpp>
-//#include <xo/arena/DArena.hpp>
 #include <xo/facet/obj.hpp>
 
 namespace xo {
@@ -16,13 +15,14 @@ namespace xo {
          *  Already in quoted-literal context
          *
          *       ( quote-expr ... )
-         *      ^ ^                ^
-         *      | qlist_1a         qlist_2(done)
-         *      qlist_0
+         *      ^ ^              ^ ^
+         *      | qlist_1a       | qlist_2(done)
+         *      qlist_0          qlist_1a
          *
          *  qlist_0 --on_leftparen_token()--> qlist_1a [push ExpectQLiteralSsm]
          *  qlist_1a --on_quoted_literal()--> qlist_1a [append literal]
          *  qlist_1a --on_rightparen_token()--> qlist_2(done) [report quoted list]
+         *  qlist_2 end state
          **/
         class QListXst {
         public:

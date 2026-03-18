@@ -6,14 +6,10 @@
 #include "ExpectQLiteralSsm.hpp"
 #include "ExpectQListSsm.hpp"
 #include "ExpectQArraySsm.hpp"
+#include "ExpectQDictSsm.hpp"
 #include <xo/object2/Float.hpp>
 #include <xo/object2/Integer.hpp>
-//#include "ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp"
-//#include <xo/expression2/DVariable.hpp>
-//#include <xo/expression2/detail/IGCObject_DVariable.hpp>
-//#include <xo/printable2/Printable.hpp>
-//#include <xo/alloc2/arena/IAllocator_DArena.hpp>
-//#include <xo/facet/FacetRegistry.hpp>
+#include <xo/stringtable2/String.hpp>
 #include <xo/indentlog/scope.hpp>
 
 namespace xo {
@@ -95,6 +91,10 @@ namespace xo {
                 this->on_i64_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_string:
+                this->on_string_token(tk, p_psm);
+                return;
+
             case tokentype::tk_leftparen:
                 this->on_leftparen_token(tk, p_psm);
                 return;
@@ -111,6 +111,10 @@ namespace xo {
                 this->on_rightbracket_token(tk, p_psm);
                 return;
 
+            case tokentype::tk_leftbrace:
+                this->on_leftbrace_token(tk, p_psm);
+                return;
+
             case tokentype::tk_comma:
             case tokentype::tk_lambda:
             case tokentype::tk_def:
@@ -119,12 +123,10 @@ namespace xo {
             case tokentype::tk_symbol:
             case tokentype::tk_colon:
             case tokentype::tk_singleassign:
-            case tokentype::tk_string:
             case tokentype::tk_bool:
             case tokentype::tk_semicolon:
             case tokentype::tk_invalid:
             case tokentype::tk_quote:
-            case tokentype::tk_leftbrace:
             case tokentype::tk_rightbrace:
             case tokentype::tk_leftangle:
             case tokentype::tk_rightangle:
@@ -176,49 +178,16 @@ namespace xo {
             p_psm->on_quoted_literal(literal);
         }
 
-#ifdef NOT_YET
         void
-        DExpectQLiteralSsm::_accept_formal(obj<AAllocator> expr_alloc,
-                                                DArena & parser_alloc,
-                                                const DUniqueString * param_name,
-                                                TypeDescr param_type)
+        DExpectQLiteralSsm::on_string_token(const Token & tk,
+                                            ParserStateMachine * p_psm)
         {
-            /* note: param_type can be nullptr */
-            TypeRef typeref
-                = TypeRef::dwim(TypeRef::prefix_type::from_chars("formal"), param_type);
+            auto literal = obj<AGCObject,DString>(DString::from_view(p_psm->expr_alloc(),
+                                                                     std::string_view(tk.text())));
 
-            DVariable * var = DVariable::make(expr_alloc,
-                                              param_name,
-                                              typeref);
-
-            // need AGCObject facet to use DArray here.
-            // May want to have gc feature that allows it to use
-            // FacetRegistry on memory that stores obj<AExpression,..>
-            //
-            // In this case doesn't matter since DExpectQLiteralSsm not actually collected!
-
-            obj<AGCObject,DVariable> var_o(var);
-
-            if (argl_->size() == argl_->capacity()) {
-                // need to expand argl_ capacity.
-                // If DArena were to allow it (i.e. offer a realloc() feature,
-                // could do this in place since this SSM is at the top of the parser stack.
-
-                obj<AAllocator,DArena> mm(&parser_alloc);
-                DArray * argl_2x = DArray::empty(mm, 2 * argl_->capacity());
-
-                for (DArray::size_type i = 0, n = argl_->size(); i < n; ++i) {
-                    // TODO: prefer non-bounds-checked access here
-                    argl_2x->push_back(argl_->at(i));
-                }
-
-                // update in place
-                this->argl_ = argl_2x;
-            }
-
-            this->argl_->push_back(var_o);
+            p_psm->pop_ssm();
+            p_psm->on_quoted_literal(literal);
         }
-#endif
 
         void
         DExpectQLiteralSsm::on_leftparen_token(const Token & tk,
@@ -266,6 +235,17 @@ namespace xo {
             }
 
             Super::illegal_token(tk, p_psm);
+        }
+
+        void
+        DExpectQLiteralSsm::on_leftbrace_token(const Token & tk,
+                                               ParserStateMachine * p_psm)
+        {
+            // replace self with specialized version for parsing a literal dict
+
+            p_psm->pop_ssm();
+            DExpectQDictSsm::start(p_psm);
+            p_psm->on_token(tk);
         }
 
         bool
