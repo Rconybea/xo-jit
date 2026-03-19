@@ -6,7 +6,6 @@ set(SELF_SRCS
     SetupExpression2.cpp
 
     DConstant.cpp
-    DVariable.cpp
     DVarRef.cpp
     DApplyExpr.cpp
 
@@ -20,9 +19,10 @@ set(SELF_SRCS
     IGCObject_DConstant.cpp
     IPrintable_DConstant.cpp
 
-    IExpression_DVariable.cpp
-    IGCObject_DVariable.cpp
-    IPrintable_DVariable.cpp
+    DVariable.cpp
+    facet/IExpression_DVariable.cpp
+    facet/IGCObject_DVariable.cpp
+    facet/IPrintable_DVariable.cpp
 
     IExpression_DVarRef.cpp
     IGCObject_DVarRef.cpp

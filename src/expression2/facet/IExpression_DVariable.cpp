@@ -11,7 +11,7 @@
  *       [idl/IExpression_DVariable.json5]
 **/
 
-#include "detail/IExpression_DVariable.hpp"
+#include "variable/IExpression_DVariable.hpp"
 
 namespace xo {
     namespace scm {

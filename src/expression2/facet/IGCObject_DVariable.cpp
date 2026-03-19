@@ -11,7 +11,7 @@
  *       [idl/IGCObject_DVariable.json5]
 **/
 
-#include "detail/IGCObject_DVariable.hpp"
+#include "variable/IGCObject_DVariable.hpp"
 
 namespace xo {
     namespace scm {

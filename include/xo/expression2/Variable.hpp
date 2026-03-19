@@ -6,8 +6,8 @@
 #pragma once
 
 #include "DVariable.hpp"
-#include "detail/IExpression_DVariable.hpp"
-#include "detail/IGCObject_DVariable.hpp"
-#include "detail/IPrintable_DVariable.hpp"
+#include "variable/IExpression_DVariable.hpp"
+#include "variable/IGCObject_DVariable.hpp"
+#include "variable/IPrintable_DVariable.hpp"
 
 /* end Variable.hpp */

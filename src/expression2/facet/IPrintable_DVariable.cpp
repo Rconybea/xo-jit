@@ -11,7 +11,7 @@
  *       [idl/IPrintable_DVariable.json5]
 **/
 
-#include "detail/IPrintable_DVariable.hpp"
+#include "variable/IPrintable_DVariable.hpp"
 
 namespace xo {
     namespace scm {
