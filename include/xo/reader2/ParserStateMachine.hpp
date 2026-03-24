@@ -7,8 +7,8 @@
 
 #include "ParserResult.hpp"
 #include "GlobalEnv.hpp"
-#include <xo/expression2/DGlobalSymtab.hpp>
-#include <xo/expression2/DLocalSymtab.hpp>
+#include <xo/expression2/GlobalSymtab.hpp>
+#include <xo/expression2/LocalSymtab.hpp>
 #include <xo/expression2/DVariable.hpp>
 #include <xo/expression2/VarRef.hpp>
 #include <xo/tokenizer2/Token.hpp>
@@ -38,6 +38,7 @@ namespace xo {
         class ParserStateMachine {
         public:
             using TypeDescr = xo::reflect::TypeDescr;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using ArenaConfig = xo::mm::ArenaConfig;
             using AGCObject = xo::mm::AGCObject;
@@ -66,6 +67,13 @@ namespace xo {
              *                   (e.g. DArenaHashMap for global symtable).
              *                   If not using X1Collector, this can be the
              *                   same as @p expr_alloc.
+             *
+             *  NOTE:
+             *  When @p expr_alloc supports the Collector facet:
+             *  ParserStateMachine isn't itself in gc-space
+             *  (i.e. isn't expected to belong to @p expr_alloc).
+             *  To update pointers to gc-owned objects, must have forward_children()
+             *  called as part of @p expr_alloc's gc cycle.
              **/
             ParserStateMachine(const ArenaConfig & config,
                                const ArenaHashMapConfig & symtab_var_config,
@@ -81,6 +89,8 @@ namespace xo {
             /** non-trivial dtor for @ref global_symtab_ **/
             ~ParserStateMachine();
 
+            static constexpr bool is_gc_eligible() { return false; }
+
             ///@}
             /** @defgroup scm-parserstatemachine-accessors accessor methods **/
             ///@{
@@ -90,7 +100,7 @@ namespace xo {
             obj<AAllocator> expr_alloc() const noexcept { return expr_alloc_; }
             StringTable * stringtable()  noexcept { return &stringtable_; }
             DGlobalSymtab * global_symtab() const noexcept { return global_symtab_.data(); }
-            DLocalSymtab * local_symtab() const noexcept { return local_symtab_; }
+            DLocalSymtab * local_symtab() const noexcept { return local_symtab_.data(); }
             DGlobalEnv * global_env() const noexcept { return global_env_.data(); }
             const ParserResult & result() const noexcept { return result_; }
 
@@ -175,7 +185,6 @@ namespace xo {
             void clear_error_reset();
 
             ///@}
-
             /** @defgroup scm-parserstatemachine-inputmethods input methods **/
             ///@{
 
@@ -339,8 +348,37 @@ namespace xo {
                                         std::string_view sym);
 
             ///@}
+            /** @defgroup scm-parserstatemachine-gcobject-facet gc support **/
+            ///@{
+
+#ifdef OBSOLETE
+            std::size_t shallow_size() const noexcept;
+            /** NOTE:
+             *  ParserStateMachine only eligible to be a GC root.
+             *  It's not eligible to reside in gc-owned space
+             **/
+            ParserStateMachine * shallow_copy(obj<AAllocator> mm) const noexcept;
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
+#endif
+            /** update gc-aware exit pointers from this ParserStateMachine **/
+            void forward_children(obj<ACollector> gc) noexcept;
+
+            ///@}
 
         private:
+#ifdef OBSOLETE
+            /** @defgroup scm-parserstatemachine-impl-methods implementation methods **/
+            ///@{
+
+            /** record gc-mutable state vars so they're updated when gc runs **/
+            void _add_gc_roots();
+
+            ///@}
+#endif
+
+        private:
+            /** @defgroup scm-parserstatemachine-instance-vars instance variables **/
+            ///@{
 
             /** Table containing interned strings + symbols.
              **/
@@ -348,6 +386,7 @@ namespace xo {
 
             /** Arena for internal parsing stack.
              *  Must be owned exclusively because destructively
+
              *  modified as parser completes parsing of each sub-expression
              *
              *  Contents will be a stack of ExprState instances
@@ -403,7 +442,7 @@ namespace xo {
              *        if so, along with stringtable_.
              *        maybe new struct ParserState?
              **/
-            dp<DGlobalSymtab> global_symtab_;
+            obj<AGCObject,DGlobalSymtab> global_symtab_;
 
             /** symbol table with local bindings.
              *  non-null during parsing of lambda expressions.
@@ -411,7 +450,7 @@ namespace xo {
              *  Push local symbol table here to remember local params
              *  during the body of a lambda expression.
              **/
-            DLocalSymtab * local_symtab_ = nullptr;
+            obj<AGCObject,DLocalSymtab> local_symtab_;
 
             /** global variable bindings (builtin primitives) **/
             obj<AGCObject,DGlobalEnv> global_env_;
@@ -435,6 +474,8 @@ namespace xo {
 
             /** true to enable debug output **/
             bool debug_flag_ = false;
+
+            ///@}
         };
     } /*namespace scm*/
 } /*namespace xo*/

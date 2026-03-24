@@ -15,6 +15,7 @@ namespace xo {
         class DExpectQLiteralSsm : public DSyntaxStateMachine<DExpectQLiteralSsm> {
         public:
             using Super = DSyntaxStateMachine<DExpectQLiteralSsm>;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
@@ -122,6 +123,13 @@ namespace xo {
             ///@{
 
             bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
+            /** @defgroup scm-expectqliteralssm-gc-support gc support methods **/
+            ///@{
+
+            /** gc support: visit gc-aware child pointers **/
+            void forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
 

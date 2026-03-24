@@ -6,6 +6,7 @@
 #include "ParenSsm.hpp"
 #include "ExpectExprSsm.hpp"
 #include "syntaxstatetype.hpp"
+#include <xo/alloc2/GCObject.hpp>
 #include <string_view>
 
 namespace xo {
@@ -457,6 +458,11 @@ namespace xo {
                                              refrtag("expect", this->get_expect_str()));
         }
 
+        void
+        DParenSsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_pivot_inplace(&expr_);
+        }
     } /*namespace scm*/
 } /*namespace xo*/
 

@@ -270,6 +270,12 @@ namespace xo {
                                              refrtag("deftypestate", deftype_xst_),
                                              refrtag("expect", this->get_expect_str()));
         }
+        void
+        DDeftypeSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        {
+            static_assert(!DUniqueString::is_gc_eligible());
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

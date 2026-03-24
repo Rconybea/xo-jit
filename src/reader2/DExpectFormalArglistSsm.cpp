@@ -4,24 +4,14 @@
  */
 
 #include "ExpectFormalArglistSsm.hpp"
-//#include "ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp"
 #include "ExpectFormalArgSsm.hpp"
-//#include "ssm/ISyntaxStateMachine_DExpectFormalArgSsm.hpp"
-#include <xo/expression2/DVariable.hpp>
-#include <xo/expression2/detail/IGCObject_DVariable.hpp>
+#include <xo/expression2/Variable.hpp>
+#include <xo/object2/Array.hpp>
 #include <xo/printable2/Printable.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/alloc2/arena/IAllocator_DArena.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>
-
-#ifdef NOT_YET
-#include "parserstatemachine.hpp"
-#include "exprstatestack.hpp"
-#include "expect_formal_xs.hpp"
-#include "expect_symbol_xs.hpp"
-#include "xo/expression/Variable.hpp"
-#include "xo/indentlog/print/vector.hpp"
-#endif
 
 namespace xo {
     using xo::print::APrintable;
@@ -365,6 +355,12 @@ namespace xo {
 
                 return false;
             }
+        }
+
+        void
+        DExpectFormalArglistSsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_inplace(&argl_);
         }
 
     } /*namespace scm*/

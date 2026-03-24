@@ -5,8 +5,10 @@
 
 #include "ApplySsm.hpp"
 #include "ExpectExprSsm.hpp"
-#include <xo/facet/FacetRegistry.hpp>
+#include <xo/object2/Array.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/alloc2/Arena.hpp>
+#include <xo/facet/FacetRegistry.hpp>
 #include <xo/reflectutil/typeseq.hpp>
 
 //#include "parserstatemachine.hpp"
@@ -392,6 +394,13 @@ namespace xo {
                                              refrtag("applystate", applystate_),
                                              refrtag("expect", this->get_expect_str()),
                                              refrtag("fn_expr", fn_expr, fn_expr_present));
+        }
+
+        void
+        DApplySsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_pivot_inplace(&fn_expr_);
+            gc.forward_inplace(&args_expr_v_);
         }
 
     } /*namespace scm*/

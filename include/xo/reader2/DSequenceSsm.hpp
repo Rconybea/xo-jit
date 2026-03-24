@@ -29,8 +29,7 @@ namespace xo {
         class DSequenceSsm : public DSyntaxStateMachine<DSequenceSsm> {
         public:
             using Super = DSyntaxStateMachine<DSequenceSsm>;
-            //using Sequence = xo::scm::Sequence;
-            //using Lambda = xo::scm::Lambda;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -87,11 +86,18 @@ namespace xo {
                                                  ParserStateMachine * p_psm);
 
             ///@}
-            /** @defgroup scm-sequencessm-printable-facet printable facet **/
+            /** @defgroup scm-sequencessm-printable-facet printable facet methods **/
             ///@{
 
             /** pretty printing support **/
             bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
+            /** @defgroup scm-sequencessm-gcobject-facet gcobject facet methods **/
+            ///@{
+
+            /** gc support: visit gc-aware child pointers **/
+            void forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
 

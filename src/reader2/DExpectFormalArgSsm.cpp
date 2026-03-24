@@ -264,6 +264,12 @@ namespace xo {
             }
         }
 
+        void
+        DExpectFormalArgSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        {
+            static_assert(!DUniqueString::is_gc_eligible());
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

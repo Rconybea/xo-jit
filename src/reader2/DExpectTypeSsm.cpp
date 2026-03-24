@@ -197,6 +197,12 @@ namespace xo {
                  "DExpectTypeSsm");
         }
 
+        void
+        DExpectTypeSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        {
+            // corrected_: POD, skip
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

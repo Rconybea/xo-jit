@@ -77,6 +77,11 @@ namespace xo {
         {
             self.on_quoted_literal(lit, p_psm);
         }
+        auto
+        ISyntaxStateMachine_DProgressSsm::forward_children(DProgressSsm & self, obj<ACollector> gc) -> void
+        {
+            self.forward_children(gc);
+        }
 
     } /*namespace scm*/
 } /*namespace xo*/

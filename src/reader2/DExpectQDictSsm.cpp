@@ -5,6 +5,8 @@
 
 #include "ExpectQDictSsm.hpp"
 #include "ExpectQLiteralSsm.hpp"
+#include <xo/stringtable2/String.hpp>
+#include <xo/alloc2/GCObject.hpp>
 
 namespace xo {
     using xo::print::APrintable;
@@ -263,6 +265,13 @@ namespace xo {
                                              refrtag("dict", dict_pr));
         }
 
+
+        void
+        DExpectQDictSsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_inplace(const_cast<DString **>(&key_));
+            gc.forward_inplace(&dict_);
+        }
 
     } /*namespace scm*/
 } /*namespace xo*/

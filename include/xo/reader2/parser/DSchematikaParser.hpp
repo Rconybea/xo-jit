@@ -1,4 +1,4 @@
-/** @file SchematikaParser.hpp
+/** @file DSchematikaParser.hpp
  *
  *  @author Roland Conybeare, Jan 2026
  **/
@@ -151,13 +151,21 @@ namespace xo {
          *                       | =>
          *                       | >
          *
+         * ----------------------------------------------------------------
+         * NOTES:
+         * - SchematikaParser partially supports the gcobject facet so it can be a collector root node.
+         *   It's not actually moveable (since its ParserStateMachine member isn't moveable),
+         *   Only the forward_children method is load-bearing.
+         * 
          **/
-        class SchematikaParser {
+        class DSchematikaParser {
         public:
             using token_type = Token;
             using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
             using ArenaConfig = xo::mm::ArenaConfig;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
+            using AGCObject = xo::mm::AGCObject;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ppindentinfo = xo::print::ppindentinfo;
             using size_type = std::size_t;
@@ -173,12 +181,36 @@ namespace xo {
              *                   with lifetime bounded by this
              *                   SchematikeParser itself
              **/
-            SchematikaParser(const ParserConfig & config,
-                             obj<AAllocator> expr_alloc,
-                             obj<AAllocator> aux_alloc);
+            DSchematikaParser(const ParserConfig & config,
+                              obj<AAllocator> expr_alloc,
+                              obj<AAllocator> aux_alloc);
 
             /** non-trivial dtor because of @ref psm_ **/
-            ~SchematikaParser() = default;
+            ~DSchematikaParser() = default;
+
+            /** create parser in initial state.
+             *
+             *  @p mm            allocate SchematikaParser instance from here.
+             *                   (likely the same as aux_alloc)
+             *  @p config        parser configuration
+             *  @p expr_alloc    allocator for schematika expressions.
+             *                   Probably shared with execution.
+             *  @p aux_alloc     aux allocator for non-copyable memory
+             *                   with lifetime bounded by this
+             *                   SchematikeParser itself
+             **/
+            static DSchematikaParser * _make(obj<AAllocator> mm,
+                                             const ParserConfig & config,
+                                             obj<AAllocator> expr_alloc,
+                                             obj<AAllocator> aux_alloc);
+
+            /** like _make(mm,config,expr_alloc,aux_alloc),
+             *  but as fop
+             **/
+            static obj<AGCObject,DSchematikaParser> make(obj<AAllocator> mm,
+                                                         const ParserConfig & config,
+                                                         obj<AAllocator> expr_alloc,
+                                                         obj<AAllocator> aux_alloc);
 
             /** scm-schematikaparser-access-methods **/
             ///@{
@@ -248,7 +280,7 @@ namespace xo {
             void reset_to_idle_toplevel();
 
             ///@}
-            /** scm-schematikaparser-pretty-methods **/
+            /** @defgroup scm-schematikaparser-pretty-methods **/
             ///@{
 
             /** print human-readable representation on stream @p os **/
@@ -257,18 +289,32 @@ namespace xo {
             bool pretty(const ppindentinfo & ppii) const;
 
             ///@}
+            /** @defgroup scm-schematikaparser-gcobject-methods **/
+            ///@{
 
+            std::size_t shallow_size() const noexcept;
+            /** not implemented (SchematikaParser not designed to be copyable) **/
+            DSchematikaParser * shallow_copy(obj<AAllocator> mm) const noexcept;
+            /** forward gc-aware children **/
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
+
+            ///@}
         private:
+            /** @defgroup scm-schematikaparser-member-variables member variables **/
+            ///@{
+
             /** state machine **/
             ParserStateMachine psm_;
 
             /** debug flag (also stored in psm_) **/
             bool debug_flag_ = false;
-        }; /*SchematikaParser*/
+
+            ///@}
+        }; /*DSchematikaParser*/
 
         inline std::ostream &
         operator<< (std::ostream & os,
-                    const SchematikaParser * x) {
+                    const DSchematikaParser * x) {
             if (x) {
                 x->print(os);
             } else {
@@ -284,8 +330,8 @@ namespace xo {
          *  to handle ParserResult instances
          **/
         template <>
-        struct ppdetail<xo::scm::SchematikaParser*> {
-            static inline bool print_pretty(const ppindentinfo & ppii, const xo::scm::SchematikaParser* p) {
+        struct ppdetail<xo::scm::DSchematikaParser*> {
+            static inline bool print_pretty(const ppindentinfo & ppii, const xo::scm::DSchematikaParser* p) {
                 if (p)
                     return p->pretty(ppii);
                 else
@@ -295,4 +341,4 @@ namespace xo {
     }
 } /*namespace xo*/
 
-/* end SchematikaParser.hpp */
+/* end DSchematikaParser.hpp */

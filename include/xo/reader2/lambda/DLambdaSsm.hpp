@@ -59,6 +59,7 @@ namespace xo {
         public:
             using Super = DSyntaxStateMachine<DLambdaSsm>;
             using DLocalSymtab = xo::scm::DLocalSymtab;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
@@ -182,6 +183,13 @@ namespace xo {
 
             /** pretty-printing support **/
             bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
+            /** @defgroup scm-lambdassm-gc-support gc support methods **/
+            ///@{
+
+            /** gc support: visit gc-aware child pointers **/
+            void forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
 

@@ -42,6 +42,7 @@ namespace xo {
             /** @defgroup scm-syntaxstatemachine-dexpectqlistssm-type-traits **/
             ///@{
             using TypeDescr = xo::scm::ASyntaxStateMachine::TypeDescr;
+            using ACollector = xo::scm::ASyntaxStateMachine::ACollector;
             using AGCObject = xo::scm::ASyntaxStateMachine::AGCObject;
             using Copaque = xo::scm::ASyntaxStateMachine::Copaque;
             using Opaque = xo::scm::ASyntaxStateMachine::Opaque;
@@ -75,6 +76,8 @@ namespace xo {
             static void on_parsed_expression_with_token(DExpectQListSsm & self, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for nested quoted literal @p lit **/
             static void on_quoted_literal(DExpectQListSsm & self, obj<AGCObject> lit, ParserStateMachine * p_psm);
+            /** gc support: move immediate children to to-space and sub forwarding pointer **/
+            static void forward_children(DExpectQListSsm & self, obj<ACollector> gc);
             ///@}
         };
 

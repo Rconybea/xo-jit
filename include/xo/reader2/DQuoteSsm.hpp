@@ -65,6 +65,7 @@ namespace xo {
         public:
             using Super = DSyntaxStateMachine<DQuoteSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -145,7 +146,13 @@ namespace xo {
             bool pretty(const ppindentinfo & ppii) const;
 
             ///@}
+            /** @defgroup scm-quotessm-gc-support gc support methods */
+            ///@{
 
+            /** gc support: visit gc-aware child pointers **/
+            void forward_children(obj<ACollector> gc) noexcept;
+
+            ///@}
         private:
             /** @defgroup scm-parenssm-member-vars **/
             ///@{

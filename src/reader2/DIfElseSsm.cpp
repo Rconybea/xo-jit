@@ -9,6 +9,7 @@
 #include "DExpectExprSsm.hpp"
 #include <xo/expression2/detail/IPrintable_DIfElseExpr.hpp>
 #include <xo/printable2/Printable.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 
 namespace xo {
@@ -507,5 +508,10 @@ namespace xo {
                         refrtag("if_expr", expr));
         }
 
+        void
+        DIfElseSsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_pivot_inplace(&if_expr_);
+        }
     } /*namespace scm*/
 } /*namespace xo*/

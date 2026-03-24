@@ -6,6 +6,7 @@
 #include "ExpectQArraySsm.hpp"
 #include "ExpectQLiteralSsm.hpp"
 #include <xo/object2/Array.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/print/pretty.hpp>
 
@@ -218,6 +219,12 @@ namespace xo {
                                              refrtag("expect", this->get_expect_str()),
                                              refrtag("array", array_pr));
         }
+        void
+        DExpectQArraySsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_inplace(&array_);
+        }
+
     }
 }
 

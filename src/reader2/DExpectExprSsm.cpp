@@ -624,6 +624,12 @@ namespace xo {
         }
 #endif
 
+        void
+        DExpectExprSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        {
+            // all members POD, skip
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

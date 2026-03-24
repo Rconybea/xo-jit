@@ -6,6 +6,7 @@
 #include "ExpectQListSsm.hpp"
 #include "ExpectQLiteralSsm.hpp"
 #include <xo/object2/List.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/print/pretty.hpp>
 
@@ -213,6 +214,13 @@ namespace xo {
                                              refrtag("expect", this->get_expect_str()),
                                              refrtag("list", list_pr));
         }
+        void
+        DExpectQListSsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_inplace(&start_);
+            gc.forward_inplace(&end_);
+        }
+
     }
 }
 

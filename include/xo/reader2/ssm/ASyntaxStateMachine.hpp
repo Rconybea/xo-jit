@@ -19,11 +19,12 @@
 #include <xo/type/Type.hpp>
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/reflect/TypeDescr.hpp>
+#include <xo/alloc2/Collector.hpp>
 #include <xo/facet/obj.hpp>
 #include <xo/facet/facet_implementation.hpp>
 #include <xo/facet/typeseq.hpp>
 
-// {pretex} here
+// {pretext} here
 
 namespace xo {
 namespace scm {
@@ -45,6 +46,8 @@ public:
     using Opaque = void *;
     /** reflected c++ type **/
     using TypeDescr = xo::reflect::TypeDescr;
+    /** gc interface **/
+    using ACollector = xo::mm::ACollector;
     /** gc-aware object **/
     using AGCObject = xo::mm::AGCObject;
     ///@}
@@ -52,6 +55,11 @@ public:
     /** @defgroup scm-syntaxstatemachine-methods **/
     ///@{
     // const methods
+    /** An uninitialized ASyntaxStateMachine instance will have zero vtable pointer (per {linux,osx} abi).
+     *  Use case for this is narrow. We go to some lengths to avoid null vtable pointers. For example
+     *  obj<AFacet> will have non-null vtable (via IFacet_Any) with all methods terminating.
+     **/
+    bool _has_null_vptr() const noexcept { return *reinterpret_cast<const void * const *>(this) == nullptr; }
     /** RTTI: unique id# for actual runtime data representation **/
     virtual typeseq _typeseq() const noexcept = 0;
     /** destroy instance @p d; calls c++ dtor only for actual runtime type; does not recover memory **/
@@ -82,6 +90,8 @@ public:
     virtual void on_parsed_expression_with_token(Opaque data, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update state machine for nested quoted literal @p lit **/
     virtual void on_quoted_literal(Opaque data, obj<AGCObject> lit, ParserStateMachine * p_psm)  = 0;
+    /** gc support: move immediate children to to-space and sub forwarding pointer **/
+    virtual void forward_children(Opaque data, obj<ACollector> gc)  = 0;
     ///@}
 }; /*ASyntaxStateMachine*/
 

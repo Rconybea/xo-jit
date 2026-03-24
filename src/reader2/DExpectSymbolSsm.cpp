@@ -145,6 +145,12 @@ namespace xo {
                  //refrtag("member", member_)
                     );
         }
+        void
+        DExpectSymbolSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        {
+            // no gc-aware members
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

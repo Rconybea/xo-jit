@@ -55,6 +55,7 @@ namespace xo {
         class DIfElseSsm : public DSyntaxStateMachine<DIfElseSsm> {
         public:
             using Super = DSyntaxStateMachine<DIfElseSsm>;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
@@ -166,6 +167,13 @@ namespace xo {
             virtual void on_rightbrace_token(const token_type & tk,
                                              parserstatemachine * p_psm) override;
 #endif
+
+            /** @defgroup scm-ifelsessm-gc-support gc support methods **/
+            ///@{
+
+            void forward_children(obj<ACollector> gc) noexcept;
+
+            ///@}
 
         private:
 #ifdef NOT_YET

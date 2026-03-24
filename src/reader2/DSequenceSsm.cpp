@@ -3,12 +3,13 @@
 #include "DSequenceSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DSequenceSsm.hpp"
 #include "DExpectExprSsm.hpp"
+#include <xo/expression2/SequenceExpr.hpp>
+#include <xo/alloc2/GCObject.hpp>
 
 #ifdef NOT_YET
 #include "expect_expr_xs.hpp"
 #include "let1_xs.hpp"
 #include "xo/expression/DefineExpr.hpp"
-#include "xo/expression/Sequence.hpp"
 #include "xo/expression/pretty_expression.hpp"
 #endif
 
@@ -254,6 +255,12 @@ namespace xo {
                         "DSequenceSsm",
                         refrtag("seq_expr.size", seq_expr_->size()),
                         refrtag("expect", this->get_expect_str()));
+        }
+
+        void
+        DSequenceSsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_inplace(&seq_expr_);
         }
 
     } /*namespace scm*/

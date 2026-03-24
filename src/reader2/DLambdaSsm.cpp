@@ -16,6 +16,7 @@
 //#include <xo/expression2/detail/IExpression_DVariable.hpp>
 //#include <xo/expression2/symtab/ISymbolTable_DLocalSymtab.hpp>
 #include <xo/printable2/Printable.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/arena/DArena.hpp>
 
@@ -470,6 +471,14 @@ namespace xo {
                      refrtag("lmstate", lmstate_),
                      refrtag("expect", this->get_expect_str()));
             }
+        }
+
+        void
+        DLambdaSsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_inplace(&local_symtab_);
+            gc.forward_pivot_inplace(&body_);
+            gc.forward_pivot_inplace(&parent_symtab_);
         }
 
     } /*namespace scm*/

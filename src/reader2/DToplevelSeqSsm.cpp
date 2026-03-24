@@ -517,6 +517,12 @@ namespace xo {
                  "DToplevelSeqSsm",
                  refrtag("seqtype", seqtype_));
         }
+        void
+        DToplevelSeqSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        {
+            // seqtype_: POD, skip
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

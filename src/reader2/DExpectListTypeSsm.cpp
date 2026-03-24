@@ -7,6 +7,7 @@
 #include "ExpectTypeSsm.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/type/ListType.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <string_view>
 
 namespace xo {
@@ -200,6 +201,12 @@ namespace xo {
             return ppii.pps()->pretty_struct
                 (ppii,
                  "DExpectListTypeSsm");
+        }
+
+        void
+        DExpectListTypeSsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_pivot_inplace(&elt_type_);
         }
 
     } /*namespace scm*/

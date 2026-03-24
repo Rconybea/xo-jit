@@ -22,6 +22,7 @@
 #include <xo/procedure2/init_primitives.hpp>  // for xo::scm::Primitives
 #include <xo/procedure2/detail/IGCObject_DPrimitive_gco_2_gco_gco.hpp>
 
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/reflectutil/typeseq.hpp>
@@ -1240,6 +1241,13 @@ case optype::op_assign:
             }
 
             return obj<AExpression>();
+        }
+
+        void
+        DProgressSsm::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_pivot_inplace(&lhs_);
+            gc.forward_pivot_inplace(&rhs_);
         }
 
     } /*namespace scm*/

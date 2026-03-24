@@ -10,13 +10,14 @@
         "<xo/type/Type.hpp>",
         "<xo/tokenizer2/Token.hpp>",
         "<xo/reflect/TypeDescr.hpp>",
+        "<xo/alloc2/Collector.hpp>"
     ],
     // extra includes in SyntaxStateMachine.hpp, if any
     user_hpp_includes: [],
     namespace1: "xo",
     namespace2: "scm",
     // text after includes, before ASyntaxStateMachine
-    pretext: ["// {pretex} here"],
+    pretext: ["// {pretext} here"],
     facet: "SyntaxStateMachine",
     detail_subdir: "ssm",
     brief: "specialized state machine for parsing some particular schematika syntax",
@@ -26,6 +27,7 @@
     ],
     types: [
         { name: "TypeDescr", doc: [ "reflected c++ type" ], definition: "xo::reflect::TypeDescr" },
+        { name: "ACollector", doc: [ "gc interface" ], definition: "xo::mm::ACollector" },
         { name: "AGCObject", doc: [ "gc-aware object" ], definition: "xo::mm::AGCObject" },
         // { name: string, doc: [ string ], definition: string },
     ],
@@ -142,6 +144,14 @@
             args: [
                 {type: "obj<AGCObject>", name: "lit"},
                 {type: "ParserStateMachine *", name: "p_psm"},
+            ],
+        },
+        {
+            name: "forward_children",
+            doc: ["gc support: move immediate children to to-space and sub forwarding pointer"],
+            return_type: "void",
+            args: [
+                {type: "obj<ACollector>", name: "gc"},
             ],
         }
     ],

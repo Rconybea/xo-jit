@@ -95,6 +95,12 @@ ISyntaxStateMachine_Any::on_quoted_literal(Opaque, obj<AGCObject>, ParserStateMa
     _fatal();
 }
 
+auto
+ISyntaxStateMachine_Any::forward_children(Opaque, obj<ACollector>)  -> void
+{
+    _fatal();
+}
+
 
 } /*namespace scm*/
 } /*namespace xo*/

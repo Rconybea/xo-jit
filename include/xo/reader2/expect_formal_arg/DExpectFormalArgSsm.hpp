@@ -48,6 +48,7 @@ namespace xo {
         public:
             using Super = DSyntaxStateMachine<DExpectFormalArgSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
+            using ACollector = xo::mm::ACollector;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -119,6 +120,13 @@ namespace xo {
 
             /** pretty-printing support **/
             bool pretty(const ppindentinfo & ppii) const;
+
+            ///@}
+            /** @defgroup scm-expectformalargssm-gc-support gc support methods **/
+            ///@{
+
+            /** gc support: visit gc-aware child pointers **/
+            void forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
 

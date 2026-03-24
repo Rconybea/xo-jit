@@ -32,6 +32,7 @@ public:
     using DataPtr = Object::DataPtr;
     using typeseq = xo::reflect::typeseq;
     using TypeDescr = ASyntaxStateMachine::TypeDescr;
+    using ACollector = ASyntaxStateMachine::ACollector;
     using AGCObject = ASyntaxStateMachine::AGCObject;
     ///@}
 
@@ -91,6 +92,9 @@ public:
     }
     void on_quoted_literal(obj<AGCObject> lit, ParserStateMachine * p_psm)  {
         return O::iface()->on_quoted_literal(O::data(), lit, p_psm);
+    }
+    void forward_children(obj<ACollector> gc)  {
+        return O::iface()->forward_children(O::data(), gc);
     }
 
     ///@}

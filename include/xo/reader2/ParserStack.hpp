@@ -21,6 +21,7 @@ namespace xo {
          **/
         class ParserStack {
         public:
+            using ACollector = xo::mm::ACollector;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -42,6 +43,8 @@ namespace xo {
             static ParserStack * pop(ParserStack * stack,
                                      DArena & mm);
 
+            static constexpr bool is_gc_eligible() { return false; }
+
             DArena::Checkpoint ckp() const noexcept { return ckp_; }
             obj<ASyntaxStateMachine> top() const noexcept { return ssm_; }
             ParserStack * parent() const noexcept { return parent_; }
@@ -50,6 +53,8 @@ namespace xo {
             void print(std::ostream & os) const;
             /** pretty-printer support **/
             bool pretty(const ppindentinfo & ppii) const;
+
+            void forward_children(obj<ACollector> gc) noexcept;
 
         private:
             /** stack pointer: top of stack just before this instance created **/

@@ -90,6 +90,7 @@ namespace xo {
         public:
             using Super = DSyntaxStateMachine<DProgressSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
+            using ACollector = xo::mm::ACollector;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -213,6 +214,13 @@ namespace xo {
 
             void print(std::ostream & os) const override;
 #endif
+
+            /** @defgroup scm-progressssm-gc-support gc support methods **/
+            ///@{
+
+            void forward_children(obj<ACollector> gc) noexcept;
+
+            ///@}
 
         private:
             /** populate an expression here, may be followed by an operator **/

@@ -9,7 +9,7 @@
 #include "DExpectExprSsm.hpp"
 #include "ssm/ISyntaxStateMachine_DDefineSsm.hpp"
 #include "ssm/IPrintable_DDefineSsm.hpp"
-#include <xo/expression2/detail/IPrintable_DDefineExpr.hpp>
+#include <xo/expression2/DefineExpr.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 
@@ -688,6 +688,14 @@ namespace xo {
                                              refrtag("defstate", defstate_),
                                              refrtag("expect", this->get_expect_str()),
                                              refrtag("def_expr", expr));
+        }
+
+        // ----- gc support -----
+
+        void
+        DDefineSsm::forward_children(obj<ACollector> gc)
+        {
+            gc.forward_inplace(&def_expr_.data_);
         }
     } /*namespace scm*/
 } /*namespace xo*/
