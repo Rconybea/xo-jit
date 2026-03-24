@@ -4,6 +4,7 @@
  **/
 
 #include "TypeRef.hpp"
+#include <xo/alloc2/Collector.hpp>
 #include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/print/cond.hpp>
@@ -103,10 +104,12 @@ namespace xo {
         void
         TypeRef::forward_children(obj<ACollector> gc) noexcept
         {
-            {
-                auto e = FacetRegistry::instance().variant<AGCObject,AType>(type_);
-                gc.forward_inplace(e.iface(), (void **)&(type_.data_));
-            }
+            gc.forward_pivot_inplace(&type_);
+
+            //if (type_) {
+            //    auto e = FacetRegistry::instance().variant<AGCObject,AType>(type_);
+            //    gc.forward_inplace(e.iface(), (void **)&(type_.data_));
+            //}
         }
 
         bool
