@@ -12,9 +12,13 @@
 namespace xo {
     namespace scm {
         struct ReaderResult {
+            using ACollector = xo::mm::ACollector;
             using span_type = xo::mm::span<const char>;
 
             bool is_tk_error() const { return tk_error_.is_error(); }
+
+            /** forward gc-aware pointers (called during gc cycle) **/
+            void forward_children(obj<ACollector> gc) noexcept;
 
             /** schematika expression parsed from input **/
             obj<AExpression> expr_;
@@ -35,6 +39,7 @@ namespace xo {
          **/
         class SchematikaReader {
         public:
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using span_type = xo::mm::span<const char>;
@@ -100,6 +105,9 @@ namespace xo {
              *  - current parsing state
              **/
             void reset_to_idle_toplevel();
+
+            /** update gc-aware child pointers **/
+            void forward_children(obj<ACollector> gc) noexcept;
 
         private:
             /** tokenizer converts a stream of chars

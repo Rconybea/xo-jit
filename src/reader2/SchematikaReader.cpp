@@ -9,6 +9,14 @@ namespace xo {
     using xo::mm::MemorySizeInfo;
 
     namespace scm {
+        void
+        ReaderResult::forward_children(obj<ACollector> gc) noexcept
+        {
+            gc.forward_pivot_inplace(&expr_);
+        }
+
+        // ----- SchematikaReader -----
+
         SchematikaReader::SchematikaReader(const ReaderConfig & config,
                                            obj<AAllocator> expr_alloc,
                                            obj<AAllocator> aux_alloc)
@@ -198,6 +206,16 @@ namespace xo {
             this->tokenizer_.discard_current_line();
             this->parser_.reset_to_idle_toplevel();
         }
+
+        void
+        SchematikaReader::forward_children(obj<ACollector> gc) noexcept
+        {
+            // tokenizer doesn't contain any gc-aware pointers.
+
+            parser_.forward_children(gc);
+            result_.forward_children(gc);
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 
