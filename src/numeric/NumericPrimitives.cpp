@@ -33,7 +33,7 @@ namespace xo {
 
             auto pm_ty = obj<AType>();
 
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_mul", pm_ty,
+            return DPrimitive_gco_2_gco_gco::_make(mm, c_multiply_pm_name, pm_ty,
                                                    &NumericDispatch::multiply);
         }
 
@@ -48,7 +48,7 @@ namespace xo {
             auto pm_ty = obj<AType,DFunctionType>
                 (DFunctionType::_make(mm, numeric_ty, numeric_ty, numeric_ty));
 
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_div", pm_ty,
+            return DPrimitive_gco_2_gco_gco::_make(mm, c_divide_pm_name, pm_ty,
                                                    &NumericDispatch::divide);
         }
 
@@ -63,7 +63,7 @@ namespace xo {
             auto pm_ty = obj<AType,DFunctionType>
                 (DFunctionType::_make(mm, numeric_ty, numeric_ty, numeric_ty));
 
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_add", pm_ty,
+            return DPrimitive_gco_2_gco_gco::_make(mm, c_add_pm_name, pm_ty,
                                                    &NumericDispatch::add);
         }
 
@@ -78,7 +78,7 @@ namespace xo {
             auto pm_ty = obj<AType,DFunctionType>
                 (DFunctionType::_make(mm, numeric_ty, numeric_ty, numeric_ty));
 
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_sub", pm_ty,
+            return DPrimitive_gco_2_gco_gco::_make(mm, c_sub_pm_name, pm_ty,
                                                    &NumericDispatch::subtract);
         }
 
@@ -94,7 +94,7 @@ namespace xo {
             auto pm_ty = obj<AType,DFunctionType>
                 (DFunctionType::_make(mm, booleic_ty, numeric_ty, numeric_ty));
 
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmpeq", pm_ty,
+            return DPrimitive_gco_2_gco_gco::_make(mm, c_cmpeq_pm_name, pm_ty,
                                                    &NumericDispatch::cmp_equal);
         }
 
@@ -110,7 +110,7 @@ namespace xo {
             auto pm_ty = obj<AType,DFunctionType>
                 (DFunctionType::_make(mm, booleic_ty, numeric_ty, numeric_ty));
 
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmpne", pm_ty,
+            return DPrimitive_gco_2_gco_gco::_make(mm, c_cmpne_pm_name, pm_ty,
                                                    &NumericDispatch::cmp_notequal);
         }
 
@@ -126,7 +126,7 @@ namespace xo {
             auto pm_ty = obj<AType,DFunctionType>
                 (DFunctionType::_make(mm, booleic_ty, numeric_ty, numeric_ty));
 
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmplt", pm_ty,
+            return DPrimitive_gco_2_gco_gco::_make(mm, c_cmplt_pm_name, pm_ty,
                                                    &NumericDispatch::cmp_less);
         }
 
@@ -142,7 +142,7 @@ namespace xo {
             auto pm_ty = obj<AType,DFunctionType>
                 (DFunctionType::_make(mm, booleic_ty, numeric_ty, numeric_ty));
 
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmple", pm_ty,
+            return DPrimitive_gco_2_gco_gco::_make(mm, c_cmple_pm_name, pm_ty,
                                                    &NumericDispatch::cmp_lessequal);
         }
 
@@ -158,7 +158,7 @@ namespace xo {
             auto pm_ty = obj<AType,DFunctionType>
                 (DFunctionType::_make(mm, booleic_ty, numeric_ty, numeric_ty));
 
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmpgt", pm_ty,
+            return DPrimitive_gco_2_gco_gco::_make(mm, c_cmpgt_pm_name, pm_ty,
                                                    &NumericDispatch::cmp_greater);
         }
 
@@ -174,7 +174,7 @@ namespace xo {
             auto pm_ty = obj<AType,DFunctionType>
                 (DFunctionType::_make(mm, booleic_ty, numeric_ty, numeric_ty));
 
-            return DPrimitive_gco_2_gco_gco::_make(mm, "_cmpge", pm_ty,
+            return DPrimitive_gco_2_gco_gco::_make(mm, c_cmpge_pm_name, pm_ty,
                                                    &NumericDispatch::cmp_greatequal);
         }
 
