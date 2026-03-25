@@ -6,8 +6,7 @@
 #include <xo/reader2/SchematikaParser.hpp>
 #include <xo/reader2/DDefineSsm.hpp>
 #include <xo/reader2/DExpectExprSsm.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DExpectExprSsm.hpp>
-#include <xo/reader2/ssm/ISyntaxStateMachine_DDefineSsm.hpp>
+#include <xo/reader2/DefineSsm.hpp>
 #include <xo/reader2/init_reader2.hpp>
 #include <xo/expression2/DefineExpr.hpp>
 #include <xo/expression2/ApplyExpr.hpp>

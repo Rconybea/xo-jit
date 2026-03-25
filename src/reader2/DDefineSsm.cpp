@@ -7,8 +7,7 @@
 #include "DExpectSymbolSsm.hpp"
 #include "DExpectTypeSsm.hpp"
 #include "DExpectExprSsm.hpp"
-#include "ssm/ISyntaxStateMachine_DDefineSsm.hpp"
-#include "ssm/IPrintable_DDefineSsm.hpp"
+#include "DefineSsm.hpp"
 #include <xo/expression2/DefineExpr.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>

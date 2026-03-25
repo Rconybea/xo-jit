@@ -902,8 +902,8 @@ namespace xo {
         void
         ParserStateMachine::forward_children(obj<ACollector> gc) noexcept
         {
-            static_assert(!stringtable_.is_gc_eligible());
-            static_assert(!parser_alloc_.is_gc_eligible());
+            assert(!stringtable_.is_gc_eligible());
+            assert(!parser_alloc_.is_gc_eligible());
 
             if (stack_) {
                 stack_->forward_children(gc);

@@ -5,7 +5,8 @@
 
 #include "ifelse/DIfElseSsm.hpp"
 #include "ifelse/ISyntaxStateMachine_DIfElseSsm.hpp"
-#include "ssm/IPrintable_DDefineSsm.hpp"
+#include "DefineSsm.hpp"
+//#include "define/IPrintable_DDefineSsm.hpp"
 #include "DExpectExprSsm.hpp"
 #include <xo/expression2/detail/IPrintable_DIfElseExpr.hpp>
 #include <xo/printable2/Printable.hpp>

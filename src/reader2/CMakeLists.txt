@@ -27,8 +27,8 @@ set(SELF_SRCS
     IPrintable_DToplevelSeqSsm.cpp
 
     DDefineSsm.cpp
-    ISyntaxStateMachine_DDefineSsm.cpp
-    IPrintable_DDefineSsm.cpp
+    facet/ISyntaxStateMachine_DDefineSsm.cpp
+    facet/IPrintable_DDefineSsm.cpp
 
     DDeftypeSsm.cpp
     facet/ISyntaxStateMachine_DDeftypeSsm.cpp
