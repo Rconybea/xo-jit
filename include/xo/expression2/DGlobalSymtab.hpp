@@ -31,6 +31,7 @@ namespace xo {
             using repr_type = xo::map::DArenaHashMap<key_type, Binding::slot_type>;
             using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
+            using AGCObject = xo::mm::AGCObject;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ppindentinfo = xo::print::ppindentinfo;
             using size_type = std::uint32_t;
@@ -47,10 +48,16 @@ namespace xo {
              *  Use memory from @p mm for DGlobalSymtab instance.
              *  Hashmap for variables per @p var_cfg; for types per @p type_cfg.
              **/
-            static dp<DGlobalSymtab> make(obj<AAllocator> mm,
-                                          obj<AAllocator> fixed_mm,
-                                          const ArenaHashMapConfig & var_cfg,
-                                          const ArenaHashMapConfig & type_cfg);
+            static DGlobalSymtab * _make(obj<AAllocator> mm,
+                                         obj<AAllocator> fixed_mm,
+                                         const ArenaHashMapConfig & var_cfg,
+                                         const ArenaHashMapConfig & type_cfg);
+
+            /** like _make(..), but create fop **/
+            static obj<AGCObject,DGlobalSymtab> make(obj<AAllocator> mm,
+                                                     obj<AAllocator> fixed_mm,
+                                                     const ArenaHashMapConfig & var_cfg,
+                                                     const ArenaHashMapConfig & type_cfg);
 
             /** non-trivial destructor for @ref map_ **/
             ~DGlobalSymtab() = default;

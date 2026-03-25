@@ -3,7 +3,7 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "DGlobalSymtab.hpp"
+#include "GlobalSymtab.hpp"
 #include "Typename.hpp"
 #include "Binding.hpp"
 #include "DUniqueString.hpp"
@@ -29,11 +29,11 @@ namespace xo {
         {
         }
 
-        dp<DGlobalSymtab>
-        DGlobalSymtab::make(obj<AAllocator> mm,
-                            obj<AAllocator> aux_mm,
-                            const ArenaHashMapConfig & var_cfg,
-                            const ArenaHashMapConfig & type_cfg)
+        DGlobalSymtab *
+        DGlobalSymtab::_make(obj<AAllocator> mm,
+                             obj<AAllocator> aux_mm,
+                             const ArenaHashMapConfig & var_cfg,
+                             const ArenaHashMapConfig & type_cfg)
         {
             /* note: using aux_mm for DArenaHashMap superstructure.
              * {variable, type} storage allocated from mm.
@@ -51,12 +51,24 @@ namespace xo {
 
             DArray * types = DArray::empty(mm, type_map->capacity());
 
-            auto symtab = dp<DGlobalSymtab>::make(mm,
-                                                  std::move(var_map), vars,
-                                                  std::move(type_map), types);
+            void * mem = mm.alloc_for<DGlobalSymtab>();
+
+            auto symtab = new (mem) DGlobalSymtab(std::move(var_map),
+                                                  vars,
+                                                  std::move(type_map),
+                                                  types);
             assert(symtab);
 
             return symtab;
+        }
+
+        obj<AGCObject,DGlobalSymtab>
+        DGlobalSymtab::make(obj<AAllocator> mm,
+                            obj<AAllocator> aux_mm,
+                            const ArenaHashMapConfig & var_cfg,
+                            const ArenaHashMapConfig & type_cfg)
+        {
+            return obj<AGCObject,DGlobalSymtab>(_make(mm, aux_mm, var_cfg, type_cfg));
         }
 
         void
@@ -274,6 +286,9 @@ namespace xo {
         DGlobalSymtab::forward_children(obj<ACollector> gc) noexcept
         {
             // map_ doesn't contain any gc-owned data, can skip
+
+            static_assert(var_map_.is_gc_eligible() == false);
+            static_assert(type_map_.is_gc_eligible() == false);
 
             gc.forward_inplace(&vars_);
             gc.forward_inplace(&types_);
