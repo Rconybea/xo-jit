@@ -99,7 +99,7 @@ namespace xo {
             obj<AAllocator> mm = rcx.allocator();
             StringTable * stbl = rcx.stringtable();
 
-            scope log(XO_DEBUG(true));
+            scope log(XO_DEBUG(false));
 
             bool ok = true;
 
