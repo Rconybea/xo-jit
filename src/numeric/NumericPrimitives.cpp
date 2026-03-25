@@ -24,10 +24,14 @@ namespace xo {
             //
             // e.g. f64 x f64 -> f64
 
+#ifdef NOPE
             auto numeric_ty = DAtomicType::make(mm, Metatype::t_numeric());
             // #op+: numeric x numeric -> numeric
             auto pm_ty = obj<AType,DFunctionType>
                 (DFunctionType::_make(mm, numeric_ty, numeric_ty, numeric_ty));
+#endif
+
+            auto pm_ty = obj<AType>();
 
             return DPrimitive_gco_2_gco_gco::_make(mm, "_mul", pm_ty,
                                                    &NumericDispatch::multiply);
