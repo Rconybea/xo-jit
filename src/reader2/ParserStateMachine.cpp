@@ -8,6 +8,7 @@
 #include "SyntaxStateMachine.hpp"
 #include "ToplevelSeqSsm.hpp"
 #include "DefineSsm.hpp"
+#include <xo/numeric/NumericPrimitives.hpp>
 #include <xo/procedure2/PrimitiveRegistry.hpp>
 #include <xo/procedure2/SimpleRcx.hpp>
 #include <xo/object2/array/IPrintable_DArray.hpp>
@@ -107,61 +108,71 @@ namespace xo {
             //
 
             {
-                const DUniqueString * name = stringtable_.lookup("_mul");
+                const DUniqueString * name
+                    = stringtable_.lookup(NumericPrimitives::c_multiply_pm_name);
                 assert(name);
                 this->multiply_binding_ = global_symtab_->lookup_binding(name);
             }
 
             {
-                const DUniqueString * name = stringtable_.lookup("_div");
+                const DUniqueString * name
+                    = stringtable_.lookup(NumericPrimitives::c_divide_pm_name);
                 assert(name);
                 this->divide_binding_ = global_symtab_->lookup_binding(name);
             }
 
             {
-                const DUniqueString * name = stringtable_.lookup("_add");
+                const DUniqueString * name
+                    = stringtable_.lookup(NumericPrimitives::c_add_pm_name);
                 assert(name);
                 this->add_binding_ = global_symtab_->lookup_binding(name);
             }
 
             {
-                const DUniqueString * name = stringtable_.lookup("_sub");
+                const DUniqueString * name
+                    = stringtable_.lookup(NumericPrimitives::c_sub_pm_name);
                 assert(name);
                 this->subtract_binding_ = global_symtab_->lookup_binding(name);
             }
 
             {
-                const DUniqueString * name = stringtable_.lookup("_cmpeq");
+                const DUniqueString * name
+                    = stringtable_.lookup(NumericPrimitives::c_cmpeq_pm_name);
                 assert(name);
                 this->cmpeq_binding_ = global_symtab_->lookup_binding(name);
             }
 
             {
-                const DUniqueString * name = stringtable_.lookup("_cmpne");
+                const DUniqueString * name
+                    = stringtable_.lookup(NumericPrimitives::c_cmpne_pm_name);
                 assert(name);
                 this->cmpne_binding_ = global_symtab_->lookup_binding(name);
             }
 
             {
-                const DUniqueString * name = stringtable_.lookup("_cmplt");
+                const DUniqueString * name
+                    = stringtable_.lookup(NumericPrimitives::c_cmplt_pm_name);
                 assert(name);
                 this->cmplt_binding_ = global_symtab_->lookup_binding(name);
             }
 
             {
-                const DUniqueString * name = stringtable_.lookup("_cmple");
+                const DUniqueString * name
+                    = stringtable_.lookup(NumericPrimitives::c_cmple_pm_name);
                 assert(name);
                 this->cmple_binding_ = global_symtab_->lookup_binding(name);
             }
 
             {
-                const DUniqueString * name = stringtable_.lookup("_cmpgt");
+                const DUniqueString * name
+                    = stringtable_.lookup(NumericPrimitives::c_cmpgt_pm_name);
                 assert(name);
                 this->cmpgt_binding_ = global_symtab_->lookup_binding(name);
             }
 
             {
-                const DUniqueString * name = stringtable_.lookup("_cmpge");
+                const DUniqueString * name
+                    = stringtable_.lookup(NumericPrimitives::c_gmpge_pm_name);
                 assert(name);
                 this->cmpge_binding_ = global_symtab_->lookup_binding(name);
             }
