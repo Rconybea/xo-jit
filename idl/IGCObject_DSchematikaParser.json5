@@ -1,0 +1,18 @@
+{
+    mode: "implementation",
+    output_cpp_dir: "src/reader2/facet",
+    output_hpp_dir: "include/xo/reader2",
+    output_impl_subdir: "parser",
+    includes: [
+        "<xo/alloc2/GCObject.hpp>",
+        "<xo/alloc2/Allocator.hpp>"
+    ],
+    local_types: [ ],
+    namespace1: "xo",
+    namespace2: "scm",
+    facet_idl: "idl/GCObject.json5",
+    brief: "provide AGCObject interface for SchematikaParser",
+    using_doxygen: true,
+    repr: "DSchematikaParser",
+    doc: [ "implement AGCObject for DSchematikaParser" ],
+}
