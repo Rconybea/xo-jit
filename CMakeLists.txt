@@ -24,6 +24,17 @@ add_definitions(${PROJECT_CXX_FLAGS})
 
 add_subdirectory(utest)
 
+# ----------------------------------------------------------------
+
+# note: manual target; generated code committed to git
+xo_add_genfacetimpl(
+    TARGET xo-reader2-facetimpl-gcobject-schematikaparser
+    FACET_PKG xo_alloc2
+    INPUT idl/IGCObject_DSchematikaParser.json5
+)
+
+# ----------------------------------------------------------------
+
 # note: manual target; generated code committed to git
 xo_add_genfacet(
     TARGET xo-reader2-facet-syntaxstatemachine
