@@ -22,12 +22,14 @@ namespace xo {
         public:
             using StringTable = xo::scm::StringTable;
             using AAllocator = xo::mm::AAllocator;
+            using ACollector = xo::mm::ACollector;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
 
         public:
             DVsmRcx(VirtualSchematikaMachine * vsm);
 
             obj<AAllocator> allocator() const noexcept;
+            obj<ACollector> collector() const noexcept;
             StringTable * stringtable() const noexcept;
             obj<AAllocator> error_allocator() const noexcept;
             void visit_pools(const MemorySizeVisitor & visitor) const;

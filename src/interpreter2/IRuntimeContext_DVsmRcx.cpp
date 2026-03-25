@@ -22,6 +22,12 @@ namespace xo {
         }
 
         auto
+        IRuntimeContext_DVsmRcx::collector(const DVsmRcx & self) noexcept -> obj<ACollector>
+        {
+            return self.collector();
+        }
+
+        auto
         IRuntimeContext_DVsmRcx::stringtable(const DVsmRcx & self) noexcept -> StringTable *
         {
             return self.stringtable();
