@@ -31,6 +31,12 @@ namespace xo {
                 return retval;
             }
 
+            VsmConfig with_x1_debug_flag(bool x) const {
+                VsmConfig retval = *this;
+                retval.x1_config_.debug_flag_ = x;
+                return retval;
+            }
+
             /** true for interactive parser session; false for batch session **/
             bool interactive_flag_ = true;
 

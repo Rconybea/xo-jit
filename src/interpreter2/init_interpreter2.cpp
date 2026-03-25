@@ -7,6 +7,7 @@
 #include "SetupInterpreter2.hpp"
 
 #include <xo/reader2/init_reader2.hpp>
+#include <xo/gc/init_gc.hpp>
 #include <xo/alloc2/CollectorTypeRegistry.hpp>
 
 namespace xo {
@@ -31,6 +32,7 @@ namespace xo {
 
         /* direct subsystem deps for xo-interpreter2/ */
         retval ^= InitSubsys<S_reader2_tag>::require();
+        retval ^= InitSubsys<S_gc_tag>::require();
 
         /* xo-interpreter2/'s own initialization code */
         retval ^= Subsystem::provide<S_interpreter2_tag>("interpreter2", &init);

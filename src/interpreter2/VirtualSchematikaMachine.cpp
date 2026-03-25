@@ -86,6 +86,8 @@ namespace xo {
             }
 
             this->global_env_ = reader_.global_env();
+
+            //this->_add_gc_roots();
         }
 
         obj<AAllocator>
