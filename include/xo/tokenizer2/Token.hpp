@@ -133,6 +133,8 @@ namespace xo {
 
             /** token for @c "==" **/
             static Token cmpeq_token() { return Token(tokentype::tk_cmpeq); }
+            /** token for @c "!=" **/
+            static Token cmpne_token() { return Token(tokentype::tk_cmpne); }
 
             /** token representing keyword @c nil **/
             static Token nil_token() { return Token(tokentype::tk_nil); }
