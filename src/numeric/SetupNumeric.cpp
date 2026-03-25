@@ -103,42 +103,52 @@ namespace xo {
 
             bool ok = true;
 
+            /* "_mul" */
             ok = ok & (PrimitiveRegistry::install_aux
                        (sink,
                         NumericPrimitives::make_multiply_pm(mm, stbl),
                         flags & InstallFlags::f_essential));
+            /* "_div" */
             ok = ok & (PrimitiveRegistry::install_aux
                        (sink,
                         NumericPrimitives::make_divide_pm(mm, stbl),
                         flags & InstallFlags::f_essential));
+            /* "_add" */
             ok = ok & (PrimitiveRegistry::install_aux
                        (sink,
                         NumericPrimitives::make_add_pm(mm, stbl),
                         flags & InstallFlags::f_essential));
+            /* "_sub" */
             ok = ok & (PrimitiveRegistry::install_aux
                        (sink,
                         NumericPrimitives::make_subtract_pm(mm, stbl),
                         flags & InstallFlags::f_essential));
+            /* "_cmpeq" */
             ok = ok & (PrimitiveRegistry::install_aux
                        (sink,
                         NumericPrimitives::make_cmpeq_pm(mm, stbl),
                         flags & InstallFlags::f_essential));
+            /* "_cmpne" */
             ok = ok & (PrimitiveRegistry::install_aux
                        (sink,
                         NumericPrimitives::make_cmpne_pm(mm, stbl),
                         flags & InstallFlags::f_essential));
+            /* "_cmplt" */
             ok = ok & (PrimitiveRegistry::install_aux
                        (sink,
                         NumericPrimitives::make_cmplt_pm(mm, stbl),
                         flags & InstallFlags::f_essential));
+            /* "_cmple" */
             ok = ok & (PrimitiveRegistry::install_aux
                        (sink,
                         NumericPrimitives::make_cmple_pm(mm, stbl),
                         flags & InstallFlags::f_essential));
+            /* "_cmpgt" */
             ok = ok & (PrimitiveRegistry::install_aux
                        (sink,
                         NumericPrimitives::make_cmpgt_pm(mm, stbl),
                         flags & InstallFlags::f_essential));
+            /* "_cmpge" */
             ok = ok & (PrimitiveRegistry::install_aux
                        (sink,
                         NumericPrimitives::make_cmpge_pm(mm, stbl),
