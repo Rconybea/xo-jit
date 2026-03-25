@@ -4,7 +4,9 @@
  **/
 
 #include "ParserResult.hpp"
+#include <xo/stringtable2/String.hpp>
 #include <xo/printable2/Printable.hpp>
+#include <xo/alloc2/GCObject.hpp>
 #include <xo/facet/FacetRegistry.hpp>
 
 namespace xo {
@@ -101,6 +103,15 @@ namespace xo {
             }
 
             return false;
+        }
+
+        void
+        ParserResult::forward_children(obj<ACollector> gc) noexcept
+        {
+            // {result_type_, error_src_fn_}: pod, ignore
+
+            gc.forward_pivot_inplace(&result_expr_);
+            gc.forward_inplace(const_cast<DString **>(&error_description_));
         }
     } /*namespace scm*/
 } /*namespace xo*/

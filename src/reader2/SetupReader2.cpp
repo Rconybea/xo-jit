@@ -47,6 +47,10 @@ namespace xo {
         {
             scope log(XO_DEBUG(true));
 
+            // SchematikParser 
+
+            FacetRegistry::register_impl<AGCObject, DSchematikaParser>();
+
             // GlobalEnv
 
             FacetRegistry::register_impl<AGCObject, DGlobalEnv>();
@@ -114,10 +118,10 @@ namespace xo {
             FacetRegistry::register_impl<ASyntaxStateMachine, DExpectQArraySsm>();
             FacetRegistry::register_impl<APrintable, DExpectQArraySsm>();
 
-            // misc types showing up in aux arena
-            TypeRegistry::register_type<SchematikaParser>();
             // misc types showing up in parser stack arena
             TypeRegistry::register_type<ParserStack>();
+
+            log && log(xtag("DSchematikaParser.tseq", typeseq::id<DSchematikaParser>()));
 
             log && log(xtag("DGlobalEnv.tseq", typeseq::id<DGlobalEnv>()));
             log && log(xtag("DToplevelSeqSsm.tseq", typeseq::id<DToplevelSeqSsm>()));

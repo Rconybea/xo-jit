@@ -19,17 +19,16 @@
 #include <xo/object2/Float.hpp>
 #include <xo/object2/Integer.hpp>
 #include <xo/stringtable2/String.hpp>
-#include <xo/alloc2/arena/IAllocator_DArena.hpp>
+#include <xo/gc/init_gc.hpp>
+#include <xo/gc/X1Collector.hpp>
+#include <xo/alloc2/CollectorTypeRegistry.hpp>
+#include <xo/alloc2/Arena.hpp>
 #include <xo/facet/TypeRegistry.hpp>
 #include <catch2/catch.hpp>
 
 namespace xo {
     using xo::scm::ParserConfig;
-    using xo::scm::SchematikaParser;
-//    using xo::scm::ASyntaxStateMachine;
-//    using xo::scm::syntaxstatetype;
-//    using xo::scm::DDefineSsm;
-//    using xo::scm::DExpectExprSsm;
+    using xo::scm::DSchematikaParser;
 
     using xo::scm::AExpression;
     using xo::scm::DDefineExpr;
@@ -38,9 +37,7 @@ namespace xo {
     using xo::scm::DVarRef;
     using xo::scm::DConstant;
 
-    //using xo::scm::ParserResult;
     using xo::scm::Token;
-    using xo::mm::AGCObject;
     using xo::scm::DPrimitive_gco_2_gco_gco;
     using xo::scm::DList;
     using xo::scm::DString;
@@ -51,67 +48,129 @@ namespace xo {
 
     using xo::mm::ArenaConfig;
     using xo::mm::AAllocator;
+    using xo::mm::ACollector;
+    using xo::mm::AGCObject;
     using xo::mm::DArena;
+    using xo::mm::DX1Collector;
+    using xo::mm::generation;
+    using xo::mm::X1CollectorConfig;
+    using xo::mm::CollectorTypeRegistry;
     using xo::mm::MemorySizeInfo;
-//    using xo::facet::with_facet;
 
-    static InitEvidence s_init = (InitSubsys<S_reader2_tag>::require());
+    static InitEvidence s_init = (InitSubsys<S_reader2_tag>::require()
+                                  ^ InitSubsys<S_gc_tag>::require());
 
     namespace ut {
         struct ParserFixture {
-            ParserFixture(const std::string & testname, bool debug_flag)
+            ParserFixture(const std::string & testname,
+                          bool gc_flag,
+                          bool debug_flag)
             {
                 this->aux_arena_
                     = std::move(DArena(ArenaConfig()
                                        .with_name(testname)
-                                       .with_size(4 * 1024)
+                                       .with_size(64 * 1024)
                                        .with_store_header_flag(true)));
                 obj<AAllocator,DArena> aux_mm(&aux_arena_);
 
-                this->expr_arena_
-                    = dp<DArena>::make(aux_mm,
-                                       (ArenaConfig()
-                                        .with_name("expr")
-                                        .with_size(16 * 1024)
-                                        .with_store_header_flag(true)));
-                obj<AAllocator,DArena> expr_mm(expr_arena_.data());
+                if (gc_flag) {
+                    X1CollectorConfig x1_config
+                        = (X1CollectorConfig()
+                           .with_name("gc")
+                           .with_size(32 * 1024)
+                           .with_debug_flag(true)
+                           .with_sanitize_flag(true));
+
+                    dp<DX1Collector> expr_x1_dp
+                        = dp<DX1Collector>::make(aux_mm, x1_config);
+
+                    this->expr_mm_
+                        = obj<AAllocator,DX1Collector>(expr_x1_dp.release());
+
+                    obj<ACollector> gc = expr_mm_.to_facet<ACollector>();
+
+                    CollectorTypeRegistry::instance().install_types(gc);
+                } else {
+                    ArenaConfig arena_config
+                        = (ArenaConfig().with_name("expr")
+                                    .with_size(16 * 1024)
+                                    .with_store_header_flag(true));
+
+                    dp<DArena> expr_arena_dp
+                        = dp<DArena>::make(aux_mm, arena_config);
+
+                    this->expr_mm_
+                        = obj<AAllocator,DArena>(expr_arena_dp.release());
+
+                }
 
                 ParserConfig cfg;
-                cfg.parser_arena_config_.size_ = 16 * 1024;
-                /* editor bait: symbol table */
-                cfg.symtab_var_config_.hint_max_capacity_ = 128;
-                cfg.symtab_types_config_.hint_max_capacity_ = 64;
-                cfg.max_stringtable_capacity_ = 512;
-                cfg.debug_flag_ = false;
+                {
+                    cfg.parser_arena_config_.size_ = 16 * 1024;
+                    /* editor bait: symbol table */
+                    cfg.symtab_var_config_.hint_max_capacity_ = 128;
+                    cfg.symtab_types_config_.hint_max_capacity_ = 64;
+                    cfg.max_stringtable_capacity_ = 512;
+                    cfg.debug_flag_ = false;
+                }
 
                 this->parser_
-                    = dp<SchematikaParser>::make(aux_mm, cfg, expr_mm, aux_mm);
+                    = DSchematikaParser::make(aux_mm, cfg, expr_mm_, aux_mm);
+                this->parser_gco_ = parser_;
+
+                if (gc_flag) {
+                    obj<ACollector> gc = expr_mm_.to_facet<ACollector>();
+
+                    if (gc) {
+                        gc.add_gc_root_poly(&parser_gco_);
+                    }
+
+                    // Also add parser itself as a global.
+                    // SchematikaParser is a snowflake GCObject:
+                    // it only supports the AGCObject forward_children() method
+                    //
+                }
+
+                this->gc_flag_ = gc_flag;
+                this->debug_flag_ = debug_flag;
             }
 
             ParserFixture(const ParserFixture & other) = delete;
             ParserFixture(const ParserFixture && other) = delete;
 
+            ~ParserFixture() {
+                // destroy allocator
+                expr_mm_._drop();
+                // destroy parser (reminder: was allocated from aux_arena_)
+                parser_._drop();
+            }
+
             bool log_memory_layout(scope * p_log) {
                 using xo::facet::TypeRegistry;
                 using xo::mm::MemorySizeDetail;
 
-                auto visitor = [p_log](const MemorySizeInfo & info) {
+                auto visitor = [this, p_log](const MemorySizeInfo & info) {
                     *p_log && (*p_log)(xtag("name",   info.resource_name_),
                                        xtag("used",   info.used_),
                                        xtag("alloc",  info.allocated_),
                                        xtag("commit", info.committed_),
                                        xtag("resv",   info.reserved_));
-                    if (*p_log && info.detail_) {
+
+                    if (*p_log && debug_mm_detail_ && info.detail_) {
                         (*p_log)("detail",
                                  xtag("n", (*info.detail_)[0].n_alloc_),
                                  xtag("z", (*info.detail_)[0].z_alloc_));
+
                         for (size_t i = 1; i < info.detail_->size(); ++i) {
                             const MemorySizeDetail & d = (*info.detail_)[i];
 
                             if (d.tseq_.is_sentinel())
                                 break;
 
-                            (*p_log)("[",i,"]",
+                            char buf[40];
+                            snprintf(buf, sizeof(buf), "[%lu]", i);
+
+                            (*p_log)(buf,
                                      xtag("tseq",d.tseq_),
                                      xtag("type", TypeRegistry::id2name(d.tseq_)),
                                      xtag("n", d.n_alloc_),
@@ -123,47 +182,68 @@ namespace xo {
                 aux_arena_.visit_pools(visitor);
                 FacetRegistry::instance().visit_pools(visitor);
                 TypeRegistry::instance().visit_pools(visitor);
-                expr_arena_->visit_pools(visitor);
+                expr_mm_.visit_pools(visitor);
                 parser_->visit_pools(visitor);
 
                 return true;
             }
 
             DArena aux_arena_;
-            dp<DArena> expr_arena_;
-            dp<SchematikaParser> parser_;
+            /** allocator for parsed schematika expressions **/
+            obj<AAllocator> expr_mm_;
+            obj<AGCObject,DSchematikaParser> parser_;
+            /** parser_ as variant gco, to sastify Collector.add_gc_root_poly() **/
+            obj<AGCObject> parser_gco_;
+            bool gc_flag_ = false;
+            bool debug_flag_ = false;
+            bool debug_mm_detail_ = false;
         };
 
         void
-        utest_tokenizer_loop(SchematikaParser * parser, std::vector<Token> & tk_v, bool debug_flag)
+        utest_tokenizer_loop(ParserFixture * fixture,
+                             std::vector<Token> & tk_v,
+                             bool debug_flag)
         {
             scope log(XO_DEBUG(debug_flag));
 
+            obj<ACollector> expr_gc
+                = fixture->expr_mm_.try_to_facet<ACollector>();
+
             size_t i_tk = 0;
             size_t n_tk = tk_v.size();
+
             for (const auto & tk : tk_v) {
-                INFO(tostr(xtag("i_tk", i_tk), xtag("tk", tk)));
+                INFO(tostr(xtag("i_tk", i_tk),
+                           xtag("tk", tk)));
 
-                auto & result = parser->on_token(tk);
+                auto & result = fixture->parser_->on_token(tk);
 
-                log && log("after token", xtag("i_tk", i_tk), xtag("tk", tk));
-                log && log(xtag("parser", parser));
+                log && log("after token",
+                           xtag("i_tk", i_tk), xtag("tk", tk));
+                log && log(xtag("parser", fixture->parser_.data()));
                 log && log(xtag("result", result));
 
                 if (i_tk + 1 < n_tk) {
-                    REQUIRE(parser->has_incomplete_expr() == true);
+                    REQUIRE(fixture->parser_->has_incomplete_expr() == true);
                     REQUIRE(!result.is_error());
                     REQUIRE(result.is_incomplete());
                 } else {
                     /* last token in tk_v[] */
 
-                    REQUIRE(parser->has_incomplete_expr() == false);
+                    REQUIRE(fixture->parser_->has_incomplete_expr() == false);
                     REQUIRE(!result.is_error());
                     REQUIRE(result.is_expression());
                     REQUIRE(result.result_expr());
                 }
 
                 ++i_tk;
+
+                // for this test: invoke full collection after each token
+                if (fixture->gc_flag_) {
+                    REQUIRE(expr_gc);
+
+                    expr_gc.request_gc(generation(2));
+                }
             }
         }
 
@@ -174,11 +254,11 @@ namespace xo {
             constexpr bool c_debug_flag = true;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            REQUIRE(parser.debug_flag() == false);
-            REQUIRE(parser.is_at_toplevel() == true);
+            REQUIRE(parser->debug_flag() == false);
+            REQUIRE(parser->is_at_toplevel() == true);
 
             // baseline:
             //   SchematikaParser-ctor :used 1408
@@ -205,14 +285,14 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             // after begin_interactive_session, parser has toplevel exprseq
             // but is still "at toplevel" in the sense of ready for input
-            REQUIRE(parser.has_incomplete_expr() == false);
+            REQUIRE(parser->has_incomplete_expr() == false);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -224,94 +304,138 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_batch_session();
+            parser->begin_batch_session();
 
             // after begin_translation_unit, parser has toplevel exprseq
             // but is still "at toplevel" in the sense of ready for input
-            REQUIRE(parser.has_incomplete_expr() == false);
+            REQUIRE(parser->has_incomplete_expr() == false);
 
             log && fixture.log_memory_layout(&log);
+        }
+
+        namespace {
+            void
+            test_batch_def(ParserFixture * fixture)
+            {
+                scope log(XO_DEBUG(fixture->debug_flag_));
+
+                auto parser = fixture->parser_;
+
+                parser->begin_batch_session();
+
+                /**  Walkthrough parsing input equivalent to:
+                 *
+                 *     def foo : f64 = 3.141593 ;
+                 *
+                 **/
+
+                std::vector<Token> tk_v{
+                    Token::def_token(),
+                    Token::symbol_token("foo"),
+                    Token::colon_token(),
+                    Token::symbol_token("f64"),
+                    Token::singleassign_token(),
+                    Token::f64_token("3.141593"),
+                    Token::semicolon_token(),
+                };
+
+                utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
+
+                const auto & result = parser->result();
+                {
+                    auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
+                    REQUIRE(expr);
+                }
+
+                log && fixture->log_memory_layout(&log);
+            }
+
+            void
+            test_driver(const std::string & testname,
+                        std::function<void (ParserFixture *)> test_subject,
+                        std::array<bool, 2> debug_flag_v)
+            {
+                scope log(XO_DEBUG(debug_flag_v[0] || debug_flag_v[1]),
+                      xtag("test", testname));
+
+                /* phase=0 arena, no gc
+                 * phase=1 x1 collector
+                 */
+                for (int phase = 0; phase < 2; ++phase)
+                    {
+                        log && log(xtag("phase", phase));
+
+                        ParserFixture fixture(testname, phase == 1 /*gc*/, debug_flag_v[phase]);
+
+                        test_subject(&fixture);
+                    }
+
+            }
         }
 
         TEST_CASE("SchematikaParser-batch-def", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, true}};
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            test_driver(testname,
+                        &test_batch_def,
+                        c_debug_flag_v);
+        }
 
-            parser.begin_batch_session();
-
-            /**  Walkthrough parsing input equivalent to:
-             *
-             *     def foo : f64 = 3.141593 ;
-             *
-             **/
-
-            std::vector<Token> tk_v{
-                Token::def_token(),
-                Token::symbol_token("foo"),
-                Token::colon_token(),
-                Token::symbol_token("f64"),
-                Token::singleassign_token(),
-                Token::f64_token("3.141593"),
-                Token::semicolon_token(),
-            };
-
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
-
-            const auto & result = parser.result();
+        namespace {
+            void
+            test_batch_deftype(ParserFixture * fixture)
             {
-                auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
-                REQUIRE(expr);
-            }
+                scope log(XO_DEBUG(fixture->debug_flag_));
 
-            log && fixture.log_memory_layout(&log);
+                auto parser = fixture->parser_;
+
+                parser->begin_batch_session();
+
+                /**  Walkthrough parsing input equivalent to:
+                 *
+                 *     deftype foo :: f64;
+                 **/
+
+                std::vector<Token> tk_v{
+                    Token::deftype_token(),
+                    Token::symbol_token("foo"),
+                    Token::doublecolon_token(),
+                    Token::symbol_token("f64"),
+                    Token::semicolon_token(),
+                };
+
+                utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
+
+                const auto & result = parser->result();
+                {
+                    // placeholder for form's sake.
+                    // deftype doesn't actuallly produce any executable content
+
+                    auto expr = obj<AExpression,DConstant>::from(result.result_expr());
+                    REQUIRE(expr);
+                }
+
+                log && fixture->log_memory_layout(&log);
+            }
         }
 
         TEST_CASE("SchematikaParser-batch-deftype", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, true}};
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
-
-            parser.begin_batch_session();
-
-            /**  Walkthrough parsing input equivalent to:
-             *
-             *     deftype foo :: f64;
-             **/
-
-            std::vector<Token> tk_v{
-                Token::deftype_token(),
-                Token::symbol_token("foo"),
-                Token::doublecolon_token(),
-                Token::symbol_token("f64"),
-                Token::semicolon_token(),
-            };
-
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
-
-            const auto & result = parser.result();
-            {
-                // placeholder for form's sake.
-                // deftype doesn't actuallly produce any executable content
-
-                auto expr = obj<AExpression,DConstant>::from(result.result_expr());
-                REQUIRE(expr);
-            }
-
-            log && fixture.log_memory_layout(&log);
+            test_driver(testname,
+                        &test_batch_deftype,
+                        c_debug_flag_v);
         }
 
         TEST_CASE("SchematikaParser-batch-deftype-2", "[reader2][SchematikaParser]")
@@ -321,10 +445,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_batch_session();
+            parser->begin_batch_session();
 
             /**  Walkthrough parsing input equivalent to:
              *
@@ -342,9 +466,9 @@ namespace xo {
                 Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
-            const auto & result = parser.result();
+            const auto & result = parser->result();
             {
                 // placeholder for form's sake.
                 // deftype doesn't actuallly produce any executable content
@@ -363,10 +487,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             {
                 /**  Walkthrough parsing input equivalent to:
@@ -385,15 +509,15 @@ namespace xo {
                     Token::semicolon_token(),
                 };
 
-                utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+                utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
-                const auto & result = parser.result();
+                const auto & result = parser->result();
                 {
                     auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
                     REQUIRE(expr);
                 }
 
-                parser.reset_result();
+                parser->reset_result();
             }
 
             {
@@ -410,9 +534,9 @@ namespace xo {
                     Token::semicolon_token(),
                 };
 
-                utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+                utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
-                const auto & result = parser.result();
+                const auto & result = parser->result();
                 {
                     auto expr = obj<AExpression,DVarRef>::from(result.result_expr());
                     REQUIRE(expr);
@@ -429,10 +553,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -441,25 +565,25 @@ namespace xo {
              **/
 
             {
-                auto & result = parser.on_token(Token::i64_token("1011"));
+                auto & result = parser->on_token(Token::i64_token("1011"));
 
                 log && log("after integer token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
-                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(parser->has_incomplete_expr() == true);
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_incomplete());
             }
 
             {
-                auto & result = parser.on_token(Token::semicolon_token());
+                auto & result = parser->on_token(Token::semicolon_token());
 
                 log && log("after semicolon token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
-                REQUIRE(parser.has_incomplete_expr() == false);
+                REQUIRE(parser->has_incomplete_expr() == false);
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_expression());
                 REQUIRE(result.result_expr());
@@ -490,10 +614,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -502,25 +626,25 @@ namespace xo {
              **/
 
             {
-                auto & result = parser.on_token(Token::f64_token("3.14159265"));
+                auto & result = parser->on_token(Token::f64_token("3.14159265"));
 
                 log && log("after float token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
-                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(parser->has_incomplete_expr() == true);
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_incomplete());
             }
 
             {
-                auto & result = parser.on_token(Token::semicolon_token());
+                auto & result = parser->on_token(Token::semicolon_token());
 
                 log && log("after semicolon token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
-                REQUIRE(parser.has_incomplete_expr() == false);
+                REQUIRE(parser->has_incomplete_expr() == false);
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_expression());
                 REQUIRE(result.result_expr());
@@ -551,10 +675,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -563,25 +687,25 @@ namespace xo {
              **/
 
             {
-                auto & result = parser.on_token(Token::string_token("hello world"));
+                auto & result = parser->on_token(Token::string_token("hello world"));
 
                 log && log("after string token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
-                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(parser->has_incomplete_expr() == true);
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_incomplete());
             }
 
             {
-                auto & result = parser.on_token(Token::semicolon_token());
+                auto & result = parser->on_token(Token::semicolon_token());
 
                 log && log("after semicolon token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
-                REQUIRE(parser.has_incomplete_expr() == false);
+                REQUIRE(parser->has_incomplete_expr() == false);
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_expression());
                 REQUIRE(result.result_expr());
@@ -612,10 +736,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -624,25 +748,25 @@ namespace xo {
              **/
 
             {
-                auto & result = parser.on_token(Token::nil_token());
+                auto & result = parser->on_token(Token::nil_token());
 
                 log && log("after nil token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
-                REQUIRE(parser.has_incomplete_expr() == true);
+                REQUIRE(parser->has_incomplete_expr() == true);
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_incomplete());
             }
 
             {
-                auto & result = parser.on_token(Token::semicolon_token());
+                auto & result = parser->on_token(Token::semicolon_token());
 
                 log && log("after semicolon token:");
                 log && log(xtag("parser", &parser));
                 log && log(xtag("result", result));
 
-                REQUIRE(parser.has_incomplete_expr() == false);
+                REQUIRE(parser->has_incomplete_expr() == false);
                 REQUIRE(!result.is_error());
                 REQUIRE(result.is_expression());
                 REQUIRE(result.result_expr());
@@ -673,10 +797,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -691,9 +815,9 @@ namespace xo {
                 Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
-            const auto & result = parser.result();
+            const auto & result = parser->result();
             {
                 auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
                 REQUIRE(expr);
@@ -732,10 +856,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -752,9 +876,9 @@ namespace xo {
 
             INFO(testname);
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
-            const auto & result = parser.result();
+            const auto & result = parser->result();
             {
                 auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
                 REQUIRE(expr);
@@ -793,10 +917,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -815,9 +939,9 @@ namespace xo {
 
             INFO(testname);
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
-            const auto & result = parser.result();
+            const auto & result = parser->result();
             {
                 auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
                 REQUIRE(expr);
@@ -863,10 +987,10 @@ namespace xo {
             constexpr bool c_debug_flag = true;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -885,9 +1009,9 @@ namespace xo {
 
             INFO(testname);
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
-            const auto & result = parser.result();
+            const auto & result = parser->result();
             {
                 auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
                 REQUIRE(expr);
@@ -933,10 +1057,10 @@ namespace xo {
             constexpr bool c_debug_flag = true;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -958,7 +1082,7 @@ namespace xo {
 
             utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
 
-            const auto & result = parser.result();
+            const auto & result = parser->result();
             {
                 auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
                 REQUIRE(expr);
@@ -998,7 +1122,8 @@ namespace xo {
         }
 #endif
 
-        TEST_CASE("SchematikaParser-interactive-cmp", "[reader2][SchematikaParser]")
+#ifdef NOT_YET
+        TEST_CASE("SchematikaParser-interactive-cmpne", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
@@ -1006,10 +1131,72 @@ namespace xo {
             scope log(XO_DEBUG(c_debug_flag),
                       xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
+
+            /** Walkthrough parsing input equivalent to:
+             *
+             *    312 != 312 ;
+             *    ^   ^  ^   ^
+             *    0   1  2   3
+             **/
+
+            std::vector<Token> tk_v{
+                /* [0] */ Token::i64_token("312"),
+                /* [1] */ Token::cmpne_token(),
+                /* [2] */ Token::i64_token("312"),
+                /* [3] */ Token::semicolon_token(),
+            };
+
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+
+            const auto & result = parser->result();
+            {
+                auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
+                REQUIRE(expr);
+
+                REQUIRE(expr->n_args() == 2);
+
+                auto fn = obj<AExpression,DConstant>::from(expr->fn());
+                REQUIRE(fn);
+
+                auto pm = obj<AGCObject,DPrimitive_gco_2_gco_gco>::from(fn->value());
+                REQUIRE(pm);
+                REQUIRE(pm->name() == "_cmpne");
+
+                auto lhs = obj<AExpression,DConstant>::from(expr->arg(0));
+                REQUIRE(lhs);
+
+                auto lhs_i64 = obj<AGCObject,DInteger>::from(lhs->value());
+                REQUIRE(lhs_i64);
+                REQUIRE(lhs_i64->value() == 312);
+
+                auto rhs = obj<AExpression,DConstant>::from(expr->arg(1));
+                REQUIRE(rhs);
+
+                auto rhs_i64 = obj<AGCObject,DInteger>::from(rhs->value());
+                REQUIRE(rhs_i64);
+                REQUIRE(rhs_i64->value() == 312);
+            }
+
+            log && fixture.log_memory_layout(&log);
+        }
+#endif
+
+        TEST_CASE("SchematikaParser-interactive-cmpeq", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            constexpr bool c_debug_flag = false;
+            scope log(XO_DEBUG(c_debug_flag),
+                      xtag("test", testname));
+
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
+
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1025,9 +1212,9 @@ namespace xo {
                 /* [3] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
-            const auto & result = parser.result();
+            const auto & result = parser->result();
             {
                 auto expr = obj<AExpression,DApplyExpr>::from(result.result_expr());
                 REQUIRE(expr);
@@ -1067,10 +1254,10 @@ namespace xo {
             scope log(XO_DEBUG(c_debug_flag),
                       xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             {
                 /** Walkthrough parsing input equivalent to:
@@ -1088,18 +1275,18 @@ namespace xo {
                     /* [4] */ Token::semicolon_token()
                 };
 
-                utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+                utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
             }
 
             {
-                const auto & result = parser.result();
+                const auto & result = parser->result();
 
                 auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
                 REQUIRE(expr);
             }
 
             {
-                parser.reset_result();
+                parser->reset_result();
 
                 /** Walkthrough parsing input equivalent to:
                  *
@@ -1125,10 +1312,10 @@ namespace xo {
                     /* [c] */ Token::semicolon_token()
                 };
 
-                utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+                utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
             }
 
-            const auto & result = parser.result();
+            const auto & result = parser->result();
             {
                 auto expr = obj<AExpression,DIfElseExpr>::from(result.result_expr());
                 REQUIRE(expr);
@@ -1144,10 +1331,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1175,7 +1362,7 @@ namespace xo {
                 /* [ e] */ Token::rightbrace_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1187,10 +1374,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1209,7 +1396,7 @@ namespace xo {
                 /* [6] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1221,10 +1408,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1250,7 +1437,7 @@ namespace xo {
                 /* [ c] */ Token::rightbrace_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1262,10 +1449,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1296,7 +1483,7 @@ namespace xo {
                 /* [ g] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1310,10 +1497,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1354,7 +1541,7 @@ namespace xo {
                 /* [ m] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1368,10 +1555,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1412,7 +1599,7 @@ namespace xo {
                 /* [ q] */     Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1426,10 +1613,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1447,7 +1634,7 @@ namespace xo {
                 /* [ 4] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1461,10 +1648,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1490,7 +1677,7 @@ namespace xo {
                 /* [ 9] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1504,10 +1691,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1528,7 +1715,7 @@ namespace xo {
                 /* [ 7] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1542,10 +1729,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1566,7 +1753,7 @@ namespace xo {
                 /* [ 7] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1580,10 +1767,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1604,7 +1791,7 @@ namespace xo {
                 /* [ 7] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1618,10 +1805,10 @@ namespace xo {
             constexpr bool c_debug_flag = true;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1642,7 +1829,7 @@ namespace xo {
                 /* [ 5] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }
@@ -1656,10 +1843,10 @@ namespace xo {
             constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
-            ParserFixture fixture(testname, c_debug_flag);
-            auto & parser = *(fixture.parser_);
+            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
+            auto parser = fixture.parser_;
 
-            parser.begin_interactive_session();
+            parser->begin_interactive_session();
 
             /** Walkthrough parsing input equivalent to:
              *
@@ -1694,7 +1881,7 @@ namespace xo {
                 /* [ g] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&parser, tk_v, c_debug_flag);
+            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
 
             log && fixture.log_memory_layout(&log);
         }

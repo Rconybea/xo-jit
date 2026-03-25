@@ -43,7 +43,7 @@ namespace xo {
                              DGlobalSymtab * global_symtab,
                              InstallFlags pm_install_flags)
             {
-                scope log(XO_DEBUG(true));
+                scope log(XO_DEBUG(false));
 
                 DGlobalEnv * env = DGlobalEnv::_make(mm,
                                                      global_symtab);
@@ -102,10 +102,9 @@ namespace xo {
                                            pm_install_flags)},
               debug_flag_{config.debug_flag_}
         {
-            obj<ACollector> gc = expr_alloc_.try_to_facet<ACollector>();
-            if (gc) {
-                gc.add_gc_root(&global_env_);
-            }
+            // see xo-numeric/ {SetupNumeric.cpp, NumericPrimitives.cpp}
+            // for setup of {_mul, _div, _sub, ...}
+            //
 
             {
                 const DUniqueString * name = stringtable_.lookup("_mul");
@@ -175,6 +174,8 @@ namespace xo {
             if (gc) {
                 scope log(XO_DEBUG(true), "remove_gc_root not implemented");
 
+                gc.remove_gc_root(&global_symtab_);
+                gc.remove_gc_root(&local_symtab_);
                 gc.remove_gc_root(&global_env_);
             }
         }
@@ -404,7 +405,7 @@ namespace xo {
             //
 
             if (local_symtab_) {
-                DLocalSymtab * symtab = local_symtab_;
+                DLocalSymtab * symtab = local_symtab_.data();
 
                 // count #of nested scopes to cross, to reach symbol
                 //
@@ -450,7 +451,7 @@ namespace xo {
         void
         ParserStateMachine::push_local_symtab(DLocalSymtab * symtab)
         {
-            this->local_symtab_ = symtab;
+            this->local_symtab_ = obj<AGCObject,DLocalSymtab>(symtab);
         }
 
         void
@@ -458,7 +459,7 @@ namespace xo {
         {
             assert(local_symtab_);
 
-            this->local_symtab_ = local_symtab_->parent();
+            this->local_symtab_ = obj<AGCObject,DLocalSymtab>(local_symtab_->parent());
         }
 
         void
@@ -877,6 +878,45 @@ namespace xo {
                                              std::string_view(errmsg_string));
 
             this->capture_error(ssm_name, errmsg);
+        }
+
+        // ----- gc support -----
+
+#ifdef OBSOLETE
+        std::size_t
+        ParserStateMachine::shallow_size() const noexcept
+        {
+            return sizeof(ParserStateMachine);
+        }
+
+        ParserStateMachine *
+        ParserStateMachine::shallow_copy(obj<AAllocator> mm) const noexcept
+        {
+            (void)mm;
+
+            assert(false);
+            return nullptr;
+        }
+#endif
+
+        void
+        ParserStateMachine::forward_children(obj<ACollector> gc) noexcept
+        {
+            static_assert(!stringtable_.is_gc_eligible());
+            static_assert(!parser_alloc_.is_gc_eligible());
+
+            if (stack_) {
+                stack_->forward_children(gc);
+            }
+
+            // static_assert(!expr_alloc_.is_gc_eligible());
+            // static_assert(!aux_alloc_.is_gc_eligible());
+
+            gc.forward_inplace(&global_symtab_);
+            gc.forward_inplace(&local_symtab_);
+            gc.forward_inplace(&global_env_);
+
+            result_.forward_children(gc);
         }
 
     } /*namespace scm*/

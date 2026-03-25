@@ -1,4 +1,4 @@
-/** @file SchematikaParser.cpp
+/** @file DSchematikaParser.cpp
  *
  *  @author Roland Conybeare, Jan 2026
  **/
@@ -12,7 +12,9 @@
 #include <stdexcept>
 
 namespace xo {
+    using xo::mm::ACollector;
     using xo::mm::AAllocator;
+    using xo::mm::AGCObject;
     using xo::mm::MemorySizeInfo;
     using xo::tostr;
     using xo::xtag;
@@ -20,9 +22,9 @@ namespace xo {
     namespace scm {
         // ----- SchematikaParser -----
 
-        SchematikaParser::SchematikaParser(const ParserConfig & cfg,
-                                           obj<AAllocator> expr_alloc,
-                                           obj<AAllocator> aux_alloc)
+        DSchematikaParser::DSchematikaParser(const ParserConfig & cfg,
+                                             obj<AAllocator> expr_alloc,
+                                             obj<AAllocator> aux_alloc)
         : psm_{
                 cfg.parser_arena_config_,
                 cfg.symtab_var_config_,
@@ -36,74 +38,94 @@ namespace xo {
         {
         }
 
+        DSchematikaParser *
+        DSchematikaParser::_make(obj<AAllocator> mm,
+                                 const ParserConfig & cfg,
+                                 obj<AAllocator> expr_alloc,
+                                 obj<AAllocator> aux_alloc)
+        {
+            void * mem = mm.alloc_for<DSchematikaParser>();
+
+            return new (mem) DSchematikaParser(cfg, expr_alloc, aux_alloc);
+        }
+
+        obj<AGCObject,DSchematikaParser>
+        DSchematikaParser::make(obj<AAllocator> mm,
+                                const ParserConfig & cfg,
+                                obj<AAllocator> expr_alloc,
+                                obj<AAllocator> aux_alloc)
+        {
+            return obj<AGCObject,DSchematikaParser>(_make(mm, cfg, expr_alloc, aux_alloc));
+        }
+
         DGlobalSymtab *
-        SchematikaParser::global_symtab() const noexcept
+        DSchematikaParser::global_symtab() const noexcept
         {
             return psm_.global_symtab();
         }
 
         DGlobalEnv *
-        SchematikaParser::global_env() const noexcept
+        DSchematikaParser::global_env() const noexcept
         {
             return psm_.global_env();
         }
 
         bool
-        SchematikaParser::is_at_toplevel() const
+        DSchematikaParser::is_at_toplevel() const
         {
             return psm_.is_at_toplevel();
         }
 
         bool
-        SchematikaParser::has_incomplete_expr() const
+        DSchematikaParser::has_incomplete_expr() const
         {
             return psm_.has_incomplete_expr();
         }
 
         obj<ASyntaxStateMachine>
-        SchematikaParser::top_ssm() const
+        DSchematikaParser::top_ssm() const
         {
             return psm_.top_ssm();
         }
 
         const ParserResult &
-        SchematikaParser::result() const
+        DSchematikaParser::result() const
         {
             return psm_.result();
         }
 
         void
-        SchematikaParser::visit_pools(const MemorySizeVisitor & visitor) const
+        DSchematikaParser::visit_pools(const MemorySizeVisitor & visitor) const
         {
             return psm_.visit_pools(visitor);
         }
 
         void
-        SchematikaParser::begin_interactive_session()
+        DSchematikaParser::begin_interactive_session()
         {
             DToplevelSeqSsm::establish_interactive(psm_.parser_alloc(), &psm_);
 
         }
 
         void
-        SchematikaParser::begin_batch_session()
+        DSchematikaParser::begin_batch_session()
         {
             DToplevelSeqSsm::establish_batch(psm_.parser_alloc(), &psm_);
         }
 
         const DUniqueString *
-        SchematikaParser::intern_string(std::string_view str)
+        DSchematikaParser::intern_string(std::string_view str)
         {
             return psm_.intern_string(str);
         }
 
         const ParserResult &
-        SchematikaParser::on_token(const token_type & tk)
+        DSchematikaParser::on_token(const token_type & tk)
         {
             scope log(XO_DEBUG(debug_flag_), xtag("tk", tk));
 
             if (psm_.stack() == nullptr) {
-                throw std::runtime_error(tostr("SchematikaParser::include_token",
+                throw std::runtime_error(tostr("DSchematikaParser::include_token",
                                                ": parser not expecting input"
                                                "(call parser.begin_translation_unit()..?)",
                                                xtag("token", tk)));
@@ -120,19 +142,19 @@ namespace xo {
         } /*include_token*/
 
         void
-        SchematikaParser::reset_result()
+        DSchematikaParser::reset_result()
         {
             psm_.reset_result();
         }
 
         void
-        SchematikaParser::reset_to_idle_toplevel()
+        DSchematikaParser::reset_to_idle_toplevel()
         {
             psm_.clear_error_reset();
         } /*reset_to_idle_toplevel*/
 
         void
-        SchematikaParser::print(std::ostream & os) const {
+        DSchematikaParser::print(std::ostream & os) const {
             os << "<SchematikaParser"
                << xtag("debug", debug_flag_)
                << xtag("has_stack", (psm_.stack() != nullptr))
@@ -140,7 +162,7 @@ namespace xo {
         }
 
         bool
-        SchematikaParser::pretty(const ppindentinfo & ppii) const {
+        DSchematikaParser::pretty(const ppindentinfo & ppii) const {
             auto * pps = ppii.pps();
 
             if (ppii.upto())
@@ -161,6 +183,30 @@ namespace xo {
                         refrtag("stack", psm_.stack())
                            );
         }
+
+        std::size_t
+        DSchematikaParser::shallow_size() const noexcept
+        {
+            return sizeof(DSchematikaParser);
+        }
+
+        DSchematikaParser *
+        DSchematikaParser::shallow_copy(obj<AAllocator> mm) const noexcept
+        {
+            (void)mm;
+
+            assert(false);
+            return nullptr;
+        }
+
+        std::size_t
+        DSchematikaParser::forward_children(obj<ACollector> gc) noexcept
+        {
+            psm_.forward_children(gc);
+
+            return this->shallow_size();
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

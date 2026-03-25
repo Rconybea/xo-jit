@@ -89,6 +89,18 @@ namespace xo {
             return false;
         }
 
+        void
+        ParserStack::forward_children(obj<ACollector> gc) noexcept
+        {
+
+            for (ParserStack * target = this; target; target = target->parent_) {
+                // ParserStack::ckp: skip, POD
+
+                if (target->ssm_)
+                    target->ssm_.forward_children(gc);
+            }
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

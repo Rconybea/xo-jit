@@ -110,7 +110,7 @@ namespace xo {
             /** parser converts a stream of tokens
              *  to a stream of expressions
              **/
-            SchematikaParser parser_;
+            DSchematikaParser parser_;
 
             /** current output from reader **/
             ReaderResult result_;

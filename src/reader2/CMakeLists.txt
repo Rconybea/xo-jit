@@ -8,7 +8,9 @@ set(SELF_SRCS
     SchematikaReader.cpp
     ReaderConfig.cpp
 
-    SchematikaParser.cpp
+    DSchematikaParser.cpp
+    facet/IGCObject_DSchematikaParser.cpp
+
     ParserStateMachine.cpp
     ParserStack.cpp
     ParserResult.cpp
