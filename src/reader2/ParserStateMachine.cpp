@@ -172,7 +172,7 @@ namespace xo {
 
             {
                 const DUniqueString * name
-                    = stringtable_.lookup(NumericPrimitives::c_gmpge_pm_name);
+                    = stringtable_.lookup(NumericPrimitives::c_cmpge_pm_name);
                 assert(name);
                 this->cmpge_binding_ = global_symtab_->lookup_binding(name);
             }
