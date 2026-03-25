@@ -85,9 +85,18 @@ namespace xo {
                 this->error_mm_.adopt(obj<AAllocator,DArena>(arena));
             }
 
-            this->global_env_ = reader_.global_env();
+            this->global_env_
+                = obj<AGCObject,DGlobalEnv>(reader_.global_env());
 
             //this->_add_gc_roots();
+        }
+
+        VirtualSchematikaMachine *
+        VirtualSchematikaMachine::_make(obj<AAllocator> mm,
+                                        const VsmConfig & config,
+                                        obj<AAllocator> aux_mm)
+        {
+            xxx;
         }
 
         obj<AAllocator>
@@ -308,7 +317,7 @@ namespace xo {
             auto def_expr
                 = obj<AExpression,DDefineExpr>::from(expr_);
 
-            if (local_env_ == nullptr) {
+            if (local_env_) {
                 // top-level define
 
                 // .stack_ --+
@@ -411,7 +420,7 @@ namespace xo {
 
             DClosure * closure = DClosure::make(mm_.to_op(),
                                                 lambda.data(),
-                                                local_env_);
+                                                local_env_.data());
 
             this->value_
                 = VsmResult(obj<AGCObject>(obj<AGCObject,DClosure>(closure)));
@@ -623,7 +632,7 @@ namespace xo {
                         DVsmApplyClosureFrame::make(mm_.to_op(),
                                                     stack_,
                                                     cont_,
-                                                    local_env_));
+                                                    local_env_.data()));
 
                 // push frame w/ saved vsm registers
                 this->stack_ = frame;
@@ -634,11 +643,11 @@ namespace xo {
 
             auto local_env
                 = DLocalEnv::_make(mm_.to_op(),
-                                   local_env_,
+                                   local_env_.data(),
                                    lambda->local_symtab(),
-                                   args_);
+                                   args_.data());
 
-            this->local_env_ = local_env;
+            this->local_env_ = obj<AGCObject,DLocalEnv>(local_env);
             this->expr_ = lambda->body_expr();
             this->pc_ = VsmInstr::c_eval;
             // cont_ already established
@@ -649,7 +658,7 @@ namespace xo {
         {
             auto fn = fn_.to_facet<AProcedure>();
 
-            this->value_ = VsmResult(fn.apply_nocheck(rcx_.to_op(), args_));
+            this->value_ = VsmResult(fn.apply_nocheck(rcx_.to_op(), args_.data()));
             this->pc_ = cont_;
             this->cont_ = VsmInstr::c_sentinel;
         }
@@ -727,7 +736,7 @@ namespace xo {
                         // corner case: function with 0 arguments
 
                         this->fn_ = apply_frame->fn(); // = value;
-                        this->args_ = apply_frame->args(); // empty
+                        this->args_ = obj<AGCObject,DArray>(apply_frame->args()); // empty
 
                         this->stack_ = apply_frame->parent();
                         this->pc_ = VsmInstr::c_apply;
@@ -765,7 +774,7 @@ namespace xo {
                     //
 
                     this->fn_ = apply_frame->fn();
-                    this->args_ = apply_frame->args();
+                    this->args_ = obj<AGCObject,DArray>(apply_frame->args());
 
                     this->stack_ = apply_frame->parent();
                     this->pc_ = VsmInstr::c_apply;
@@ -796,7 +805,7 @@ namespace xo {
             assert(frame);
 
             this->stack_ = frame->parent();
-            this->local_env_ = frame->local_env();
+            this->local_env_ = obj<AGCObject,DLocalEnv>(frame->local_env());
             this->pc_ = frame->cont();
             this->cont_ = VsmInstr::c_sentinel;
         }
@@ -880,6 +889,30 @@ namespace xo {
                 return;
             }
          }
+
+        std::size_t
+        VirtualSchematikaMachine::shallow_size() const noexcept
+        {
+            return sizeof(VirtualSchematikaMachine);
+        }
+
+        std::size_t
+        VirtualSchematikaMachine::forward_children(obj<ACollector> gc) noexcept
+        {
+            reader_.forward_children(gc);
+
+            gc.forward_inplace(&stack_);
+            gc.forward_pivot_inplace(&expr_);
+            gc.forward_inplace(&global_env_);
+            gc.forward_inplace(&local_env_);
+            gc.forward_inplace(&fn_);
+            gc.forward_inplace(&args_);
+            if (value_.is_value()) {
+                gc.forward_inplace(&value_.value_ref());
+            }
+
+            return this->shallow_size();
+        }
 
     } /*namespace scm*/
 } /*namespace xo*/

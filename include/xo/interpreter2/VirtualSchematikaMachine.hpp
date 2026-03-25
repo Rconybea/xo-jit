@@ -8,9 +8,10 @@
 #include "VsmConfig.hpp"
 #include "VsmInstr.hpp"
 #include "VsmFrame.hpp"
-#include "DLocalEnv.hpp"
-#include "DGlobalEnv.hpp"
+#include "LocalEnv.hpp"
+#include "GlobalEnv.hpp"
 #include <xo/object2/RuntimeError.hpp>
+#include <xo/object2/Array.hpp>
 #include <xo/reader2/SchematikaReader.hpp>
 #include <xo/expression2/Expression.hpp>
 #include <xo/alloc2/GCObject.hpp>
@@ -46,6 +47,7 @@ namespace xo {
             bool is_eval_error() const;
 
             const obj<AGCObject> * value() const { return std::get_if<obj<AGCObject>>(&result_); }
+            obj<AGCObject> & value_ref() { return std::get<obj<AGCObject>>(result_); }
 
             /** result of evaluating first expression encountered in input **/
             std::variant<obj<AGCObject>, TokenizerError> result_;
@@ -69,6 +71,7 @@ namespace xo {
         public:
             // will be DArenaVector<obj<StackFrame>> probably
             using Stack = void *;
+            using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
@@ -126,6 +129,18 @@ namespace xo {
              *  @retval instruction count. 1 unless pc_ is halt.
              **/
             bool execute_one();
+
+            /** @defgroup scm-virtualschematikamachine-gcobject-facet gcobject facet **/
+            ///@{
+
+            /** object size **/
+            std::size_t shallow_size() const noexcept;
+
+            /** forward gc-aware child pointers
+             **/
+            std::size_t forward_children(obj<ACollector> gc) noexcept;
+
+            ///@}
 
         private:
             /** Require:
@@ -281,18 +296,18 @@ namespace xo {
             /** environment pointer.  Maintains bindings
              *  for global variables.  Obtained from reader
              **/
-            DGlobalEnv * global_env_ = nullptr;
+            obj<AGCObject,DGlobalEnv> global_env_;
 
             /** environment pointer.  Provides bindings
              *  for surrounding lexical scope at this point
              *  in execution
              **/
-            DLocalEnv * local_env_ = nullptr;
+            obj<AGCObject,DLocalEnv> local_env_;
 
             /** evaluated function to call **/
             obj<AGCObject> fn_;
             /** evaluated argument list **/
-            DArray * args_;
+            obj<AGCObject,DArray> args_;
 
             /** result register **/
             VsmResult value_;
