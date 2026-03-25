@@ -70,6 +70,9 @@ namespace xo {
             /** polymorphic (in both arguments) compare (>) **/
             static DPrimitive_gco_2_gco_gco * make_cmpgt_pm(obj<AAllocator> mm,
                                                             StringTable * stbl);
+
+            /** name for greater-or-equal-comparison primitive.  Used for op>= **/
+            static constexpr const char * c_cmpge_pm_name = "_cmpge";
             /** polymorphic (in both arguments) compare (>=) **/
             static DPrimitive_gco_2_gco_gco * make_cmpge_pm(obj<AAllocator> mm,
                                                             StringTable * stbl);
