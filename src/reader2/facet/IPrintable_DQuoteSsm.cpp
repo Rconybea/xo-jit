@@ -11,7 +11,7 @@
  *       [idl/IPrintable_DQuoteSsm.json5]
 **/
 
-#include "ssm/IPrintable_DQuoteSsm.hpp"
+#include "quote/IPrintable_DQuoteSsm.hpp"
 
 namespace xo {
     namespace scm {

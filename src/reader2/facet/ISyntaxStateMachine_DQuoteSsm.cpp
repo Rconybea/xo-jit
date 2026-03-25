@@ -11,7 +11,7 @@
  *       [idl/ISyntaxStateMachine_DQuoteSsm.json5]
 **/
 
-#include "ssm/ISyntaxStateMachine_DQuoteSsm.hpp"
+#include "quote/ISyntaxStateMachine_DQuoteSsm.hpp"
 
 namespace xo {
     namespace scm {

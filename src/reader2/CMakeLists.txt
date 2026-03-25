@@ -99,8 +99,8 @@ set(SELF_SRCS
     IPrintable_DProgressSsm.cpp
 
     DQuoteSsm.cpp
-    ISyntaxStateMachine_DQuoteSsm.cpp
-    IPrintable_DQuoteSsm.cpp
+    facet/ISyntaxStateMachine_DQuoteSsm.cpp
+    facet/IPrintable_DQuoteSsm.cpp
 
     )
 
