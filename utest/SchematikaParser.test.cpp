@@ -1122,7 +1122,6 @@ namespace xo {
         }
 #endif
 
-#ifdef NOT_YET
         TEST_CASE("SchematikaParser-interactive-cmpne", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
@@ -1183,7 +1182,6 @@ namespace xo {
 
             log && fixture.log_memory_layout(&log);
         }
-#endif
 
         TEST_CASE("SchematikaParser-interactive-cmpeq", "[reader2][SchematikaParser]")
         {
