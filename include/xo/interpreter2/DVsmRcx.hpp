@@ -12,7 +12,7 @@
 namespace xo {
     namespace scm {
         // see xo-interpreter/ VirtualSchematikaMachine.hpp
-        class VirtualSchematikaMachine;
+        class DVirtualSchematikaMachine;
 
         /** @brief Runtime context for schematika interpreter
          *
@@ -26,7 +26,7 @@ namespace xo {
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
 
         public:
-            DVsmRcx(VirtualSchematikaMachine * vsm);
+            DVsmRcx(DVirtualSchematikaMachine * vsm);
 
             obj<AAllocator> allocator() const noexcept;
             obj<ACollector> collector() const noexcept;
@@ -36,7 +36,7 @@ namespace xo {
 
         private:
             /** schematika interpreter **/
-            VirtualSchematikaMachine * vsm_ = nullptr;;
+            DVirtualSchematikaMachine * vsm_ = nullptr;;
         };
     } /*namespace scm*/
 } /*namespace xo*/

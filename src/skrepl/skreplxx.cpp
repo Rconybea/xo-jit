@@ -14,7 +14,7 @@
 #endif
 
 namespace xo {
-    using xo::scm::VirtualSchematikaMachine;
+    using xo::scm::DVirtualSchematikaMachine;
     using xo::scm::VsmResultExt;
     using xo::mm::AAllocator;
     using xo::mm::ArenaConfig;
@@ -108,17 +108,17 @@ namespace xo {
         //using AAllocator = xo::mm::AAllocator;
         //using DX1Collector = xo::mm::DX1Collector;
         //using X1CollectorConfig = xo::mm::X1CollectorConfig;
+        using AGCObject = xo::mm::AGCObject;
         //using DArena = xo::mm::DArena;
         //using ArenaConfig = xo::mm::ArenaConfig;
         using VsmConfig = xo::scm::VsmConfig;
         using Replxx = replxx::Replxx;
-        using span_type = VirtualSchematikaMachine::span_type;
+        using span_type = DVirtualSchematikaMachine::span_type;
 
         App(const AppConfig & cfg = AppConfig())
         : repl_config_{cfg.repl_config_},
           app_arena_{cfg.app_arena_config_},
           vsm_config_{cfg.vsm_config_}
-          //vsm_{cfg.vsm_config_, obj<AAllocator,DArena>(&app_arena_)}
         {
             this->interactive_ = isatty(STDIN_FILENO);
 
@@ -136,6 +136,7 @@ namespace xo {
         void _start();
         void _repl();
         bool _read_eval_print(span_type * p_input, bool eof);
+        void _stop();
 
     private:
         InitEvidence init_evidence_ = 0;
@@ -151,7 +152,7 @@ namespace xo {
         DArena app_arena_;
         /** schematika virtual machine **/
         VsmConfig vsm_config_;
-        std::unique_ptr<VirtualSchematikaMachine> vsm_;
+        abox<AGCObject,DVirtualSchematikaMachine> vsm_;
     };
 
     void
@@ -173,8 +174,9 @@ namespace xo {
 
         Subsystem::initialize_all();
 
-        vsm_.reset(new VirtualSchematikaMachine(vsm_config_,
-                                                obj<AAllocator,DArena>(&app_arena_)));
+        vsm_.adopt(DVirtualSchematikaMachine::make(obj<AAllocator,DArena>(&app_arena_),
+                                                   vsm_config_,
+                                                   obj<AAllocator,DArena>(&app_arena_)));
     }
 
     void
@@ -229,6 +231,12 @@ namespace xo {
         *p_input = res.remaining_;
 
         return !res.is_tk_error() && !res.is_eval_error();
+    }
+
+    void
+    App::_stop()
+    {
+        vsm_._drop();
     }
 
 } /*namespace xo*/

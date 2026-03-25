@@ -13,7 +13,7 @@ namespace xo {
 
     namespace scm {
 
-        DVsmRcx::DVsmRcx(VirtualSchematikaMachine * vsm) : vsm_{vsm} {}
+        DVsmRcx::DVsmRcx(DVirtualSchematikaMachine * vsm) : vsm_{vsm} {}
 
         obj<AAllocator>
         DVsmRcx::allocator() const noexcept

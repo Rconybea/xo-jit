@@ -26,11 +26,19 @@ add_subdirectory(utest)
 
 # ----------------------------------------------------------------
 
+# only supporting forward_children(), for virtual root.
+xo_add_genfacetimpl(
+    TARGET xo-interpreter2-facetimpl-gcobject-virtualschematikamachine
+    FACET_PKG xo_alloc2
+    INPUT idl/IGCObject_DVirtualSchematikaMachine.json5
+)
+
+# ----------------------------------------------------------------
+
 # note: manual target; generated code committed to git
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-gcobject-vsmdefcontframe
     FACET_PKG xo_alloc2
-#    REPR VsmDefContFrame
     INPUT idl/IGCObject_DVsmDefContFrame.json5
 )
 
@@ -38,7 +46,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-printable-vsmdefcontframe
     FACET_PKG xo_printable2
-#    REPR VsmDefContFrame
     INPUT idl/IPrintable_DVsmDefContFrame.json5
 )
 

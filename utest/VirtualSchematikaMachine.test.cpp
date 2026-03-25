@@ -14,13 +14,14 @@
 #include <xo/object2/RuntimeError.hpp>
 #include <xo/stringtable2/UniqueString.hpp>
 #include <xo/alloc2/Arena.hpp>
+#include <xo/alloc2/abox.hpp>
 #include <xo/facet/TypeRegistry.hpp>
 #include <xo/indentlog/print/hex.hpp>
 
 #include <catch2/catch.hpp>
 
 namespace xo {
-    using xo::scm::VirtualSchematikaMachine;
+    using xo::scm::DVirtualSchematikaMachine;
     using xo::scm::VsmConfig;
     using xo::scm::VsmResultExt;
     using xo::scm::DClosure;
@@ -39,7 +40,7 @@ namespace xo {
     using xo::mm::ArenaConfig;
     using xo::facet::FacetRegistry;
     using xo::facet::TypeRegistry;
-    using span_type = xo::scm::VirtualSchematikaMachine::span_type;
+    using span_type = xo::scm::DVirtualSchematikaMachine::span_type;
     using Catch::Matchers::WithinAbs;
 
     using std::cout;
@@ -63,9 +64,14 @@ namespace xo {
             explicit VsmFixture(const std::string & testname,
                                 bool debug_flag,
                                 const VsmConfig & cfg = VsmConfig())
-            : aux_mm_{testname},
-              vsm_{cfg.with_debug_flag(debug_flag), aux_mm_.to_op()}
-            {}
+            : aux_mm_{testname}
+            {
+                vsm_.adopt(DVirtualSchematikaMachine::make(aux_mm_.to_op(),
+                                                           cfg.with_debug_flag(debug_flag),
+                                                           aux_mm_.to_op()));
+            }
+
+            ~VsmFixture() {}
 
             bool log_memory_layout(scope * p_log) {
                 auto visitor = [p_log](const MemorySizeInfo & info) {
@@ -79,13 +85,13 @@ namespace xo {
                 aux_mm_.arena_.visit_pools(visitor);
                 TypeRegistry::instance().visit_pools(visitor);
                 FacetRegistry::instance().visit_pools(visitor);
-                vsm_.visit_pools(visitor);
+                vsm_->visit_pools(visitor);
 
                 return true;
             }
 
             ArenaShim aux_mm_;
-            VirtualSchematikaMachine vsm_;
+            abox<AGCObject,DVirtualSchematikaMachine> vsm_;
         };
 
         TEST_CASE("VirtualSchematikaMachine-ctor", "[interpreter2][VSM]")
@@ -113,8 +119,8 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
-            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("3.141592635;"), eof_flag);
+            vsm->begin_interactive_session();
+            VsmResultExt res = vsm->read_eval_print(span_type::from_cstr("3.141592635;"), eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -143,8 +149,8 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
-            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("1011;"), eof_flag);
+            vsm->begin_interactive_session();
+            VsmResultExt res = vsm->read_eval_print(span_type::from_cstr("1011;"), eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -174,8 +180,8 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
-            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("3.14159265 * 0.5;"), eof_flag);
+            vsm->begin_interactive_session();
+            VsmResultExt res = vsm->read_eval_print(span_type::from_cstr("3.14159265 * 0.5;"), eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -205,8 +211,8 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
-            VsmResultExt res = vsm.read_eval_print(span_type::from_cstr("3.14159265 / 0.5;"), eof_flag);
+            vsm->begin_interactive_session();
+            VsmResultExt res = vsm->read_eval_print(span_type::from_cstr("3.14159265 / 0.5;"), eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -236,10 +242,10 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
             VsmResultExt res
-                = vsm.read_eval_print(span_type::from_cstr("123 == 123;"),
-                                      eof_flag);
+                = vsm->read_eval_print(span_type::from_cstr("123 == 123;"),
+                                       eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -269,10 +275,10 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
             VsmResultExt res
-                = vsm.read_eval_print(span_type::from_cstr("if 123 == 123 then \"equal\" else \"notequal\";"),
-                                      eof_flag);
+                = vsm->read_eval_print(span_type::from_cstr("if 123 == 123 then \"equal\" else \"notequal\";"),
+                                       eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -302,9 +308,9 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
             VsmResultExt res
-                = vsm.read_eval_print(span_type::from_cstr("lambda (x : i64) -> i64 { x * x; }"),
+                = vsm->read_eval_print(span_type::from_cstr("lambda (x : i64) -> i64 { x * x; }"),
                                       eof_flag);
 
             REQUIRE(res.is_value());
@@ -335,9 +341,9 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
             VsmResultExt res
-                = vsm.read_eval_print(span_type::from_cstr
+                = vsm->read_eval_print(span_type::from_cstr
                                           ("(lambda (x : i64, y : i64) { x * y; })(13, 15);"),
                                       eof_flag);
 
@@ -374,9 +380,9 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
             VsmResultExt res
-                = vsm.read_eval_print(span_type::from_cstr("def foo = 3.14159;"),
+                = vsm->read_eval_print(span_type::from_cstr("def foo = 3.14159;"),
                                       eof_flag);
 
             REQUIRE(res.is_value());
@@ -413,7 +419,7 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
 
             span_type input = span_type::from_cstr("def foo = 3.14159; foo;");
 
@@ -421,7 +427,7 @@ namespace xo {
                 log && log(xtag("input", input));
 
                 VsmResultExt res
-                    = vsm.read_eval_print(input, eof_flag);
+                    = vsm->read_eval_print(input, eof_flag);
 
                 REQUIRE(res.is_value());
                 REQUIRE(res.value());
@@ -464,7 +470,7 @@ namespace xo {
 
             bool eof_flag = true;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
 
             span_type input = span_type::from_cstr("def fact = lambda (n) { if (n == 0) then 1 else n * fact(n - 1) };");
 
@@ -472,7 +478,7 @@ namespace xo {
                 log && log(xtag("input", input));
 
                 VsmResultExt res
-                    = vsm.read_eval_print(input, eof_flag);
+                    = vsm->read_eval_print(input, eof_flag);
 
                 REQUIRE(res.is_value());
                 REQUIRE(res.value());
@@ -506,7 +512,7 @@ namespace xo {
 
             bool eof_flag = true;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
 
             span_type input = span_type::from_cstr("def n = 4; if (n == 4) then n * 3 else n * 5;");
 
@@ -514,7 +520,7 @@ namespace xo {
                 log && log(xtag("input", input));
 
                 VsmResultExt res
-                    = vsm.read_eval_print(input, eof_flag);
+                    = vsm->read_eval_print(input, eof_flag);
 
                 REQUIRE(res.is_value());
                 REQUIRE(res.value());
@@ -553,7 +559,7 @@ namespace xo {
 
             bool eof_flag = true;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
 
             span_type input = span_type::from_cstr("def fact = lambda (n) { if (n == 0) then 1 else n * fact(n - 1) }; fact(4);");
 
@@ -561,7 +567,7 @@ namespace xo {
                 log && log(xtag("input", input));
 
                 VsmResultExt res
-                    = vsm.read_eval_print(input, eof_flag);
+                    = vsm->read_eval_print(input, eof_flag);
 
                 REQUIRE(res.is_value());
                 REQUIRE(res.value());
@@ -601,14 +607,14 @@ namespace xo {
 
             bool eof_flag = false;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
 
             span_type input = span_type::from_cstr("#q{ 4.5 };");
 
             log && log(xtag("input", input));
 
             VsmResultExt res
-                = vsm.read_eval_print(input, eof_flag);
+                = vsm->read_eval_print(input, eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -639,14 +645,14 @@ namespace xo {
 
             bool eof_flag = true;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
 
             span_type input = span_type::from_cstr("#q{ (4.5 7.2) };");
 
             log && log(xtag("input", input));
 
             VsmResultExt res
-                = vsm.read_eval_print(input, eof_flag);
+                = vsm->read_eval_print(input, eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -683,14 +689,14 @@ namespace xo {
 
             bool eof_flag = true;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
 
             span_type input = span_type::from_cstr("#q{ [4.5 7.2] };");
 
             log && log(xtag("input", input));
 
             VsmResultExt res
-                = vsm.read_eval_print(input, eof_flag);
+                = vsm->read_eval_print(input, eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());
@@ -727,14 +733,14 @@ namespace xo {
 
             bool eof_flag = true;
 
-            vsm.begin_interactive_session();
+            vsm->begin_interactive_session();
 
             span_type input = span_type::from_cstr("report-memory-use();");
 
             log && log(xtag("input", input));
 
             VsmResultExt res
-                = vsm.read_eval_print(input, eof_flag);
+                = vsm->read_eval_print(input, eof_flag);
 
             REQUIRE(res.is_value());
             REQUIRE(res.value());

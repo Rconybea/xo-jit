@@ -70,7 +70,7 @@ namespace xo {
         // NOTE: using heap here for {DX1Collector, DArena, DVsmRcx} instances
         //       (though DX1Collector allocations will be from explictly mmap'd memory)
         //
-        VirtualSchematikaMachine::VirtualSchematikaMachine(const VsmConfig & config,
+        DVirtualSchematikaMachine::DVirtualSchematikaMachine(const VsmConfig & config,
                                                            obj<AAllocator> aux_mm)
         : config_{config},
           aux_mm_{aux_mm},
@@ -91,40 +91,51 @@ namespace xo {
             //this->_add_gc_roots();
         }
 
-        VirtualSchematikaMachine *
-        VirtualSchematikaMachine::_make(obj<AAllocator> mm,
+        DVirtualSchematikaMachine *
+        DVirtualSchematikaMachine::_make(obj<AAllocator> mm,
                                         const VsmConfig & config,
                                         obj<AAllocator> aux_mm)
         {
-            xxx;
+            void * mem = mm.alloc_for<DVirtualSchematikaMachine>();
+
+            return new (mem) DVirtualSchematikaMachine(config, aux_mm);
+        }
+
+        obj<AGCObject,DVirtualSchematikaMachine>
+        DVirtualSchematikaMachine::make(obj<AAllocator> mm,
+                                       const VsmConfig & config,
+                                       obj<AAllocator> aux_mm)
+        {
+            return obj<AGCObject,DVirtualSchematikaMachine>(
+                                                           _make(mm, config, aux_mm));
         }
 
         obj<AAllocator>
-        VirtualSchematikaMachine::allocator() const noexcept
+        DVirtualSchematikaMachine::allocator() const noexcept
         {
             return mm_.to_op();
         }
 
         obj<AAllocator>
-        VirtualSchematikaMachine::error_allocator() const noexcept
+        DVirtualSchematikaMachine::error_allocator() const noexcept
         {
             return error_mm_.to_op();
         }
 
         StringTable *
-        VirtualSchematikaMachine::stringtable() noexcept
+        DVirtualSchematikaMachine::stringtable() noexcept
         {
             return reader_.stringtable();
         }
 
         bool
-        VirtualSchematikaMachine::is_at_toplevel() const noexcept
+        DVirtualSchematikaMachine::is_at_toplevel() const noexcept
         {
             return reader_.is_at_toplevel();
         }
 
         void
-        VirtualSchematikaMachine::visit_pools(const MemorySizeVisitor & visitor) const
+        DVirtualSchematikaMachine::visit_pools(const MemorySizeVisitor & visitor) const
         {
             aux_mm_.visit_pools(visitor);
             mm_.visit_pools(visitor);
@@ -133,19 +144,19 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::begin_interactive_session()
+        DVirtualSchematikaMachine::begin_interactive_session()
         {
             reader_.begin_interactive_session();
         }
 
         void
-        VirtualSchematikaMachine::begin_batch_session()
+        DVirtualSchematikaMachine::begin_batch_session()
         {
             reader_.begin_batch_session();
         }
 
         VsmResultExt
-        VirtualSchematikaMachine::read_eval_print(span_type input, bool eof)
+        DVirtualSchematikaMachine::read_eval_print(span_type input, bool eof)
         {
             if (input.empty()) {
                 return VsmResultExt();
@@ -188,7 +199,7 @@ namespace xo {
         }
 
         VsmResult
-        VirtualSchematikaMachine::start_eval(obj<AExpression> expr)
+        DVirtualSchematikaMachine::start_eval(obj<AExpression> expr)
         {
             this->pc_ = VsmInstr::c_eval;
             this->expr_ = expr;
@@ -201,14 +212,14 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::run()
+        DVirtualSchematikaMachine::run()
         {
             while (this->execute_one())
                 ;
         }
 
         bool
-        VirtualSchematikaMachine::execute_one()
+        DVirtualSchematikaMachine::execute_one()
         {
             scope log(XO_DEBUG(config_.debug_flag_));
 
@@ -264,7 +275,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_eval_op()
+        DVirtualSchematikaMachine::_do_eval_op()
         {
             switch(expr_.extype()) {
             case exprtype::invalid:
@@ -298,7 +309,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_eval_constant_op()
+        DVirtualSchematikaMachine::_do_eval_constant_op()
         {
             auto expr
                 = obj<AExpression,DConstant>::from(expr_);
@@ -310,7 +321,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_eval_define_op()
+        DVirtualSchematikaMachine::_do_eval_define_op()
         {
             scope log(XO_DEBUG(true));
 
@@ -318,6 +329,11 @@ namespace xo {
                 = obj<AExpression,DDefineExpr>::from(expr_);
 
             if (local_env_) {
+                // nested defines implemented by rewriting,
+                // so this branch should be unreachable
+
+                assert(false);
+            } else {
                 // top-level define
 
                 // .stack_ --+
@@ -349,16 +365,11 @@ namespace xo {
                 this->expr_ = def_expr->rhs();
                 this->pc_ = VsmInstr::c_eval;
                 this->cont_ = VsmInstr::c_def_cont;
-            } else {
-                // nested defines implemented by rewriting,
-                // so this branch should be unreachable
-
-                assert(false);
             }
         }
 
         void
-        VirtualSchematikaMachine::_do_def_cont_op()
+        DVirtualSchematikaMachine::_do_def_cont_op()
         {
             // see DVsmDefContFrame
 
@@ -385,7 +396,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_eval_lambda_op()
+        DVirtualSchematikaMachine::_do_eval_lambda_op()
         {
             // assuming bump allocator
             //
@@ -430,14 +441,14 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_eval_variable_op()
+        DVirtualSchematikaMachine::_do_eval_variable_op()
         {
             // not implemented
             assert(false);
         }
 
         void
-        VirtualSchematikaMachine::_do_eval_varref_op()
+        DVirtualSchematikaMachine::_do_eval_varref_op()
         {
             auto var = obj<AExpression,DVarRef>::from(expr_);
 
@@ -477,7 +488,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_eval_apply_op()
+        DVirtualSchematikaMachine::_do_eval_apply_op()
         {
             // ApplyExpr in expr_ register
 
@@ -527,7 +538,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_eval_if_else_op()
+        DVirtualSchematikaMachine::_do_eval_if_else_op()
         {
             // control:
             //   self -> eval(test) -> ifelse_cont -> eval(when_true)
@@ -546,7 +557,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_eval_sequence_op()
+        DVirtualSchematikaMachine::_do_eval_sequence_op()
         {
             // stack:
             //
@@ -587,7 +598,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_apply_op()
+        DVirtualSchematikaMachine::_do_apply_op()
         {
             // rcx_  : runtime context
             // fn_   : function to call
@@ -607,7 +618,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_call_closure_op()
+        DVirtualSchematikaMachine::_do_call_closure_op()
         {
             // We need to preserve registers while evaluating
             // lambda body
@@ -654,7 +665,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_call_primitive_op()
+        DVirtualSchematikaMachine::_do_call_primitive_op()
         {
             auto fn = fn_.to_facet<AProcedure>();
 
@@ -664,7 +675,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_evalargs_op()
+        DVirtualSchematikaMachine::_do_evalargs_op()
         {
             scope log(XO_DEBUG(false));
 
@@ -796,7 +807,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_apply_cont_op()
+        DVirtualSchematikaMachine::_do_apply_cont_op()
         {
             // see DVsmApplyClosureFrame
 
@@ -811,7 +822,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_ifelse_cont_op()
+        DVirtualSchematikaMachine::_do_ifelse_cont_op()
         {
             // pre: result of evaluating test condition in value_ register
 
@@ -856,7 +867,7 @@ namespace xo {
         }
 
         void
-        VirtualSchematikaMachine::_do_seq_cont_op()
+        DVirtualSchematikaMachine::_do_seq_cont_op()
         {
             auto frame = obj<AGCObject,DVsmSeqContFrame>::from(stack_);
 
@@ -891,13 +902,25 @@ namespace xo {
          }
 
         std::size_t
-        VirtualSchematikaMachine::shallow_size() const noexcept
+        DVirtualSchematikaMachine::shallow_size() const noexcept
         {
-            return sizeof(VirtualSchematikaMachine);
+            return sizeof(DVirtualSchematikaMachine);
+        }
+
+        DVirtualSchematikaMachine *
+        DVirtualSchematikaMachine::shallow_copy(obj<AAllocator> mm) const noexcept
+        {
+            (void)mm;
+
+            /** not copyable (because SchematikaReader isn't) **/
+
+            assert(false);
+
+            return nullptr;
         }
 
         std::size_t
-        VirtualSchematikaMachine::forward_children(obj<ACollector> gc) noexcept
+        DVirtualSchematikaMachine::forward_children(obj<ACollector> gc) noexcept
         {
             reader_.forward_children(gc);
 
@@ -917,4 +940,4 @@ namespace xo {
     } /*namespace scm*/
 } /*namespace xo*/
 
-/* end VirtualSchematikaMachine.cpp */
+/* end DVirtualSchematikaMachine.cpp */

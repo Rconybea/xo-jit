@@ -5,8 +5,10 @@ set(SELF_SRCS
     init_interpreter2.cpp
     SetupInterpreter2.cpp
 
-    VirtualSchematikaMachine.cpp
     VsmPrimitives.cpp
+
+    DVirtualSchematikaMachine.cpp
+    facet/IGCObject_DVirtualSchematikaMachine.cpp
 
     DVsmDefContFrame.cpp
     IGCObject_DVsmDefContFrame.cpp
@@ -37,7 +39,7 @@ set(SELF_SRCS
     IPrintable_DClosure.cpp
 
     DLocalEnv.cpp
-    IGCObject_DLocalEnv.cpp
+    facet/IGCObject_DLocalEnv.cpp
     IPrintable_DLocalEnv.cpp
 
     DVsmRcx.cpp
