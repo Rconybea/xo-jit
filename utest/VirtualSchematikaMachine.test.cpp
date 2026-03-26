@@ -92,27 +92,35 @@ namespace xo {
                 return true;
             }
 
-            bool session_with_complete_input(const char * input_text,
-                                             std::function<bool (const VsmResultExt & x)> verify_result)
+            /** @p must_exhaust expression must exhaust input.
+             *                  otherwise mut *not* exhaust input
+             **/
+            span_type read_eval_verify(bool debug_flag,
+                                       span_type input_span,
+                                       std::function<bool (const VsmResultExt & x)> verify_result,
+                                       bool must_exhaust,
+                                       bool eof_flag)
             {
-                INFO(xtag("input_text", input_text));
+                scope log(XO_DEBUG(debug_flag));
 
-                bool eof_flag = false;
-
-                vsm_->begin_interactive_session();
-
-                VsmResultExt res = vsm_->read_eval_print(span_type::from_cstr(input_text),
-                                                         eof_flag);
+                VsmResultExt res = vsm_->read_eval_print(input_span, eof_flag);
 
                 REQUIRE(res.is_value());
                 REQUIRE(res.value());
 
+                log && log(xtag("res.tseq", res.value()->_typeseq()),
+                           xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
+
                 REQUIRE(verify_result(res));
 
-                REQUIRE(res.remaining_.size() == 1);
-                REQUIRE(*res.remaining_.lo() == '\n');
+                if (must_exhaust) {
+                    REQUIRE(res.remaining_.size() == 1);
+                    REQUIRE(*res.remaining_.lo() == '\n');
+                } else {
+                    REQUIRE(res.remaining_.size() > 1);
+                }
 
-                return true;
+                return res.remaining_;
             }
 
             ArenaShim aux_mm_;
@@ -125,15 +133,25 @@ namespace xo {
                                    std::function<bool (const VsmResultExt & x)> verify_fn,
                                    const VsmConfig & cfg = VsmConfig())
         {
-            scope log(XO_DEBUG(debug_flag), xtag("test", testname));
+            scope log(XO_DEBUG(debug_flag), xtag("test", testname), xtag("input", input));
+            bool eof_flag = false;
+            bool must_exhaust = true;
+
+            INFO(xtag("input", input));
 
             VsmFixture vsm_fixture(testname, debug_flag, cfg);
 
-            vsm_fixture.session_with_complete_input(input, verify_fn);
+            vsm_fixture.vsm_->begin_interactive_session();
+
+            vsm_fixture.read_eval_verify(debug_flag,
+                                         span_type::from_cstr(input), verify_fn,
+                                         must_exhaust, eof_flag);
 
             log && vsm_fixture.log_memory_layout(&log);
         }
 
+        /** input comprises N expressions, with verify_fns.size() = N.
+         **/
         void vsm_multi_utest_pattern(bool debug_flag,
                                      const std::string & testname,
                                      const char * input,
@@ -146,31 +164,20 @@ namespace xo {
             VsmFixture vsm_fixture(testname, debug_flag, cfg);
             auto & vsm = vsm_fixture.vsm_;
 
-            vsm->begin_interactive_session();
+            vsm_fixture.vsm_->begin_interactive_session();
 
             span_type remaining = span_type::from_cstr(input);
 
             for (std::size_t i = 0; i < verify_fns.size(); ++i) {
                 log && log(xtag("i_expr", i), xtag("input", remaining));
 
-                VsmResultExt res = vsm->read_eval_print(remaining, eof_flag);
+                bool must_exhaust = (i + 1 == verify_fns.size());
 
-                REQUIRE(res.is_value());
-                REQUIRE(res.value());
-
-                log && log(xtag("res.tseq", res.value()->_typeseq()),
-                           xtag("res.type", TypeRegistry::id2name(res.value()->_typeseq())));
-
-                REQUIRE(verify_fns[i](res));
-
-                if (i + 1 == verify_fns.size()) {
-                    REQUIRE(res.remaining_.size() == 1);
-                    REQUIRE(*res.remaining_.lo() == '\n');
-                } else {
-                    REQUIRE(res.remaining_.size() > 1);
-                }
-
-                remaining = res.remaining_;
+                remaining
+                    = vsm_fixture.read_eval_verify(debug_flag,
+                                                   remaining,
+                                                   verify_fns[i],
+                                                   must_exhaust, eof_flag);
             }
 
             log && vsm_fixture.log_memory_layout(&log);
