@@ -134,8 +134,9 @@ namespace xo {
             ok &= gc.install_type(impl_for<AGCObject, DConstant>());
             ok &= gc.install_type(impl_for<AGCObject, DVariable>());
             ok &= gc.install_type(impl_for<AGCObject, DTypename>());
+            ok &= gc.install_type(impl_for<AGCObject, DVarRef>());
             ok &= gc.install_type(impl_for<AGCObject, DDefineExpr>());
-            //ok &= gc.install_type(impl_for<AGCObject, DApplyExpr>());   // when avail
+            ok &= gc.install_type(impl_for<AGCObject, DApplyExpr>());
             ok &= gc.install_type(impl_for<AGCObject, DLambdaExpr>());
             ok &= gc.install_type(impl_for<AGCObject, DIfElseExpr>());
             ok &= gc.install_type(impl_for<AGCObject, DSequenceExpr>());
