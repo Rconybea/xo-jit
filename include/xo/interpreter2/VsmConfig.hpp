@@ -58,7 +58,7 @@ namespace xo {
             /** Configuration for allocator/collector.
              *  TODO: may want to make CollectorConfig polymorphic
              **/
-            X1CollectorConfig x1_config_ = X1CollectorConfig().with_name("gc").with_size(4*1024*1024);
+            X1CollectorConfig x1_config_ = std_x1_config();
             /** Configuration for handful of non-moveable high-level objects
              *  e.g. DArenaHashMap in global symtab
              **/
