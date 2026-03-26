@@ -31,10 +31,20 @@ namespace xo {
                 return retval;
             }
 
+            VsmConfig with_x1_config(const X1CollectorConfig & x) const {
+                VsmConfig retval = *this;
+                retval.x1_config_ = x;
+                return retval;
+            }
+
             VsmConfig with_x1_debug_flag(bool x) const {
                 VsmConfig retval = *this;
                 retval.x1_config_.debug_flag_ = x;
                 return retval;
+            }
+
+            static X1CollectorConfig std_x1_config() {
+                return X1CollectorConfig().with_name("gc").with_size(4*1024*1024);
             }
 
             /** true for interactive parser session; false for batch session **/

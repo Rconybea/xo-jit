@@ -33,6 +33,7 @@
 #include <xo/gc/X1Collector.hpp>
 #include <xo/reflect/Reflect.hpp>
 #include <xo/stringtable2/UniqueString.hpp>
+#include <xo/alloc2/CollectorTypeRegistry.hpp>
 #include <xo/alloc2/Arena.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/facet/FacetRegistry.hpp>
@@ -46,9 +47,11 @@ namespace xo {
     using xo::reflect::Reflect;
     using xo::mm::AGCObject;
     using xo::mm::MemorySizeInfo;
+    using xo::mm::CollectorTypeRegistry;
     using xo::mm::AAllocator;
     using xo::mm::ACollector;
     using xo::mm::DX1Collector;
+    using xo::mm::X1CollectorConfig;
     using xo::mm::DArena;
     using xo::facet::FacetRegistry;
     using xo::facet::TypeRegistry;
@@ -68,6 +71,22 @@ namespace xo {
             }
         }
 
+        namespace {
+            /** helper function to create X1 collector instance **/
+            abox<AAllocator,DX1Collector>
+            vsm_make_gc(obj<AAllocator> aux_mm,
+                        const X1CollectorConfig & config)
+            {
+                auto retval = abox<AAllocator,DX1Collector>::make(aux_mm, config);
+
+                // establish the set of types that mm_ will be able to collect
+
+                CollectorTypeRegistry::instance().install_types(retval.to_op().to_facet<ACollector>());
+
+                return retval;
+            }
+        }
+
         // NOTE: using heap here for {DX1Collector, DArena, DVsmRcx} instances
         //       (though DX1Collector allocations will be from explictly mmap'd memory)
         //
@@ -76,7 +95,7 @@ namespace xo {
         : config_{config},
           self_vroot_{obj<AGCObject,DVirtualSchematikaMachine>(this)},
           aux_mm_{aux_mm},
-          mm_(abox<AAllocator,DX1Collector>::make(aux_mm_, config.x1_config_)),
+          mm_(vsm_make_gc(aux_mm_, config.x1_config_)),
           rcx_(abox<ARuntimeContext,DVsmRcx>::make(aux_mm_, this)),
           reader_{config.rdr_config_, mm_.to_op(), aux_mm_}
         {
