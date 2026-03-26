@@ -250,6 +250,8 @@ main (int argc, char * argv[])
     AppConfig cfg;
     // [cmdline options here]
 
+    cfg.vsm_config_.x1_config_.debug_flag_ = true;
+
     App app(cfg);
 
     app.run();
