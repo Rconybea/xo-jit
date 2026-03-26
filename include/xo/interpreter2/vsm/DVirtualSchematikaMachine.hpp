@@ -119,7 +119,7 @@ namespace xo {
             /** evaluate expression @p expr
              *  Require: must first start interactive/batch session
              **/
-            VsmResult start_eval(obj<AExpression> expr);
+            const VsmResult & start_eval(obj<AExpression> expr);
 
             /** borrow calling thread to run indefinitely,
              *  until halt instruction

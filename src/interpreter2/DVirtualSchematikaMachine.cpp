@@ -225,7 +225,7 @@ namespace xo {
             return VsmResultExt(VsmResult(*p_value), remaining);
         }
 
-        VsmResult
+        const VsmResult &
         DVirtualSchematikaMachine::start_eval(obj<AExpression> expr)
         {
             this->pc_ = VsmInstr::c_eval;
