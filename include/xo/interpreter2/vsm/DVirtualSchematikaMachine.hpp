@@ -20,19 +20,6 @@
 
 namespace xo {
     namespace scm {
-#ifdef OBSOLETE // see DVsmError
-        // TODO: move error to collected space?
-        //       or special arena?
-        //
-        struct EvaluationError {
-            /** source location (in vsm implementation) at which error identified **/
-            std::string_view src_function_;
-            /** error description (allocated from ErrorArena) **/
-            std::string_view error_description_;
-            // TODO: info about location in schematika source
-        };
-#endif
-
         /** similar to @ref xo::scm::ReaderResult **/
         struct VsmResult {
             using AGCObject = xo::mm::AGCObject;
