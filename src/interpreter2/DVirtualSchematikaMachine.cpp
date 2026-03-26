@@ -47,6 +47,7 @@ namespace xo {
     using xo::mm::AGCObject;
     using xo::mm::MemorySizeInfo;
     using xo::mm::AAllocator;
+    using xo::mm::ACollector;
     using xo::mm::DX1Collector;
     using xo::mm::DArena;
     using xo::facet::FacetRegistry;
@@ -71,8 +72,9 @@ namespace xo {
         //       (though DX1Collector allocations will be from explictly mmap'd memory)
         //
         DVirtualSchematikaMachine::DVirtualSchematikaMachine(const VsmConfig & config,
-                                                           obj<AAllocator> aux_mm)
+                                                             obj<AAllocator> aux_mm)
         : config_{config},
+          self_vroot_{obj<AGCObject,DVirtualSchematikaMachine>(this)},
           aux_mm_{aux_mm},
           mm_(abox<AAllocator,DX1Collector>::make(aux_mm_, config.x1_config_)),
           rcx_(abox<ARuntimeContext,DVsmRcx>::make(aux_mm_, this)),
@@ -88,7 +90,13 @@ namespace xo {
             this->global_env_
                 = obj<AGCObject,DGlobalEnv>(reader_.global_env());
 
-            //this->_add_gc_roots();
+            // TODO:
+            // annoying to have to create self_vroot_ to appease
+            // add_gc_root_poly() signature.
+            // In practice gc won't modify the pointer
+            // (instead traverses it to find +update children)
+            //
+            mm_.to_op().to_facet<ACollector>().add_gc_root_poly(&self_vroot_);
         }
 
         DVirtualSchematikaMachine *
