@@ -270,6 +270,13 @@ namespace xo {
             /** configuration **/
             VsmConfig config_;
 
+            /** virtual gc root.
+             *  Arranges for gc to traverse+forward pointers exiting VSM.
+             *  It won't (and can't) copy/move the VSM itself, since alloc'd
+             *  outside gc.
+             **/
+            obj<AGCObject> self_vroot_;
+
             /** allocator (likely DArena) for globals.
              *  For example DArenaHashMap in global symta.
              **/
