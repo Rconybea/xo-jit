@@ -51,7 +51,7 @@ namespace xo {
     using xo::mm::AGCObject;
     using xo::mm::DArena;
     using xo::mm::DX1Collector;
-    using xo::mm::generation;
+    using xo::mm::Generation;
     using xo::mm::X1CollectorConfig;
     using xo::mm::CollectorTypeRegistry;
     using xo::mm::MemorySizeInfo;
@@ -241,7 +241,7 @@ namespace xo {
                 if (fixture->gc_flag_) {
                     REQUIRE(expr_gc);
 
-                    expr_gc.request_gc(generation(2));
+                    expr_gc.request_gc(Generation(2));
                 }
             }
         }
