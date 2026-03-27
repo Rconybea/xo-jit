@@ -27,17 +27,15 @@ namespace xo {
 
             VsmResult() = default;
             explicit VsmResult(obj<AGCObject> value) : result_{value} {}
-            explicit VsmResult(TokenizerError err) : result_{err} {}
 
-            bool is_value() const { return std::holds_alternative<obj<AGCObject>>(result_); }
-            bool is_tk_error() const { return std::holds_alternative<TokenizerError>(result_); }
-            bool is_eval_error() const;
+            bool is_value() const { return result_; }
+            bool is_error() const;
 
-            const obj<AGCObject> * value() const { return std::get_if<obj<AGCObject>>(&result_); }
-            obj<AGCObject> & value_ref() { return std::get<obj<AGCObject>>(result_); }
+            const obj<AGCObject> * value() const { return &result_; }
+            obj<AGCObject> & value_ref() { return result_; }
 
             /** result of evaluating first expression encountered in input **/
-            std::variant<obj<AGCObject>, TokenizerError> result_;
+            obj<AGCObject> result_;
         };
 
         /** vsm result + reamining span **/
@@ -270,7 +268,9 @@ namespace xo {
             obj<AAllocator> aux_mm_;
 
             /** allocator (likely DX1Collector or similar) for
-             *  expressions and values. Schemaatika reader will use this also
+             *  expressions and values. Schemaatika reader will use this also.
+             *
+             *  Allocations must represent a type that supports GCObject.
              **/
             abox<AAllocator> mm_;
 

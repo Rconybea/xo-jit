@@ -230,7 +230,7 @@ namespace xo {
 
         *p_input = res.remaining_;
 
-        return !res.is_tk_error() && !res.is_eval_error();
+        return !res.is_error();
     }
 
     void

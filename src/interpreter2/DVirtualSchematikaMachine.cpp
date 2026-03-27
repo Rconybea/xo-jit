@@ -60,15 +60,9 @@ namespace xo {
     namespace scm {
 
         bool
-        VsmResult::is_eval_error() const
+        VsmResult::is_error() const
         {
-            if (std::holds_alternative<obj<AGCObject>>(result_)) {
-                auto err = obj<AGCObject,DRuntimeError>::from(*(this->value()));
-
-                return err;
-            } else {
-                return false;
-            }
+            return (*this->value() && obj<AGCObject,DRuntimeError>::from(*(this->value())));
         }
 
         namespace {
@@ -191,18 +185,39 @@ namespace xo {
 
             reader_.reset_result();
 
-            auto [expr, remaining, error1]
+            auto [expr, remaining, tk_error]
                 = reader_.read_expr(input, eof);
 
             if (!expr) {
-                /* tokenizer error */
+                if (tk_error.is_error()) {
+                    // tokenizer error -> convert to runtime error
 
-                return VsmResultExt(VsmResult(error1), remaining);
+                    DString * src = DString::from_view(mm_.to_op(), tk_error.src_function());
+                    DString * msg = tk_error.report_to_string(mm_.to_op());
+
+                    auto error = obj<AGCObject,DRuntimeError>(DRuntimeError::_make(mm_.to_op(), src, msg));
+
+                    {
+                        obj<APrintable> error_pr
+                            = FacetRegistry::instance().variant<APrintable,AGCObject>(error);
+
+                        ppconfig ppc;
+                        ppstate_standalone pps(&cout, 0, &ppc);
+                        pps.prettyn(error_pr);
+                    }
+
+                    return VsmResultExt(VsmResult(error), remaining);
+                } else {
+                    // incomplete input
+                    return VsmResultExt(VsmResult(), remaining);
+                }
             }
+
+            // here: have obtained complete input expression
 
             VsmResult evalresult = this->start_eval(expr);
 
-            if (evalresult.is_tk_error()) {
+            if (evalresult.is_error()) {
                 // TODO: print error here
 
                 return VsmResultExt(evalresult, remaining);
@@ -210,19 +225,21 @@ namespace xo {
 
             assert(evalresult.is_value());
 
-            obj<AGCObject> * p_value = std::get_if<obj<AGCObject>>(&(evalresult.result_));
+            obj<AGCObject> value = evalresult.result_;
 
-            assert(p_value);
+            assert(value);
 
-            obj<APrintable> value_pr
-                = FacetRegistry::instance().variant<APrintable,AGCObject>(*p_value);
+            {
+                obj<APrintable> value_pr
+                    = FacetRegistry::instance().variant<APrintable,AGCObject>(value);
 
-            // pretty_toplevel(value_pr, &cout, ppconfig());
-            ppconfig ppc;
-            ppstate_standalone pps(&cout, 0, &ppc);
-            pps.prettyn(value_pr);
+                // pretty_toplevel(value_pr, &cout, ppconfig());
+                ppconfig ppc;
+                ppstate_standalone pps(&cout, 0, &ppc);
+                pps.prettyn(value_pr);
+            }
 
-            return VsmResultExt(VsmResult(*p_value), remaining);
+            return VsmResultExt(VsmResult(value), remaining);
         }
 
         const VsmResult &
