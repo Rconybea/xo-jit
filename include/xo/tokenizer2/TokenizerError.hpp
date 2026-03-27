@@ -8,6 +8,8 @@
 #include "TkInputState.hpp"
 #include "tokentype.hpp"
 #include "span.hpp"
+#include <xo/stringtable2/String.hpp>
+#include <xo/alloc2/Allocator.hpp>
 #include <iomanip>
 
 namespace xo {
@@ -19,6 +21,7 @@ namespace xo {
          **/
         class TokenizerError {
         public:
+            using AAllocator = xo::mm::AAllocator;
             using CharT = char;
             using span_type = xo::mm::span<const CharT>;
 
@@ -88,6 +91,9 @@ namespace xo {
 
             /** Print human-oriented error report on @p os. **/
             void report(std::ostream & os) const;
+
+            /** Similar to report, but capture as string, allocated from @p mm **/
+            DString * report_to_string(obj<AAllocator> mm) const;
 
             ///@}
 

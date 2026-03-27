@@ -54,6 +54,20 @@ namespace xo {
             }
         }
 
+        DString *
+        TokenizerError::report_to_string(obj<AAllocator> dest_mm) const
+        {
+            // FIXME:
+            // using heap here for scratch space.
+            // Would prefer to checkpoint + realloc.
+
+            std::stringstream ss;
+
+            this->report(ss);
+
+            return DString::from_str(dest_mm, ss.str());
+        }
+
     } /*namespace scm*/
 } /*namespace xo*/
 

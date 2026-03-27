@@ -6,6 +6,7 @@ include(CMakeFindDependencyMacro)
 #       must coordinate with xo_dependency() calls
 #       in src/tokenizer2/CMakeLists.txt
 #
+find_dependency(xo_stringtable2)
 find_dependency(xo_arena)
 find_dependency(indentlog)
 
