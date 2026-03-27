@@ -32,18 +32,33 @@ namespace xo {
             bool is_error() const;
 
             const obj<AGCObject> * value() const { return &result_; }
-            obj<AGCObject> & value_ref() { return result_; }
+            const obj<AGCObject> & value_ref() const { return result_; }
 
             /** result of evaluating first expression encountered in input **/
             obj<AGCObject> result_;
         };
 
-        /** vsm result + reamining span **/
-        struct VsmResultExt : public VsmResult {
+        /** vsm result + reamining span
+         *
+         *  Preserves address of wrapped VsmResult
+         *  (so it can continue to be owned by DVirtualSchematikaMachine,
+         *   and to be known to gc without add'l effort)
+         **/
+        struct VsmResultExt {
+            using AGCObject = xo::mm::AGCObject;
             using span_type = VsmResult::span_type;
 
             VsmResultExt() = default;
-            VsmResultExt(const VsmResult & result, span_type rem) : VsmResult{result}, remaining_{rem} {}
+            VsmResultExt(const VsmResult & result, span_type rem) : p_result_{&result}, remaining_{rem} {}
+
+            bool is_empty() const { return !p_result_; }
+            bool is_value() const { return p_result_ ? p_result_->is_value() : false; }
+            bool is_error() const { return p_result_ ? p_result_->is_error() : false; }
+
+            const obj<AGCObject> * value() const { return p_result_ ? p_result_->value() : nullptr; }
+            //const obj<AGCObject> & value_ref() { return result_.value_ref(); }
+
+            const VsmResult * p_result_ = nullptr;
 
             /** unconsumed portion of input **/
             VsmResult::span_type remaining_;

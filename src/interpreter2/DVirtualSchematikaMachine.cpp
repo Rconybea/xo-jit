@@ -197,6 +197,8 @@ namespace xo {
 
                     auto error = obj<AGCObject,DRuntimeError>(DRuntimeError::_make(mm_.to_op(), src, msg));
 
+                    this->value_ = VsmResult(error);
+
                     {
                         obj<APrintable> error_pr
                             = FacetRegistry::instance().variant<APrintable,AGCObject>(error);
@@ -206,7 +208,7 @@ namespace xo {
                         pps.prettyn(error_pr);
                     }
 
-                    return VsmResultExt(VsmResult(error), remaining);
+                    return VsmResultExt(value_, remaining);
                 } else {
                     // incomplete input
                     return VsmResultExt(VsmResult(), remaining);
@@ -215,7 +217,7 @@ namespace xo {
 
             // here: have obtained complete input expression
 
-            VsmResult evalresult = this->start_eval(expr);
+            const VsmResult & evalresult = this->start_eval(expr);
 
             if (evalresult.is_error()) {
                 // TODO: print error here
@@ -239,7 +241,7 @@ namespace xo {
                 pps.prettyn(value_pr);
             }
 
-            return VsmResultExt(VsmResult(value), remaining);
+            return VsmResultExt(evalresult, remaining);
         }
 
         const VsmResult &
@@ -975,7 +977,7 @@ namespace xo {
             gc.forward_inplace(&fn_);
             gc.forward_inplace(&args_);
             if (value_.is_value()) {
-                gc.forward_inplace(&value_.value_ref());
+                gc.forward_inplace(const_cast<obj<AGCObject> *>(&value_.value_ref()));
             }
 
             return this->shallow_size();

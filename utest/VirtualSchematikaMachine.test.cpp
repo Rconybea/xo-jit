@@ -103,6 +103,8 @@ namespace xo {
             {
                 scope log(XO_DEBUG(debug_flag));
 
+                // WARNING: res.value() is unstable - gc may move it
+
                 VsmResultExt res = vsm_->read_eval_print(input_span, eof_flag);
 
                 REQUIRE(res.is_value());
