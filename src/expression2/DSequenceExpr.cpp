@@ -135,11 +135,7 @@ namespace xo {
         {
             typeref_.forward_children(gc);
 
-            {
-                //auto iface = facet::impl_for<AGCObject,DArray>();
-                //gc.forward_inplace(&iface, (void**)&expr_v_);
-                gc.forward_inplace(&expr_v_);
-            }
+            gc.forward_inplace(&expr_v_);
 
             return this->shallow_size();
         }

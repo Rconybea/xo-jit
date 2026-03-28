@@ -104,12 +104,9 @@ namespace xo {
         void
         TypeRef::forward_children(obj<ACollector> gc) noexcept
         {
-            gc.forward_pivot_inplace(&type_);
+            //scope log(XO_DEBUG(true), xtag("type", type_.data()), xtag("type.tseq", type_._typeseq()));
 
-            //if (type_) {
-            //    auto e = FacetRegistry::instance().variant<AGCObject,AType>(type_);
-            //    gc.forward_inplace(e.iface(), (void **)&(type_.data_));
-            //}
+            gc.forward_pivot_inplace(&type_);
         }
 
         bool
