@@ -374,7 +374,6 @@ namespace xo {
             }
         }
 
-#ifdef NOPE
         TEST_CASE("SchematikaParser-batch-def", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
@@ -1198,8 +1197,9 @@ namespace xo {
 
             log && fixture.log_memory_layout(&log);
         }
-#endif
+#endif // OBSOLETE
 
+#ifdef NOPE
         void test_interactive_cmpne(ParserFixture * fixture)
         {
             scope log(XO_DEBUG(fixture->debug_flag_));
@@ -1466,22 +1466,17 @@ namespace xo {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
             // [0] arena; [1] gc
-            constexpr std::array<bool, 2> c_debug_flag_v = {{false, true}};
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
             test_driver(testname,
                         &test_interactive_lambda,
                         c_debug_flag_v);
         }
 
-#ifdef NOPE
-        TEST_CASE("SchematikaParser-interactive-if2", "[reader2][SchematikaParser]")
+        void test_interactive_if2(ParserFixture * fixture)
         {
-            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+            scope log(XO_DEBUG(fixture->debug_flag_));
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
-
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1502,20 +1497,27 @@ namespace xo {
                 /* [6] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-lambda2", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-if2", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_interactive_if2,
+                        c_debug_flag_v);
+        }
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        void test_interactive_lambda2(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1543,20 +1545,27 @@ namespace xo {
                 /* [ c] */ Token::rightbrace_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-apply", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-lambda2", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_interactive_lambda2,
+                        c_debug_flag_v);
+        }
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        void test_interactive_apply(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1589,22 +1598,27 @@ namespace xo {
                 /* [ g] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-apply2", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-apply", "[reader2][SchematikaParser]")
         {
-            // top-level apply, with multiple arguments
-
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_interactive_apply,
+                        c_debug_flag_v);
+        }
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        void test_interactive_apply2(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1647,22 +1661,29 @@ namespace xo {
                 /* [ m] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-batch-def2", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-apply2", "[reader2][SchematikaParser]")
         {
-            // top-level recursive function definition
+            // top-level apply, with multiple arguments
 
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_interactive_apply2,
+                        c_debug_flag_v);
+        }
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        void test_batch_def2(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1705,22 +1726,29 @@ namespace xo {
                 /* [ q] */     Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-batch-qliteral1", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-batch-def2", "[reader2][SchematikaParser]")
         {
             // top-level recursive function definition
 
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_batch_def2,
+                        c_debug_flag_v);
+        }
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        void test_batch_qliteral1(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1740,22 +1768,30 @@ namespace xo {
                 /* [ 4] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-batch-qliteral2", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-batch-qliteral1", "[reader2][SchematikaParser]")
         {
             // top-level recursive function definition
 
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_batch_qliteral1,
+                        c_debug_flag_v);
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        }
+
+        void test_batch_qliteral2(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1783,22 +1819,30 @@ namespace xo {
                 /* [ 9] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-batch-qlist", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-batch-qliteral2", "[reader2][SchematikaParser]")
         {
             // top-level recursive function definition
 
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+                        // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_batch_qliteral2,
+                        c_debug_flag_v);
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        }
+
+        void test_batch_qlist(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1821,22 +1865,29 @@ namespace xo {
                 /* [ 7] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-batch-qlist2", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-batch-qlist", "[reader2][SchematikaParser]")
         {
             // top-level recursive function definition
 
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_batch_qlist,
+                        c_debug_flag_v);
+        }
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        void test_batch_qlist2(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1859,22 +1910,27 @@ namespace xo {
                 /* [ 7] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-batch-qarray", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-batch-qlist2", "[reader2][SchematikaParser]")
         {
-            // top-level recursive function definition
-
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_batch_qlist2,
+                        c_debug_flag_v);
+        }
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        void test_batch_qarray(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1897,22 +1953,27 @@ namespace xo {
                 /* [ 7] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-batch-qdict0", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-batch-qarray", "[reader2][SchematikaParser]")
         {
-            // top-level recursive function definition
-
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_batch_qarray,
+                        c_debug_flag_v);
+        }
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        void test_batch_qdict0(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1935,22 +1996,27 @@ namespace xo {
                 /* [ 5] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-batch-qdict1", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-batch-qdict0", "[reader2][SchematikaParser]")
         {
-            // top-level recursive function definition
-
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_batch_qdict0,
+                        c_debug_flag_v);
+        }
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+        void test_batch_qdict1(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1987,11 +2053,22 @@ namespace xo {
                 /* [ g] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
-#endif
+
+        TEST_CASE("SchematikaParser-batch-qdict1", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+            test_driver(testname,
+                        &test_batch_qdict1,
+                        c_debug_flag_v);
+        }
+
     } /*namespace ut*/
 } /*namespace xo*/
 
