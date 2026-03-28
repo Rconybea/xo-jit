@@ -913,12 +913,12 @@ namespace xo {
         void
         ParserStateMachine::forward_children(obj<ACollector> gc) noexcept
         {
-            scope log(XO_DEBUG(true));
+            //scope log(XO_DEBUG(true));
 
             assert(!stringtable_.is_gc_eligible());
             assert(!parser_alloc_.is_gc_eligible());
 
-            log && log("forward stack_");
+            //log && log("forward stack_", xtag("addr", stack_));
             if (stack_) {
                 stack_->forward_children(gc);
             }
@@ -926,16 +926,16 @@ namespace xo {
             // static_assert(!expr_alloc_.is_gc_eligible());
             // static_assert(!aux_alloc_.is_gc_eligible());
 
-            log && log("global_symtab_");
+            //log && log("global_symtab_", xtag("addr", global_symtab_.data()));
             gc.forward_inplace(&global_symtab_);
 
-            log && log("local_symtab_");
+            //log && log("local_symtab_", xtag("addr", local_symtab_.data()));
             gc.forward_inplace(&local_symtab_);
 
-            log && log("global_env_");
+            //log && log("global_env_", xtag("addr", global_env_.data()));
             gc.forward_inplace(&global_env_);
 
-            log && log("result_");
+            //log && log("result_");
             result_.forward_children(gc);
         }
 
