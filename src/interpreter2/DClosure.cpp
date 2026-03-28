@@ -8,6 +8,7 @@
 #include "LocalEnv.hpp"
 #include "VsmRcx.hpp"
 #include <xo/object2/RuntimeError.hpp>
+#include <xo/facet/FacetRegistry.hpp>
 #include <xo/indentlog/scope.hpp>
 #include <cstddef>
 
@@ -82,16 +83,18 @@ namespace xo {
         DClosure::forward_children(obj<ACollector> gc) noexcept
         {
             {
-                auto iface = xo::facet::impl_for<AGCObject,DLambdaExpr>();
-                gc.forward_inplace(&iface, (void **)(&lambda_));
+                gc.forward_inplace(&lambda_);
+                //auto iface = xo::facet::impl_for<AGCObject,DLambdaExpr>();
+                //gc.forward_inplace(&iface, (void **)(&lambda_));
 
             }
             {
-                auto iface = xo::facet::impl_for<AGCObject,DLocalEnv>();
-                gc.forward_inplace(&iface, (void **)(&env_));
+                gc.forward_inplace(&env_);
+                //auto iface = xo::facet::impl_for<AGCObject,DLocalEnv>();
+                //gc.forward_inplace(&iface, (void **)(&env_));
             }
 
-            return shallow_size();
+            return this->shallow_size();
         }
 
         // ----- printable facet -----
