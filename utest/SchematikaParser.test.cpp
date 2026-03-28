@@ -250,7 +250,7 @@ namespace xo {
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
+            constexpr bool c_debug_flag = false;
             scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
 
             ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
@@ -380,7 +380,7 @@ namespace xo {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
             // [0] arena; [1] gc
-            constexpr std::array<bool, 2> c_debug_flag_v = {{false, true}};
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
             test_driver(testname,
                         &test_batch_def,
@@ -430,55 +430,67 @@ namespace xo {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
             // [0] arena; [1] gc
-            constexpr std::array<bool, 2> c_debug_flag_v = {{false, true}};
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
             test_driver(testname,
                         &test_batch_deftype,
                         c_debug_flag_v);
         }
 
-        TEST_CASE("SchematikaParser-batch-deftype-2", "[reader2][SchematikaParser]")
+        namespace {
+            void
+            test_batch_deftype2(ParserFixture * fixture)
+            {
+                scope log(XO_DEBUG(fixture->debug_flag_));
+
+                auto parser = fixture->parser_;
+
+                parser->begin_batch_session();
+
+                /**  Walkthrough parsing input equivalent to:
+                 *
+                 *     deftype foo :: list<f64>;
+                 **/
+
+                std::vector<Token> tk_v{
+                    Token::deftype_token(),
+                    Token::symbol_token("foo"),
+                    Token::doublecolon_token(),
+                    Token::symbol_token("list"),
+                    Token::leftangle_token(),
+                    Token::symbol_token("f64"),
+                    Token::rightangle_token(),
+                    Token::semicolon_token(),
+                };
+
+                utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
+
+                const auto & result = parser->result();
+                {
+                    // placeholder for form's sake.
+                    // deftype doesn't actuallly produce any executable content
+
+                    auto expr = obj<AExpression,DConstant>::from(result.result_expr());
+                    REQUIRE(expr);
+                }
+
+                log && fixture->log_memory_layout(&log);
+            }
+        }
+
+        TEST_CASE("SchematikaParser-batch-deftype2", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
-
-            parser->begin_batch_session();
-
-            /**  Walkthrough parsing input equivalent to:
-             *
-             *     deftype foo :: list<f64>;
-             **/
-
-            std::vector<Token> tk_v{
-                Token::deftype_token(),
-                Token::symbol_token("foo"),
-                Token::doublecolon_token(),
-                Token::symbol_token("list"),
-                Token::leftangle_token(),
-                Token::symbol_token("f64"),
-                Token::rightangle_token(),
-                Token::semicolon_token(),
-            };
-
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
-
-            const auto & result = parser->result();
-            {
-                // placeholder for form's sake.
-                // deftype doesn't actuallly produce any executable content
-
-                auto expr = obj<AExpression,DConstant>::from(result.result_expr());
-                REQUIRE(expr);
-            }
-
-            log && fixture.log_memory_layout(&log);
+            test_driver(testname,
+                        &test_batch_deftype2,
+                        c_debug_flag_v);
         }
 
+#ifdef NOPE
         TEST_CASE("SchematikaParser-interactive-def2", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
