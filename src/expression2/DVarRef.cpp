@@ -78,9 +78,9 @@ namespace xo {
         std::size_t
         DVarRef::forward_children(obj<ACollector> gc) noexcept
         {
-            // TODO: this can be helper in RCollector interface
-            auto iface = xo::facet::impl_for<AGCObject,DVariable>();
-            gc.forward_inplace(&iface, (void **)vardef_);
+            gc.forward_inplace(&vardef_);
+            //auto iface = xo::facet::impl_for<AGCObject,DVariable>();
+            //gc.forward_inplace(&iface, (void **)vardef_.data_);
 
             // TODO: concept to indicate that no gc pointers in Binding
 
