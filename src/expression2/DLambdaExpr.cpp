@@ -169,8 +169,9 @@ namespace xo {
             }
 
             {
-                auto iface = body_expr_.to_facet<AGCObject>().iface();
-                gc.forward_inplace(iface, (void **)(&body_expr_));
+                gc.forward_pivot_inplace(&body_expr_);
+                //auto iface = body_expr_.to_facet<AGCObject>().iface();
+                //gc.forward_inplace(iface, (void **)&(body_expr_.data_));
             }
 
             // xxx free_var_set
