@@ -113,6 +113,7 @@ namespace xo {
 
             ok &= gc.install_type(impl_for<AGCObject, DVsmApplyFrame>());
             ok &= gc.install_type(impl_for<AGCObject, DVsmEvalArgsFrame>());
+            ok &= gc.install_type(impl_for<AGCObject, DClosure>());
 
             return ok;
         }
