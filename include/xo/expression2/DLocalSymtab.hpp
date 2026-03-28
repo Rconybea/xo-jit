@@ -120,15 +120,6 @@ namespace xo {
              *   types_[i] is convertible to obj<AType>
              **/
             DArray * types_ = nullptr;
-
-#ifdef OBSOLETE
-            /** actual range of slots_[] array.  Can use indices in [0,..,n) **/
-            size_type capacity_ = 0;
-            /** number of slots in use **/
-            size_type size_ = 0;
-            /** memory for names and bindings **/
-            Slot slots_[];
-#endif
         };
     } /*namespace scm*/
 } /*namespace xo*/
