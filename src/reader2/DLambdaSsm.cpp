@@ -477,6 +477,10 @@ namespace xo {
         DLambdaSsm::forward_children(obj<ACollector> gc) noexcept
         {
             gc.forward_inplace(&local_symtab_);
+
+            // explicit_return_td not gcobject
+            // lambda_td not gcobject
+
             gc.forward_pivot_inplace(&body_);
             gc.forward_pivot_inplace(&parent_symtab_);
         }

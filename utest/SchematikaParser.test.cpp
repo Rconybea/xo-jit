@@ -77,7 +77,7 @@ namespace xo {
                         = (X1CollectorConfig()
                            .with_name("gc")
                            .with_size(32 * 1024)
-                           .with_debug_flag(true)
+                           .with_debug_flag(debug_flag)
                            .with_sanitize_flag(true));
 
                     dp<DX1Collector> expr_x1_dp
@@ -371,10 +371,10 @@ namespace xo {
 
                         test_subject(&fixture);
                     }
-
             }
         }
 
+#ifdef NOPE
         TEST_CASE("SchematikaParser-batch-def", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
@@ -490,82 +490,87 @@ namespace xo {
                         c_debug_flag_v);
         }
 
-#ifdef NOPE
+        namespace {
+            void test_interactive_def2(ParserFixture * fixture)
+            {
+                scope log(XO_DEBUG(fixture->debug_flag_));
+
+                auto parser = fixture->parser_;
+
+                parser->begin_interactive_session();
+
+                {
+                    /**  Walkthrough parsing input equivalent to:
+                     *
+                     *     def foo : f64 = 3.141593 ;
+                     *
+                     **/
+
+                    std::vector<Token> tk_v{
+                        Token::def_token(),
+                        Token::symbol_token("foo"),
+                        Token::colon_token(),
+                        Token::symbol_token("f64"),
+                        Token::singleassign_token(),
+                        Token::f64_token("3.141593"),
+                        Token::semicolon_token(),
+                    };
+
+                    utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
+
+                    const auto & result = parser->result();
+                    {
+                        auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
+                        REQUIRE(expr);
+                    }
+
+                    parser->reset_result();
+                }
+
+                {
+                    /** Walkthrough parsing input equivalent to:
+                     *
+                     *    foo ;
+                     *
+                     **/
+
+                    std::vector<Token> tk_v{
+//                    Token::f64_token("2.0"),
+//                    Token::star_token(),
+                        Token::symbol_token("foo"),
+                        Token::semicolon_token(),
+                    };
+
+                    utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
+
+                    const auto & result = parser->result();
+                    {
+                        auto expr = obj<AExpression,DVarRef>::from(result.result_expr());
+                        REQUIRE(expr);
+                    }
+                }
+
+                log && fixture->log_memory_layout(&log);
+            }
+        }
+
         TEST_CASE("SchematikaParser-interactive-def2", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
-
-            parser->begin_interactive_session();
-
-            {
-                /**  Walkthrough parsing input equivalent to:
-                 *
-                 *     def foo : f64 = 3.141593 ;
-                 *
-                 **/
-
-                std::vector<Token> tk_v{
-                    Token::def_token(),
-                    Token::symbol_token("foo"),
-                    Token::colon_token(),
-                    Token::symbol_token("f64"),
-                    Token::singleassign_token(),
-                    Token::f64_token("3.141593"),
-                    Token::semicolon_token(),
-                };
-
-                utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
-
-                const auto & result = parser->result();
-                {
-                    auto expr = obj<AExpression,DDefineExpr>::from(result.result_expr());
-                    REQUIRE(expr);
-                }
-
-                parser->reset_result();
-            }
-
-            {
-                /** Walkthrough parsing input equivalent to:
-                 *
-                 *    foo ;
-                 *
-                 **/
-
-                std::vector<Token> tk_v{
-//                    Token::f64_token("2.0"),
-//                    Token::star_token(),
-                    Token::symbol_token("foo"),
-                    Token::semicolon_token(),
-                };
-
-                utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
-
-                const auto & result = parser->result();
-                {
-                    auto expr = obj<AExpression,DVarRef>::from(result.result_expr());
-                    REQUIRE(expr);
-                }
-            }
-
-            log && fixture.log_memory_layout(&log);
+            test_driver(testname,
+                        &test_interactive_def2,
+                        c_debug_flag_v);
         }
 
-        TEST_CASE("SchematikaParser-interactive-integer", "[reader2][SchematikaParser]")
+        void test_interactive_integer(ParserFixture * fixture)
         {
-            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+            scope log(XO_DEBUG(fixture->debug_flag_));
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
-
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -615,18 +620,26 @@ namespace xo {
             //// illegal input on token
             //REQUIRE(result.error_description());
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-float", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-integer", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            test_driver(testname,
+                        &test_interactive_integer,
+                        c_debug_flag_v);
+        }
+
+        void test_interactive_float(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -676,18 +689,26 @@ namespace xo {
             //// illegal input on token
             //REQUIRE(result.error_description());
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-string", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-float", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            test_driver(testname,
+                        &test_interactive_float,
+                        c_debug_flag_v);
+        }
+
+        void test_interactive_string(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -737,18 +758,26 @@ namespace xo {
             //// illegal input on token
             //REQUIRE(result.error_description());
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-nil", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-string", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            test_driver(testname,
+                        &test_interactive_string,
+                        c_debug_flag_v);
+        }
+
+        void test_interactive_nil(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -798,18 +827,26 @@ namespace xo {
             //// illegal input on token
             //REQUIRE(result.error_description());
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-arith", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-nil", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            test_driver(testname,
+                        &test_interactive_nil,
+                        c_debug_flag_v);
+        }
+
+        void test_interactive_arith(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -826,7 +863,7 @@ namespace xo {
                 Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
             const auto & result = parser->result();
             {
@@ -857,18 +894,26 @@ namespace xo {
                 REQUIRE(rhs_f64->value() == 0.5);
             }
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-arith2", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-arith", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            test_driver(testname,
+                        &test_interactive_arith,
+                        c_debug_flag_v);
+        }
+
+        void test_interactive_arith2(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -885,9 +930,7 @@ namespace xo {
                 Token::semicolon_token(),
             };
 
-            INFO(testname);
-
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
             const auto & result = parser->result();
             {
@@ -918,18 +961,26 @@ namespace xo {
                 REQUIRE(rhs_f64->value() == 10.0);
             }
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-arith3", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-arith2", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            test_driver(testname,
+                        &test_interactive_arith2,
+                        c_debug_flag_v);
+        }
+
+        void test_interactive_arith3(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -948,9 +999,7 @@ namespace xo {
                 Token::semicolon_token(),
             };
 
-            INFO(testname);
-
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
             const auto & result = parser->result();
             {
@@ -988,18 +1037,26 @@ namespace xo {
                 REQUIRE(rhs_i64->value() == 3);
             }
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-arith4", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-arith3", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = true;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            test_driver(testname,
+                        &test_interactive_arith3,
+                        c_debug_flag_v);
+        }
+
+        void test_interactive_arith4(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1018,9 +1075,7 @@ namespace xo {
                 Token::semicolon_token(),
             };
 
-            INFO(testname);
-
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
             const auto & result = parser->result();
             {
@@ -1057,7 +1112,19 @@ namespace xo {
                 REQUIRE(rhs_rhs_i64->value() == 3);
             }
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
+        } /*test_interactive_arith4*/
+
+        TEST_CASE("SchematikaParser-interactive-arith4", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
+
+            test_driver(testname,
+                        &test_interactive_arith4,
+                        c_debug_flag_v);
         }
 
 #ifdef OBSOLETE
@@ -1133,16 +1200,11 @@ namespace xo {
         }
 #endif
 
-        TEST_CASE("SchematikaParser-interactive-cmpne", "[reader2][SchematikaParser]")
+        void test_interactive_cmpne(ParserFixture * fixture)
         {
-            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+            scope log(XO_DEBUG(fixture->debug_flag_));
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag),
-                      xtag("test", testname));
-
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1160,7 +1222,7 @@ namespace xo {
                 /* [3] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
             const auto & result = parser->result();
             {
@@ -1191,19 +1253,26 @@ namespace xo {
                 REQUIRE(rhs_i64->value() == 312);
             }
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-cmpeq", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-cmpne", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag),
-                      xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            test_driver(testname,
+                        &test_interactive_cmpne,
+                        c_debug_flag_v);
+        }
+
+        void test_interactive_cmpeq(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1221,7 +1290,7 @@ namespace xo {
                 /* [3] */ Token::semicolon_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
             const auto & result = parser->result();
             {
@@ -1252,19 +1321,26 @@ namespace xo {
                 REQUIRE(rhs_i64->value() == 312);
             }
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-if1", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-cmpeq", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag),
-                      xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            test_driver(testname,
+                        &test_interactive_cmpeq,
+                        c_debug_flag_v);
+        }
+
+        void test_interactive_if1(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1284,7 +1360,7 @@ namespace xo {
                     /* [4] */ Token::semicolon_token()
                 };
 
-                utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+                utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
             }
 
             {
@@ -1321,7 +1397,7 @@ namespace xo {
                     /* [c] */ Token::semicolon_token()
                 };
 
-                utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+                utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
             }
 
             const auto & result = parser->result();
@@ -1330,18 +1406,27 @@ namespace xo {
                 REQUIRE(expr);
             }
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
-        TEST_CASE("SchematikaParser-interactive-lambda", "[reader2][SchematikaParser]")
+        TEST_CASE("SchematikaParser-interactive-if1", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
 
-            constexpr bool c_debug_flag = false;
-            scope log(XO_DEBUG(c_debug_flag), xtag("test", testname));
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, false}};
 
-            ParserFixture fixture(testname, false /*!gc*/, c_debug_flag);
-            auto parser = fixture.parser_;
+            test_driver(testname,
+                        &test_interactive_if1,
+                        c_debug_flag_v);
+        }
+#endif
+
+        void test_interactive_lambda(ParserFixture * fixture)
+        {
+            scope log(XO_DEBUG(fixture->debug_flag_));
+
+            auto parser = fixture->parser_;
 
             parser->begin_interactive_session();
 
@@ -1371,11 +1456,23 @@ namespace xo {
                 /* [ e] */ Token::rightbrace_token(),
             };
 
-            utest_tokenizer_loop(&fixture, tk_v, c_debug_flag);
+            utest_tokenizer_loop(fixture, tk_v, fixture->debug_flag_);
 
-            log && fixture.log_memory_layout(&log);
+            log && fixture->log_memory_layout(&log);
         }
 
+        TEST_CASE("SchematikaParser-interactive-lambda", "[reader2][SchematikaParser]")
+        {
+            const auto & testname = Catch::getResultCapture().getCurrentTestName();
+
+            // [0] arena; [1] gc
+            constexpr std::array<bool, 2> c_debug_flag_v = {{false, true}};
+            test_driver(testname,
+                        &test_interactive_lambda,
+                        c_debug_flag_v);
+        }
+
+#ifdef NOPE
         TEST_CASE("SchematikaParser-interactive-if2", "[reader2][SchematikaParser]")
         {
             const auto & testname = Catch::getResultCapture().getCurrentTestName();
@@ -1894,7 +1991,7 @@ namespace xo {
 
             log && fixture.log_memory_layout(&log);
         }
-
+#endif
     } /*namespace ut*/
 } /*namespace xo*/
 
