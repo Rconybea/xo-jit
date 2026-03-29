@@ -28,6 +28,12 @@ namespace xo {
         }
 
         auto
+        IRuntimeContext_DVsmRcx::error_allocator(const DVsmRcx & self) noexcept -> obj<AAllocator>
+        {
+            return self.error_allocator();
+        }
+
+        auto
         IRuntimeContext_DVsmRcx::stringtable(const DVsmRcx & self) noexcept -> StringTable *
         {
             return self.stringtable();

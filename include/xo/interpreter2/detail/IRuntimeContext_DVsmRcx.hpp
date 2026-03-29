@@ -52,6 +52,8 @@ namespace xo {
             static obj<AAllocator> allocator(const DVsmRcx & self) noexcept;
             /** collector facet for allocator. If non-null, same data pointer as allocator **/
             static obj<ACollector> collector(const DVsmRcx & self) noexcept;
+            /** last-resort allocator for erros. e.g. regular allocator exhausted **/
+            static obj<AAllocator> error_allocator(const DVsmRcx & self) noexcept;
             /** stringtable for unique symbols **/
             static StringTable * stringtable(const DVsmRcx & self) noexcept;
             /** invoke visitor for each distinct memory pool **/
