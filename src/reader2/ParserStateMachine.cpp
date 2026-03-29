@@ -49,7 +49,10 @@ namespace xo {
                 DGlobalEnv * env = DGlobalEnv::_make(mm,
                                                      global_symtab);
 
-                DSimpleRcx rcx(mm, &stringtable);
+                // FUDGING this for now
+                obj<AAllocator> err_mm;
+
+                DSimpleRcx rcx(mm, err_mm, &stringtable);
 
                 InstallSink sink = ([env, rcx, &log]
                                     (std::string_view name,
