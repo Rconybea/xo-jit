@@ -93,7 +93,7 @@ namespace xo {
             log && log(xtag("DVsmEvalArgsFrame.tseq", typeseq::id<DVsmEvalArgsFrame>()));
             log && log(xtag("DVsmApplyClosureFrame.tseq", typeseq::id<DVsmApplyClosureFrame>()));
             log && log(xtag("DVsmDefContFrame.tseq", typeseq::id<DVsmDefContFrame>()));
-            log && log(xtag("DVsmDefContFrame.tseq", typeseq::id<DVsmDefContFrame>()));
+            //log && log(xtag("DVsmDefContFrame.tseq", typeseq::id<DVsmDefContFrame>()));
             log && log(xtag("DVsmIfElseContFrame.tseq", typeseq::id<DVsmIfElseContFrame>()));
             log && log(xtag("DVsmSeqContFrame.tseq", typeseq::id<DVsmSeqContFrame>()));
             log && log(xtag("DClosure.tseq", typeseq::id<DClosure>()));
@@ -113,6 +113,8 @@ namespace xo {
 
             ok &= gc.install_type(impl_for<AGCObject, DVsmApplyFrame>());
             ok &= gc.install_type(impl_for<AGCObject, DVsmEvalArgsFrame>());
+            ok &= gc.install_type(impl_for<AGCObject, DVsmDefContFrame>());
+
             ok &= gc.install_type(impl_for<AGCObject, DClosure>());
 
             return ok;
