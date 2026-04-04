@@ -16,12 +16,6 @@
 namespace xo {
     namespace scm {
         auto
-        IGCObject_DGlobalSymtab::shallow_size(const DGlobalSymtab & self) noexcept -> size_type
-        {
-            return self.shallow_size();
-        }
-
-        auto
         IGCObject_DGlobalSymtab::shallow_move(DGlobalSymtab & self, obj<ACollector> gc) noexcept -> Opaque
         {
             return self.shallow_move(gc);

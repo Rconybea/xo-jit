@@ -16,12 +16,6 @@
 namespace xo {
     namespace scm {
         auto
-        IGCObject_DLambdaExpr::shallow_size(const DLambdaExpr & self) noexcept -> size_type
-        {
-            return self.shallow_size();
-        }
-
-        auto
         IGCObject_DLambdaExpr::shallow_move(DLambdaExpr & self, obj<ACollector> gc) noexcept -> Opaque
         {
             return self.shallow_move(gc);

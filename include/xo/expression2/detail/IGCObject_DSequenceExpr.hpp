@@ -50,8 +50,6 @@ namespace xo {
             /** @defgroup scm-gcobject-dsequenceexpr-methods **/
             ///@{
             // const methods
-            /** memory consumption for this instance **/
-            static size_type shallow_size(const DSequenceExpr & self) noexcept;
 
             // non-const methods
             /** move instance using allocator **/
