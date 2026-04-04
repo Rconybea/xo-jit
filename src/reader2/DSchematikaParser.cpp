@@ -191,7 +191,7 @@ namespace xo {
         }
 
         DSchematikaParser *
-        DSchematikaParser::shallow_copy(obj<AAllocator> mm) const noexcept
+        DSchematikaParser::shallow_move(obj<AAllocator> mm) const noexcept
         {
             (void)mm;
 

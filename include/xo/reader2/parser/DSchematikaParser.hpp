@@ -156,7 +156,7 @@ namespace xo {
          * - SchematikaParser partially supports the gcobject facet so it can be a collector root node.
          *   It's not actually moveable (since its ParserStateMachine member isn't moveable),
          *   Only the forward_children method is load-bearing.
-         * 
+         *
          **/
         class DSchematikaParser {
         public:
@@ -294,7 +294,7 @@ namespace xo {
 
             std::size_t shallow_size() const noexcept;
             /** not implemented (SchematikaParser not designed to be copyable) **/
-            DSchematikaParser * shallow_copy(obj<AAllocator> mm) const noexcept;
+            DSchematikaParser * shallow_move(obj<AAllocator> mm) const noexcept;
             /** forward gc-aware children **/
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 

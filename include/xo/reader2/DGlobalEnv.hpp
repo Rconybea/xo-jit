@@ -71,7 +71,7 @@ namespace xo {
             ///@{
 
             std::size_t shallow_size() const noexcept;
-            DGlobalEnv * shallow_copy(obj<AAllocator> mm) noexcept;
+            DGlobalEnv * shallow_move(obj<AAllocator> mm) noexcept;
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}

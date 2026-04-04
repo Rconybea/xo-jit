@@ -53,7 +53,7 @@ namespace xo {
             /** memory consumption for this instance **/
             static size_type shallow_size(const DSchematikaParser & self) noexcept;
             /** copy instance using allocator **/
-            static Opaque shallow_copy(const DSchematikaParser & self, obj<AAllocator> mm) noexcept;
+            static Opaque shallow_move(const DSchematikaParser & self, obj<AAllocator> mm) noexcept;
 
             // non-const methods
             /** during GC: forward immdiate children **/
