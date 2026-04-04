@@ -116,7 +116,7 @@ namespace xo {
         DGlobalEnv *
         DGlobalEnv::shallow_move(obj<ACollector> gc) noexcept
         {
-            return gc.std_copy_for<DGlobalEnv>(this);
+            return gc.std_move_for<DGlobalEnv>(this);
         }
 
         std::size_t

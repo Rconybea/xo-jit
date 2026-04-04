@@ -195,7 +195,7 @@ namespace xo {
         {
             (void)gc;
 
-            /** TODO: may be feasible to use gc.std_copy_for(this)
+            /** TODO: may be feasible to use gc.std_move_for(this)
              *  if/when DSchematikaParser is moveable
              **/
             assert(false);
