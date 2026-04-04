@@ -954,11 +954,14 @@ namespace xo {
         }
 
         DVirtualSchematikaMachine *
-        DVirtualSchematikaMachine::shallow_move(obj<AAllocator> mm) const noexcept
+        DVirtualSchematikaMachine::shallow_move(obj<ACollector> gc) noexcept
         {
-            (void)mm;
+            (void)gc;
 
-            /** not copyable (because SchematikaReader isn't) **/
+            /** TODO: should be able to use gc.std_copy_for(this) now
+             *  that shallow_move uses move construction.
+             *  DVirtualSchematikaMachine is (or can be made) moveable.
+             **/
 
             assert(false);
 

@@ -97,13 +97,8 @@ namespace xo {
         }
 
         DLocalEnv *
-        DLocalEnv::shallow_move(obj<AAllocator> mm) const noexcept {
-            DLocalEnv * copy = (DLocalEnv *)mm.alloc_copy((std::byte *)this);
-
-            if (copy)
-                *copy = *this;
-
-            return copy;
+        DLocalEnv::shallow_move(obj<ACollector> gc) noexcept {
+            return gc.std_copy_for(this);
         }
 
         std::size_t

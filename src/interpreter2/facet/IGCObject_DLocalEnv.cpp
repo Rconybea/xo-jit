@@ -22,9 +22,9 @@ namespace xo {
         }
 
         auto
-        IGCObject_DLocalEnv::shallow_move(DLocalEnv & self, obj<AAllocator> mm) noexcept -> Opaque
+        IGCObject_DLocalEnv::shallow_move(DLocalEnv & self, obj<ACollector> gc) noexcept -> Opaque
         {
-            return self.shallow_move(mm);
+            return self.shallow_move(gc);
         }
         auto
         IGCObject_DLocalEnv::forward_children(DLocalEnv & self, obj<ACollector> gc) noexcept -> size_type

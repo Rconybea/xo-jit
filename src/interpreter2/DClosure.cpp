@@ -70,13 +70,8 @@ namespace xo {
         }
 
         DClosure *
-        DClosure::shallow_move(obj<AAllocator> mm) const noexcept {
-            DClosure * copy = (DClosure *)mm.alloc_copy((std::byte *)this);
-
-            if (copy)
-                *copy = *this;
-
-            return copy;
+        DClosure::shallow_move(obj<ACollector> gc) noexcept {
+            return gc.std_copy_for(this);
         }
 
         std::size_t
