@@ -39,7 +39,7 @@ namespace xo {
         }
 
         DVsmSeqContFrame *
-        DVsmSeqContFrame::shallow_copy(obj<AAllocator> mm) const noexcept
+        DVsmSeqContFrame::shallow_copy(obj<AAllocator> mm) noexcept
         {
             return mm.std_copy_for<DVsmSeqContFrame>(this);
         }

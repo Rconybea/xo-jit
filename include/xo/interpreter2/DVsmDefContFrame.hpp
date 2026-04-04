@@ -51,7 +51,7 @@ namespace xo {
             ///@{
 
             std::size_t shallow_size() const noexcept;
-            DVsmDefContFrame * shallow_copy(obj<AAllocator> mm) const noexcept;
+            DVsmDefContFrame * shallow_copy(obj<AAllocator> mm) noexcept;
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}

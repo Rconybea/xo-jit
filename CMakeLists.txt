@@ -172,7 +172,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-gcobject-localenv
     FACET_PKG xo_alloc2
-#    REPR LocalEnv
     INPUT idl/IGCObject_DLocalEnv.json5
 )
 
@@ -180,7 +179,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-printable-localenv
     FACET_PKG xo_printable2
-#    REPR LocalEnv
     INPUT idl/IPrintable_DLocalEnv.json5
 )
 
@@ -189,7 +187,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-runtimecontext-vsmrcx
     FACET_PKG xo_procedure2
-#    REPR DVsmRcx
     INPUT idl/IRuntimeContext_DVsmRcx.json5
     )
 

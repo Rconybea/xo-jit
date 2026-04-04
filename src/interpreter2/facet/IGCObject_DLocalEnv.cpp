@@ -22,11 +22,10 @@ namespace xo {
         }
 
         auto
-        IGCObject_DLocalEnv::shallow_copy(const DLocalEnv & self, obj<AAllocator> mm) noexcept -> Opaque
+        IGCObject_DLocalEnv::shallow_copy(DLocalEnv & self, obj<AAllocator> mm) noexcept -> Opaque
         {
             return self.shallow_copy(mm);
         }
-
         auto
         IGCObject_DLocalEnv::forward_children(DLocalEnv & self, obj<ACollector> gc) noexcept -> size_type
         {

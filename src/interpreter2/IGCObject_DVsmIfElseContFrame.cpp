@@ -22,11 +22,10 @@ namespace xo {
         }
 
         auto
-        IGCObject_DVsmIfElseContFrame::shallow_copy(const DVsmIfElseContFrame & self, obj<AAllocator> mm) noexcept -> Opaque
+        IGCObject_DVsmIfElseContFrame::shallow_copy(DVsmIfElseContFrame & self, obj<AAllocator> mm) noexcept -> Opaque
         {
             return self.shallow_copy(mm);
         }
-
         auto
         IGCObject_DVsmIfElseContFrame::forward_children(DVsmIfElseContFrame & self, obj<ACollector> gc) noexcept -> size_type
         {
