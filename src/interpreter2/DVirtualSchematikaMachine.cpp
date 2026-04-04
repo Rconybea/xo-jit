@@ -958,7 +958,7 @@ namespace xo {
         {
             (void)gc;
 
-            /** TODO: should be able to use gc.std_copy_for(this) now
+            /** TODO: should be able to use gc.std_move_for(this) now
              *  that shallow_move uses move construction.
              *  DVirtualSchematikaMachine is (or can be made) moveable.
              **/

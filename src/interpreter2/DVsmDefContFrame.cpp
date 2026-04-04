@@ -40,7 +40,7 @@ namespace xo {
         DVsmDefContFrame *
         DVsmDefContFrame::shallow_move(obj<ACollector> gc) noexcept
         {
-            return gc.std_copy_for<DVsmDefContFrame>(this);
+            return gc.std_move_for<DVsmDefContFrame>(this);
         }
 
         std::size_t

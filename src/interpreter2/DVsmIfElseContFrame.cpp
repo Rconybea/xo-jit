@@ -38,7 +38,7 @@ namespace xo {
         DVsmIfElseContFrame *
         DVsmIfElseContFrame::shallow_move(obj<ACollector> gc) noexcept
         {
-            return gc.std_copy_for<DVsmIfElseContFrame>(this);
+            return gc.std_move_for<DVsmIfElseContFrame>(this);
         }
 
         std::size_t
