@@ -22,11 +22,10 @@ namespace xo {
         }
 
         auto
-        IGCObject_DVariable::shallow_copy(const DVariable & self, obj<AAllocator> mm) noexcept -> Opaque
+        IGCObject_DVariable::shallow_copy(DVariable & self, obj<AAllocator> mm) noexcept -> Opaque
         {
             return self.shallow_copy(mm);
         }
-
         auto
         IGCObject_DVariable::forward_children(DVariable & self, obj<ACollector> gc) noexcept -> size_type
         {

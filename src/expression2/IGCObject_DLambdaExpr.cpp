@@ -22,11 +22,10 @@ namespace xo {
         }
 
         auto
-        IGCObject_DLambdaExpr::shallow_copy(const DLambdaExpr & self, obj<AAllocator> mm) noexcept -> Opaque
+        IGCObject_DLambdaExpr::shallow_copy(DLambdaExpr & self, obj<AAllocator> mm) noexcept -> Opaque
         {
             return self.shallow_copy(mm);
         }
-
         auto
         IGCObject_DLambdaExpr::forward_children(DLambdaExpr & self, obj<ACollector> gc) noexcept -> size_type
         {

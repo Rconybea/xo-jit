@@ -119,7 +119,7 @@ namespace xo {
         }
 
         DLocalSymtab *
-        DLocalSymtab::shallow_copy(obj<AAllocator> mm) const noexcept
+        DLocalSymtab::shallow_copy(obj<AAllocator> mm) noexcept
         {
             return mm.std_copy_for(this);
         }

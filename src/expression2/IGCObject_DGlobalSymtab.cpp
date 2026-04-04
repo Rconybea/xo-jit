@@ -22,11 +22,10 @@ namespace xo {
         }
 
         auto
-        IGCObject_DGlobalSymtab::shallow_copy(const DGlobalSymtab & self, obj<AAllocator> mm) noexcept -> Opaque
+        IGCObject_DGlobalSymtab::shallow_copy(DGlobalSymtab & self, obj<AAllocator> mm) noexcept -> Opaque
         {
             return self.shallow_copy(mm);
         }
-
         auto
         IGCObject_DGlobalSymtab::forward_children(DGlobalSymtab & self, obj<ACollector> gc) noexcept -> size_type
         {

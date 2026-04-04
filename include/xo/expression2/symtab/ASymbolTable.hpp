@@ -45,6 +45,11 @@ public:
     /** @defgroup scm-symboltable-methods **/
     ///@{
     // const methods
+    /** An uninitialized ASymbolTable instance will have zero vtable pointer (per {linux,osx} abi).
+     *  Use case for this is narrow. We go to some lengths to avoid null vtable pointers. For example
+     *  obj<AFacet> will have non-null vtable (via IFacet_Any) with all methods terminating.
+     **/
+    bool _has_null_vptr() const noexcept { return *reinterpret_cast<const void * const *>(this) == nullptr; }
     /** RTTI: unique id# for actual runtime data representation **/
     virtual typeseq _typeseq() const noexcept = 0;
     /** destroy instance @p d; calls c++ dtor only for actual runtime type; does not recover memory **/

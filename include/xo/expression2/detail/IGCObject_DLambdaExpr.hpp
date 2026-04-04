@@ -52,10 +52,10 @@ namespace xo {
             // const methods
             /** memory consumption for this instance **/
             static size_type shallow_size(const DLambdaExpr & self) noexcept;
-            /** copy instance using allocator **/
-            static Opaque shallow_copy(const DLambdaExpr & self, obj<AAllocator> mm) noexcept;
 
             // non-const methods
+            /** copy instance using allocator **/
+            static Opaque shallow_copy(DLambdaExpr & self, obj<AAllocator> mm) noexcept;
             /** during GC: forward immdiate children **/
             static size_type forward_children(DLambdaExpr & self, obj<ACollector> gc) noexcept;
             ///@}
