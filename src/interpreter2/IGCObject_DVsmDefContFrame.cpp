@@ -27,9 +27,9 @@ namespace xo {
             return self.shallow_move(gc);
         }
         auto
-        IGCObject_DVsmDefContFrame::forward_children(DVsmDefContFrame & self, obj<ACollector> gc) noexcept -> size_type
+        IGCObject_DVsmDefContFrame::forward_children(DVsmDefContFrame & self, obj<ACollector> gc) noexcept -> void
         {
-            return self.forward_children(gc);
+            self.forward_children(gc);
         }
 
     } /*namespace scm*/
