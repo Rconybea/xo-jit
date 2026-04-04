@@ -22,9 +22,9 @@ namespace xo {
         }
 
         auto
-        IGCObject_DVsmApplyClosureFrame::shallow_copy(DVsmApplyClosureFrame & self, obj<AAllocator> mm) noexcept -> Opaque
+        IGCObject_DVsmApplyClosureFrame::shallow_move(DVsmApplyClosureFrame & self, obj<AAllocator> mm) noexcept -> Opaque
         {
-            return self.shallow_copy(mm);
+            return self.shallow_move(mm);
         }
         auto
         IGCObject_DVsmApplyClosureFrame::forward_children(DVsmApplyClosureFrame & self, obj<ACollector> gc) noexcept -> size_type

@@ -47,7 +47,7 @@ namespace xo {
         }
 
         DVsmApplyFrame *
-        DVsmApplyFrame::shallow_copy(obj<AAllocator> mm) const noexcept
+        DVsmApplyFrame::shallow_move(obj<AAllocator> mm) const noexcept
         {
             DVsmApplyFrame * copy = (DVsmApplyFrame *)mm.alloc_copy((std::byte *)this);
 

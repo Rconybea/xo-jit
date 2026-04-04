@@ -43,7 +43,7 @@ namespace xo {
             int32_t increment_arg() { return ++i_arg_; }
 
             std::size_t shallow_size() const noexcept;
-            DVsmEvalArgsFrame * shallow_copy(obj<AAllocator> mm) const noexcept;
+            DVsmEvalArgsFrame * shallow_move(obj<AAllocator> mm) const noexcept;
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             bool pretty(const ppindentinfo & ppii) const;

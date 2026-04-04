@@ -36,7 +36,7 @@ namespace xo {
         }
 
         DVsmIfElseContFrame *
-        DVsmIfElseContFrame::shallow_copy(obj<AAllocator> mm) noexcept
+        DVsmIfElseContFrame::shallow_move(obj<AAllocator> mm) noexcept
         {
             return mm.std_copy_for<DVsmIfElseContFrame>(this);
         }

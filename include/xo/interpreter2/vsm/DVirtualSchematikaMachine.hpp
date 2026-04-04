@@ -153,7 +153,7 @@ namespace xo {
             /** shallow copy during gc cycle.  Not implemented!  Only intending to support
              *  VSM as virtual root
              **/
-            DVirtualSchematikaMachine * shallow_copy(obj<AAllocator> mm) const noexcept;
+            DVirtualSchematikaMachine * shallow_move(obj<AAllocator> mm) const noexcept;
 
             /** forward gc-aware child pointers
              **/

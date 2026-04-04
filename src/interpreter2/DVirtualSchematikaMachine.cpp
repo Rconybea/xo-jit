@@ -954,7 +954,7 @@ namespace xo {
         }
 
         DVirtualSchematikaMachine *
-        DVirtualSchematikaMachine::shallow_copy(obj<AAllocator> mm) const noexcept
+        DVirtualSchematikaMachine::shallow_move(obj<AAllocator> mm) const noexcept
         {
             (void)mm;
 

@@ -70,7 +70,7 @@ namespace xo {
         }
 
         DClosure *
-        DClosure::shallow_copy(obj<AAllocator> mm) const noexcept {
+        DClosure::shallow_move(obj<AAllocator> mm) const noexcept {
             DClosure * copy = (DClosure *)mm.alloc_copy((std::byte *)this);
 
             if (copy)

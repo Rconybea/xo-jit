@@ -58,7 +58,7 @@ namespace xo {
             ///@{
 
             std::size_t shallow_size() const noexcept;
-            DClosure * shallow_copy(obj<AAllocator> mm) const noexcept;
+            DClosure * shallow_move(obj<AAllocator> mm) const noexcept;
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}

@@ -38,7 +38,7 @@ namespace xo {
         }
 
         DVsmDefContFrame *
-        DVsmDefContFrame::shallow_copy(obj<AAllocator> mm) noexcept
+        DVsmDefContFrame::shallow_move(obj<AAllocator> mm) noexcept
         {
             return mm.std_copy_for<DVsmDefContFrame>(this);
         }
