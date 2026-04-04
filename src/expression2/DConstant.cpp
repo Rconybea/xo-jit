@@ -78,7 +78,7 @@ namespace xo {
         }
 
         DConstant *
-        DConstant::shallow_copy(obj<AAllocator> mm) const noexcept
+        DConstant::shallow_move(obj<AAllocator> mm) const noexcept
         {
             DConstant * copy = (DConstant *)mm.alloc_copy((std::byte *)this);
 

@@ -54,8 +54,8 @@ namespace xo {
             static size_type shallow_size(const DApplyExpr & self) noexcept;
 
             // non-const methods
-            /** copy instance using allocator **/
-            static Opaque shallow_copy(DApplyExpr & self, obj<AAllocator> mm) noexcept;
+            /** move instance using allocator **/
+            static Opaque shallow_move(DApplyExpr & self, obj<AAllocator> mm) noexcept;
             /** during GC: forward immdiate children **/
             static size_type forward_children(DApplyExpr & self, obj<ACollector> gc) noexcept;
             ///@}

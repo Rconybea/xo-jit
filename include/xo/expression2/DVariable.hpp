@@ -63,7 +63,7 @@ namespace xo {
             ///@{
 
             size_t shallow_size() const noexcept;
-            DVariable * shallow_copy(obj<AAllocator> mm) const noexcept;
+            DVariable * shallow_move(obj<AAllocator> mm) const noexcept;
             size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}

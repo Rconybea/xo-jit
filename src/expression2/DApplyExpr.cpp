@@ -110,7 +110,7 @@ namespace xo {
         }
 
         DApplyExpr *
-        DApplyExpr::shallow_copy(obj<AAllocator> mm) const noexcept {
+        DApplyExpr::shallow_move(obj<AAllocator> mm) const noexcept {
             DApplyExpr * copy = (DApplyExpr *)mm.alloc_copy((std::byte *)this);
 
             if (copy) {

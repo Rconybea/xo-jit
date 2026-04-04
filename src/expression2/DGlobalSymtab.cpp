@@ -261,7 +261,7 @@ namespace xo {
         }
 
         DGlobalSymtab *
-        DGlobalSymtab::shallow_copy(obj<AAllocator> mm) const noexcept
+        DGlobalSymtab::shallow_move(obj<AAllocator> mm) const noexcept
         {
             /** can't use std_copy_for because of non-copyable dp<repr_type>
              *

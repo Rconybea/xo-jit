@@ -85,7 +85,7 @@ namespace xo {
         }
 
         DDefineExpr *
-        DDefineExpr::shallow_copy(obj<AAllocator> mm) noexcept
+        DDefineExpr::shallow_move(obj<AAllocator> mm) noexcept
         {
             return mm.std_copy_for(this);
         }

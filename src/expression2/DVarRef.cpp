@@ -65,7 +65,7 @@ namespace xo {
         }
 
         DVarRef *
-        DVarRef::shallow_copy(obj<AAllocator> mm) const noexcept
+        DVarRef::shallow_move(obj<AAllocator> mm) const noexcept
         {
             DVarRef * copy = (DVarRef *)mm.alloc_copy((std::byte *)this);
 

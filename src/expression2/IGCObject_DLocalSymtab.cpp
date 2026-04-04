@@ -22,9 +22,9 @@ namespace xo {
         }
 
         auto
-        IGCObject_DLocalSymtab::shallow_copy(DLocalSymtab & self, obj<AAllocator> mm) noexcept -> Opaque
+        IGCObject_DLocalSymtab::shallow_move(DLocalSymtab & self, obj<AAllocator> mm) noexcept -> Opaque
         {
-            return self.shallow_copy(mm);
+            return self.shallow_move(mm);
         }
         auto
         IGCObject_DLocalSymtab::forward_children(DLocalSymtab & self, obj<ACollector> gc) noexcept -> size_type

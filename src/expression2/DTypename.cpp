@@ -47,7 +47,7 @@ namespace xo {
         }
 
         DTypename *
-        DTypename::shallow_copy(obj<AAllocator> mm) noexcept
+        DTypename::shallow_move(obj<AAllocator> mm) noexcept
         {
             return mm.std_copy_for(this);
         }

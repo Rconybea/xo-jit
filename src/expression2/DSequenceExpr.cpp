@@ -120,7 +120,7 @@ namespace xo {
         }
 
         DSequenceExpr *
-        DSequenceExpr::shallow_copy(obj<AAllocator> mm) const noexcept
+        DSequenceExpr::shallow_move(obj<AAllocator> mm) const noexcept
         {
             DSequenceExpr * copy = (DSequenceExpr *)mm.alloc_copy((std::byte *)this);
 

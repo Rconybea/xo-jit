@@ -89,7 +89,7 @@ namespace xo {
         }
 
         DIfElseExpr *
-        DIfElseExpr::shallow_copy(obj<AAllocator> mm) const noexcept
+        DIfElseExpr::shallow_move(obj<AAllocator> mm) const noexcept
         {
             DIfElseExpr * copy = (DIfElseExpr *)mm.alloc_copy((std::byte *)this);
 
