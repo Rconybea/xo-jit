@@ -27,9 +27,9 @@ namespace xo {
             return self.shallow_move(gc);
         }
         auto
-        IGCObject_DGlobalEnv::forward_children(DGlobalEnv & self, obj<ACollector> gc) noexcept -> size_type
+        IGCObject_DGlobalEnv::forward_children(DGlobalEnv & self, obj<ACollector> gc) noexcept -> void
         {
-            return self.forward_children(gc);
+            self.forward_children(gc);
         }
 
     } /*namespace scm*/
