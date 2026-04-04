@@ -16,12 +16,6 @@
 namespace xo {
     namespace scm {
         auto
-        IGCObject_DClosure::shallow_size(const DClosure & self) noexcept -> size_type
-        {
-            return self.shallow_size();
-        }
-
-        auto
         IGCObject_DClosure::shallow_move(DClosure & self, obj<ACollector> gc) noexcept -> Opaque
         {
             return self.shallow_move(gc);

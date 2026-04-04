@@ -50,8 +50,6 @@ namespace xo {
             /** @defgroup scm-gcobject-dvirtualschematikamachine-methods **/
             ///@{
             // const methods
-            /** memory consumption for this instance **/
-            static size_type shallow_size(const DVirtualSchematikaMachine & self) noexcept;
 
             // non-const methods
             /** move instance using allocator **/
