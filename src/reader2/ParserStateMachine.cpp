@@ -897,19 +897,12 @@ namespace xo {
         // ----- gc support -----
 
 #ifdef OBSOLETE
-        std::size_t
-        ParserStateMachine::shallow_size() const noexcept
+        void
+        ParserStateMachine::shallow_copy(obj<ACollector> gc) noexcept
         {
-            return sizeof(ParserStateMachine);
-        }
-
-        ParserStateMachine *
-        ParserStateMachine::shallow_copy(obj<AAllocator> mm) const noexcept
-        {
-            (void)mm;
+            (void)gc;
 
             assert(false);
-            return nullptr;
         }
 #endif
 

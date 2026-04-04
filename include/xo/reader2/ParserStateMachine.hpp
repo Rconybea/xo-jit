@@ -351,15 +351,6 @@ namespace xo {
             /** @defgroup scm-parserstatemachine-gcobject-facet gc support **/
             ///@{
 
-#ifdef OBSOLETE
-            std::size_t shallow_size() const noexcept;
-            /** NOTE:
-             *  ParserStateMachine only eligible to be a GC root.
-             *  It's not eligible to reside in gc-owned space
-             **/
-            ParserStateMachine * shallow_copy(obj<AAllocator> mm) const noexcept;
-            std::size_t forward_children(obj<ACollector> gc) noexcept;
-#endif
             /** update gc-aware exit pointers from this ParserStateMachine **/
             void forward_children(obj<ACollector> gc) noexcept;
 
