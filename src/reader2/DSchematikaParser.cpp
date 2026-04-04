@@ -191,10 +191,13 @@ namespace xo {
         }
 
         DSchematikaParser *
-        DSchematikaParser::shallow_move(obj<AAllocator> mm) const noexcept
+        DSchematikaParser::shallow_move(obj<ACollector> gc) noexcept
         {
-            (void)mm;
+            (void)gc;
 
+            /** TODO: may be feasible to use gc.std_copy_for(this)
+             *  if/when DSchematikaParser is moveable
+             **/
             assert(false);
             return nullptr;
         }

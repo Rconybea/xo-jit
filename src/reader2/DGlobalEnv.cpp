@@ -114,9 +114,9 @@ namespace xo {
         }
 
         DGlobalEnv *
-        DGlobalEnv::shallow_move(obj<AAllocator> mm) noexcept
+        DGlobalEnv::shallow_move(obj<ACollector> gc) noexcept
         {
-            return mm.std_copy_for<DGlobalEnv>(this);
+            return gc.std_copy_for<DGlobalEnv>(this);
         }
 
         std::size_t

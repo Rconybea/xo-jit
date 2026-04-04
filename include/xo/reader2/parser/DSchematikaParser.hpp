@@ -294,7 +294,7 @@ namespace xo {
 
             std::size_t shallow_size() const noexcept;
             /** not implemented (SchematikaParser not designed to be copyable) **/
-            DSchematikaParser * shallow_move(obj<AAllocator> mm) const noexcept;
+            DSchematikaParser * shallow_move(obj<ACollector> gc) noexcept;
             /** forward gc-aware children **/
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 

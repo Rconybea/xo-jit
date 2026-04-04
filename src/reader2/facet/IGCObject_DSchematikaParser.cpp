@@ -22,9 +22,9 @@ namespace xo {
         }
 
         auto
-        IGCObject_DSchematikaParser::shallow_move(DSchematikaParser & self, obj<AAllocator> mm) noexcept -> Opaque
+        IGCObject_DSchematikaParser::shallow_move(DSchematikaParser & self, obj<ACollector> gc) noexcept -> Opaque
         {
-            return self.shallow_move(mm);
+            return self.shallow_move(gc);
         }
         auto
         IGCObject_DSchematikaParser::forward_children(DSchematikaParser & self, obj<ACollector> gc) noexcept -> size_type
