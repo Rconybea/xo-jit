@@ -43,6 +43,9 @@ namespace xo {
             DGlobalSymtab(dp<repr_type> var_map, DArray * vars,
                           dp<repr_type> type_map, DArray * types);
 
+            /** move constructor (needed because dp<> deletes copy ctor) **/
+            DGlobalSymtab(DGlobalSymtab && other) = default;
+
             /** create instance.
              *  Use memory from @p fixed_mm for @ref map_.
              *  Use memory from @p mm for DGlobalSymtab instance.
@@ -111,7 +114,7 @@ namespace xo {
             ///@{
 
             std::size_t shallow_size() const noexcept;
-            DGlobalSymtab * shallow_move(obj<AAllocator> mm) const noexcept;
+            DGlobalSymtab * shallow_move(obj<ACollector> gc) noexcept;
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}

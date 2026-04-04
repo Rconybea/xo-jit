@@ -261,25 +261,9 @@ namespace xo {
         }
 
         DGlobalSymtab *
-        DGlobalSymtab::shallow_move(obj<AAllocator> mm) const noexcept
+        DGlobalSymtab::shallow_move(obj<ACollector> gc) noexcept
         {
-            /** can't use std_copy_for because of non-copyable dp<repr_type>
-             *
-             * TODO: rename to shallow_move() throughout, and have std_copy_for()
-             *       -> std_move_for()
-             *
-             **/
-
-            void * copy_mem = mm.alloc_copy_for(this);
-
-            if (copy_mem) {
-                DGlobalSymtab * self = const_cast<DGlobalSymtab*>(this);
-
-                return new (copy_mem) DGlobalSymtab(std::move(self->var_map_), vars_,
-                                                    std::move(self->type_map_), types_);
-            }
-
-            return nullptr;
+            return gc.std_copy_for(this);
         }
 
         std::size_t

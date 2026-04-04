@@ -140,14 +140,8 @@ namespace xo {
         }
 
         DLambdaExpr *
-        DLambdaExpr::shallow_move(obj<AAllocator> mm) const noexcept {
-            DLambdaExpr * copy = (DLambdaExpr *)mm.alloc_copy((std::byte *)this);
-
-            if (copy) {
-                *copy = *this;
-            }
-
-            return copy;
+        DLambdaExpr::shallow_move(obj<ACollector> gc) noexcept {
+            return gc.std_copy_for(this);
         }
 
         std::size_t

@@ -85,7 +85,7 @@ namespace xo {
             ///@{
 
             std::size_t shallow_size() const noexcept;
-            DLambdaExpr * shallow_move(obj<AAllocator> mm) const noexcept;
+            DLambdaExpr * shallow_move(obj<ACollector> gc) noexcept;
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}

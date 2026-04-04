@@ -110,8 +110,11 @@ namespace xo {
         }
 
         DApplyExpr *
-        DApplyExpr::shallow_move(obj<AAllocator> mm) const noexcept {
-            DApplyExpr * copy = (DApplyExpr *)mm.alloc_copy((std::byte *)this);
+        DApplyExpr::shallow_move(obj<ACollector> gc) noexcept {
+            // note: not using ACollector.std_copy_for() here,
+            //       flexible array -> not move-constructible
+
+            DApplyExpr * copy = (DApplyExpr *)gc.alloc_copy_for(this);
 
             if (copy) {
                 copy->typeref_ = typeref_;

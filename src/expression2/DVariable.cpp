@@ -45,15 +45,9 @@ namespace xo {
         }
 
         DVariable *
-        DVariable::shallow_move(obj<AAllocator> mm) const noexcept
+        DVariable::shallow_move(obj<ACollector> gc) noexcept
         {
-            DVariable * copy = (DVariable *)mm.alloc_copy((std::byte *)this);
-
-            if (copy) {
-                *copy = *this;
-            }
-
-            return copy;
+            return gc.std_copy_for(this);
         }
 
         size_t

@@ -22,9 +22,9 @@ namespace xo {
         }
 
         auto
-        IGCObject_DApplyExpr::shallow_move(DApplyExpr & self, obj<AAllocator> mm) noexcept -> Opaque
+        IGCObject_DApplyExpr::shallow_move(DApplyExpr & self, obj<ACollector> gc) noexcept -> Opaque
         {
-            return self.shallow_move(mm);
+            return self.shallow_move(gc);
         }
         auto
         IGCObject_DApplyExpr::forward_children(DApplyExpr & self, obj<ACollector> gc) noexcept -> size_type

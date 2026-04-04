@@ -98,7 +98,7 @@ namespace xo {
             ///@{
 
             std::size_t shallow_size() const noexcept;
-            DLocalSymtab * shallow_move(obj<AAllocator> mm) noexcept;
+            DLocalSymtab * shallow_move(obj<ACollector> gc) noexcept;
             std::size_t forward_children(obj<ACollector> gc) noexcept;
 
             ///@}
