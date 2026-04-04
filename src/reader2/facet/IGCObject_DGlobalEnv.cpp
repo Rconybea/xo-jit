@@ -16,12 +16,6 @@
 namespace xo {
     namespace scm {
         auto
-        IGCObject_DGlobalEnv::shallow_size(const DGlobalEnv & self) noexcept -> size_type
-        {
-            return self.shallow_size();
-        }
-
-        auto
         IGCObject_DGlobalEnv::shallow_move(DGlobalEnv & self, obj<ACollector> gc) noexcept -> Opaque
         {
             return self.shallow_move(gc);
