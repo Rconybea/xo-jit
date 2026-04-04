@@ -44,7 +44,7 @@ namespace xo {
                           dp<repr_type> type_map, DArray * types);
 
             /** move constructor (needed because dp<> deletes copy ctor) **/
-            DGlobalSymtab(DGlobalSymtab && other) = default;
+            DGlobalSymtab(DGlobalSymtab && other);
 
             /** create instance.
              *  Use memory from @p fixed_mm for @ref map_.

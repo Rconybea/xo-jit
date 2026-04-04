@@ -29,6 +29,14 @@ namespace xo {
         {
         }
 
+        DGlobalSymtab::DGlobalSymtab(DGlobalSymtab && other)
+        : var_map_{std::move(other.var_map_)},
+          vars_{std::move(other.vars_)},
+          type_map_{std::move(other.type_map_)},
+          types_{std::move(other.types_)}
+        {
+        }
+
         DGlobalSymtab *
         DGlobalSymtab::_make(obj<AAllocator> mm,
                              obj<AAllocator> aux_mm,
