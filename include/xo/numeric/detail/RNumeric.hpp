@@ -46,6 +46,7 @@ public:
     ///@{
 
     // explicit injected content
+    static obj<ANumeric> multiply(obj<ANumeric> lhs, obj<ANumeric> rhs);
 
     // builtin methods
     typeseq _typeseq() const noexcept { return O::iface()->_typeseq(); }
