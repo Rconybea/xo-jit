@@ -15,7 +15,7 @@ namespace xo {
          **/
         class DVsmSeqContFrame {
         public:
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
@@ -32,10 +32,10 @@ namespace xo {
 
             /** create instance using memory from allocator @p mm **/
             static DVsmSeqContFrame * make(obj<AAllocator> mm,
-                                                obj<AGCObject> parent,
-                                                VsmInstr cont,
-                                                DSequenceExpr * seq_expr,
-                                                uint32_t i_seq);
+                                           obj<AGCObject> parent,
+                                           VsmInstr cont,
+                                           DSequenceExpr * seq_expr,
+                                           uint32_t i_seq);
 
             ///@}
             /** @defgroup scm-vsmevalsequenceframe-access-methods access methods **/
@@ -56,7 +56,7 @@ namespace xo {
             /** @defgroup scm-vsmevalsequenceframe-gcobject-facet gcobject facet **/
             ///@{
 
-            DVsmSeqContFrame * shallow_move(obj<ACollector> gc) noexcept;
+            DVsmSeqContFrame * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}

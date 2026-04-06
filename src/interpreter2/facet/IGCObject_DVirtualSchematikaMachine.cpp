@@ -16,9 +16,9 @@
 namespace xo {
     namespace scm {
         auto
-        IGCObject_DVirtualSchematikaMachine::shallow_move(DVirtualSchematikaMachine & self, obj<ACollector> gc) noexcept -> Opaque
+        IGCObject_DVirtualSchematikaMachine::gco_shallow_move(DVirtualSchematikaMachine & self, obj<AGCObjectVisitor> gc) noexcept -> Opaque
         {
-            return self.shallow_move(gc);
+            return self.gco_shallow_move(gc);
         }
         auto
         IGCObject_DVirtualSchematikaMachine::visit_gco_children(DVirtualSchematikaMachine & self, obj<AGCObjectVisitor> fn) noexcept -> void

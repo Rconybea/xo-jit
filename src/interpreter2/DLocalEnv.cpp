@@ -92,7 +92,7 @@ namespace xo {
         }
 
         DLocalEnv *
-        DLocalEnv::shallow_move(obj<ACollector> gc) noexcept {
+        DLocalEnv::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept {
             return gc.std_move_for(this);
         }
 

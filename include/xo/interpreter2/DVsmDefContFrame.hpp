@@ -15,7 +15,7 @@ namespace xo {
          **/
         class DVsmDefContFrame {
         public:
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
@@ -51,7 +51,7 @@ namespace xo {
             /** @defgroup scm-vsmdefcontframe-gcobject-facet gcobject facet **/
             ///@{
 
-            DVsmDefContFrame * shallow_move(obj<ACollector> gc) noexcept;
+            DVsmDefContFrame * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}

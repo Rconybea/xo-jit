@@ -65,7 +65,7 @@ namespace xo {
         }
 
         DClosure *
-        DClosure::shallow_move(obj<ACollector> gc) noexcept {
+        DClosure::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept {
             return gc.std_move_for(this);
         }
 

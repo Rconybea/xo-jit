@@ -16,7 +16,7 @@ namespace xo {
         class DLocalEnv {
         public:
             using DArray = xo::scm::DArray;
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
@@ -55,7 +55,7 @@ namespace xo {
             /** @defgroup scm-localenv-gcobject-facet **/
             ///@{
 
-            DLocalEnv * shallow_move(obj<ACollector> gc) noexcept;
+            DLocalEnv * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}

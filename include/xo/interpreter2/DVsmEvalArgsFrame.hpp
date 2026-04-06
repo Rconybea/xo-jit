@@ -14,7 +14,7 @@ namespace xo {
         /** frame for executing an apply expression **/
         class DVsmEvalArgsFrame {
         public:
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
@@ -43,7 +43,7 @@ namespace xo {
 
             int32_t increment_arg() { return ++i_arg_; }
 
-            DVsmEvalArgsFrame * shallow_move(obj<ACollector> gc) noexcept;
+            DVsmEvalArgsFrame * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             bool pretty(const ppindentinfo & ppii) const;

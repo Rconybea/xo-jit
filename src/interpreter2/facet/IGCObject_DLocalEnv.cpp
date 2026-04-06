@@ -16,9 +16,9 @@
 namespace xo {
     namespace scm {
         auto
-        IGCObject_DLocalEnv::shallow_move(DLocalEnv & self, obj<ACollector> gc) noexcept -> Opaque
+        IGCObject_DLocalEnv::gco_shallow_move(DLocalEnv & self, obj<AGCObjectVisitor> gc) noexcept -> Opaque
         {
-            return self.shallow_move(gc);
+            return self.gco_shallow_move(gc);
         }
         auto
         IGCObject_DLocalEnv::visit_gco_children(DLocalEnv & self, obj<AGCObjectVisitor> fn) noexcept -> void

@@ -33,9 +33,9 @@ namespace xo {
         // gcobject facet
 
         DVsmSeqContFrame *
-        DVsmSeqContFrame::shallow_move(obj<ACollector> gc) noexcept
+        DVsmSeqContFrame::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
-            return gc.std_move_for<DVsmSeqContFrame>(this);
+            return gc.std_move_for(this);
         }
 
         void

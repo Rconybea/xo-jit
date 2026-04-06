@@ -41,7 +41,7 @@ namespace xo {
 
             /** gcobject facet **/
             std::size_t shallow_size() const noexcept;
-            DVsmApplyClosureFrame * shallow_move(obj<ACollector> gc) noexcept;
+            DVsmApplyClosureFrame * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             /** pretty-printing support **/

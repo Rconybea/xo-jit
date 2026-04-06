@@ -71,7 +71,7 @@ namespace xo {
         public:
             // will be DArenaVector<obj<StackFrame>> probably
             using Stack = void *;
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
@@ -154,7 +154,7 @@ namespace xo {
             /** shallow copy during gc cycle.  Not implemented!  Only intending to support
              *  VSM as virtual root
              **/
-            DVirtualSchematikaMachine * shallow_move(obj<ACollector> gc) noexcept;
+            DVirtualSchematikaMachine * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
 
             /** forward gc-aware child pointers
              **/

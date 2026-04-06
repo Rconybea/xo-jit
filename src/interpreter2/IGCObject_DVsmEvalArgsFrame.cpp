@@ -16,9 +16,9 @@
 namespace xo {
     namespace scm {
         auto
-        IGCObject_DVsmEvalArgsFrame::shallow_move(DVsmEvalArgsFrame & self, obj<ACollector> gc) noexcept -> Opaque
+        IGCObject_DVsmEvalArgsFrame::gco_shallow_move(DVsmEvalArgsFrame & self, obj<AGCObjectVisitor> gc) noexcept -> Opaque
         {
-            return self.shallow_move(gc);
+            return self.gco_shallow_move(gc);
         }
         auto
         IGCObject_DVsmEvalArgsFrame::visit_gco_children(DVsmEvalArgsFrame & self, obj<AGCObjectVisitor> fn) noexcept -> void

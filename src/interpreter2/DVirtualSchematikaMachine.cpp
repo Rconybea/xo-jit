@@ -954,8 +954,11 @@ namespace xo {
         }
 
         DVirtualSchematikaMachine *
-        DVirtualSchematikaMachine::shallow_move(obj<ACollector> gc) noexcept
+        DVirtualSchematikaMachine::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
+            // need move-ctor on abox<..>
+            //return gc.std_move_for(this);
+
             (void)gc;
 
             /** TODO: should be able to use gc.std_move_for(this) now
