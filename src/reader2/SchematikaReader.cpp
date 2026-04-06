@@ -10,9 +10,9 @@ namespace xo {
 
     namespace scm {
         void
-        ReaderResult::forward_children(obj<ACollector> gc) noexcept
+        ReaderResult::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_pivot_inplace(&expr_);
+            gc.visit_poly_child(&expr_);
         }
 
         // ----- SchematikaReader -----
@@ -208,12 +208,12 @@ namespace xo {
         }
 
         void
-        SchematikaReader::forward_children(obj<ACollector> gc) noexcept
+        SchematikaReader::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
             // tokenizer doesn't contain any gc-aware pointers.
 
-            parser_.forward_children(gc);
-            result_.forward_children(gc);
+            parser_.visit_gco_children(gc);
+            result_.visit_gco_children(gc);
         }
 
     } /*namespace scm*/

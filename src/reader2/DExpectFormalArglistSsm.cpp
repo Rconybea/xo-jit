@@ -358,9 +358,9 @@ namespace xo {
         }
 
         void
-        DExpectFormalArglistSsm::forward_children(obj<ACollector> gc) noexcept
+        DExpectFormalArglistSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&argl_);
+            gc.visit_child(&argl_);
         }
 
     } /*namespace scm*/

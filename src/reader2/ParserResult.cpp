@@ -106,12 +106,12 @@ namespace xo {
         }
 
         void
-        ParserResult::forward_children(obj<ACollector> gc) noexcept
+        ParserResult::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
             // {result_type_, error_src_fn_}: pod, ignore
 
-            gc.forward_pivot_inplace(&result_expr_);
-            gc.forward_inplace(const_cast<DString **>(&error_description_));
+            gc.visit_poly_child(&result_expr_);
+            gc.visit_child(&error_description_);
         }
     } /*namespace scm*/
 } /*namespace xo*/

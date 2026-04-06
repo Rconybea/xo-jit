@@ -78,9 +78,9 @@ namespace xo {
             self.on_quoted_literal(lit, p_psm);
         }
         auto
-        ISyntaxStateMachine_DParenSsm::forward_children(DParenSsm & self, obj<ACollector> gc) -> void
+        ISyntaxStateMachine_DParenSsm::visit_gco_children(DParenSsm & self, obj<AGCObjectVisitor> gc) -> void
         {
-            self.forward_children(gc);
+            self.visit_gco_children(gc);
         }
 
     } /*namespace scm*/

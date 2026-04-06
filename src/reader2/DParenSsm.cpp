@@ -459,9 +459,9 @@ namespace xo {
         }
 
         void
-        DParenSsm::forward_children(obj<ACollector> gc) noexcept
+        DParenSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_pivot_inplace(&expr_);
+            gc.visit_poly_child(&expr_);
         }
     } /*namespace scm*/
 } /*namespace xo*/

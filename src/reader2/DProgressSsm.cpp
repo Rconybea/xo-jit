@@ -1244,10 +1244,10 @@ case optype::op_assign:
         }
 
         void
-        DProgressSsm::forward_children(obj<ACollector> gc) noexcept
+        DProgressSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_pivot_inplace(&lhs_);
-            gc.forward_pivot_inplace(&rhs_);
+            gc.visit_poly_child(&lhs_);
+            gc.visit_poly_child(&rhs_);
         }
 
     } /*namespace scm*/

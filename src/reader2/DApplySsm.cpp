@@ -397,10 +397,10 @@ namespace xo {
         }
 
         void
-        DApplySsm::forward_children(obj<ACollector> gc) noexcept
+        DApplySsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_pivot_inplace(&fn_expr_);
-            gc.forward_inplace(&args_expr_v_);
+            gc.visit_poly_child(&fn_expr_);
+            gc.visit_child(&args_expr_v_);
         }
 
     } /*namespace scm*/

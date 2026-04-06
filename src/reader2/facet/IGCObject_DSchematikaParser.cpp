@@ -21,9 +21,9 @@ namespace xo {
             return self.shallow_move(gc);
         }
         auto
-        IGCObject_DSchematikaParser::forward_children(DSchematikaParser & self, obj<ACollector> gc) noexcept -> void
+        IGCObject_DSchematikaParser::visit_gco_children(DSchematikaParser & self, obj<AGCObjectVisitor> fn) noexcept -> void
         {
-            self.forward_children(gc);
+            self.visit_gco_children(fn);
         }
 
     } /*namespace scm*/

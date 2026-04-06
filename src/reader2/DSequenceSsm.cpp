@@ -258,9 +258,9 @@ namespace xo {
         }
 
         void
-        DSequenceSsm::forward_children(obj<ACollector> gc) noexcept
+        DSequenceSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&seq_expr_);
+            gc.visit_child(&seq_expr_);
         }
 
     } /*namespace scm*/

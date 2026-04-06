@@ -10,6 +10,7 @@
 #include "ParserResult.hpp"
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/alloc2/Allocator.hpp>
+#include <xo/alloc2/GCObjectVisitor.hpp>
 
 namespace xo {
     namespace scm {
@@ -164,8 +165,9 @@ namespace xo {
             using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
             using ArenaConfig = xo::mm::ArenaConfig;
             using ACollector = xo::mm::ACollector;
-            using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ppindentinfo = xo::print::ppindentinfo;
             using size_type = std::size_t;
@@ -292,11 +294,10 @@ namespace xo {
             /** @defgroup scm-schematikaparser-gcobject-methods **/
             ///@{
 
-            std::size_t shallow_size() const noexcept;
             /** not implemented (SchematikaParser not designed to be copyable) **/
             DSchematikaParser * shallow_move(obj<ACollector> gc) noexcept;
             /** forward gc-aware children **/
-            std::size_t forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
         private:

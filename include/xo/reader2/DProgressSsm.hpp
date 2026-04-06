@@ -7,7 +7,6 @@
 
 #include "DSyntaxStateMachine.hpp"
 #include "syntaxstatetype.hpp"
-//#include <xo/expression2/Expression.hpp>
 #include <xo/facet/obj.hpp>
 
 #ifdef NOT_YET
@@ -90,7 +89,7 @@ namespace xo {
         public:
             using Super = DSyntaxStateMachine<DProgressSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
-            using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -218,7 +217,7 @@ namespace xo {
             /** @defgroup scm-progressssm-gc-support gc support methods **/
             ///@{
 
-            void forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 

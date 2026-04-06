@@ -78,9 +78,9 @@ namespace xo {
             self.on_quoted_literal(lit, p_psm);
         }
         auto
-        ISyntaxStateMachine_DApplySsm::forward_children(DApplySsm & self, obj<ACollector> gc) -> void
+        ISyntaxStateMachine_DApplySsm::visit_gco_children(DApplySsm & self, obj<AGCObjectVisitor> gc) -> void
         {
-            self.forward_children(gc);
+            self.visit_gco_children(gc);
         }
 
     } /*namespace scm*/

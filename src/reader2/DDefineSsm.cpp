@@ -692,9 +692,9 @@ namespace xo {
         // ----- gc support -----
 
         void
-        DDefineSsm::forward_children(obj<ACollector> gc)
+        DDefineSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&def_expr_.data_);
+            gc.visit_child(&def_expr_.data_);
         }
     } /*namespace scm*/
 } /*namespace xo*/

@@ -4,16 +4,13 @@
  **/
 
 #include "LambdaSsm.hpp"
-//#include "ssm/ISyntaxStateMachine_DLambdaSsm.hpp"
 #include "ExpectFormalArglistSsm.hpp"
-//#include "ssm/ISyntaxStateMachine_DExpectFormalArglistSsm.hpp"
 #include "DExpectTypeSsm.hpp"
 #include "DExpectExprSsm.hpp"
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/detail/IExpression_DLambdaExpr.hpp>
 #include <xo/expression2/Variable.hpp>
-//#include <xo/expression2/detail/IExpression_DVariable.hpp>
 //#include <xo/expression2/symtab/ISymbolTable_DLocalSymtab.hpp>
 #include <xo/printable2/Printable.hpp>
 #include <xo/alloc2/GCObject.hpp>
@@ -474,15 +471,15 @@ namespace xo {
         }
 
         void
-        DLambdaSsm::forward_children(obj<ACollector> gc) noexcept
+        DLambdaSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&local_symtab_);
+            gc.visit_child(&local_symtab_);
 
             // explicit_return_td not gcobject
             // lambda_td not gcobject
 
-            gc.forward_pivot_inplace(&body_);
-            gc.forward_pivot_inplace(&parent_symtab_);
+            gc.visit_poly_child(&body_);
+            gc.visit_poly_child(&parent_symtab_);
         }
 
     } /*namespace scm*/

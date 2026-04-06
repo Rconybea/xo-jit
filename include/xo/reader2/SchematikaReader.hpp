@@ -8,17 +8,19 @@
 #include "ReaderConfig.hpp"
 #include "SchematikaParser.hpp"
 #include <xo/tokenizer2/Tokenizer.hpp>
+#include <xo/alloc2/GCObjectVisitor.hpp>
 
 namespace xo {
     namespace scm {
         struct ReaderResult {
             using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using span_type = xo::mm::span<const char>;
 
             bool is_tk_error() const { return tk_error_.is_error(); }
 
             /** forward gc-aware pointers (called during gc cycle) **/
-            void forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             /** schematika expression parsed from input **/
             obj<AExpression> expr_;
@@ -40,6 +42,7 @@ namespace xo {
         class SchematikaReader {
         public:
             using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using span_type = xo::mm::span<const char>;
@@ -107,7 +110,7 @@ namespace xo {
             void reset_to_idle_toplevel();
 
             /** update gc-aware child pointers **/
-            void forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
         private:
             /** tokenizer converts a stream of chars

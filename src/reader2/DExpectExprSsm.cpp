@@ -625,7 +625,7 @@ namespace xo {
 #endif
 
         void
-        DExpectExprSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        DExpectExprSsm::visit_gco_children(obj<AGCObjectVisitor>) noexcept
         {
             // all members POD, skip
         }

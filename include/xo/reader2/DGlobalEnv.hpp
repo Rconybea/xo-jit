@@ -7,6 +7,7 @@
 
 #include <xo/expression2/DGlobalSymtab.hpp>
 #include <xo/object2/DArray.hpp>
+#include <xo/alloc2/GCObjectVisitor.hpp>
 
 namespace xo {
     namespace scm {
@@ -27,8 +28,9 @@ namespace xo {
         public:
             using TypeDescr = xo::reflect::TypeDescr;
             using ACollector = xo::mm::ACollector;
-            using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ppindentinfo = xo::print::ppindentinfo;
             using size_type = std::uint32_t;
@@ -70,9 +72,8 @@ namespace xo {
             /** @defgroup scm-globalenv-gcobject-facet **/
             ///@{
 
-            std::size_t shallow_size() const noexcept;
             DGlobalEnv * shallow_move(obj<ACollector> gc) noexcept;
-            std::size_t forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgroup scm-globalenv-printable-facet **/

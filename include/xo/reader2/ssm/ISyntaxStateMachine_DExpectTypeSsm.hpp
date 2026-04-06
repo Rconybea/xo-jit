@@ -42,7 +42,7 @@ namespace xo {
             /** @defgroup scm-syntaxstatemachine-dexpecttypessm-type-traits **/
             ///@{
             using TypeDescr = xo::scm::ASyntaxStateMachine::TypeDescr;
-            using ACollector = xo::scm::ASyntaxStateMachine::ACollector;
+            using AGCObjectVisitor = xo::scm::ASyntaxStateMachine::AGCObjectVisitor;
             using AGCObject = xo::scm::ASyntaxStateMachine::AGCObject;
             using Copaque = xo::scm::ASyntaxStateMachine::Copaque;
             using Opaque = xo::scm::ASyntaxStateMachine::Opaque;
@@ -76,8 +76,8 @@ namespace xo {
             static void on_parsed_expression_with_token(DExpectTypeSsm & self, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm);
             /** update state machine for nested quoted literal @p lit **/
             static void on_quoted_literal(DExpectTypeSsm & self, obj<AGCObject> lit, ParserStateMachine * p_psm);
-            /** gc support: move immediate children to to-space and sub forwarding pointer **/
-            static void forward_children(DExpectTypeSsm & self, obj<ACollector> gc);
+            /** gc support: visit immediate gc-aware child pointers with @p gc.  Call gc.visit_child() for each **/
+            static void visit_gco_children(DExpectTypeSsm & self, obj<AGCObjectVisitor> gc);
             ///@}
         };
 

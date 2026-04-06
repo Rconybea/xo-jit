@@ -220,9 +220,9 @@ namespace xo {
                                              refrtag("array", array_pr));
         }
         void
-        DExpectQArraySsm::forward_children(obj<ACollector> gc) noexcept
+        DExpectQArraySsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&array_);
+            gc.visit_child(&array_);
         }
 
     }

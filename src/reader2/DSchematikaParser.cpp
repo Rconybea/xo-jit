@@ -184,12 +184,6 @@ namespace xo {
                            );
         }
 
-        std::size_t
-        DSchematikaParser::shallow_size() const noexcept
-        {
-            return sizeof(DSchematikaParser);
-        }
-
         DSchematikaParser *
         DSchematikaParser::shallow_move(obj<ACollector> gc) noexcept
         {
@@ -202,12 +196,10 @@ namespace xo {
             return nullptr;
         }
 
-        std::size_t
-        DSchematikaParser::forward_children(obj<ACollector> gc) noexcept
+        void
+        DSchematikaParser::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            psm_.forward_children(gc);
-
-            return this->shallow_size();
+            psm_.visit_gco_children(gc);
         }
 
     } /*namespace scm*/

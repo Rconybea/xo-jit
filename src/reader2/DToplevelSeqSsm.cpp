@@ -518,7 +518,7 @@ namespace xo {
                  refrtag("seqtype", seqtype_));
         }
         void
-        DToplevelSeqSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        DToplevelSeqSsm::visit_gco_children(obj<AGCObjectVisitor>) noexcept
         {
             // seqtype_: POD, skip
         }

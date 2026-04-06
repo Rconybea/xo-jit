@@ -78,9 +78,9 @@ namespace xo {
             self.on_quoted_literal(lit, p_psm);
         }
         auto
-        ISyntaxStateMachine_DExpectFormalArglistSsm::forward_children(DExpectFormalArglistSsm & self, obj<ACollector> gc) -> void
+        ISyntaxStateMachine_DExpectFormalArglistSsm::visit_gco_children(DExpectFormalArglistSsm & self, obj<AGCObjectVisitor> gc) -> void
         {
-            self.forward_children(gc);
+            self.visit_gco_children(gc);
         }
 
     } /*namespace scm*/

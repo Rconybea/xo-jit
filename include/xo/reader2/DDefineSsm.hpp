@@ -73,7 +73,7 @@ namespace xo {
         public:
             using Super = DSyntaxStateMachine<DDefineSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
-            using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -200,7 +200,7 @@ namespace xo {
             ///@{
 
             /** gc support: visit gc-aware child pointers **/
-            void forward_children(obj<ACollector> gc);
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 

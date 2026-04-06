@@ -45,7 +45,7 @@ namespace scm {
         /** integer identifying a type **/
         using typeseq = xo::facet::typeseq;
         using TypeDescr = ASyntaxStateMachine::TypeDescr;
-        using ACollector = ASyntaxStateMachine::ACollector;
+        using AGCObjectVisitor = ASyntaxStateMachine::AGCObjectVisitor;
         using AGCObject = ASyntaxStateMachine::AGCObject;
 
         ///@}
@@ -75,7 +75,7 @@ namespace scm {
         [[noreturn]] void on_parsed_expression(Opaque, obj<AExpression>, ParserStateMachine *)  override;
         [[noreturn]] void on_parsed_expression_with_token(Opaque, obj<AExpression>, const Token &, ParserStateMachine *)  override;
         [[noreturn]] void on_quoted_literal(Opaque, obj<AGCObject>, ParserStateMachine *)  override;
-        [[noreturn]] void forward_children(Opaque, obj<ACollector>)  override;
+        [[noreturn]] void visit_gco_children(Opaque, obj<AGCObjectVisitor>)  override;
 
         ///@}
 

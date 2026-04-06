@@ -267,10 +267,10 @@ namespace xo {
 
 
         void
-        DExpectQDictSsm::forward_children(obj<ACollector> gc) noexcept
+        DExpectQDictSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(const_cast<DString **>(&key_));
-            gc.forward_inplace(&dict_);
+            gc.visit_child(&key_);
+            gc.visit_child(&dict_);
         }
 
     } /*namespace scm*/

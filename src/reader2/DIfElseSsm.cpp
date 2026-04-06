@@ -510,9 +510,9 @@ namespace xo {
         }
 
         void
-        DIfElseSsm::forward_children(obj<ACollector> gc) noexcept
+        DIfElseSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_pivot_inplace(&if_expr_);
+            gc.visit_poly_child(&if_expr_);
         }
     } /*namespace scm*/
 } /*namespace xo*/

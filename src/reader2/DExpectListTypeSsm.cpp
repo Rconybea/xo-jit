@@ -204,9 +204,9 @@ namespace xo {
         }
 
         void
-        DExpectListTypeSsm::forward_children(obj<ACollector> gc) noexcept
+        DExpectListTypeSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_pivot_inplace(&elt_type_);
+            gc.visit_poly_child(&elt_type_);
         }
 
     } /*namespace scm*/

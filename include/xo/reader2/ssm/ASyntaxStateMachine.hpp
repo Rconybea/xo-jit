@@ -19,7 +19,7 @@
 #include <xo/type/Type.hpp>
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/reflect/TypeDescr.hpp>
-#include <xo/alloc2/Collector.hpp>
+#include <xo/alloc2/GCObjectVisitor.hpp>
 #include <xo/facet/obj.hpp>
 #include <xo/facet/facet_implementation.hpp>
 #include <xo/facet/typeseq.hpp>
@@ -46,8 +46,8 @@ public:
     using Opaque = void *;
     /** reflected c++ type **/
     using TypeDescr = xo::reflect::TypeDescr;
-    /** gc interface **/
-    using ACollector = xo::mm::ACollector;
+    /** gc visitor interface **/
+    using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
     /** gc-aware object **/
     using AGCObject = xo::mm::AGCObject;
     ///@}
@@ -90,8 +90,8 @@ public:
     virtual void on_parsed_expression_with_token(Opaque data, obj<AExpression> expr, const Token & tk, ParserStateMachine * p_psm)  = 0;
     /** update state machine for nested quoted literal @p lit **/
     virtual void on_quoted_literal(Opaque data, obj<AGCObject> lit, ParserStateMachine * p_psm)  = 0;
-    /** gc support: move immediate children to to-space and sub forwarding pointer **/
-    virtual void forward_children(Opaque data, obj<ACollector> gc)  = 0;
+    /** gc support: visit immediate gc-aware child pointers with @p gc.  Call gc.visit_child() for each **/
+    virtual void visit_gco_children(Opaque data, obj<AGCObjectVisitor> gc)  = 0;
     ///@}
 }; /*ASyntaxStateMachine*/
 

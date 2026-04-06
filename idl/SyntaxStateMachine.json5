@@ -10,7 +10,7 @@
         "<xo/type/Type.hpp>",
         "<xo/tokenizer2/Token.hpp>",
         "<xo/reflect/TypeDescr.hpp>",
-        "<xo/alloc2/Collector.hpp>"
+        "<xo/alloc2/GCObjectVisitor.hpp>"
     ],
     // extra includes in SyntaxStateMachine.hpp, if any
     user_hpp_includes: [],
@@ -27,7 +27,7 @@
     ],
     types: [
         { name: "TypeDescr", doc: [ "reflected c++ type" ], definition: "xo::reflect::TypeDescr" },
-        { name: "ACollector", doc: [ "gc interface" ], definition: "xo::mm::ACollector" },
+        { name: "AGCObjectVisitor", doc: [ "gc visitor interface" ], definition: "xo::mm::AGCObjectVisitor" },
         { name: "AGCObject", doc: [ "gc-aware object" ], definition: "xo::mm::AGCObject" },
         // { name: string, doc: [ string ], definition: string },
     ],
@@ -147,11 +147,11 @@
             ],
         },
         {
-            name: "forward_children",
-            doc: ["gc support: move immediate children to to-space and sub forwarding pointer"],
+            name: "visit_gco_children",
+            doc: ["gc support: visit immediate gc-aware child pointers with @p gc.  Call gc.visit_child() for each"],
             return_type: "void",
             args: [
-                {type: "obj<ACollector>", name: "gc"},
+                {type: "obj<AGCObjectVisitor>", name: "gc"},
             ],
         }
     ],

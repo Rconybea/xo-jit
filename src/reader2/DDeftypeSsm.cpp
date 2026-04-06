@@ -271,7 +271,7 @@ namespace xo {
                                              refrtag("expect", this->get_expect_str()));
         }
         void
-        DDeftypeSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        DDeftypeSsm::visit_gco_children(obj<AGCObjectVisitor>) noexcept
         {
             static_assert(!DUniqueString::is_gc_eligible());
         }

@@ -18,7 +18,7 @@
 #include <xo/type/Type.hpp>
 #include <xo/tokenizer2/Token.hpp>
 #include <xo/reflect/TypeDescr.hpp>
-#include <xo/alloc2/Collector.hpp>
+#include <xo/alloc2/GCObjectVisitor.hpp>
 
 namespace xo {
 namespace scm {
@@ -34,7 +34,7 @@ namespace scm {
         /** integer identifying a type **/
         using typeseq = ASyntaxStateMachine::typeseq;
         using TypeDescr = ASyntaxStateMachine::TypeDescr;
-        using ACollector = ASyntaxStateMachine::ACollector;
+        using AGCObjectVisitor = ASyntaxStateMachine::AGCObjectVisitor;
         using AGCObject = ASyntaxStateMachine::AGCObject;
         ///@}
 
@@ -89,8 +89,8 @@ namespace scm {
         void on_quoted_literal(Opaque data, obj<AGCObject> lit, ParserStateMachine * p_psm)  override {
             return I::on_quoted_literal(_dcast(data), lit, p_psm);
         }
-        void forward_children(Opaque data, obj<ACollector> gc)  override {
-            return I::forward_children(_dcast(data), gc);
+        void visit_gco_children(Opaque data, obj<AGCObjectVisitor> gc)  override {
+            return I::visit_gco_children(_dcast(data), gc);
         }
 
         ///@}

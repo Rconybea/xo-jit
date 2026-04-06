@@ -107,25 +107,17 @@ namespace xo {
 
         // ----- AGCObject facet -----
 
-        std::size_t
-        DGlobalEnv::shallow_size() const noexcept
-        {
-            return sizeof(*this);
-        }
-
         DGlobalEnv *
         DGlobalEnv::shallow_move(obj<ACollector> gc) noexcept
         {
             return gc.std_move_for<DGlobalEnv>(this);
         }
 
-        std::size_t
-        DGlobalEnv::forward_children(obj<ACollector> gc) noexcept
+        void
+        DGlobalEnv::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&symtab_);
-            gc.forward_inplace(&values_);
-
-            return this->shallow_size();
+            gc.visit_child(&symtab_);
+            gc.visit_child(&values_);
         }
 
         // ----- APrintable facet -----

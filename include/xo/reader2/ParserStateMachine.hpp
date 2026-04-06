@@ -17,6 +17,7 @@
 #include <xo/object2/DArray.hpp>
 #include <xo/stringtable2/StringTable.hpp>
 #include <xo/alloc2/Allocator.hpp>
+#include <xo/alloc2/GCObjectVisitor.hpp>
 #include <xo/arena/ArenaHashMapConfig.hpp>
 #include <xo/arena/DArena.hpp>
 
@@ -39,6 +40,7 @@ namespace xo {
         public:
             using TypeDescr = xo::reflect::TypeDescr;
             using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using ArenaConfig = xo::mm::ArenaConfig;
             using AGCObject = xo::mm::AGCObject;
@@ -352,7 +354,7 @@ namespace xo {
             ///@{
 
             /** update gc-aware exit pointers from this ParserStateMachine **/
-            void forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 

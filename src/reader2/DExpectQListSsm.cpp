@@ -215,10 +215,10 @@ namespace xo {
                                              refrtag("list", list_pr));
         }
         void
-        DExpectQListSsm::forward_children(obj<ACollector> gc) noexcept
+        DExpectQListSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&start_);
-            gc.forward_inplace(&end_);
+            gc.visit_child(&start_);
+            gc.visit_child(&end_);
         }
 
     }

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "SyntaxStateMachine.hpp"
+#include <xo/alloc2/GCObjectVisitor.hpp>
 #include <xo/arena/DArena.hpp>
 #include <xo/facet/obj.hpp>
 #include <xo/indentlog/print/pretty.hpp>
@@ -21,7 +22,8 @@ namespace xo {
          **/
         class ParserStack {
         public:
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -54,7 +56,7 @@ namespace xo {
             /** pretty-printer support **/
             bool pretty(const ppindentinfo & ppii) const;
 
-            void forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
         private:
             /** stack pointer: top of stack just before this instance created **/

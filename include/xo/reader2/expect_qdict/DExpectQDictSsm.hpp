@@ -63,7 +63,7 @@ namespace xo {
         class DExpectQDictSsm : public DSyntaxStateMachine<DExpectQDictSsm> {
         public:
             using Super = DSyntaxStateMachine<DExpectQDictSsm>;
-            using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -159,7 +159,7 @@ namespace xo {
             ///@{
 
             /** gc support: visit gc-aware child pointers **/
-            void forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 

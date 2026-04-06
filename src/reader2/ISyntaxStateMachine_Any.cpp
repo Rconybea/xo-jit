@@ -96,7 +96,7 @@ ISyntaxStateMachine_Any::on_quoted_literal(Opaque, obj<AGCObject>, ParserStateMa
 }
 
 auto
-ISyntaxStateMachine_Any::forward_children(Opaque, obj<ACollector>)  -> void
+ISyntaxStateMachine_Any::visit_gco_children(Opaque, obj<AGCObjectVisitor>)  -> void
 {
     _fatal();
 }

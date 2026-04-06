@@ -256,7 +256,7 @@ namespace xo {
                                              refrtag("expect", this->get_expect_str()));
         }
         void
-        DExpectQLiteralSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        DExpectQLiteralSsm::visit_gco_children(obj<AGCObjectVisitor>) noexcept
         {
             // cxl_on_rightparen_, cxl_on_rightbracket_: POD, skip
         }

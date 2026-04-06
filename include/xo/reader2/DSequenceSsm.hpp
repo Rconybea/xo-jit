@@ -29,7 +29,7 @@ namespace xo {
         class DSequenceSsm : public DSyntaxStateMachine<DSequenceSsm> {
         public:
             using Super = DSyntaxStateMachine<DSequenceSsm>;
-            using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -97,7 +97,7 @@ namespace xo {
             ///@{
 
             /** gc support: visit gc-aware child pointers **/
-            void forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 

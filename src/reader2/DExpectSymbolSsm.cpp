@@ -146,7 +146,7 @@ namespace xo {
                     );
         }
         void
-        DExpectSymbolSsm::forward_children(obj<ACollector> /*gc*/) noexcept
+        DExpectSymbolSsm::visit_gco_children(obj<AGCObjectVisitor>) noexcept
         {
             // no gc-aware members
         }
