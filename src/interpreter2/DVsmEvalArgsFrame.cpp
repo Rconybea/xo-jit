@@ -41,25 +41,17 @@ namespace xo {
             return result;
         }
 
-        std::size_t
-        DVsmEvalArgsFrame::shallow_size() const noexcept
-        {
-            return sizeof(DVsmEvalArgsFrame);
-        }
-
         DVsmEvalArgsFrame *
         DVsmEvalArgsFrame::shallow_move(obj<ACollector> gc) noexcept
         {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DVsmEvalArgsFrame::forward_children(obj<ACollector> gc) noexcept
+        void
+        DVsmEvalArgsFrame::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&parent_);
-            gc.forward_inplace(&apply_expr_);
-
-            return this->shallow_size();
+            gc.visit_child(&parent_);
+            gc.visit_child(&apply_expr_);
         }
 
         bool

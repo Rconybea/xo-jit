@@ -32,25 +32,17 @@ namespace xo {
 
         // gcobject facet
 
-        std::size_t
-        DVsmSeqContFrame::shallow_size() const noexcept
-        {
-            return sizeof(*this);
-        }
-
         DVsmSeqContFrame *
         DVsmSeqContFrame::shallow_move(obj<ACollector> gc) noexcept
         {
             return gc.std_move_for<DVsmSeqContFrame>(this);
         }
 
-        std::size_t
-        DVsmSeqContFrame::forward_children(obj<ACollector> gc) noexcept
+        void
+        DVsmSeqContFrame::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&parent_);
-            gc.forward_inplace(&seq_expr_);
-
-            return this->shallow_size();
+            gc.visit_child(&parent_);
+            gc.visit_child(&seq_expr_);
         }
 
         // printable facet

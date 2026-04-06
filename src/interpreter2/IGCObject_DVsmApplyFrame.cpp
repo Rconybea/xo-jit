@@ -21,9 +21,9 @@ namespace xo {
             return self.shallow_move(gc);
         }
         auto
-        IGCObject_DVsmApplyFrame::forward_children(DVsmApplyFrame & self, obj<ACollector> gc) noexcept -> void
+        IGCObject_DVsmApplyFrame::visit_gco_children(DVsmApplyFrame & self, obj<AGCObjectVisitor> fn) noexcept -> void
         {
-            self.forward_children(gc);
+            self.visit_gco_children(fn);
         }
 
     } /*namespace scm*/

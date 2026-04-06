@@ -16,8 +16,9 @@ namespace xo {
         class DVsmIfElseContFrame {
         public:
             using ACollector = xo::mm::ACollector;
-            using AAllocator = xo::mm::AAllocator;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AGCObject = xo::mm::AGCObject;
+            using AAllocator = xo::mm::AAllocator;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
@@ -50,9 +51,8 @@ namespace xo {
             /** @defgroup scm-vsmevalsequenceframe-gcobject-facet gcobject facet **/
             ///@{
 
-            std::size_t shallow_size() const noexcept;
             DVsmIfElseContFrame * shallow_move(obj<ACollector> gc) noexcept;
-            std::size_t forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgrouop scm-vsmseqcontframe-printable-facet printable facet **/

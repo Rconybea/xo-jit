@@ -968,22 +968,20 @@ namespace xo {
             return nullptr;
         }
 
-        std::size_t
-        DVirtualSchematikaMachine::forward_children(obj<ACollector> gc) noexcept
+        void
+        DVirtualSchematikaMachine::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            reader_.forward_children(gc);
+            reader_.visit_gco_children(gc);
 
-            gc.forward_inplace(&stack_);
-            gc.forward_pivot_inplace(&expr_);
-            gc.forward_inplace(&global_env_);
-            gc.forward_inplace(&local_env_);
-            gc.forward_inplace(&fn_);
-            gc.forward_inplace(&args_);
+            gc.visit_child(&stack_);
+            gc.visit_poly_child(&expr_);
+            gc.visit_child(&global_env_);
+            gc.visit_child(&local_env_);
+            gc.visit_child(&fn_);
+            gc.visit_child(&args_);
             if (value_.is_value()) {
-                gc.forward_inplace(const_cast<obj<AGCObject> *>(&value_.value_ref()));
+                gc.visit_child(const_cast<obj<AGCObject> *>(&value_.value_ref()));
             }
-
-            return this->shallow_size();
         }
 
     } /*namespace scm*/

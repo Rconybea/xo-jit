@@ -72,8 +72,9 @@ namespace xo {
             // will be DArenaVector<obj<StackFrame>> probably
             using Stack = void *;
             using ACollector = xo::mm::ACollector;
-            using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using span_type = xo::mm::span<const char>;
 
@@ -157,7 +158,7 @@ namespace xo {
 
             /** forward gc-aware child pointers
              **/
-            std::size_t forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 

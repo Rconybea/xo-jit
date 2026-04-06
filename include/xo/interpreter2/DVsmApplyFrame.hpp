@@ -15,8 +15,9 @@ namespace xo {
         public:
             using AProcedure = xo::scm::AProcedure;
             using ACollector = xo::mm::ACollector;
-            using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using AAllocator = xo::mm::AAllocator;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
@@ -37,9 +38,8 @@ namespace xo {
 
             void assign_fn(obj<AGCObject> x) { this->fn_ = x; }
 
-            std::size_t shallow_size() const noexcept;
             DVsmApplyFrame * shallow_move(obj<ACollector> gc) noexcept;
-            std::size_t forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             /** pretty-printing support **/
             bool pretty(const ppindentinfo & ppii) const;

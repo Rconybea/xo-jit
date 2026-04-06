@@ -32,25 +32,17 @@ namespace xo {
             return new (mem) DVsmApplyClosureFrame(stack, cont, local_env);
         }
 
-        std::size_t
-        DVsmApplyClosureFrame::shallow_size() const noexcept
-        {
-            return sizeof(DVsmApplyClosureFrame);
-        }
-
         DVsmApplyClosureFrame *
         DVsmApplyClosureFrame::shallow_move(obj<ACollector> gc) noexcept
         {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DVsmApplyClosureFrame::forward_children(obj<ACollector> gc) noexcept
+        void
+        DVsmApplyClosureFrame::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&stack_);
-            gc.forward_inplace(&local_env_);
-
-            return this->shallow_size();
+            gc.visit_child(&stack_);
+            gc.visit_child(&local_env_);
         }
 
         bool

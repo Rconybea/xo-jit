@@ -21,9 +21,9 @@ namespace xo {
             return self.shallow_move(gc);
         }
         auto
-        IGCObject_DLocalEnv::forward_children(DLocalEnv & self, obj<ACollector> gc) noexcept -> void
+        IGCObject_DLocalEnv::visit_gco_children(DLocalEnv & self, obj<AGCObjectVisitor> fn) noexcept -> void
         {
-            self.forward_children(gc);
+            self.visit_gco_children(fn);
         }
 
     } /*namespace scm*/

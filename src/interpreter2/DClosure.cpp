@@ -64,32 +64,16 @@ namespace xo {
             return err;
         }
 
-        size_t
-        DClosure::shallow_size() const noexcept {
-            return sizeof(DClosure);
-        }
-
         DClosure *
         DClosure::shallow_move(obj<ACollector> gc) noexcept {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DClosure::forward_children(obj<ACollector> gc) noexcept
+        void
+        DClosure::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            {
-                gc.forward_inplace(&lambda_);
-                //auto iface = xo::facet::impl_for<AGCObject,DLambdaExpr>();
-                //gc.forward_inplace(&iface, (void **)(&lambda_));
-
-            }
-            {
-                gc.forward_inplace(&env_);
-                //auto iface = xo::facet::impl_for<AGCObject,DLocalEnv>();
-                //gc.forward_inplace(&iface, (void **)(&env_));
-            }
-
-            return this->shallow_size();
+            gc.visit_child(&lambda_);
+            gc.visit_child(&env_);
         }
 
         // ----- printable facet -----

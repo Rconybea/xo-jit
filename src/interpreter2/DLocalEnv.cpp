@@ -91,33 +91,29 @@ namespace xo {
             /* something terribly wrong if control here */
         }
 
-        std::size_t
-        DLocalEnv::shallow_size() const noexcept {
-            return sizeof(DLocalEnv);
-        }
-
         DLocalEnv *
         DLocalEnv::shallow_move(obj<ACollector> gc) noexcept {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DLocalEnv::forward_children(obj<ACollector> gc) noexcept
+        void
+        DLocalEnv::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
             {
-                auto iface = xo::facet::impl_for<AGCObject,DLocalEnv>();
-                gc.forward_inplace(&iface, (void **)(&parent_));
+                gc.visit_child(&parent_);
+                //auto iface = xo::facet::impl_for<AGCObject,DLocalEnv>();
+                //gc.forward_inplace(&iface, (void **)(&parent_));
             }
             {
-                auto iface = xo::facet::impl_for<AGCObject,DLocalSymtab>();
-                gc.forward_inplace(&iface, (void **)(&symtab_));
+                gc.visit_child(&symtab_);
+                //auto iface = xo::facet::impl_for<AGCObject,DLocalSymtab>();
+                //gc.forward_inplace(&iface, (void **)(&symtab_));
             }
             {
-                auto iface = xo::facet::impl_for<AGCObject,DArray>();
-                gc.forward_inplace(&iface, (void **)(&args_));
+                gc.visit_child(&args_);
+                //auto iface = xo::facet::impl_for<AGCObject,DArray>();
+                //gc.forward_inplace(&iface, (void **)(&args_));
             }
-
-            return shallow_size();
         }
 
         // ----- printable facet -----
