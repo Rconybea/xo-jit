@@ -113,14 +113,8 @@ namespace xo {
 
         // gc hooks for IGCObject_DSequenceExpr
 
-        std::size_t
-        DSequenceExpr::shallow_size() const noexcept
-        {
-            return sizeof(DSequenceExpr);
-        }
-
         DSequenceExpr *
-        DSequenceExpr::shallow_move(obj<ACollector> gc) noexcept
+        DSequenceExpr::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             return gc.std_move_for(this);
         }

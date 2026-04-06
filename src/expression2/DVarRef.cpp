@@ -58,14 +58,8 @@ namespace xo {
 
         // gcobject facet
 
-        std::size_t
-        DVarRef::shallow_size() const noexcept
-        {
-            return sizeof(DVarRef);
-        }
-
         DVarRef *
-        DVarRef::shallow_move(obj<ACollector> gc) noexcept
+        DVarRef::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             return gc.std_move_for(this);
         }

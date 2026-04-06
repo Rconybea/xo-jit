@@ -113,7 +113,7 @@ namespace xo {
         // ----- gcobject facet -----
 
         DLocalSymtab *
-        DLocalSymtab::shallow_move(obj<ACollector> gc) noexcept
+        DLocalSymtab::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             return gc.std_move_for(this);
         }

@@ -16,9 +16,9 @@
 namespace xo {
     namespace scm {
         auto
-        IGCObject_DGlobalSymtab::shallow_move(DGlobalSymtab & self, obj<ACollector> gc) noexcept -> Opaque
+        IGCObject_DGlobalSymtab::gco_shallow_move(DGlobalSymtab & self, obj<AGCObjectVisitor> gc) noexcept -> Opaque
         {
-            return self.shallow_move(gc);
+            return self.gco_shallow_move(gc);
         }
         auto
         IGCObject_DGlobalSymtab::visit_gco_children(DGlobalSymtab & self, obj<AGCObjectVisitor> fn) noexcept -> void

@@ -24,7 +24,7 @@ namespace xo {
         class DTypename {
         public:
             using ppindentinfo = xo::print::ppindentinfo;
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AGCObject = xo::mm::AGCObject;
             using AAllocator = xo::mm::AAllocator;
@@ -55,8 +55,7 @@ namespace xo {
             /** @defgroup scm-typename-gcobject-facet **/
             ///@{
 
-            size_t shallow_size() const noexcept;
-            DTypename * shallow_move(obj<ACollector> gc) noexcept;
+            DTypename * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}

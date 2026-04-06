@@ -22,7 +22,7 @@ namespace xo {
         class DVariable {
         public:
             using ppindentinfo = xo::print::ppindentinfo;
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
@@ -64,8 +64,7 @@ namespace xo {
             /** @defgroup scm-variable-gcobject-facet **/
             ///@{
 
-            size_t shallow_size() const noexcept;
-            DVariable * shallow_move(obj<ACollector> gc) noexcept;
+            DVariable * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}

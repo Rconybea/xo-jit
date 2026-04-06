@@ -8,7 +8,7 @@
 #include "Expression.hpp"
 #include "TypeRef.hpp"
 #include "exprtype.hpp"
-#include <xo/alloc2/Collector.hpp>
+//#include <xo/alloc2/Collector.hpp>
 #include <xo/alloc2/GCObjectVisitor.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <string>
@@ -21,7 +21,7 @@ namespace xo {
          **/
         class DIfElseExpr {
         public:
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
@@ -98,8 +98,7 @@ namespace xo {
             /** @defgroup scm-ifelseexpr-gcobject-facet **/
             ///@{
 
-            std::size_t shallow_size() const noexcept;
-            DIfElseExpr * shallow_move(obj<ACollector> gc) noexcept;
+            DIfElseExpr * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}

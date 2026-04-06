@@ -82,14 +82,8 @@ namespace xo {
 
         // GCObject facet
 
-        std::size_t
-        DIfElseExpr::shallow_size() const noexcept
-        {
-            return sizeof(DIfElseExpr);
-        }
-
         DIfElseExpr *
-        DIfElseExpr::shallow_move(obj<ACollector> gc) noexcept
+        DIfElseExpr::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             return gc.std_move_for(this);
         }

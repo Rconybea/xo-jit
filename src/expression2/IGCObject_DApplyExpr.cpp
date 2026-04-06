@@ -16,9 +16,9 @@
 namespace xo {
     namespace scm {
         auto
-        IGCObject_DApplyExpr::shallow_move(DApplyExpr & self, obj<ACollector> gc) noexcept -> Opaque
+        IGCObject_DApplyExpr::gco_shallow_move(DApplyExpr & self, obj<AGCObjectVisitor> gc) noexcept -> Opaque
         {
-            return self.shallow_move(gc);
+            return self.gco_shallow_move(gc);
         }
         auto
         IGCObject_DApplyExpr::visit_gco_children(DApplyExpr & self, obj<AGCObjectVisitor> fn) noexcept -> void

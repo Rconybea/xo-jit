@@ -30,7 +30,7 @@ namespace xo {
             using value_type = Binding;
             using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
             using repr_type = xo::map::DArenaHashMap<key_type, Binding::slot_type>;
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
@@ -115,7 +115,7 @@ namespace xo {
             /** @defgroup scm-globalsymtab-gcobject-facet gcobject facet **/
             ///@{
 
-            DGlobalSymtab * shallow_move(obj<ACollector> gc) noexcept;
+            DGlobalSymtab * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}

@@ -38,14 +38,8 @@ namespace xo {
             typeref_.resolve(td);
         }
 
-        size_t
-        DVariable::shallow_size() const noexcept
-        {
-            return sizeof(DVariable);
-        }
-
         DVariable *
-        DVariable::shallow_move(obj<ACollector> gc) noexcept
+        DVariable::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             return gc.std_move_for(this);
         }

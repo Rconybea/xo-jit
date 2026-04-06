@@ -20,7 +20,7 @@ namespace xo {
         public:
             using DArray = xo::scm::DArray;
             using ppindentinfo = xo::print::ppindentinfo;
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
@@ -99,7 +99,7 @@ namespace xo {
             /** @defgroup xo-localsymtab-gcobject-facet gcobject facet **/
             ///@{
 
-            DLocalSymtab * shallow_move(obj<ACollector> gc) noexcept;
+            DLocalSymtab * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}

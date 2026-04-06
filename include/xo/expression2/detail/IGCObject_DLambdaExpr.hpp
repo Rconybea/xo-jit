@@ -53,8 +53,9 @@ namespace xo {
             // const methods
 
             // non-const methods
-            /** move instance using collector **/
-            static Opaque shallow_move(DLambdaExpr & self, obj<ACollector> gc) noexcept;
+            /** move instance using object visitor.
+Arguably abusing the word 'visitor' here **/
+            static Opaque gco_shallow_move(DLambdaExpr & self, obj<AGCObjectVisitor> gc) noexcept;
             /** Invoke fn.visit_child(iface,data) for each child GCObject pointer.
 Context: provides address of data pointer so it can be updated in place
 when @p fn invokes garbage collector reentry point **/

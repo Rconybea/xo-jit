@@ -104,13 +104,8 @@ namespace xo {
 
         // ----- gcobject facet -----
 
-        std::size_t
-        DApplyExpr::shallow_size() const noexcept {
-            return sizeof(DApplyExpr) + (n_args_ * sizeof(obj<AExpression>));
-        }
-
         DApplyExpr *
-        DApplyExpr::shallow_move(obj<ACollector> gc) noexcept {
+        DApplyExpr::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept {
             // note: not using ACollector.std_copy_for() here,
             //       flexible array -> not move-constructible
 

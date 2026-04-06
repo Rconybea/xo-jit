@@ -74,8 +74,7 @@ namespace xo {
             /** @defgroup scm-defineexpr-gcobject-facet **/
             ///@{
 
-            std::size_t shallow_size() const noexcept;
-            DDefineExpr * shallow_move(obj<ACollector> gc) noexcept;
+            DDefineExpr * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}

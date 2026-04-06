@@ -263,7 +263,7 @@ namespace xo {
         // ----- gcobject facet -----
 
         DGlobalSymtab *
-        DGlobalSymtab::shallow_move(obj<ACollector> gc) noexcept
+        DGlobalSymtab::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             return gc.std_move_for(this);
         }

@@ -40,14 +40,8 @@ namespace xo {
             : name_{name}, type_{type}
         {}
 
-        size_t
-        DTypename::shallow_size() const noexcept
-        {
-            return sizeof(DTypename);
-        }
-
         DTypename *
-        DTypename::shallow_move(obj<ACollector> gc) noexcept
+        DTypename::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             return gc.std_move_for(this);
         }

@@ -23,7 +23,7 @@ namespace xo {
          **/
         class DSequenceExpr {
         public:
-            using ACollector = xo::mm::ACollector;
+            //using ACollector = xo::mm::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
@@ -74,8 +74,7 @@ namespace xo {
             /** @defgroup scm-sequenceexpr-gcobject-facet gcobject facet methods **/
             ///@{
 
-            std::size_t shallow_size() const noexcept;
-            DSequenceExpr * shallow_move(obj<ACollector> gc) noexcept;
+            DSequenceExpr * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}

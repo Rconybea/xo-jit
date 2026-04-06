@@ -78,14 +78,8 @@ namespace xo {
 
         // ----- GCObject facet -----
 
-        std::size_t
-        DDefineExpr::shallow_size() const noexcept
-        {
-            return sizeof(*this);
-        }
-
         DDefineExpr *
-        DDefineExpr::shallow_move(obj<ACollector> gc) noexcept
+        DDefineExpr::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             return gc.std_move_for(this);
         }

@@ -71,14 +71,8 @@ namespace xo {
             return nullptr;
         }
 
-        std::size_t
-        DConstant::shallow_size() const noexcept
-        {
-            return sizeof(DConstant);
-        }
-
         DConstant *
-        DConstant::shallow_move(obj<ACollector> gc) noexcept
+        DConstant::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             return gc.std_move_for(this);
         }
