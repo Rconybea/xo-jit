@@ -10,6 +10,7 @@
 #include "exprtype.hpp"
 #include "DLocalSymtab.hpp"
 #include "DString.hpp"
+#include <xo/alloc2/GCObjectVisitor.hpp>
 #include <xo/facet/obj.hpp>
 
 namespace xo {
@@ -21,6 +22,7 @@ namespace xo {
         class DLambdaExpr {
         public:
             using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -86,7 +88,7 @@ namespace xo {
 
             std::size_t shallow_size() const noexcept;
             DLambdaExpr * shallow_move(obj<ACollector> gc) noexcept;
-            std::size_t forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgroup scm-lambdaexpr-printable-facet **/

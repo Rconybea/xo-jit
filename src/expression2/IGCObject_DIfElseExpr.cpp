@@ -21,9 +21,9 @@ namespace xo {
             return self.shallow_move(gc);
         }
         auto
-        IGCObject_DIfElseExpr::forward_children(DIfElseExpr & self, obj<ACollector> gc) noexcept -> void
+        IGCObject_DIfElseExpr::visit_gco_children(DIfElseExpr & self, obj<AGCObjectVisitor> fn) noexcept -> void
         {
-            self.forward_children(gc);
+            self.visit_gco_children(fn);
         }
 
     } /*namespace scm*/

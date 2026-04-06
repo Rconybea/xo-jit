@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Variable.hpp"
+#include <xo/alloc2/GCObjectVisitor.hpp>
 
 namespace xo {
     namespace scm {
@@ -21,6 +22,7 @@ namespace xo {
         public:
             using ppindentinfo = xo::print::ppindentinfo;
             using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
 
@@ -56,7 +58,7 @@ namespace xo {
 
             size_t shallow_size() const noexcept;
             DVarRef * shallow_move(obj<ACollector> gc) noexcept;
-            size_t forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgroup scm-variable-printable-facet **/

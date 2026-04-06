@@ -10,6 +10,7 @@
 #include "exprtype.hpp"
 #include <xo/alloc2/Collector.hpp>
 #include <xo/alloc2/GCObject.hpp>
+#include <xo/alloc2/GCObjectVisitor.hpp>
 #include <xo/reflect/TaggedPtr.hpp>
 
 namespace xo {
@@ -22,8 +23,9 @@ namespace xo {
             using TaggedPtr = xo::reflect::TaggedPtr;
             using TypeDescr = xo::reflect::TypeDescr;
             using ACollector = xo::mm::ACollector;
-            using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using AAllocator = xo::mm::AAllocator;
             using typeseq = xo::reflect::typeseq;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -64,7 +66,7 @@ namespace xo {
 
             size_t shallow_size() const noexcept;
             DConstant * shallow_move(obj<ACollector> gc) noexcept;
-            size_t forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgroup scm-constant-printable-facet **/

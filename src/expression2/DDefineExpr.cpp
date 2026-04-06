@@ -90,14 +90,12 @@ namespace xo {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DDefineExpr::forward_children(obj<ACollector> gc) noexcept
+        void
+        DDefineExpr::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&lhs_var_);
+            gc.visit_child(&lhs_var_);
             //gc.forward_inplace(&rhs_);  // complicated - need to access via GCObject facet
-            poly_forward_inplace(gc, &rhs_);
-
-            return this->shallow_size();
+            gc.visit_poly_child(&rhs_);
         }
 
         bool

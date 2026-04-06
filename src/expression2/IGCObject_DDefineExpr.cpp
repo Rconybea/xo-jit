@@ -21,9 +21,9 @@ namespace xo {
             return self.shallow_move(gc);
         }
         auto
-        IGCObject_DDefineExpr::forward_children(DDefineExpr & self, obj<ACollector> gc) noexcept -> void
+        IGCObject_DDefineExpr::visit_gco_children(DDefineExpr & self, obj<AGCObjectVisitor> fn) noexcept -> void
         {
-            self.forward_children(gc);
+            self.visit_gco_children(fn);
         }
 
     } /*namespace scm*/

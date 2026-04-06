@@ -262,30 +262,22 @@ namespace xo {
 
         // ----- gcobject facet -----
 
-        std::size_t
-        DGlobalSymtab::shallow_size() const noexcept
-        {
-            return sizeof(DGlobalSymtab);
-        }
-
         DGlobalSymtab *
         DGlobalSymtab::shallow_move(obj<ACollector> gc) noexcept
         {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DGlobalSymtab::forward_children(obj<ACollector> gc) noexcept
+        void
+        DGlobalSymtab::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
             // map_ doesn't contain any gc-owned data, can skip
 
             static_assert(var_map_.is_gc_eligible() == false);
             static_assert(type_map_.is_gc_eligible() == false);
 
-            gc.forward_inplace(&vars_);
-            gc.forward_inplace(&types_);
-
-            return this->shallow_size();
+            gc.visit_child(&vars_);
+            gc.visit_child(&types_);
         }
 
         // ----- printable facet -----

@@ -9,6 +9,7 @@
 #include "DVariable.hpp"
 #include "DTypename.hpp"
 #include <xo/object2/DArray.hpp>
+#include <xo/alloc2/GCObjectVisitor.hpp>
 #include <xo/alloc2/dp.hpp>
 #include <xo/arena/DArenaHashMap.hpp>
 
@@ -30,8 +31,9 @@ namespace xo {
             using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
             using repr_type = xo::map::DArenaHashMap<key_type, Binding::slot_type>;
             using ACollector = xo::mm::ACollector;
-            using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ppindentinfo = xo::print::ppindentinfo;
             using size_type = std::uint32_t;
@@ -113,9 +115,8 @@ namespace xo {
             /** @defgroup scm-globalsymtab-gcobject-facet gcobject facet **/
             ///@{
 
-            std::size_t shallow_size() const noexcept;
             DGlobalSymtab * shallow_move(obj<ACollector> gc) noexcept;
-            std::size_t forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgroup scm-globalsymtab-printable-facet printable facet **/

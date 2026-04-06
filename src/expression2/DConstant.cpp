@@ -83,15 +83,12 @@ namespace xo {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DConstant::forward_children(obj<ACollector> gc) noexcept
+        void
+        DConstant::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            typeref_.forward_children(gc);
+            typeref_.visit_gco_children(gc);
 
-            gc.forward_inplace(&value_);
-            //gc.forward_inplace(value_.iface(), (void **)&(value_.data_));
-
-            return shallow_size();
+            gc.visit_child(&value_);
         }
 
         bool

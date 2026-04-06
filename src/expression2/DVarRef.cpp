@@ -70,16 +70,14 @@ namespace xo {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DVarRef::forward_children(obj<ACollector> gc) noexcept
+        void
+        DVarRef::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&vardef_);
+            gc.visit_child(&vardef_);
             //auto iface = xo::facet::impl_for<AGCObject,DVariable>();
             //gc.forward_inplace(&iface, (void **)vardef_.data_);
 
             // TODO: concept to indicate that no gc pointers in Binding
-
-            return shallow_size();
         }
 
         // printable facet

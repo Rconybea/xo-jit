@@ -50,12 +50,10 @@ namespace xo {
             return gc.std_move_for(this);
         }
 
-        size_t
-        DVariable::forward_children(obj<ACollector> gc) noexcept
+        void
+        DVariable::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            typeref_.forward_children(gc);
-
-            return shallow_size();
+            typeref_.visit_gco_children(gc);
         }
 
         bool

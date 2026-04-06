@@ -21,9 +21,9 @@ namespace xo {
             return self.shallow_move(gc);
         }
         auto
-        IGCObject_DGlobalSymtab::forward_children(DGlobalSymtab & self, obj<ACollector> gc) noexcept -> void
+        IGCObject_DGlobalSymtab::visit_gco_children(DGlobalSymtab & self, obj<AGCObjectVisitor> fn) noexcept -> void
         {
-            self.forward_children(gc);
+            self.visit_gco_children(fn);
         }
 
     } /*namespace scm*/

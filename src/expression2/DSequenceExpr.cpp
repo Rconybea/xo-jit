@@ -125,14 +125,12 @@ namespace xo {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DSequenceExpr::forward_children(obj<ACollector> gc) noexcept
+        void
+        DSequenceExpr::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            typeref_.forward_children(gc);
+            typeref_.visit_gco_children(gc);
 
-            gc.forward_inplace(&expr_v_);
-
-            return this->shallow_size();
+            gc.visit_child(&expr_v_);
         }
 
     } /*namespace scm*/

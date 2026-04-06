@@ -9,10 +9,9 @@
 #include "TypeRef.hpp"
 #include "exprtype.hpp"
 #include <xo/alloc2/Collector.hpp>
+#include <xo/alloc2/GCObjectVisitor.hpp>
 #include <xo/alloc2/Allocator.hpp>
-//#include <vector>
 #include <string>
-//#include <cstdint>
 
 namespace xo {
     namespace scm {
@@ -23,6 +22,7 @@ namespace xo {
         class DIfElseExpr {
         public:
             using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -100,7 +100,7 @@ namespace xo {
 
             std::size_t shallow_size() const noexcept;
             DIfElseExpr * shallow_move(obj<ACollector> gc) noexcept;
-            std::size_t forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 

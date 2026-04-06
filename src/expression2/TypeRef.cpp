@@ -102,11 +102,11 @@ namespace xo {
         }
 
         void
-        TypeRef::forward_children(obj<ACollector> gc) noexcept
+        TypeRef::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
             //scope log(XO_DEBUG(true), xtag("type", type_.data()), xtag("type.tseq", type_._typeseq()));
 
-            gc.forward_pivot_inplace(&type_);
+            gc.visit_poly_child(&type_);
         }
 
         bool

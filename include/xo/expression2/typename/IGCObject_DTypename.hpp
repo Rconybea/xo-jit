@@ -42,6 +42,7 @@ namespace xo {
             using size_type = xo::mm::AGCObject::size_type;
             using AAllocator = xo::mm::AGCObject::AAllocator;
             using ACollector = xo::mm::AGCObject::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObject::AGCObjectVisitor;
             using Copaque = xo::mm::AGCObject::Copaque;
             using Opaque = xo::mm::AGCObject::Opaque;
             ///@}
@@ -52,8 +53,10 @@ namespace xo {
             // non-const methods
             /** move instance using allocator **/
             static Opaque shallow_move(DTypename & self, obj<ACollector> gc) noexcept;
-            /** during GC: forward immdiate children **/
-            static void forward_children(DTypename & self, obj<ACollector> gc) noexcept;
+            /** Invoke fn.visit_child(iface,data) for each child GCObject pointer.
+Context: provides address of data pointer so it can be updated in place
+when @p fn invokes garbage collector reentry point **/
+            static void visit_gco_children(DTypename & self, obj<AGCObjectVisitor> fn) noexcept;
             ///@}
         };
 

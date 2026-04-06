@@ -13,6 +13,7 @@
 
 namespace xo {
     using xo::mm::AGCObject;
+    using xo::mm::AGCObjectVisitor;
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
     using xo::reflect::TypeDescr;
@@ -144,36 +145,32 @@ namespace xo {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DLambdaExpr::forward_children(obj<ACollector> gc) noexcept {
-            typeref_.forward_children(gc);
+        void
+        DLambdaExpr::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept {
+            typeref_.visit_gco_children(gc);
 
-            {
-                //gc.forward_inplace(&name_);  // doesn't compile for const ptr
-                auto iface = xo::facet::impl_for<AGCObject,DUniqueString>();
-                gc.forward_inplace(&iface, (void **)(&name_));
-            }
+            gc.visit_child(&name_);
+            //{
+            //    auto iface = xo::facet::impl_for<AGCObject,DUniqueString>();
+            //    gc.forward_inplace(&iface, (void **)(&name_));
+            //}
 
             // type_name_str_
 
             {
-                gc.forward_inplace(&local_symtab_);
-                //auto iface = xo::facet::impl_for<AGCObject,DLocalSymtab>();
-                //gc.forward_inplace(&iface, (void **)(&local_symtab_));
+                gc.visit_child(&local_symtab_);
+                //gc.forward_inplace(&local_symtab_);
             }
 
             {
-                gc.forward_pivot_inplace(&body_expr_);
-                //auto iface = body_expr_.to_facet<AGCObject>().iface();
-                //gc.forward_inplace(iface, (void **)&(body_expr_.data_));
+                gc.visit_poly_child(&body_expr_);
+                //gc.forward_pivot_inplace(&body_expr_);
             }
 
             // xxx free_var_set
             // xxx captured_var_set
             // xxx layer_var_map
             // xxx nested_lambda_map
-
-            return shallow_size();
         }
 
         bool

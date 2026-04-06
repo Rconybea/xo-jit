@@ -129,27 +129,25 @@ namespace xo {
             return copy;
         }
 
-        std::size_t
-        DApplyExpr::forward_children(obj<ACollector> gc) noexcept
+        void
+        DApplyExpr::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            typeref_.forward_children(gc);
+            typeref_.visit_gco_children(gc);
 
             {
-                obj<AGCObject> fn_gco = fn_.to_facet<AGCObject>();
-                gc.forward_inplace(fn_gco.iface(), (void **)&fn_.data_);
+                gc.visit_poly_child(&fn_);
+                //obj<AGCObject> fn_gco = fn_.to_facet<AGCObject>();
+                //gc.forward_inplace(fn_gco.iface(), (void **)&fn_.data_);
             }
 
             for (size_type i = 0; i < n_args_; ++i) {
                 obj<AExpression> & arg = args_[i];
 
                 // runtime poly here
-                obj<AGCObject> arg_gco = arg.to_facet<AGCObject>();
-
-                // need the data address within *this
-                gc.forward_inplace(arg_gco.iface(), (void **)(&arg.data_));
+                gc.visit_poly_child(&arg);
+                //obj<AGCObject> arg_gco = arg.to_facet<AGCObject>();
+                //gc.forward_inplace(arg_gco.iface(), (void **)(&arg.data_));
             }
-
-            return shallow_size();
         }
 
         // ----- printable facet -----

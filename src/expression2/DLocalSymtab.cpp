@@ -112,26 +112,18 @@ namespace xo {
 
         // ----- gcobject facet -----
 
-        std::size_t
-        DLocalSymtab::shallow_size() const noexcept
-        {
-            return sizeof(DLocalSymtab);
-        }
-
         DLocalSymtab *
         DLocalSymtab::shallow_move(obj<ACollector> gc) noexcept
         {
             return gc.std_move_for(this);
         }
 
-        std::size_t
-        DLocalSymtab::forward_children(obj<ACollector> gc) noexcept
+        void
+        DLocalSymtab::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(&parent_);
-            gc.forward_inplace(&vars_);
-            gc.forward_inplace(&types_);
-
-            return shallow_size();
+            gc.visit_child(&parent_);
+            gc.visit_child(&vars_);
+            gc.visit_child(&types_);
         }
 
         // ----- printable facet -----

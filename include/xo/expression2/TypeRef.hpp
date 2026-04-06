@@ -8,6 +8,7 @@
 #include <xo/type/Type.hpp>
 #include <xo/reflect/TypeDescr.hpp>
 #include <xo/alloc2/Collector.hpp>
+#include <xo/alloc2/GCObjectVisitor.hpp>
 #include <xo/flatstring/flatstring.hpp>
 #include <xo/indentlog/print/pretty.hpp>
 
@@ -26,6 +27,7 @@ namespace xo {
             using type_var = flatstring<20>;
             using prefix_type = flatstring<8>;
             using ACollector = xo::mm::ACollector;
+            using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
@@ -73,7 +75,7 @@ namespace xo {
             bool pretty(const ppindentinfo & ppii) const;
 
             /** gc support **/
-            void forward_children(obj<ACollector> gc) noexcept;
+            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
 
         private:
             TypeRef(const type_var & id, TypeDescr td);

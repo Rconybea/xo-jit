@@ -52,16 +52,16 @@ namespace xo {
             return gc.std_move_for(this);
         }
 
-        size_t
-        DTypename::forward_children(obj<ACollector> gc) noexcept
+        void
+        DTypename::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.forward_inplace(const_cast<DUniqueString**>(&name_));
+            gc.visit_child(&name_);
+            //gc.forward_inplace(const_cast<DUniqueString**>(&name_));
             {
-                auto e = type_.to_facet<AGCObject>();
-                gc.forward_inplace(e.iface(), (void **)&(type_.data_));
+                gc.visit_poly_child(&type_);
+                //auto e = type_.to_facet<AGCObject>();
+                //gc.forward_inplace(e.iface(), (void **)&(type_.data_));
             }
-
-            return shallow_size();
         }
 
         bool
