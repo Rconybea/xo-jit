@@ -16,9 +16,9 @@
 namespace xo {
     namespace scm {
         auto
-        IGCObject_DSchematikaParser::shallow_move(DSchematikaParser & self, obj<ACollector> gc) noexcept -> Opaque
+        IGCObject_DSchematikaParser::gco_shallow_move(DSchematikaParser & self, obj<AGCObjectVisitor> gc) noexcept -> Opaque
         {
-            return self.shallow_move(gc);
+            return self.gco_shallow_move(gc);
         }
         auto
         IGCObject_DSchematikaParser::visit_gco_children(DSchematikaParser & self, obj<AGCObjectVisitor> fn) noexcept -> void

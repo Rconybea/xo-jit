@@ -185,7 +185,7 @@ namespace xo {
         }
 
         DSchematikaParser *
-        DSchematikaParser::shallow_move(obj<ACollector> gc) noexcept
+        DSchematikaParser::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             (void)gc;
 

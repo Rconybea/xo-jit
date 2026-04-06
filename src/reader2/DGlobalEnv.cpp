@@ -108,7 +108,7 @@ namespace xo {
         // ----- AGCObject facet -----
 
         DGlobalEnv *
-        DGlobalEnv::shallow_move(obj<ACollector> gc) noexcept
+        DGlobalEnv::gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept
         {
             return gc.std_move_for<DGlobalEnv>(this);
         }
