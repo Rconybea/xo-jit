@@ -83,14 +83,32 @@ mkdir -p $builddir/ccov
 #        --base-directory ${srcdir}/foo --directory ${builddir}/foo/CMakeFiles/foo_target.dir \
 #        --base-directory ${srcdir}/bar/quux --directory ${builddir}/bar/quux/CMakeFiles/target4quux.dir
 #
-primarydirs=$(cd ${builddir} && find -name '*.gcno' \
-                  | xargs --replace=xx dirname xx \
-                  | uniq \
-                  | sed -e 's:^\./::')
+# collect unique directories containing .gcno files,
+# then remove any that are subdirectories of another in the list.
+# lcov scans recursively, so passing both parent/ and parent/facet/
+# causes "duplicate file" errors.
+_alldirs=$(cd ${builddir} && find -name '*.gcno' \
+               | xargs --replace=xx dirname xx \
+               | sort -u \
+               | sed -e 's:^\./::')
+
+primarydirs=""
+for d in ${_alldirs}; do
+    # check if any existing entry is a prefix of d
+    is_nested=false
+    for p in ${primarydirs}; do
+        case "${d}" in
+            "${p}"/*)  is_nested=true; break ;;
+        esac
+    done
+    if ! ${is_nested}; then
+        primarydirs="${primarydirs} ${d}"
+    fi
+done
 
 #echo "primarydirs=${primarydirs}"
 
-cmd="${lcov} --output ${outputstem}.info --capture --ignore-errors source"
+cmd="${lcov} --output ${outputstem}.info --capture --ignore-errors source --ignore-errors empty --ignore-errors inconsistent,inconsistent"
 
 for bdir in ${primarydirs}; do
     sdir=$(dirname $(dirname ${bdir}))
@@ -107,11 +125,11 @@ ${cmd}
 
 # keep only files with paths under source tree
 # (don't want coverage for external libraries such as libstdc++ etc)
-${lcov} --extract ${outputstem}.info "${srcdir}/*" --output ${outputstem}2.info
+${lcov} --extract ${outputstem}.info "${srcdir}/*" --output ${outputstem}2.info --ignore-errors inconsistent,inconsistent
 
 # remove unit test dirs
 # (we're interested in coverage of our installed code,  not of the unit tests that exercise it)
-${lcov} --remove ${outputstem}2.info '*/utest/*' --output ${outputstem}3.info
+${lcov} --remove ${outputstem}2.info '*/utest/*' --output ${outputstem}3.info --ignore-errors inconsistent,inconsistent
 
 # generate .html tree
 mkdir -p ${builddir}/ccov/html
