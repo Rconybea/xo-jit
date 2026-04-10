@@ -164,9 +164,9 @@ namespace xo {
             using token_type = Token;
             using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
             using ArenaConfig = xo::mm::ArenaConfig;
-            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -297,7 +297,7 @@ namespace xo {
             /** not implemented (SchematikaParser not designed to be copyable) **/
             DSchematikaParser * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
             /** forward gc-aware children **/
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
         private:

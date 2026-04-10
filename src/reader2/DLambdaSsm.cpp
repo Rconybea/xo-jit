@@ -471,15 +471,16 @@ namespace xo {
         }
 
         void
-        DLambdaSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DLambdaSsm::visit_gco_children(VisitReason reason,
+                                       obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&local_symtab_);
+            gc.visit_child(reason, &local_symtab_);
 
             // explicit_return_td not gcobject
             // lambda_td not gcobject
 
-            gc.visit_poly_child(&body_);
-            gc.visit_poly_child(&parent_symtab_);
+            gc.visit_poly_child(reason, &body_);
+            gc.visit_poly_child(reason, &parent_symtab_);
         }
 
     } /*namespace scm*/

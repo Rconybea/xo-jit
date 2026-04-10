@@ -204,9 +204,10 @@ namespace xo {
         }
 
         void
-        DExpectListTypeSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DExpectListTypeSsm::visit_gco_children(VisitReason reason,
+                                               obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_poly_child(&elt_type_);
+            gc.visit_poly_child(reason, &elt_type_);
         }
 
     } /*namespace scm*/

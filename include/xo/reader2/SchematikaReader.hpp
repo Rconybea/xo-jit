@@ -15,12 +15,14 @@ namespace xo {
         struct ReaderResult {
             using ACollector = xo::mm::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using span_type = xo::mm::span<const char>;
 
             bool is_tk_error() const { return tk_error_.is_error(); }
 
             /** forward gc-aware pointers (called during gc cycle) **/
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason,
+                                    obj<AGCObjectVisitor> gc) noexcept;
 
             /** schematika expression parsed from input **/
             obj<AExpression> expr_;
@@ -43,6 +45,7 @@ namespace xo {
         public:
             using ACollector = xo::mm::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using span_type = xo::mm::span<const char>;
@@ -110,7 +113,8 @@ namespace xo {
             void reset_to_idle_toplevel();
 
             /** update gc-aware child pointers **/
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason,
+                                    obj<AGCObjectVisitor> gc) noexcept;
 
         private:
             /** tokenizer converts a stream of chars

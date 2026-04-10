@@ -510,9 +510,10 @@ namespace xo {
         }
 
         void
-        DIfElseSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DIfElseSsm::visit_gco_children(VisitReason reason,
+                                       obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_poly_child(&if_expr_);
+            gc.visit_poly_child(reason, &if_expr_);
         }
     } /*namespace scm*/
 } /*namespace xo*/

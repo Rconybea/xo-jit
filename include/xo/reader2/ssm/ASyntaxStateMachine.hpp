@@ -50,6 +50,8 @@ public:
     using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
     /** gc-aware object **/
     using AGCObject = xo::mm::AGCObject;
+    /** hint when traversing gco graph **/
+    using VisitReason = xo::mm::VisitReason;
     ///@}
 
     /** @defgroup scm-syntaxstatemachine-methods **/
@@ -91,7 +93,7 @@ public:
     /** update state machine for nested quoted literal @p lit **/
     virtual void on_quoted_literal(Opaque data, obj<AGCObject> lit, ParserStateMachine * p_psm)  = 0;
     /** gc support: visit immediate gc-aware child pointers with @p gc.  Call gc.visit_child() for each **/
-    virtual void visit_gco_children(Opaque data, obj<AGCObjectVisitor> gc)  = 0;
+    virtual void visit_gco_children(Opaque data, VisitReason reason, obj<AGCObjectVisitor> gc)  = 0;
     ///@}
 }; /*ASyntaxStateMachine*/
 

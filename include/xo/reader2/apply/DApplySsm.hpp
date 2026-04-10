@@ -8,7 +8,6 @@
 #include "DSyntaxStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/expression2/ApplyExpr.hpp>
-//#include <xo/facet/obj.hpp>
 #include <string_view>
 
 
@@ -66,11 +65,10 @@ namespace xo {
             using Super = DSyntaxStateMachine<DApplySsm>;
             using TypeDescr = xo::reflect::TypeDescr;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
-
-            //using Apply = xo::scm::Apply;
 
         public:
             /** @defgroup scm-applyssm-ctors constructors **/
@@ -190,7 +188,8 @@ namespace xo {
             ///@{
 
             /** gc support: visit gc-aware child pointers **/
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason,
+                                    obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 

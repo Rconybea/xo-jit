@@ -625,7 +625,8 @@ namespace xo {
 #endif
 
         void
-        DExpectExprSsm::visit_gco_children(obj<AGCObjectVisitor>) noexcept
+        DExpectExprSsm::visit_gco_children(VisitReason,
+                                           obj<AGCObjectVisitor>) noexcept
         {
             // all members POD, skip
         }

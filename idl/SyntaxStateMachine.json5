@@ -29,7 +29,7 @@
         { name: "TypeDescr", doc: [ "reflected c++ type" ], definition: "xo::reflect::TypeDescr" },
         { name: "AGCObjectVisitor", doc: [ "gc visitor interface" ], definition: "xo::mm::AGCObjectVisitor" },
         { name: "AGCObject", doc: [ "gc-aware object" ], definition: "xo::mm::AGCObject" },
-        // { name: string, doc: [ string ], definition: string },
+        { name: "VisitReason", doc: [ "hint when traversing gco graph" ], definition: "xo::mm::VisitReason" },
     ],
     const_methods: [
         {
@@ -151,6 +151,7 @@
             doc: ["gc support: visit immediate gc-aware child pointers with @p gc.  Call gc.visit_child() for each"],
             return_type: "void",
             args: [
+                {type: "VisitReason", name: "reason"},
                 {type: "obj<AGCObjectVisitor>", name: "gc"},
             ],
         }

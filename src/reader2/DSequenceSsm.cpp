@@ -258,9 +258,10 @@ namespace xo {
         }
 
         void
-        DSequenceSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DSequenceSsm::visit_gco_children(VisitReason reason,
+                                         obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&seq_expr_);
+            gc.visit_child(reason, &seq_expr_);
         }
 
     } /*namespace scm*/

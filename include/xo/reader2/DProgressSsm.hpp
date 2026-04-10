@@ -90,6 +90,7 @@ namespace xo {
             using Super = DSyntaxStateMachine<DProgressSsm>;
             using TypeDescr = xo::reflect::TypeDescr;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -217,7 +218,8 @@ namespace xo {
             /** @defgroup scm-progressssm-gc-support gc support methods **/
             ///@{
 
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason,
+                                    obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 

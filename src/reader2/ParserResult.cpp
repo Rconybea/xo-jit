@@ -106,12 +106,13 @@ namespace xo {
         }
 
         void
-        ParserResult::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        ParserResult::visit_gco_children(VisitReason reason,
+                                         obj<AGCObjectVisitor> gc) noexcept
         {
             // {result_type_, error_src_fn_}: pod, ignore
 
-            gc.visit_poly_child(&result_expr_);
-            gc.visit_child(&error_description_);
+            gc.visit_poly_child(reason, &result_expr_);
+            gc.visit_child(reason, &error_description_);
         }
     } /*namespace scm*/
 } /*namespace xo*/

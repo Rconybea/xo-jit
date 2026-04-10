@@ -78,9 +78,9 @@ namespace xo {
             self.on_quoted_literal(lit, p_psm);
         }
         auto
-        ISyntaxStateMachine_DToplevelSeqSsm::visit_gco_children(DToplevelSeqSsm & self, obj<AGCObjectVisitor> gc) -> void
+        ISyntaxStateMachine_DToplevelSeqSsm::visit_gco_children(DToplevelSeqSsm & self, VisitReason reason, obj<AGCObjectVisitor> gc) -> void
         {
-            self.visit_gco_children(gc);
+            self.visit_gco_children(reason, gc);
         }
 
     } /*namespace scm*/

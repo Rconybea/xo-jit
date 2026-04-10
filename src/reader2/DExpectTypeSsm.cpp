@@ -198,7 +198,8 @@ namespace xo {
         }
 
         void
-        DExpectTypeSsm::visit_gco_children(obj<AGCObjectVisitor>) noexcept
+        DExpectTypeSsm::visit_gco_children(VisitReason,
+                                           obj<AGCObjectVisitor>) noexcept
         {
             // corrected_: POD, skip
         }

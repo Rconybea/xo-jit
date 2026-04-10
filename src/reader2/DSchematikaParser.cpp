@@ -197,9 +197,10 @@ namespace xo {
         }
 
         void
-        DSchematikaParser::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DSchematikaParser::visit_gco_children(VisitReason reason,
+                                              obj<AGCObjectVisitor> gc) noexcept
         {
-            psm_.visit_gco_children(gc);
+            psm_.visit_gco_children(reason, gc);
         }
 
     } /*namespace scm*/

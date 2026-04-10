@@ -24,6 +24,7 @@ namespace xo {
         public:
             //using ACollector = xo::mm::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using DArena = xo::mm::DArena;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -56,7 +57,8 @@ namespace xo {
             /** pretty-printer support **/
             bool pretty(const ppindentinfo & ppii) const;
 
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason,
+                                    obj<AGCObjectVisitor> gc) noexcept;
 
         private:
             /** stack pointer: top of stack just before this instance created **/

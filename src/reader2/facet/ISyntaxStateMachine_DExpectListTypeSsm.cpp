@@ -78,9 +78,9 @@ namespace xo {
             self.on_quoted_literal(lit, p_psm);
         }
         auto
-        ISyntaxStateMachine_DExpectListTypeSsm::visit_gco_children(DExpectListTypeSsm & self, obj<AGCObjectVisitor> gc) -> void
+        ISyntaxStateMachine_DExpectListTypeSsm::visit_gco_children(DExpectListTypeSsm & self, VisitReason reason, obj<AGCObjectVisitor> gc) -> void
         {
-            self.visit_gco_children(gc);
+            self.visit_gco_children(reason, gc);
         }
 
     } /*namespace scm*/

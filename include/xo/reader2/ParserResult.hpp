@@ -33,6 +33,7 @@ namespace xo {
         class ParserResult {
         public:
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
@@ -69,7 +70,7 @@ namespace xo {
             bool pretty(const ppindentinfo & ppii) const;
 
             /** gc support: forward gc-eligible children **/
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept;
 
         public:
             /** none|expression|error_description

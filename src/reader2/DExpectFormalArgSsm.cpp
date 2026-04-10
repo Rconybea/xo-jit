@@ -265,7 +265,8 @@ namespace xo {
         }
 
         void
-        DExpectFormalArgSsm::visit_gco_children(obj<AGCObjectVisitor>) noexcept
+        DExpectFormalArgSsm::visit_gco_children(VisitReason,
+                                                obj<AGCObjectVisitor>) noexcept
         {
             static_assert(!DUniqueString::is_gc_eligible());
         }

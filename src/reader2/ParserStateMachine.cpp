@@ -907,7 +907,8 @@ namespace xo {
 #endif
 
         void
-        ParserStateMachine::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        ParserStateMachine::visit_gco_children(VisitReason reason,
+                                               obj<AGCObjectVisitor> gc) noexcept
         {
             //scope log(XO_DEBUG(true));
 
@@ -916,23 +917,23 @@ namespace xo {
 
             //log && log("forward stack_", xtag("addr", stack_));
             if (stack_) {
-                stack_->visit_gco_children(gc);
+                stack_->visit_gco_children(reason, gc);
             }
 
             // static_assert(!expr_alloc_.is_gc_eligible());
             // static_assert(!aux_alloc_.is_gc_eligible());
 
             //log && log("global_symtab_", xtag("addr", global_symtab_.data()));
-            gc.visit_child(&global_symtab_);
+            gc.visit_child(reason, &global_symtab_);
 
             //log && log("local_symtab_", xtag("addr", local_symtab_.data()));
-            gc.visit_child(&local_symtab_);
+            gc.visit_child(reason, &local_symtab_);
 
             //log && log("global_env_", xtag("addr", global_env_.data()));
-            gc.visit_child(&global_env_);
+            gc.visit_child(reason, &global_env_);
 
             //log && log("result_");
-            result_.visit_gco_children(gc);
+            result_.visit_gco_children(reason, gc);
         }
 
     } /*namespace scm*/

@@ -358,9 +358,10 @@ namespace xo {
         }
 
         void
-        DExpectFormalArglistSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DExpectFormalArglistSsm::visit_gco_children(VisitReason reason,
+                                                    obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&argl_);
+            gc.visit_child(reason, &argl_);
         }
 
     } /*namespace scm*/

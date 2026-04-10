@@ -692,9 +692,10 @@ namespace xo {
         // ----- gc support -----
 
         void
-        DDefineSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DDefineSsm::visit_gco_children(VisitReason reason,
+                                       obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&def_expr_.data_);
+            gc.visit_child(reason, &def_expr_.data_);
         }
     } /*namespace scm*/
 } /*namespace xo*/

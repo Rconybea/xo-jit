@@ -397,10 +397,11 @@ namespace xo {
         }
 
         void
-        DApplySsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DApplySsm::visit_gco_children(VisitReason reason,
+                                      obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_poly_child(&fn_expr_);
-            gc.visit_child(&args_expr_v_);
+            gc.visit_poly_child(reason, &fn_expr_);
+            gc.visit_child(reason, &args_expr_v_);
         }
 
     } /*namespace scm*/

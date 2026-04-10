@@ -34,6 +34,7 @@ public:
     using TypeDescr = ASyntaxStateMachine::TypeDescr;
     using AGCObjectVisitor = ASyntaxStateMachine::AGCObjectVisitor;
     using AGCObject = ASyntaxStateMachine::AGCObject;
+    using VisitReason = ASyntaxStateMachine::VisitReason;
     ///@}
 
     /** @defgroup scm-syntaxstatemachine-router-ctors **/
@@ -93,8 +94,8 @@ public:
     void on_quoted_literal(obj<AGCObject> lit, ParserStateMachine * p_psm)  {
         return O::iface()->on_quoted_literal(O::data(), lit, p_psm);
     }
-    void visit_gco_children(obj<AGCObjectVisitor> gc)  {
-        return O::iface()->visit_gco_children(O::data(), gc);
+    void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc)  {
+        return O::iface()->visit_gco_children(O::data(), reason, gc);
     }
 
     ///@}

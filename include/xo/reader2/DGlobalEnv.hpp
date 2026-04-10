@@ -27,9 +27,9 @@ namespace xo {
         class DGlobalEnv {
         public:
             using TypeDescr = xo::reflect::TypeDescr;
-            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -73,7 +73,7 @@ namespace xo {
             ///@{
 
             DGlobalEnv * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgroup scm-globalenv-printable-facet **/

@@ -212,9 +212,10 @@ namespace xo {
         }
 
         void
-        DQuoteSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DQuoteSsm::visit_gco_children(VisitReason reason,
+                                      obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_poly_child(&expr_);
+            gc.visit_poly_child(reason, &expr_);
         }
 
     } /*namespace scm*/

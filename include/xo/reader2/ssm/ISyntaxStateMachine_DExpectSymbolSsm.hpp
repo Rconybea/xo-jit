@@ -44,6 +44,7 @@ namespace xo {
             using TypeDescr = xo::scm::ASyntaxStateMachine::TypeDescr;
             using AGCObjectVisitor = xo::scm::ASyntaxStateMachine::AGCObjectVisitor;
             using AGCObject = xo::scm::ASyntaxStateMachine::AGCObject;
+            using VisitReason = xo::scm::ASyntaxStateMachine::VisitReason;
             using Copaque = xo::scm::ASyntaxStateMachine::Copaque;
             using Opaque = xo::scm::ASyntaxStateMachine::Opaque;
             ///@}
@@ -77,7 +78,7 @@ namespace xo {
             /** update state machine for nested quoted literal @p lit **/
             static void on_quoted_literal(DExpectSymbolSsm & self, obj<AGCObject> lit, ParserStateMachine * p_psm);
             /** gc support: visit immediate gc-aware child pointers with @p gc.  Call gc.visit_child() for each **/
-            static void visit_gco_children(DExpectSymbolSsm & self, obj<AGCObjectVisitor> gc);
+            static void visit_gco_children(DExpectSymbolSsm & self, VisitReason reason, obj<AGCObjectVisitor> gc);
             ///@}
         };
 

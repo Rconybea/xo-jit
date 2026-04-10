@@ -40,10 +40,11 @@ namespace xo {
         public:
             using TypeDescr = xo::reflect::TypeDescr;
             using ACollector = xo::mm::ACollector;
+            using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using AAllocator = xo::mm::AAllocator;
             using ArenaConfig = xo::mm::ArenaConfig;
-            using AGCObject = xo::mm::AGCObject;
             using DArena = xo::mm::DArena;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
@@ -354,7 +355,8 @@ namespace xo {
             ///@{
 
             /** update gc-aware exit pointers from this ParserStateMachine **/
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason,
+                                    obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 

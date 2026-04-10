@@ -90,14 +90,15 @@ namespace xo {
         }
 
         void
-        ParserStack::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        ParserStack::visit_gco_children(VisitReason reason,
+                                        obj<AGCObjectVisitor> gc) noexcept
         {
 
             for (ParserStack * target = this; target; target = target->parent_) {
                 // ParserStack::ckp: skip, POD
 
                 if (target->ssm_)
-                    target->ssm_.visit_gco_children(gc);
+                    target->ssm_.visit_gco_children(reason, gc);
             }
         }
 

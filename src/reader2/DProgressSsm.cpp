@@ -1244,10 +1244,11 @@ case optype::op_assign:
         }
 
         void
-        DProgressSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DProgressSsm::visit_gco_children(VisitReason reason,
+                                         obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_poly_child(&lhs_);
-            gc.visit_poly_child(&rhs_);
+            gc.visit_poly_child(reason, &lhs_);
+            gc.visit_poly_child(reason, &rhs_);
         }
 
     } /*namespace scm*/

@@ -220,9 +220,10 @@ namespace xo {
                                              refrtag("array", array_pr));
         }
         void
-        DExpectQArraySsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DExpectQArraySsm::visit_gco_children(VisitReason reason,
+                                             obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&array_);
+            gc.visit_child(reason, &array_);
         }
 
     }

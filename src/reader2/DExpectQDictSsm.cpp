@@ -267,10 +267,11 @@ namespace xo {
 
 
         void
-        DExpectQDictSsm::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DExpectQDictSsm::visit_gco_children(VisitReason reason,
+                                            obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&key_);
-            gc.visit_child(&dict_);
+            gc.visit_child(reason, &key_);
+            gc.visit_child(reason, &dict_);
         }
 
     } /*namespace scm*/

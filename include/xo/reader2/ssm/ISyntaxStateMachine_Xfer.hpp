@@ -36,6 +36,7 @@ namespace scm {
         using TypeDescr = ASyntaxStateMachine::TypeDescr;
         using AGCObjectVisitor = ASyntaxStateMachine::AGCObjectVisitor;
         using AGCObject = ASyntaxStateMachine::AGCObject;
+        using VisitReason = ASyntaxStateMachine::VisitReason;
         ///@}
 
         /** @defgroup scm-syntaxstatemachine-xfer-methods **/
@@ -89,8 +90,8 @@ namespace scm {
         void on_quoted_literal(Opaque data, obj<AGCObject> lit, ParserStateMachine * p_psm)  override {
             return I::on_quoted_literal(_dcast(data), lit, p_psm);
         }
-        void visit_gco_children(Opaque data, obj<AGCObjectVisitor> gc)  override {
-            return I::visit_gco_children(_dcast(data), gc);
+        void visit_gco_children(Opaque data, VisitReason reason, obj<AGCObjectVisitor> gc)  override {
+            return I::visit_gco_children(_dcast(data), reason, gc);
         }
 
         ///@}

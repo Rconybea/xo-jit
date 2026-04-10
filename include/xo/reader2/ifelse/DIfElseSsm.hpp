@@ -56,6 +56,7 @@ namespace xo {
         public:
             using Super = DSyntaxStateMachine<DIfElseSsm>;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using AAllocator = xo::mm::AAllocator;
             using DArena = xo::mm::DArena;
             using TypeDescr = xo::reflect::TypeDescr;
@@ -171,7 +172,8 @@ namespace xo {
             /** @defgroup scm-ifelsessm-gc-support gc support methods **/
             ///@{
 
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason,
+                                    obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
 
