@@ -146,26 +146,15 @@ namespace xo {
         }
 
         void
-        DLambdaExpr::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept {
-            typeref_.visit_gco_children(gc);
+        DLambdaExpr::visit_gco_children(VisitReason reason,
+                                        obj<AGCObjectVisitor> gc) noexcept {
+            typeref_.visit_gco_children(reason, gc);
 
-            gc.visit_child(&name_);
-            //{
-            //    auto iface = xo::facet::impl_for<AGCObject,DUniqueString>();
-            //    gc.forward_inplace(&iface, (void **)(&name_));
-            //}
-
+            gc.visit_child(reason, &name_);
             // type_name_str_
 
-            {
-                gc.visit_child(&local_symtab_);
-                //gc.forward_inplace(&local_symtab_);
-            }
-
-            {
-                gc.visit_poly_child(&body_expr_);
-                //gc.forward_pivot_inplace(&body_expr_);
-            }
+            gc.visit_child(reason, &local_symtab_);
+            gc.visit_poly_child(reason, &body_expr_);
 
             // xxx free_var_set
             // xxx captured_var_set

@@ -269,15 +269,22 @@ namespace xo {
         }
 
         void
-        DGlobalSymtab::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DGlobalSymtab::visit_gco_children(VisitReason reason,
+                                          obj<AGCObjectVisitor> gc) noexcept
         {
             // map_ doesn't contain any gc-owned data, can skip
 
+#ifdef __APPLE__
+            // clang not recognizing these as comptime eligible
+            assert(var_map_.is_gc_eligible() == false);
+            assert(type_map_.is_gc_eligible() == false);
+#else
             static_assert(var_map_.is_gc_eligible() == false);
             static_assert(type_map_.is_gc_eligible() == false);
+#endif
 
-            gc.visit_child(&vars_);
-            gc.visit_child(&types_);
+            gc.visit_child(reason, &vars_);
+            gc.visit_child(reason, &types_);
         }
 
         // ----- printable facet -----

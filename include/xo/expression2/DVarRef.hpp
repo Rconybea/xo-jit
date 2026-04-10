@@ -21,8 +21,8 @@ namespace xo {
         class DVarRef {
         public:
             using ppindentinfo = xo::print::ppindentinfo;
-            //using ACollector = xo::mm::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using AAllocator = xo::mm::AAllocator;
             using TypeDescr = xo::reflect::TypeDescr;
 
@@ -57,7 +57,7 @@ namespace xo {
             ///@{
 
             DVarRef * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgroup scm-variable-printable-facet **/

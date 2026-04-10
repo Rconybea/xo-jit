@@ -89,26 +89,15 @@ namespace xo {
         }
 
         void
-        DIfElseExpr::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DIfElseExpr::visit_gco_children(VisitReason reason,
+                                        obj<AGCObjectVisitor> gc) noexcept
         {
-            typeref_.visit_gco_children(gc);
+            typeref_.visit_gco_children(reason, gc);
 
             // GC needs to locate AGCObject iface for each member.
-            {
-                gc.visit_poly_child(&test_);
-                //auto gco = test_.to_facet<AGCObject>();
-                //gc.forward_inplace(gco.iface(), (void **)&(test_.data_));
-            }
-            {
-                gc.visit_poly_child(&when_true_);
-                //auto gco = when_true_.to_facet<AGCObject>();
-                //gc.forward_inplace(gco.iface(), (void **)&(when_true_.data_));
-            }
-            {
-                gc.visit_poly_child(&when_false_);
-                //auto gco = when_false_.to_facet<AGCObject>();
-                //gc.forward_inplace(gco.iface(), (void **)&(when_false_.data_));
-            }
+            gc.visit_poly_child(reason, &test_);
+            gc.visit_poly_child(reason, &when_true_);
+            gc.visit_poly_child(reason, &when_false_);
         }
 
         // ----- printable facet -----

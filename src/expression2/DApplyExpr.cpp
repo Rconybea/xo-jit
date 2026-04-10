@@ -125,23 +125,16 @@ namespace xo {
         }
 
         void
-        DApplyExpr::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DApplyExpr::visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept
         {
-            typeref_.visit_gco_children(gc);
+            typeref_.visit_gco_children(reason, gc);
 
-            {
-                gc.visit_poly_child(&fn_);
-                //obj<AGCObject> fn_gco = fn_.to_facet<AGCObject>();
-                //gc.forward_inplace(fn_gco.iface(), (void **)&fn_.data_);
-            }
+            gc.visit_poly_child(reason, &fn_);
 
             for (size_type i = 0; i < n_args_; ++i) {
                 obj<AExpression> & arg = args_[i];
 
-                // runtime poly here
-                gc.visit_poly_child(&arg);
-                //obj<AGCObject> arg_gco = arg.to_facet<AGCObject>();
-                //gc.forward_inplace(arg_gco.iface(), (void **)(&arg.data_));
+                gc.visit_poly_child(reason, &arg);
             }
         }
 

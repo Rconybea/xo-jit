@@ -8,7 +8,6 @@
 #include "Expression.hpp"
 #include "TypeRef.hpp"
 #include "exprtype.hpp"
-//#include <xo/alloc2/Collector.hpp>
 #include <xo/alloc2/GCObject.hpp>
 #include <xo/alloc2/GCObjectVisitor.hpp>
 #include <xo/reflect/TaggedPtr.hpp>
@@ -22,8 +21,8 @@ namespace xo {
         public:
             using TaggedPtr = xo::reflect::TaggedPtr;
             using TypeDescr = xo::reflect::TypeDescr;
-            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
+            using VisitReason = xo::mm::VisitReason;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using AAllocator = xo::mm::AAllocator;
             using typeseq = xo::reflect::typeseq;
@@ -65,7 +64,7 @@ namespace xo {
             ///@{
 
             DConstant * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgroup scm-constant-printable-facet **/

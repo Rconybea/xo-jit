@@ -102,11 +102,10 @@ namespace xo {
         }
 
         void
-        TypeRef::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        TypeRef::visit_gco_children(VisitReason reason,
+                                    obj<AGCObjectVisitor> gc) noexcept
         {
-            //scope log(XO_DEBUG(true), xtag("type", type_.data()), xtag("type.tseq", type_._typeseq()));
-
-            gc.visit_poly_child(&type_);
+            gc.visit_poly_child(reason, &type_);
         }
 
         bool

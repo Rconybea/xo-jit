@@ -85,11 +85,11 @@ namespace xo {
         }
 
         void
-        DDefineExpr::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DDefineExpr::visit_gco_children(VisitReason reason,
+                                        obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&lhs_var_);
-            //gc.forward_inplace(&rhs_);  // complicated - need to access via GCObject facet
-            gc.visit_poly_child(&rhs_);
+            gc.visit_child(reason, &lhs_var_);
+            gc.visit_poly_child(reason, &rhs_);
         }
 
         bool
@@ -103,9 +103,6 @@ namespace xo {
 
             if (lhs_var_)
                 assert(lhs.data());
-
-            (void)lhs;
-            (void)rhs;
 
             if (rhs_)
                 assert(rhs.data());

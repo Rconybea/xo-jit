@@ -9,7 +9,6 @@
 #include <cstddef>
 
 namespace xo {
-    using xo::mm::ACollector;
     using xo::facet::typeseq;
 
     namespace scm {
@@ -45,9 +44,9 @@ namespace xo {
         }
 
         void
-        DVariable::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DVariable::visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept
         {
-            typeref_.visit_gco_children(gc);
+            typeref_.visit_gco_children(reason, gc);
         }
 
         bool

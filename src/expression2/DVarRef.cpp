@@ -65,9 +65,10 @@ namespace xo {
         }
 
         void
-        DVarRef::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DVarRef::visit_gco_children(VisitReason reason,
+                                    obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&vardef_);
+            gc.visit_child(reason, &vardef_);
             //auto iface = xo::facet::impl_for<AGCObject,DVariable>();
             //gc.forward_inplace(&iface, (void **)vardef_.data_);
 

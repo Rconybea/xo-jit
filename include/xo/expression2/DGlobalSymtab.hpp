@@ -30,9 +30,9 @@ namespace xo {
             using value_type = Binding;
             using ArenaHashMapConfig = xo::map::ArenaHashMapConfig;
             using repr_type = xo::map::DArenaHashMap<key_type, Binding::slot_type>;
-            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using AAllocator = xo::mm::AAllocator;
             using MemorySizeVisitor = xo::mm::MemorySizeVisitor;
             using ppindentinfo = xo::print::ppindentinfo;
@@ -116,7 +116,7 @@ namespace xo {
             ///@{
 
             DGlobalSymtab * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgroup scm-globalsymtab-printable-facet printable facet **/

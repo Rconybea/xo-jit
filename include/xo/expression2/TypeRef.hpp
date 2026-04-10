@@ -26,8 +26,8 @@ namespace xo {
             using TypeDescr = xo::reflect::TypeDescr;
             using type_var = flatstring<20>;
             using prefix_type = flatstring<8>;
-            using ACollector = xo::mm::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
@@ -75,7 +75,7 @@ namespace xo {
             bool pretty(const ppindentinfo & ppii) const;
 
             /** gc support **/
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept;
 
         private:
             TypeRef(const type_var & id, TypeDescr td);

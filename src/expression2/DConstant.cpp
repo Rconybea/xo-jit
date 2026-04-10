@@ -3,8 +3,8 @@
  *  @author Roland Conybeare, Jan 2026
  **/
 
-#include "DConstant.hpp"
-#include "detail/IExpression_DConstant.hpp"
+#include "Constant.hpp"
+//#include "detail/IExpression_DConstant.hpp"
 #include "TypeDescr.hpp"
 #include <xo/object2/DFloat.hpp>
 #include <xo/object2/DInteger.hpp>
@@ -78,11 +78,12 @@ namespace xo {
         }
 
         void
-        DConstant::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DConstant::visit_gco_children(VisitReason reason,
+                                      obj<AGCObjectVisitor> gc) noexcept
         {
-            typeref_.visit_gco_children(gc);
+            typeref_.visit_gco_children(reason, gc);
 
-            gc.visit_child(&value_);
+            gc.visit_child(reason, &value_);
         }
 
         bool

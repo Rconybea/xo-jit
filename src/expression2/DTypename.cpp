@@ -47,15 +47,11 @@ namespace xo {
         }
 
         void
-        DTypename::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DTypename::visit_gco_children(VisitReason reason,
+                                      obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&name_);
-            //gc.forward_inplace(const_cast<DUniqueString**>(&name_));
-            {
-                gc.visit_poly_child(&type_);
-                //auto e = type_.to_facet<AGCObject>();
-                //gc.forward_inplace(e.iface(), (void **)&(type_.data_));
-            }
+            gc.visit_child(reason, &name_);
+            gc.visit_poly_child(reason, &type_);
         }
 
         bool

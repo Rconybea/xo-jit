@@ -120,11 +120,11 @@ namespace xo {
         }
 
         void
-        DSequenceExpr::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DSequenceExpr::visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept
         {
-            typeref_.visit_gco_children(gc);
+            typeref_.visit_gco_children(reason, gc);
 
-            gc.visit_child(&expr_v_);
+            gc.visit_child(reason, &expr_v_);
         }
 
     } /*namespace scm*/

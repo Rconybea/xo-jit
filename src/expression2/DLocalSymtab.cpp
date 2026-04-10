@@ -119,11 +119,12 @@ namespace xo {
         }
 
         void
-        DLocalSymtab::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DLocalSymtab::visit_gco_children(VisitReason reason,
+                                         obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&parent_);
-            gc.visit_child(&vars_);
-            gc.visit_child(&types_);
+            gc.visit_child(reason, &parent_);
+            gc.visit_child(reason, &vars_);
+            gc.visit_child(reason, &types_);
         }
 
         // ----- printable facet -----
