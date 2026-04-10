@@ -21,9 +21,9 @@ namespace xo {
             return self.gco_shallow_move(gc);
         }
         auto
-        IGCObject_DVirtualSchematikaMachine::visit_gco_children(DVirtualSchematikaMachine & self, obj<AGCObjectVisitor> fn) noexcept -> void
+        IGCObject_DVirtualSchematikaMachine::visit_gco_children(DVirtualSchematikaMachine & self, VisitReason reason, obj<AGCObjectVisitor> fn) noexcept -> void
         {
-            self.visit_gco_children(fn);
+            self.visit_gco_children(reason, fn);
         }
 
     } /*namespace scm*/

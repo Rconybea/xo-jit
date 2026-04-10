@@ -972,18 +972,19 @@ namespace xo {
         }
 
         void
-        DVirtualSchematikaMachine::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DVirtualSchematikaMachine::visit_gco_children(VisitReason reason,
+                                                      obj<AGCObjectVisitor> gc) noexcept
         {
-            reader_.visit_gco_children(gc);
+            reader_.visit_gco_children(reason, gc);
 
-            gc.visit_child(&stack_);
-            gc.visit_poly_child(&expr_);
-            gc.visit_child(&global_env_);
-            gc.visit_child(&local_env_);
-            gc.visit_child(&fn_);
-            gc.visit_child(&args_);
+            gc.visit_child(reason, &stack_);
+            gc.visit_poly_child(reason, &expr_);
+            gc.visit_child(reason, &global_env_);
+            gc.visit_child(reason, &local_env_);
+            gc.visit_child(reason, &fn_);
+            gc.visit_child(reason, &args_);
             if (value_.is_value()) {
-                gc.visit_child(const_cast<obj<AGCObject> *>(&value_.value_ref()));
+                gc.visit_child(reason, const_cast<obj<AGCObject> *>(&value_.value_ref()));
             }
         }
 

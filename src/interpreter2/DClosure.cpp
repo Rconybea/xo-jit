@@ -70,10 +70,11 @@ namespace xo {
         }
 
         void
-        DClosure::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DClosure::visit_gco_children(VisitReason reason,
+                                     obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&lambda_);
-            gc.visit_child(&env_);
+            gc.visit_child(reason, &lambda_);
+            gc.visit_child(reason, &env_);
         }
 
         // ----- printable facet -----

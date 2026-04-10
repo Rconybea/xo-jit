@@ -14,9 +14,9 @@ namespace xo {
         class DVsmApplyFrame {
         public:
             using AProcedure = xo::scm::AProcedure;
-            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using AAllocator = xo::mm::AAllocator;
             using ppindentinfo = xo::print::ppindentinfo;
 
@@ -39,7 +39,7 @@ namespace xo {
             void assign_fn(obj<AGCObject> x) { this->fn_ = x; }
 
             DVsmApplyFrame * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept;
 
             /** pretty-printing support **/
             bool pretty(const ppindentinfo & ppii) const;

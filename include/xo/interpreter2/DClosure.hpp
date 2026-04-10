@@ -19,9 +19,9 @@ namespace xo {
         class DClosure {
         public:
             using ARuntimeContext = xo::scm::ARuntimeContext;
-            //using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
             using AAllocator = xo::mm::AAllocator;
             using ppindentinfo = xo::print::ppindentinfo;
             using size_type = std::int32_t;
@@ -59,7 +59,7 @@ namespace xo {
             ///@{
 
             DClosure * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgroup scm-closure-printable-facet **/

@@ -97,23 +97,12 @@ namespace xo {
         }
 
         void
-        DLocalEnv::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DLocalEnv::visit_gco_children(VisitReason reason,
+                                      obj<AGCObjectVisitor> gc) noexcept
         {
-            {
-                gc.visit_child(&parent_);
-                //auto iface = xo::facet::impl_for<AGCObject,DLocalEnv>();
-                //gc.forward_inplace(&iface, (void **)(&parent_));
-            }
-            {
-                gc.visit_child(&symtab_);
-                //auto iface = xo::facet::impl_for<AGCObject,DLocalSymtab>();
-                //gc.forward_inplace(&iface, (void **)(&symtab_));
-            }
-            {
-                gc.visit_child(&args_);
-                //auto iface = xo::facet::impl_for<AGCObject,DArray>();
-                //gc.forward_inplace(&iface, (void **)(&args_));
-            }
+            gc.visit_child(reason, &parent_);
+            gc.visit_child(reason, &symtab_);
+            gc.visit_child(reason, &args_);
         }
 
         // ----- printable facet -----

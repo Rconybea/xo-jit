@@ -39,10 +39,11 @@ namespace xo {
         }
 
         void
-        DVsmApplyClosureFrame::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DVsmApplyClosureFrame::visit_gco_children(VisitReason reason,
+                                                  obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&stack_);
-            gc.visit_child(&local_env_);
+            gc.visit_child(reason, &stack_);
+            gc.visit_child(reason, &local_env_);
         }
 
         bool

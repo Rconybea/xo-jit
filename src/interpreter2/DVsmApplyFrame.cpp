@@ -47,11 +47,12 @@ namespace xo {
         }
 
         void
-        DVsmApplyFrame::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DVsmApplyFrame::visit_gco_children(VisitReason reason,
+                                           obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&parent_);
-            gc.visit_child(&fn_);
-            gc.visit_child(&args_);
+            gc.visit_child(reason, &parent_);
+            gc.visit_child(reason, &fn_);
+            gc.visit_child(reason, &args_);
         }
 
         bool

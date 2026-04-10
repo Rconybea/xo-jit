@@ -15,10 +15,10 @@ namespace xo {
          **/
         class DVsmSeqContFrame {
         public:
-            //using ACollector = xo::mm::ACollector;
-            using AAllocator = xo::mm::AAllocator;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
+            using VisitReason = xo::mm::VisitReason;
+            using AAllocator = xo::mm::AAllocator;
             using ppindentinfo = xo::print::ppindentinfo;
 
         public:
@@ -57,7 +57,7 @@ namespace xo {
             ///@{
 
             DVsmSeqContFrame * gco_shallow_move(obj<AGCObjectVisitor> gc) noexcept;
-            void visit_gco_children(obj<AGCObjectVisitor> gc) noexcept;
+            void visit_gco_children(VisitReason reason, obj<AGCObjectVisitor> gc) noexcept;
 
             ///@}
             /** @defgrouop scm-vsmseqcontframe-printable-facet printable facet **/

@@ -36,10 +36,11 @@ namespace xo {
         }
 
         void
-        DVsmIfElseContFrame::visit_gco_children(obj<AGCObjectVisitor> gc) noexcept
+        DVsmIfElseContFrame::visit_gco_children(VisitReason reason,
+                                                obj<AGCObjectVisitor> gc) noexcept
         {
-            gc.visit_child(&parent_);
-            gc.visit_child(&ifelse_expr_);
+            gc.visit_child(reason, &parent_);
+            gc.visit_child(reason, &ifelse_expr_);
         }
 
         // printable facet

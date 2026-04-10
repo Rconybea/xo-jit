@@ -45,6 +45,7 @@ namespace xo {
             using AAllocator = xo::mm::AGCObject::AAllocator;
             using ACollector = xo::mm::AGCObject::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObject::AGCObjectVisitor;
+            using VisitReason = xo::mm::AGCObject::VisitReason;
             using Copaque = xo::mm::AGCObject::Copaque;
             using Opaque = xo::mm::AGCObject::Opaque;
             ///@}
@@ -59,7 +60,7 @@ Arguably abusing the word 'visitor' here **/
             /** Invoke fn.visit_child(iface,data) for each child GCObject pointer.
 Context: provides address of data pointer so it can be updated in place
 when @p fn invokes garbage collector reentry point **/
-            static void visit_gco_children(DVsmApplyFrame & self, obj<AGCObjectVisitor> fn) noexcept;
+            static void visit_gco_children(DVsmApplyFrame & self, VisitReason reason, obj<AGCObjectVisitor> fn) noexcept;
             ///@}
         };
 
