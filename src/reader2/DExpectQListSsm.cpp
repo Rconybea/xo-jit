@@ -182,7 +182,9 @@ namespace xo {
                         = DList::_cons(p_psm->expr_alloc(), lit, DList::_nil());
 
                     if (this->end_) {
-                        end_->assign_rest(new_last);
+                        /* DExpectQListSsm owns {start_, end_} -> preserves acyclic property */
+
+                        end_->_assign_rest(new_last);
 
                         this->end_ = new_last;
                     } else {
