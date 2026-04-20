@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+#
+# xo-cmake-llvmcov-harness:
+#   clang/llvm source-based coverage driver.
+#   Parallel to xo-cmake-lcov-harness (gcov path).
+#
+# Pipeline:
+#   1. run ctest with LLVM_PROFILE_FILE pointing into ${builddir}/ccov/raw
+#   2. merge the produced .profraw files to ${outputstem}.profdata
+#   3. read ${builddir}/ccov/utest-binaries.list (written by xo_umbrella_coverage_config)
+#   4. emit browsable HTML under ${builddir}/ccov/html
+#   5. print summary table to stdout
+#
+
+set -euo pipefail
+
+srcdir=${1:-}
+builddir=${2:-}
+outputstem=${3:-}
+
+if [[ -z "${srcdir}" || -z "${builddir}" ]]; then
+    echo "usage: $0 srcdir builddir [outputstem]" >&2
+    exit 1
+fi
+
+if [[ -z "${outputstem}" ]]; then
+    outputstem=${builddir}/ccov/out
+fi
+
+llvm_profdata=@LLVM_PROFDATA_EXECUTABLE@
+llvm_cov=@LLVM_COV_EXECUTABLE@
+
+for kv in "llvm-profdata:${llvm_profdata}" "llvm-cov:${llvm_cov}"; do
+    name=${kv%%:*}
+    path=${kv#*:}
+    if [[ -z "${path}" || "${path}" == *NOTFOUND ]]; then
+        echo "xo-cmake-llvmcov-harness: ${name} not found during xo-cmake build/install" >&2
+        exit 1
+    fi
+done
+
+manifest=${builddir}/ccov/utest-binaries.list
+if [[ ! -f "${manifest}" ]]; then
+    echo "xo-cmake-llvmcov-harness: missing ${manifest}" >&2
+    echo "xo-cmake-llvmcov-harness: expected xo_umbrella_coverage_config() to produce it" >&2
+    exit 1
+fi
+
+rawdir=${builddir}/ccov/raw
+htmldir=${builddir}/ccov/html
+mkdir -p "${rawdir}" "${htmldir}"
+
+# clear prior raws so we don't mix stale data from a past run
+rm -f "${rawdir}"/*.profraw
+
+# 1. run tests. LLVM_PROFILE_FILE pattern: %h=hostname %m=binary-signature %p=pid
+#    keeps output unique across parallel tests and across binaries.
+#
+# tolerate ctest failures: a crashing/asserting utest still emits .profraw
+# before dying, and we want a coverage report even when some tests are broken.
+# Surface the exit code at the end.
+ctest_rc=0
+(cd "${builddir}" && \
+    LLVM_PROFILE_FILE="${rawdir}/%h-%m-%p.profraw" \
+    ctest --output-on-failure) || ctest_rc=$?
+
+# 2. merge .profraw -> .profdata
+shopt -s nullglob
+raws=("${rawdir}"/*.profraw)
+if [[ ${#raws[@]} -eq 0 ]]; then
+    echo "xo-cmake-llvmcov-harness: no .profraw produced - was the build instrumented?" >&2
+    exit 1
+fi
+"${llvm_profdata}" merge -sparse "${raws[@]}" -o "${outputstem}.profdata"
+
+# 3. read binary list. drop blank lines and anything not executable
+#    (target may be in manifest but unbuilt if 'ninja ccov' was invoked
+#    before a full build; defensive).
+readarray -t all_bins < "${manifest}"
+bins=()
+for b in "${all_bins[@]}"; do
+    [[ -n "${b}" && -x "${b}" ]] && bins+=("${b}")
+done
+if [[ ${#bins[@]} -eq 0 ]]; then
+    echo "xo-cmake-llvmcov-harness: no executable utests found in manifest" >&2
+    exit 1
+fi
+
+# llvm-cov takes the first binary positionally; the rest via -object.
+first=${bins[0]}
+objargs=()
+if [[ ${#bins[@]} -gt 1 ]]; then
+    for b in "${bins[@]:1}"; do objargs+=(-object "${b}"); done
+fi
+
+# exclude test code and toolchain headers from the report
+ignore_re='/utest/|/nix/store/'
+
+# 4. HTML
+"${llvm_cov}" show \
+    -instr-profile="${outputstem}.profdata" \
+    -format=html \
+    -output-dir="${htmldir}" \
+    -show-line-counts-or-regions \
+    -ignore-filename-regex="${ignore_re}" \
+    "${first}" "${objargs[@]}"
+
+# 5. summary to stdout
+"${llvm_cov}" report \
+    -instr-profile="${outputstem}.profdata" \
+    -ignore-filename-regex="${ignore_re}" \
+    "${first}" "${objargs[@]}"
+
+echo
+echo "xo-cmake-llvmcov-harness: HTML report -> ${htmldir}/index.html"
+if [[ ${ctest_rc} -ne 0 ]]; then
+    echo "xo-cmake-llvmcov-harness: WARNING ctest exited ${ctest_rc} - coverage is from successful tests only" >&2
+fi

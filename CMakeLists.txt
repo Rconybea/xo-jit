@@ -7,15 +7,31 @@ include (GNUInstallDirs)
 
 set(XO_PROJECT_NAME xo_macros)
 
-# LCOV_EXECUTABLE,GENHTML_EXECUTABLE: needed by xo-cmake-lcov-harness.in
+# LCOV_EXECUTABLE,GENHTML_EXECUTABLE: needed by xo-cmake-lcov-harness.in (gcov toolchain)
 find_program(LCOV_EXECUTABLE NAMES lcov)
 find_program(GENHTML_EXECUTABLE NAMES genhtml)
+
+# LLVM_PROFDATA_EXECUTABLE,LLVM_COV_EXECUTABLE: needed by xo-cmake-llvmcov-harness.in (llvm toolchain)
+find_program(LLVM_PROFDATA_EXECUTABLE NAMES llvm-profdata)
+find_program(LLVM_COV_EXECUTABLE NAMES llvm-cov)
 
 configure_file(
     ${PROJECT_SOURCE_DIR}/bin/xo-cmake-lcov-harness.in
     ${PROJECT_BINARY_DIR}/xo-cmake-lcov-harness
     @ONLY
     )
+file(CHMOD ${PROJECT_BINARY_DIR}/xo-cmake-lcov-harness
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+configure_file(
+    ${PROJECT_SOURCE_DIR}/bin/xo-cmake-llvmcov-harness.in
+    ${PROJECT_BINARY_DIR}/xo-cmake-llvmcov-harness
+    @ONLY
+    )
+file(CHMOD ${PROJECT_BINARY_DIR}/xo-cmake-llvmcov-harness
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 configure_file(
     ${PROJECT_SOURCE_DIR}/bin/xo-cmake-config.in
@@ -41,6 +57,7 @@ install(
 install(
     FILES
     "${PROJECT_BINARY_DIR}/xo-cmake-lcov-harness"
+    "${PROJECT_BINARY_DIR}/xo-cmake-llvmcov-harness"
     "${PROJECT_BINARY_DIR}/xo-cmake-config"
     "${PROJECT_BINARY_DIR}/xo-build"
     PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE

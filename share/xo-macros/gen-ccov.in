@@ -3,28 +3,17 @@
 srcdir=@PROJECT_SOURCE_DIR@
 builddir=@PROJECT_BINARY_DIR@
 
-#lcov=@LCOV_EXECUTABLE@
-#genhtml=@GENHTML_EXECUTABLE@
-#
-#if [[ $lcov == "LCOV_EXECUTABLE-NOTFOUND" ]]; then
-#    echo "gen-ccov: lcov executable not found"
-#    exit 1
-#fi
-#
-#if [[ $genhtml == "GENHTML_EXECUTABLE-NOTFOUND" ]]; then
-#    echo "gen-ccov: genhtml executable not found"
-#    exit 1
-#fi
+# path to the toolchain-specific harness. Configured by either
+# xo_toplevel_coverage_config2 (standalone satellite build) or
+# xo_umbrella_coverage_config (umbrella build). Resolves to one of:
+#   xo-cmake-lcov-harness      (gcov toolchain)
+#   xo-cmake-llvmcov-harness   (llvm toolchain)
+covharness=@XO_CMAKE_COV_HARNESS_EXECUTABLE@
 
-lcovharness=@XO_CMAKE_LCOV_HARNESS_EXECUTABLE@
-
-if [[ -z $lcovharness ]]; then
-   echo "gen-ccov: lcov-harness executable (XO_CMAKE_LCOV_HARNESS_EXECUTABLE) not configured"
-   echo "gen-ccov: expect value of path/to/xo-cmake-config --lcov-harness-exe"
-   echo "gen-ccov: stored in XO_CMAKE_LCOV_HARNESS_EXECUTABLE by xo_toplevel_testing_options2()"
+if [[ -z $covharness ]]; then
+   echo "gen-ccov: coverage harness (XO_CMAKE_COV_HARNESS_EXECUTABLE) not configured"
+   echo "gen-ccov: should be set by xo_umbrella_coverage_config or xo_toplevel_coverage_config2"
    exit 1
 fi
 
-# TODO: allow providing LCOV_EXECUTABLE GENHTML_EXECUTABLE here
-
-$lcovharness $srcdir $builddir
+$covharness $srcdir $builddir

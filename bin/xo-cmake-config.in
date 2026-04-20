@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 usage() {
-    echo "$0 [-u|--usage|-h|--help|--lcov-exe|--genhtml-exe|--lcov-harness-exe|--gen-ccov-template|--reconfigure-template|--cmake-module-path|--subsystem-list]" 1>&2
+    echo "$0 [-u|--usage|-h|--help|--lcov-exe|--genhtml-exe|--lcov-harness-exe|--llvmcov-harness-exe|--gen-ccov-template|--reconfigure-template|--cmake-module-path|--subsystem-list]" 1>&2
 }
 
 help() {
@@ -17,7 +17,8 @@ Options:
   --cmake-module-path report directory providing xo-cmake macros (will use/appear-in CMAKE_MODULE_PATH)
   --lcov-exe          report path to 'lcov' executable
   --genhtml-exe       report path to 'genhtml' executable
-  --lcov-harness-exe  report path to 'xo-cmake-lcov-harness' executable
+  --lcov-harness-exe     report path to 'xo-cmake-lcov-harness' executable (gcov toolchain)
+  --llvmcov-harness-exe  report path to 'xo-cmake-llvmcov-harness' executable (llvm toolchain)
   --gen-ccov-template    report path to 'gen-ccov.in' template
   --reconfigure-template report path to 'xo-reconfigure.in' template
   --doxygen-template     report path to 'Doxyfile.in' template
@@ -45,6 +46,9 @@ while [[ $# > 0 ]]; do
             ;;
         --lcov-harness-exe)
             cmd='lcov_harness_exe'
+            ;;
+        --llvmcov-harness-exe)
+            cmd='llvmcov_harness_exe'
             ;;
         --gen-ccov-template)
             cmd='gen_ccov_template'
@@ -81,6 +85,8 @@ elif [[ $cmd == 'genhtml_exe' ]]; then
     echo -n @GENHTML_EXECUTABLE@
 elif [[ $cmd == 'lcov_harness_exe' ]]; then
     echo -n @CMAKE_INSTALL_FULL_BINDIR@/xo-cmake-lcov-harness
+elif [[ $cmd == 'llvmcov_harness_exe' ]]; then
+    echo -n @CMAKE_INSTALL_FULL_BINDIR@/xo-cmake-llvmcov-harness
 elif [[ $cmd == 'gen_ccov_template' ]]; then
     echo -n @CMAKE_INSTALL_FULL_DATADIR@/xo-macros/gen-ccov.in
 elif [[ $cmd == 'reconfigure_template' ]]; then

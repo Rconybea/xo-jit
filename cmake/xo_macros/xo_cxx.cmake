@@ -236,30 +236,54 @@ endmacro()
 #
 macro(xo_toplevel_coverage_config2)
     if ("${CMAKE_BUILD_TYPE}" STREQUAL "coverage")
-        #find_program(LCOV_EXECUTABLE NAMES lcov)
-        #find_program(GENHTML_EXECUTABLE NAMES genhtml)
-        # see bin/xo-cmake-lcov-harness in this repo
-        execute_process(COMMAND ${XO_CMAKE_CONFIG_EXECUTABLE} --lcov-harness-exe OUTPUT_VARIABLE XO_CMAKE_LCOV_HARNESS_EXECUTABLE)
-        execute_process(COMMAND ${XO_CMAKE_CONFIG_EXECUTABLE} --gen-ccov-template OUTPUT_VARIABLE XO_CMAKE_GEN_CCOV_TEMPLATE)
+        # select coverage toolchain by compiler family:
+        #   GNU              -> gcov (post-process with lcov/genhtml)
+        #   Clang/AppleClang -> llvm source-based coverage (post-process with llvm-profdata/llvm-cov)
+        # Apple clang ships no libgcov, so the gcov path does not link on darwin.
+        if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+            set(XO_COVERAGE_TOOLCHAIN "llvm" CACHE STRING "coverage toolchain: gcov or llvm")
+            set(_xo_cov_compile -ggdb -Og -fprofile-instr-generate -fcoverage-mapping)
+            set(_xo_cov_link    -fprofile-instr-generate)
+        else()
+            set(XO_COVERAGE_TOOLCHAIN "gcov" CACHE STRING "coverage toolchain: gcov or llvm")
+            set(_xo_cov_compile -ggdb -Og -fprofile-arcs -ftest-coverage)
+            set(_xo_cov_link    --coverage)
+        endif()
+        message(STATUS "XO_COVERAGE_TOOLCHAIN=${XO_COVERAGE_TOOLCHAIN}")
 
         if (NOT DEFINED PROJECT_CXX_FLAGS_COVERAGE)
-            # note: for clang would use -fprofile-instr-generate -fcoverage-mapping here instead and also at link time
-            set(PROJECT_CXX_FLAGS_COVERAGE -ggdb -Og -fprofile-arcs -ftest-coverage
+            set(PROJECT_CXX_FLAGS_COVERAGE ${_xo_cov_compile}
                 CACHE STRING "coverage c++ compiler flags")
         endif()
         message(STATUS "PROJECT_CXX_FLAGS_COVERAGE: coverage c++ flags are [${PROJECT_CXX_FLAGS_COVERAGE}]")
 
         add_compile_options("$<$<CONFIG:COVERAGE>:${PROJECT_CXX_FLAGS_COVERAGE}>")
-        # when -DCMAKE_BUILD_TYPE=coverage, must also link executables with gcov
-        link_libraries("$<$<CONFIG:COVERAGE>:gcov>")
+        add_link_options("$<$<CONFIG:COVERAGE>:${_xo_cov_link}>")
 
-        if("${XO_CMAKE_GEN_CCOV_TEMPLATE}" STREQUAL "")
-            message(ERROR "xo_toplevel_testing_config2: XO_CMAKE_GEN_CCOV_TEMPLATE not set")
-            message(ERROR "see xo_toplevel_testing_options2()")
-        else()
-            message(DEBUG "XO_CMAKE_GEN_CCOV_TEMPLATE=${XO_CMAKE_GEN_CCOV_TEMPLATE}")
-            configure_file(${XO_CMAKE_GEN_CCOV_TEMPLATE} ${PROJECT_BINARY_DIR}/gen-ccov @ONLY)
-            file(CHMOD ${PROJECT_BINARY_DIR}/gen-ccov PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+        # per-project gen-ccov: only in standalone satellite builds.
+        # umbrella builds delegate to xo_umbrella_coverage_config(), which reads
+        # the in-tree template directly (bypassing the installed xo-cmake-config).
+        if (NOT XO_SUBMODULE_BUILD)
+            # xo-cmake-config reports installed paths of the harnesses + template.
+            execute_process(COMMAND ${XO_CMAKE_CONFIG_EXECUTABLE} --lcov-harness-exe    OUTPUT_VARIABLE _xo_cov_lcov_harness)
+            execute_process(COMMAND ${XO_CMAKE_CONFIG_EXECUTABLE} --llvmcov-harness-exe OUTPUT_VARIABLE _xo_cov_llvmcov_harness)
+            execute_process(COMMAND ${XO_CMAKE_CONFIG_EXECUTABLE} --gen-ccov-template   OUTPUT_VARIABLE XO_CMAKE_GEN_CCOV_TEMPLATE)
+
+            # pick the harness matching XO_COVERAGE_TOOLCHAIN
+            if (XO_COVERAGE_TOOLCHAIN STREQUAL "llvm")
+                set(XO_CMAKE_COV_HARNESS_EXECUTABLE ${_xo_cov_llvmcov_harness})
+            else()
+                set(XO_CMAKE_COV_HARNESS_EXECUTABLE ${_xo_cov_lcov_harness})
+            endif()
+
+            if("${XO_CMAKE_GEN_CCOV_TEMPLATE}" STREQUAL "")
+                message(WARNING "xo_toplevel_coverage_config2: XO_CMAKE_GEN_CCOV_TEMPLATE not set "
+                                "(xo-cmake not installed? skipping per-project gen-ccov)")
+            else()
+                message(DEBUG "XO_CMAKE_GEN_CCOV_TEMPLATE=${XO_CMAKE_GEN_CCOV_TEMPLATE}")
+                configure_file(${XO_CMAKE_GEN_CCOV_TEMPLATE} ${PROJECT_BINARY_DIR}/gen-ccov @ONLY)
+                file(CHMOD ${PROJECT_BINARY_DIR}/gen-ccov PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+            endif()
         endif()
     endif()
 endmacro()
@@ -300,6 +324,68 @@ function(xo_generate_reconfigure_script)
         WORLD_READ WORLD_EXECUTE)
     message(STATUS "Generated ${_reconfigure_script}")
 endfunction()
+
+# umbrella-level coverage wiring: emits utest-binaries.list manifest
+# and the `ccov` target, driven by the singleton global utest list
+# populated by xo_add_utest_executable.
+#
+# Call once from the umbrella CMakeLists.txt, after all add_subdirectory()
+# calls for satellites. Inside a satellite-standalone build,
+# xo_utest_coverage_config2 fills the equivalent role.
+#
+macro(xo_umbrella_coverage_config)
+    if ("${CMAKE_BUILD_TYPE}" STREQUAL "coverage")
+        get_property(_all_utests GLOBAL PROPERTY xo_all_utest_executables)
+        get_property(_all_libs   GLOBAL PROPERTY xo_all_shared_libraries)
+        list(LENGTH _all_utests _n_utests)
+        list(LENGTH _all_libs   _n_libs)
+        message(STATUS "xo_umbrella_coverage_config: ${_n_utests} utests + ${_n_libs} libraries")
+
+        # manifest: one resolved binary path per line. Both utest executables
+        # and satellite shared libraries must appear so that llvm-cov can
+        # resolve coverage mappings from every instrumented object (.cpp in
+        # libs, templates/header code in exes). $<TARGET_FILE:...> is
+        # deferred until build-graph time, so file(GENERATE) is required
+        # (configure_file wouldn't resolve the generator expressions).
+        set(_bin_lines)
+        foreach(_t ${_all_utests} ${_all_libs})
+            list(APPEND _bin_lines "$<TARGET_FILE:${_t}>")
+        endforeach()
+        string(JOIN "\n" _bin_contents ${_bin_lines})
+        file(GENERATE
+             OUTPUT ${CMAKE_BINARY_DIR}/ccov/utest-binaries.list
+             CONTENT "${_bin_contents}\n")
+
+        # gen-ccov: use in-tree template directly, bypassing the installed
+        # xo-cmake-config (which doesn't exist in a from-scratch umbrella build).
+        # pick the harness matching XO_COVERAGE_TOOLCHAIN (set by xo_toplevel_coverage_config2).
+        if (XO_COVERAGE_TOOLCHAIN STREQUAL "llvm")
+            set(XO_CMAKE_COV_HARNESS_EXECUTABLE ${CMAKE_BINARY_DIR}/xo-cmake/xo-cmake-llvmcov-harness)
+        else()
+            set(XO_CMAKE_COV_HARNESS_EXECUTABLE ${CMAKE_BINARY_DIR}/xo-cmake/xo-cmake-lcov-harness)
+        endif()
+        message(STATUS "xo_umbrella_coverage_config: harness=${XO_CMAKE_COV_HARNESS_EXECUTABLE}")
+
+        set(_gen_ccov_template ${XO_UMBRELLA_SOURCE_DIR}/xo-cmake/share/xo-macros/gen-ccov.in)
+        if (EXISTS ${_gen_ccov_template})
+            configure_file(${_gen_ccov_template} ${CMAKE_BINARY_DIR}/gen-ccov @ONLY)
+            file(CHMOD ${CMAKE_BINARY_DIR}/gen-ccov
+                 PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                             GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+        else()
+            message(WARNING "xo_umbrella_coverage_config: template not found: ${_gen_ccov_template}")
+        endif()
+
+        # ccov target. DEPENDS on utest targets ensures they build before
+        # gen-ccov runs (which itself drives `ctest`).
+        add_custom_target(
+            ccov
+            DEPENDS ${_all_utests}
+            COMMAND ${CMAKE_BINARY_DIR}/gen-ccov
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMENT "Generating coverage report -> ${CMAKE_BINARY_DIR}/ccov/html")
+    endif()
+endmacro()
 
 # target to build+install coverage report.
 #
@@ -806,6 +892,11 @@ macro(xo_add_shared_library4 target projectTargets targetversion soversion sourc
         APPEND
         PROPERTY targets ${target})
 
+    # singleton global list of every shared library across satellites.
+    # consumed by xo_umbrella_coverage_config to extend the ccov binary
+    # manifest so llvm-cov resolves .cpp coverage in satellite .dylibs/.so.
+    set_property(GLOBAL APPEND PROPERTY xo_all_shared_libraries ${target})
+
     set_target_properties(
         ${target}
         PROPERTIES
@@ -982,6 +1073,10 @@ macro(xo_add_utest_executable target sources)
         APPEND
         PROPERTY targets ${target})
     add_dependencies(all_utest_executables_${PROJECT_NAME} ${target})
+
+    # singleton global list of every utest target: survives across project() scopes,
+    # so umbrella and standalone-satellite builds can query one source of truth
+    set_property(GLOBAL APPEND PROPERTY xo_all_utest_executables ${target})
 
 endmacro()
 
