@@ -561,8 +561,8 @@ namespace xo {
             auto apply = obj<AExpression,DApplyExpr>::from(expr_);
 
             // accumulate evaluated arguments here
-            DArray * args = DArray::empty(mm_.to_op(),
-                                          apply->n_args());
+            DArray * args = DArray::_empty(mm_.to_op(),
+                                           apply->n_args());
 
             // TODO: check function signature
 
@@ -821,7 +821,9 @@ namespace xo {
 
                 log && log(xtag("i_arg", i_arg), xtag("n_arg", args->size()), xtag("cap", args->capacity()));
 
-                args->push_back(value);
+                auto gc = mm_.to_op().to_facet<ACollector>();
+
+                args->push_back(gc, value);
 
                 i_arg = evalargs_frame->increment_arg();
 
