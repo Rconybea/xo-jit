@@ -17,6 +17,7 @@ namespace xo {
     using xo::print::APrintable;
     using xo::print::ppstate;
     using xo::print::ppindentinfo;
+    using xo::mm::ACollector;
     using xo::mm::AGCObject;
     using xo::mm::AAllocator;
     using xo::facet::FacetRegistry;
@@ -61,7 +62,7 @@ namespace xo {
             /* allocate room for 8 arguments (during parsing)
              * will re-alloc to expand as needed
              */
-            DArray * argl = DArray::empty(mm, 8);
+            DArray * argl = DArray::_empty(mm, 8);
 
             return new (mem) DExpectFormalArglistSsm(argl);
         }
@@ -198,18 +199,22 @@ namespace xo {
                 // could do this in place since this SSM is at the top of the parser stack.
 
                 obj<AAllocator,DArena> mm(&parser_alloc);
-                DArray * argl_2x = DArray::empty(mm, 2 * argl_->capacity());
+                DArray * argl_2x = DArray::_empty(mm, 2 * argl_->capacity());
+
+                auto gc = obj<AAllocator>(mm).try_to_facet<ACollector>();
 
                 for (DArray::size_type i = 0, n = argl_->size(); i < n; ++i) {
                     // TODO: prefer non-bounds-checked access here
-                    argl_2x->push_back(argl_->at(i));
+                    argl_2x->push_back(gc, argl_->at(i));
                 }
 
                 // update in place
                 this->argl_ = argl_2x;
             }
 
-            this->argl_->push_back(var_o);
+            auto gc = expr_alloc.try_to_facet<ACollector>();
+
+            this->argl_->push_back(gc, var_o);
         }
 
         void

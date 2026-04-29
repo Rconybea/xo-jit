@@ -13,6 +13,7 @@
 namespace xo {
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
+    using xo::mm::ACollector;
     using xo::mm::AGCObject;
 
     namespace scm {
@@ -142,8 +143,8 @@ namespace xo {
             if (state_.code() == QArrayXst::code::qarray_0) {
                 this->state_ = QArrayXst(QArrayXst::code::qarray_1a);
 
-                this->array_ = DArray::empty(p_psm->expr_alloc(),
-                                             8 /*heuristic starting capacity*/);
+                this->array_ = DArray::_empty(p_psm->expr_alloc(),
+                                              8 /*heuristic starting capacity*/);
 
                 DExpectQLiteralSsm::start(p_psm,
                                           false /*cxl_on_rightparen*/,
@@ -177,6 +178,8 @@ namespace xo {
         DExpectQArraySsm::on_quoted_literal(obj<AGCObject> lit,
                                            ParserStateMachine * p_psm)
         {
+            auto gc = p_psm->expr_alloc().try_to_facet<ACollector>();
+
             if(state_.code() == QArrayXst::code::qarray_1a) {
                 // append lit at the end of array_
                 {
@@ -192,7 +195,7 @@ namespace xo {
                                                     2 * array_->capacity());
                     }
 
-                    bool ok = array_->push_back(lit);
+                    bool ok = array_->push_back(gc, lit);
 
                     assert(ok);
                 }

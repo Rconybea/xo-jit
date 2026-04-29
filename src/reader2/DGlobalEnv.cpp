@@ -21,7 +21,7 @@ namespace xo {
         DGlobalEnv::_make(obj<AAllocator> mm,
                           DGlobalSymtab * symtab)
         {
-            DArray * values = DArray::empty(mm, symtab->var_capacity());
+            DArray * values = DArray::_empty(mm, symtab->var_capacity());
 
             void * mem = mm.alloc_for<DGlobalSymtab>();
 
