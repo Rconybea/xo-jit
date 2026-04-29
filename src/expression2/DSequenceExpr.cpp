@@ -15,6 +15,7 @@
 #include <xo/reflectutil/typeseq.hpp>
 
 namespace xo {
+    using xo::mm::ACollector;
     using xo::mm::AGCObject;
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
@@ -47,8 +48,8 @@ namespace xo {
             /** allocate 2nd, so it comes after DSequenceExpr in
              *  memory.  This may later allow realloc
              **/
-            DArray * expr_v = DArray::empty(mm,
-                                            c_hint_capacity);
+            DArray * expr_v = DArray::_empty(mm,
+                                             c_hint_capacity);
 
             expr->expr_v_ = expr_v;
 
@@ -73,23 +74,25 @@ namespace xo {
         DSequenceExpr::push_back(obj<AAllocator> mm,
                                  obj<AExpression> expr)
         {
+            // null gc -> no write barrier
+            obj<ACollector> gc = mm.try_to_facet<ACollector>();
+
             if (expr_v_->size() == expr_v_->capacity()) {
                 /* reallocate+expand */
 
                 DArray * expr_2x_v
-                    = DArray::empty(mm, 2 * expr_v_->capacity());
+                    = DArray::_empty(mm, 2 * expr_v_->capacity());
 
                 for (size_type i = 0, z = expr_v_->size(); i < z; ++i) {
-                    expr_2x_v->push_back((*expr_2x_v)[i]);
+                    expr_2x_v->push_back(gc, (*expr_2x_v)[i]);
                 }
 
                 this->expr_v_ = expr_2x_v;
             }
 
-            obj<AGCObject> expr_gco
-                = FacetRegistry::instance().variant<AGCObject,AExpression>(expr);
+            obj<AGCObject> expr_gco = expr.to_facet<AGCObject>();
 
-            this->expr_v_->push_back(expr_gco);
+            this->expr_v_->push_back(gc, expr_gco);
         }
 
         void

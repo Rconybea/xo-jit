@@ -13,9 +13,9 @@
 #include <xo/indentlog/scope.hpp>
 
 namespace xo {
+    using xo::mm::ACollector;
     using xo::mm::AGCObject;
     using xo::print::APrintable;
-    //using xo::facet::typeseq;
     using xo::print::ppstate;
 
     namespace scm {
@@ -34,8 +34,8 @@ namespace xo {
         {
             void * mem = mm.alloc_for<DLocalSymtab>();
 
-            DArray * vars = DArray::empty(mm, nv);
-            DArray * types = DArray::empty(mm, nt);
+            DArray * vars = DArray::_empty(mm, nv);
+            DArray * types = DArray::_empty(mm, nt);
 
             return new (mem) DLocalSymtab(p, vars, types);
         }
@@ -69,7 +69,9 @@ namespace xo {
                 Binding binding = Binding::local(vars_->size());
 
                 DVariable * var = DVariable::make(mm, name, typeref, binding);
-                vars_->push_back(obj<AGCObject,DVariable>(var));
+
+                auto gc = mm.try_to_facet<ACollector>();
+                vars_->push_back(gc, obj<AGCObject,DVariable>(var));
 
                 return binding;
             }
@@ -87,7 +89,8 @@ namespace xo {
             } else {
                 obj<AGCObject> tname = DTypename::make(mm, name, type);
 
-                types_->push_back(tname);
+                auto gc = mm.try_to_facet<ACollector>();
+                types_->push_back(gc, tname);
             }
         }
 

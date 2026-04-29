@@ -16,6 +16,7 @@
 
 namespace xo {
     using xo::map::DArenaHashMap;
+    using xo::mm::ACollector;
     using xo::mm::AGCObject;
 
     namespace scm {
@@ -51,13 +52,13 @@ namespace xo {
             assert(var_map);
 
             /* choosing same capacity for hash, vars */
-            DArray * vars = DArray::empty(mm, var_map->capacity());
+            DArray * vars = DArray::_empty(mm, var_map->capacity());
             assert(vars);
 
             auto type_map = dp<repr_type>::make(aux_mm, type_cfg);
             assert(type_map);
 
-            DArray * types = DArray::empty(mm, type_map->capacity());
+            DArray * types = DArray::_empty(mm, type_map->capacity());
 
             void * mem = mm.alloc_for<DGlobalSymtab>();
 
@@ -109,6 +110,8 @@ namespace xo {
                                        DVariable * var)
         {
             scope log(XO_DEBUG(false), std::string_view(*var->name()));
+
+            auto gc = mm.try_to_facet<ACollector>();
 
             // It's possible there's already a global variable
             // with the same name.
@@ -165,7 +168,7 @@ namespace xo {
                 // need slot# in .map_ for this unique symbol
                 (*var_map_)[var->name()] = binding.j_slot();
 
-                vars_->push_back(obj<AGCObject,DVariable>(var));
+                vars_->push_back(gc, obj<AGCObject,DVariable>(var));
             }
         }
 
@@ -190,6 +193,8 @@ namespace xo {
         {
             scope log(XO_DEBUG(true),
                       std::string_view(*tname->name()));
+
+            auto gc = mm.try_to_facet<ACollector>();
 
             auto ix = type_map_->find(tname->name());
 
@@ -218,12 +223,13 @@ namespace xo {
                 (*type_map_)[tname->name()] = n;
 
                 log && log("STUB: need write barrier");
-                types_->push_back(obj<AGCObject,DTypename>(tname));
+                types_->push_back(gc, obj<AGCObject,DTypename>(tname));
             } else {
                 Binding::slot_type i_slot = ix->second;
 
                 log && log("STUB: need write barrier");
-                (*types_)[i_slot] = obj<AGCObject,DTypename>(tname);
+                types_->assign_at(gc, i_slot,
+                                  obj<AGCObject,DTypename>(tname));
             }
         }
 
