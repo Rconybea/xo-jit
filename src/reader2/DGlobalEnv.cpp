@@ -8,6 +8,7 @@
 #include <xo/object2/Array.hpp>
 
 namespace xo {
+    using xo::mm::ACollector;
     using xo::mm::AAllocator;
     using xo::mm::AGCObject;
 
@@ -84,8 +85,11 @@ namespace xo {
                 values_->resize(ix.j_slot() + 1);
             }
 
-            log && log("STUB: need write barrier for GC here");
-            (*values_)[ix.j_slot()] = x;
+            //auto gc = mm.try_to_facet<ACollector>();
+
+            values_->assign_at(mm,
+                               ix.j_slot(),
+                               x);
         }
 
         DVariable *

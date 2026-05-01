@@ -233,7 +233,7 @@ namespace xo {
                 assert(expr_gco);
 
                 obj<AAllocator,DArena> mm(&(p_psm->parser_alloc()));
-                auto gc = obj<AAllocator>(mm).try_to_facet<ACollector>();
+                //auto gc = obj<AAllocator>(mm).try_to_facet<ACollector>();
 
                 if (args_expr_v_->size() == args_expr_v_->capacity()) {
                     // need to expand .args_expr_v_ capacity.
@@ -243,14 +243,14 @@ namespace xo {
                     DArray * argv_2x = DArray::_empty(mm, 2 * args_expr_v_->capacity());
 
                     for (DArray::size_type i = 0, n = args_expr_v_->size(); i < n; ++i) {
-                        argv_2x->push_back(gc, (*args_expr_v_)[i]);
+                        argv_2x->push_back(mm, (*args_expr_v_)[i]);
                     }
 
                     this->args_expr_v_ = argv_2x;
                 }
 
                 if (args_expr_v_->size() < args_expr_v_->capacity())
-                    args_expr_v_->push_back(gc, expr_gco);
+                    args_expr_v_->push_back(mm, expr_gco);
 
                 if (tk.tk_type() == tokentype::tk_rightparen) {
                     obj<AExpression> apply_ex = this->assemble_expr(p_psm->expr_alloc());

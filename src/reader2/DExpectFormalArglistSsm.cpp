@@ -201,20 +201,20 @@ namespace xo {
                 obj<AAllocator,DArena> mm(&parser_alloc);
                 DArray * argl_2x = DArray::_empty(mm, 2 * argl_->capacity());
 
-                auto gc = obj<AAllocator>(mm).try_to_facet<ACollector>();
+                //auto gc = obj<AAllocator>(mm).try_to_facet<ACollector>();
 
                 for (DArray::size_type i = 0, n = argl_->size(); i < n; ++i) {
                     // TODO: prefer non-bounds-checked access here
-                    argl_2x->push_back(gc, argl_->at(i));
+                    argl_2x->push_back(mm, argl_->at(i));
                 }
 
                 // update in place
                 this->argl_ = argl_2x;
             }
 
-            auto gc = expr_alloc.try_to_facet<ACollector>();
+            //auto gc = expr_alloc.try_to_facet<ACollector>();
 
-            this->argl_->push_back(gc, var_o);
+            this->argl_->push_back(expr_alloc, var_o);
         }
 
         void
