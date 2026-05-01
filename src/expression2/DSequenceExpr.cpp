@@ -5,8 +5,7 @@
 
 #include "DSequenceExpr.hpp"
 #include "detail/IExpression_DSequenceExpr.hpp"
-#include <xo/object2/array/IGCObject_DArray.hpp>
-#include <xo/object2/array/IPrintable_DArray.hpp>
+#include <xo/object2/Array.hpp>
 #include <xo/alloc2/GCObject.hpp>
 #include <xo/alloc2/Allocator.hpp>
 #include <xo/printable2/Printable.hpp>
@@ -15,7 +14,6 @@
 #include <xo/reflectutil/typeseq.hpp>
 
 namespace xo {
-    using xo::mm::ACollector;
     using xo::mm::AGCObject;
     using xo::print::APrintable;
     using xo::facet::FacetRegistry;
@@ -75,7 +73,7 @@ namespace xo {
                                  obj<AExpression> expr)
         {
             // null gc -> no write barrier
-            obj<ACollector> gc = mm.try_to_facet<ACollector>();
+            //obj<ACollector> gc = mm.try_to_facet<ACollector>();
 
             if (expr_v_->size() == expr_v_->capacity()) {
                 /* reallocate+expand */
@@ -84,7 +82,7 @@ namespace xo {
                     = DArray::_empty(mm, 2 * expr_v_->capacity());
 
                 for (size_type i = 0, z = expr_v_->size(); i < z; ++i) {
-                    expr_2x_v->push_back(gc, (*expr_2x_v)[i]);
+                    expr_2x_v->push_back(mm, (*expr_2x_v)[i]);
                 }
 
                 this->expr_v_ = expr_2x_v;
@@ -92,7 +90,7 @@ namespace xo {
 
             obj<AGCObject> expr_gco = expr.to_facet<AGCObject>();
 
-            this->expr_v_->push_back(gc, expr_gco);
+            this->expr_v_->push_back(mm, expr_gco);
         }
 
         void

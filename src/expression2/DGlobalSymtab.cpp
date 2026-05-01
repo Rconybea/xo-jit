@@ -111,7 +111,7 @@ namespace xo {
         {
             scope log(XO_DEBUG(false), std::string_view(*var->name()));
 
-            auto gc = mm.try_to_facet<ACollector>();
+            //auto gc = mm.try_to_facet<ACollector>();
 
             // It's possible there's already a global variable
             // with the same name.
@@ -136,7 +136,10 @@ namespace xo {
                 // replacing previous one
                 //
                 log && log("STUB: need write barrier");
-                (*vars_)[existing->path().j_slot()] = obj<AGCObject,DVariable>(var);
+                vars_->assign_at(mm,
+                                 existing->path().j_slot(),
+                                 obj<AGCObject,DVariable>(var));
+                //(*vars_)[existing->path().j_slot()] = obj<AGCObject,DVariable>(var);
             } else {
                 log && log("variable is new");
 
@@ -168,7 +171,7 @@ namespace xo {
                 // need slot# in .map_ for this unique symbol
                 (*var_map_)[var->name()] = binding.j_slot();
 
-                vars_->push_back(gc, obj<AGCObject,DVariable>(var));
+                vars_->push_back(mm, obj<AGCObject,DVariable>(var));
             }
         }
 
@@ -194,7 +197,7 @@ namespace xo {
             scope log(XO_DEBUG(true),
                       std::string_view(*tname->name()));
 
-            auto gc = mm.try_to_facet<ACollector>();
+            //auto gc = mm.try_to_facet<ACollector>();
 
             auto ix = type_map_->find(tname->name());
 
@@ -223,12 +226,12 @@ namespace xo {
                 (*type_map_)[tname->name()] = n;
 
                 log && log("STUB: need write barrier");
-                types_->push_back(gc, obj<AGCObject,DTypename>(tname));
+                types_->push_back(mm, obj<AGCObject,DTypename>(tname));
             } else {
                 Binding::slot_type i_slot = ix->second;
 
                 log && log("STUB: need write barrier");
-                types_->assign_at(gc, i_slot,
+                types_->assign_at(mm, i_slot,
                                   obj<AGCObject,DTypename>(tname));
             }
         }
