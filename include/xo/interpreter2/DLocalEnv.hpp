@@ -16,6 +16,7 @@ namespace xo {
         class DLocalEnv {
         public:
             using DArray = xo::scm::DArray;
+            using ACollector = xo::mm::ACollector;
             using AGCObject = xo::mm::AGCObject;
             using AGCObjectVisitor = xo::mm::AGCObjectVisitor;
             using VisitReason = xo::mm::VisitReason;
@@ -49,7 +50,7 @@ namespace xo {
             obj<AGCObject> lookup_value(Binding ix) const noexcept;
 
             /** assign value associated with binding @p ix to @p x **/
-            void assign_value(Binding ix, obj<AGCObject> x);
+            void assign_value(obj<AAllocator> mm, Binding ix, obj<AGCObject> x);
 
             ///@}
             /** @defgroup scm-localenv-gcobject-facet **/

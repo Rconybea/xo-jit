@@ -63,7 +63,9 @@ namespace xo {
         }
 
         void
-        DLocalEnv::assign_value(Binding ix, obj<AGCObject> x)
+        DLocalEnv::assign_value(obj<AAllocator> mm,
+                                Binding ix,
+                                obj<AGCObject> x)
         {
             scope log(XO_DEBUG(true));
 
@@ -79,8 +81,7 @@ namespace xo {
                 auto j = ix.j_slot();
 
                 if (j < static_cast<decltype(j)>(env->n_vars())) {
-                    log && log("STUB: need write barrier for GC here");
-                    (*(env->args_))[j] = x;
+                    env->args_->assign_at(mm, j, x);
                 } else {
                     assert(false);
                 }

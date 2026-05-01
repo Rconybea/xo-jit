@@ -821,9 +821,9 @@ namespace xo {
 
                 log && log(xtag("i_arg", i_arg), xtag("n_arg", args->size()), xtag("cap", args->capacity()));
 
-                auto gc = mm_.to_op().to_facet<ACollector>();
+                //auto gc = mm_.to_op().to_facet<ACollector>();
 
-                args->push_back(gc, value);
+                args->push_back(mm_.to_op(), value);
 
                 i_arg = evalargs_frame->increment_arg();
 
