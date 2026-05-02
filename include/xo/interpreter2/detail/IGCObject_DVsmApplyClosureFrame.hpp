@@ -43,7 +43,6 @@ namespace xo {
             ///@{
             using size_type = xo::mm::AGCObject::size_type;
             using AAllocator = xo::mm::AGCObject::AAllocator;
-            using ACollector = xo::mm::AGCObject::ACollector;
             using AGCObjectVisitor = xo::mm::AGCObject::AGCObjectVisitor;
             using VisitReason = xo::mm::AGCObject::VisitReason;
             using Copaque = xo::mm::AGCObject::Copaque;
