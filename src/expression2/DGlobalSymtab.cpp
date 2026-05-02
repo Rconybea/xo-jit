@@ -111,8 +111,6 @@ namespace xo {
         {
             scope log(XO_DEBUG(false), std::string_view(*var->name()));
 
-            //auto gc = mm.try_to_facet<ACollector>();
-
             // It's possible there's already a global variable
             // with the same name.
             //
@@ -196,8 +194,6 @@ namespace xo {
         {
             scope log(XO_DEBUG(true),
                       std::string_view(*tname->name()));
-
-            //auto gc = mm.try_to_facet<ACollector>();
 
             auto ix = type_map_->find(tname->name());
 

@@ -70,7 +70,6 @@ namespace xo {
 
                 DVariable * var = DVariable::make(mm, name, typeref, binding);
 
-                //auto gc = mm.try_to_facet<ACollector>();
                 vars_->push_back(mm, obj<AGCObject,DVariable>(var));
 
                 return binding;
@@ -89,7 +88,6 @@ namespace xo {
             } else {
                 obj<AGCObject> tname = DTypename::make(mm, name, type);
 
-                //auto gc = mm.try_to_facet<ACollector>();
                 types_->push_back(mm, tname);
             }
         }

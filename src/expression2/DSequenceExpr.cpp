@@ -72,9 +72,6 @@ namespace xo {
         DSequenceExpr::push_back(obj<AAllocator> mm,
                                  obj<AExpression> expr)
         {
-            // null gc -> no write barrier
-            //obj<ACollector> gc = mm.try_to_facet<ACollector>();
-
             if (expr_v_->size() == expr_v_->capacity()) {
                 /* reallocate+expand */
 
