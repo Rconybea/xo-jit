@@ -184,7 +184,7 @@ namespace xo {
                     if (this->end_) {
                         /* DExpectQListSsm owns {start_, end_} -> preserves acyclic property */
 
-                        end_->_assign_rest(new_last);
+                        end_->_assign_rest(p_psm->expr_alloc(), new_last);
 
                         this->end_ = new_last;
                     } else {
