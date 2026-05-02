@@ -75,7 +75,8 @@ namespace xo {
 
                 // establish the set of types that mm_ will be able to collect
 
-                CollectorTypeRegistry::instance().install_types(retval.to_op().to_facet<ACollector>());
+                CollectorTypeRegistry::instance().install_types
+                    (retval.to_op().to_facet<ACollector>());
 
                 return retval;
             }
@@ -820,8 +821,6 @@ namespace xo {
                 DArray * args = apply_frame->args();
 
                 log && log(xtag("i_arg", i_arg), xtag("n_arg", args->size()), xtag("cap", args->capacity()));
-
-                //auto gc = mm_.to_op().to_facet<ACollector>();
 
                 args->push_back(mm_.to_op(), value);
 
