@@ -9,10 +9,18 @@
  *       [iface_facet_any.hpp.j2]
  *  3. idl for facet methods
  *       [idl/SyntaxStateMachine.json5]
+ *
+ *  variables:
+ *    {facet_hpp_fname} -> SyntaxStateMachine.hpp
+ *    {impl_hpp_subdir} -> ssm
+ *    {facet_ns1} -> xo
+ *    {facet_detail_subdir} -> ssm
+ *    {abstract_facet_fname} -> ASyntaxStateMachine.hpp
  **/
 
 #pragma once
 
+#include "ASyntaxStateMachine.hpp"
 #include "ParserStateMachine.hpp"
 #include "syntaxstatetype.hpp"
 #include <xo/type/Type.hpp>
