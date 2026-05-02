@@ -9,10 +9,18 @@
  *       [iface_facet_any.hpp.j2]
  *  3. idl for facet methods
  *       [idl/SymbolTable.json5]
+ *
+ *  variables:
+ *    {facet_hpp_fname} -> SymbolTable.hpp
+ *    {impl_hpp_subdir} -> symtab
+ *    {facet_ns1} -> xo
+ *    {facet_detail_subdir} -> symtab
+ *    {abstract_facet_fname} -> ASymbolTable.hpp
  **/
 
 #pragma once
 
+#include "ASymbolTable.hpp"
 #include "Binding.hpp"
 #include "DUniqueString.hpp"
 

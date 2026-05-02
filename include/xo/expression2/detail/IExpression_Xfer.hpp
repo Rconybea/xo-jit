@@ -9,10 +9,18 @@
  *       [iface_facet_any.hpp.j2]
  *  3. idl for facet methods
  *       [idl/Expression.json5]
+ *
+ *  variables:
+ *    {facet_hpp_fname} -> Expression.hpp
+ *    {impl_hpp_subdir} -> detail
+ *    {facet_ns1} -> xo
+ *    {facet_detail_subdir} -> detail
+ *    {abstract_facet_fname} -> AExpression.hpp
  **/
 
 #pragma once
 
+#include "AExpression.hpp"
 #include "TypeRef.hpp"
 #include "exprtype.hpp"
 #include <xo/reflect/TypeDescr.hpp>
