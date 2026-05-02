@@ -233,7 +233,6 @@ namespace xo {
                 assert(expr_gco);
 
                 obj<AAllocator,DArena> mm(&(p_psm->parser_alloc()));
-                //auto gc = obj<AAllocator>(mm).try_to_facet<ACollector>();
 
                 if (args_expr_v_->size() == args_expr_v_->capacity()) {
                     // need to expand .args_expr_v_ capacity.

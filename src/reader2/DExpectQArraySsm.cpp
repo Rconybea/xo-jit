@@ -178,8 +178,6 @@ namespace xo {
         DExpectQArraySsm::on_quoted_literal(obj<AGCObject> lit,
                                            ParserStateMachine * p_psm)
         {
-            //auto gc = p_psm->expr_alloc().try_to_facet<ACollector>();
-
             if(state_.code() == QArrayXst::code::qarray_1a) {
                 // append lit at the end of array_
                 {

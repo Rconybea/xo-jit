@@ -85,8 +85,6 @@ namespace xo {
                 values_->resize(ix.j_slot() + 1);
             }
 
-            //auto gc = mm.try_to_facet<ACollector>();
-
             values_->assign_at(mm,
                                ix.j_slot(),
                                x);
