@@ -466,7 +466,7 @@ namespace xo {
         DDefineSsm::on_parsed_typedescr(TypeDescr td,
                                         ParserStateMachine * p_psm)
         {
-            scope log(XO_DEBUG(true), xtag("td", td));
+            scope log(XO_DEBUG(p_psm->debug_flag()), xtag("td", td));
 
             if (defstate_ == defexprstatetype::def_3) {
                 this->defstate_ = defexprstatetype::def_4;
