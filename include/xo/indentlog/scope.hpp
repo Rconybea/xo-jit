@@ -125,6 +125,20 @@ namespace xo {
     public:
         template <typename... Tn>
         basic_scope(scope_setup setup, Tn&&... rest);
+        basic_scope(basic_scope && other) noexcept
+            : dest_sbuf_{other.dest_sbuf_},
+              style_{other.style_},
+              name1_{other.name1_},
+              name2_{other.name2_},
+              file_{other.file_},
+              line_{other.line_},
+              finalized_{other.finalized_}
+        {
+            other.finalized_ = true;
+        }
+        basic_scope(const basic_scope &) = delete;
+        basic_scope & operator=(const basic_scope &) = delete;
+        basic_scope & operator=(basic_scope &&) = delete;
         ~basic_scope();
 
         bool enabled() const { return !finalized_; }
