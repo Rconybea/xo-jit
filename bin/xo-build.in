@@ -6,10 +6,12 @@ usage() {
     cat <<EOF
 $0 [-u|--usage|-h|--help]
     [--list] [-n|--dry-run] [--xoname=NAME]
-    [--repo|--clone|--configure|--build|--install]
+    [--repo|--add-umbrella-remote|--pull-umbrella-remote|--push-umbrella-remote]
+    [--clone|--configure|--build|--install]
     [--with-examples] [--with-utests] [--with-asm] [--debug-build]
     [--with-opengl=GLFLAG] [--with-vulkan=VKFLAG]
     [-S=SOURCEDIR] [-B=BUILDDIR]
+    NAME
 EOF
 }
 
@@ -26,7 +28,6 @@ Options:
   --list               list known xo libraries
   -n | --dry-run       dry-run: don't actually invoke state-changing commands
   --xoname=NAME        operate on xo subsystem NAME
-  --repo               report github repo for NAME
   --clone              git clone xo library NAME in current directory
   --configure          run cmake for xo library NAME in immediate subdir
                        Will use NAME/.build as build directory
@@ -45,13 +46,17 @@ Options:
   --with-opengl=GLFLAG in configure step, set -DXO_ENABLE_OPENGL=GLFLAG [ON]
   --with-vulkan=VKFLAG in configure step, set -DXO_ENABLE_VULKAN=VKFLAG [OFF]
 
+  --repo               report github repo for NAME
+  --add-umbrella-remote  (in umbrella sandbox) add remote for xo library NAME
+  --pull-umbrella-remote (in umbrella sandbox) pull satellite remote for xo library NAME
+  --push-umbrella-remote (in umbrella sandbox) push satellite remote for xo library NAME
+
 EOF
 }
 
 cmd=
 noop_flag=0
 xoname=
-repo_flag=0
 clone_flag=0
 configure_flag=0
 build_flag=0
@@ -66,6 +71,10 @@ with_asm=0
 debug_build=0
 with_opengl=
 with_vulkan=
+repo_flag=0
+add_umbrella_remote_flag=0
+pull_umbrella_remote_flag=0
+push_umbrella_remote_flag=0
 
 while [[ $# > 0 ]]; do
     case "$1" in
@@ -97,9 +106,6 @@ while [[ $# > 0 ]]; do
             ;;
         --xoname=*)
             xoname="${1#*=}"
-            ;;
-        --repo)
-            repo_flag=1
             ;;
         --clone)
             clone_flag=1
@@ -137,6 +143,18 @@ while [[ $# > 0 ]]; do
         --with-vulkan=*)
             with_vulkan="${1#*=}"
             ;;
+        --repo)
+            repo_flag=1
+            ;;
+        --add-umbrella-remote)
+            add_umbrella_remote_flag=1
+            ;;
+        --pull-umbrella-remote)
+            pull_umbrella_remote_flag=1
+            ;;
+        --push-umbrella-remote)
+            push_umbrella_remote_flag=1
+            ;;
         xo-*)
             xoname="$1"
             ;;
@@ -169,7 +187,12 @@ subsystem_list() {
     cat ${SUBSYSTEMLIST_FILE}
 }
 
-XO_REPO_STEM="https://github.com/Rconybea"
+XO_REPO_STEM=
+if [[ $(whoami) == "roland" ]]; then
+    XO_REPO_STEM="git@github.com:Rconybea"
+else
+    XO_REPO_STEM="https://github.com/Rconybea"
+fi
 
 printrepo() {
     xoname=$1
@@ -222,6 +245,52 @@ if [[ $repo_flag -eq 1 ]]; then
     fi
 fi
 
+if [[ $add_umbrella_remote_flag -eq 1 ]]; then
+    if [[ $clone_flag -eq 1 || $configure_flag -eq 1 || $build_flag -eq 1 || $build_docs_flag -eq 1 || $install_flag -eq 1 || $realclean_flag -eq 1 ]]; then
+        2>&1 echo "error: xo-build: repo operation --add-umbrella-remote conflicts with"
+        2>&1 echo "                 build operation --clone|--configure|--build|--build-docs|--install|--realclean"
+        exit 1
+    fi
+
+    if [[ -n "$xoname" ]]; then
+        url=$(printrepo $xoname)
+
+        cmd="git remote add $xoname $url"
+
+        if [[ $noop_flag -eq 1 ]]; then
+            echo $cmd
+        else
+            $cmd
+        fi
+    fi
+fi
+
+if [[ $pull_umbrella_remote_flag -eq 1 ]]; then
+    if [[ -n "$xoname" ]]; then
+        branch=$(git branch --show-current)
+        cmd="git subtree pull --prefix=$xoname $xoname ${branch}"
+
+        if [[ $noop_flag -eq 1 ]]; then
+            echo $cmd
+        else
+            $cmd
+        fi
+    fi
+fi
+
+if [[ $push_umbrella_remote_flag -eq 1 ]]; then
+    if [[ -n "$xoname" ]]; then
+        branch=$(git branch --show-current)
+        cmd="git subtree push --prefix=$xoname $xoname ${branch}"
+
+        if [[ $noop_flag -eq 1 ]]; then
+            echo $cmd
+        else
+            $cmd
+        fi
+    fi
+fi
+
 if [[ $clone_flag -eq 1 ]]; then
     if [[ -n "$xoname" ]]; then
         url=$(printrepo $xoname)
@@ -243,6 +312,7 @@ if [[ $configure_flag -eq 1 ]]; then
             testingarg="-DENABLE_TESTING=1"
         fi
 
+        asmarg=
         if [[ $with_asm -eq 1 ]]; then
             asmarg="-DENABLE_ASM=1"
         fi
