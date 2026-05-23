@@ -277,8 +277,8 @@ fi
 
 if [[ $split_umbrella_remote_flag -eq 1 ]]; then
     if [[ -n "$xoname" ]]; then
-        branch=$(git branch --show-current)
-        cmd="git subtree split --rejoin --prefix=$xoname $xoname ${branch}"
+        #branch=$(git branch --show-current)
+        cmd="git subtree split --rejoin --prefix=$xoname"
 
         if [[ $noop_flag -eq 1 ]]; then
             echo $cmd
