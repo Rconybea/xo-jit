@@ -6,7 +6,11 @@ usage() {
     cat <<EOF
 $0 [-u|--usage|-h|--help]
     [--list] [-n|--dry-run] [--xoname=NAME]
-    [--repo|--add-umbrella-remote|--pull-umbrella-remote|--push-umbrella-remote]
+    [--repo
+     |--add-umbrella-remote
+     |--split-umbrella-remote
+     |--pull-umbrella-remote
+     |--push-umbrella-remote]
     [--clone|--configure|--build|--install]
     [--with-examples] [--with-utests] [--with-asm] [--debug-build]
     [--with-opengl=GLFLAG] [--with-vulkan=VKFLAG]
@@ -23,33 +27,35 @@ help() {
 fetch and/or build xo component libraries
 
 Options:
-  -u | --usage         brief help message
-  -h | --help          this help message
-  --list               list known xo libraries
-  -n | --dry-run       dry-run: don't actually invoke state-changing commands
-  --xoname=NAME        operate on xo subsystem NAME
-  --clone              git clone xo library NAME in current directory
-  --configure          run cmake for xo library NAME in immediate subdir
-                       Will use NAME/.build as build directory
-  --build              run cmake build for xo library NAME in immediate subdir
-  --build-docs         build documentation for xo library NAME in immediate subdir
-  --install            run cmake install for xo library NAME in immediate subdir
-  --realclean          nuke build directory
+  -u | --usage            brief help message
+  -h | --help             this help message
+  --list                  list known xo libraries
+  -n | --dry-run          dry-run: don't actually invoke state-changing commands
+  --xoname=NAME           operate on xo subsystem NAME
+  --clone                 git clone xo library NAME in current directory
+  --configure             run cmake for xo library NAME in immediate subdir
+                          Will use NAME/.build as build directory
+  --build                 run cmake build for xo library NAME in immediate subdir
+  --build-docs            build documentation for xo library NAME in immediate subdir
+  --install               run cmake install for xo library NAME in immediate subdir
+  --realclean             nuke build directory
 
-  -S=SOURCEDIR         override path/to/source
-  -B=BUILDDIR          override path/to/build
+  -S=SOURCEDIR            override path/to/source
+  -B=BUILDDIR             override path/to/build
 
-  --with-examples      in configure step, set -DXO_ENABLE_EXAMPLES=1
-  --with-utests        in configure step, set -DENABLE_TESTING=1
-  --with-asm           in configure step, set -DXO_ENABLE_ASM=1
-  --debug-build        in configure step, set -DCMAKE_BUILD_TYPE=Debug
-  --with-opengl=GLFLAG in configure step, set -DXO_ENABLE_OPENGL=GLFLAG [ON]
-  --with-vulkan=VKFLAG in configure step, set -DXO_ENABLE_VULKAN=VKFLAG [OFF]
+  --with-examples         in configure step, set -DXO_ENABLE_EXAMPLES=1
+  --with-utests           in configure step, set -DENABLE_TESTING=1
+  --with-asm              in configure step, set -DXO_ENABLE_ASM=1
+  --debug-build           in configure step, set -DCMAKE_BUILD_TYPE=Debug
+  --with-opengl=GLFLAG    in configure step, set -DXO_ENABLE_OPENGL=GLFLAG [ON]
+  --with-vulkan=VKFLAG    in configure step, set -DXO_ENABLE_VULKAN=VKFLAG [OFF]
 
-  --repo               report github repo for NAME
-  --add-umbrella-remote  (in umbrella sandbox) add remote for xo library NAME
-  --pull-umbrella-remote (in umbrella sandbox) pull satellite remote for xo library NAME
-  --push-umbrella-remote (in umbrella sandbox) push satellite remote for xo library NAME
+  --repo                  report github repo for NAME
+
+  --add-umbrella-remote   (in umbrella sandbox) add remote for xo library NAME
+  --split-umbrella-remote (in umbrella sandbox) generate split branch for xo library NAME
+  --pull-umbrella-remote  (in umbrella sandbox) pull satellite remote for xo library NAME
+  --push-umbrella-remote  (in umbrella sandbox) push satellite remote for xo library NAME
 
 EOF
 }
@@ -73,6 +79,7 @@ with_opengl=
 with_vulkan=
 repo_flag=0
 add_umbrella_remote_flag=0
+split_umbrella_remote_flag=0
 pull_umbrella_remote_flag=0
 push_umbrella_remote_flag=0
 
@@ -148,6 +155,9 @@ while [[ $# > 0 ]]; do
             ;;
         --add-umbrella-remote)
             add_umbrella_remote_flag=1
+            ;;
+        --split-umbrella-remote)
+            split_umbrella_remote_flag=1
             ;;
         --pull-umbrella-remote)
             pull_umbrella_remote_flag=1
@@ -256,6 +266,19 @@ if [[ $add_umbrella_remote_flag -eq 1 ]]; then
         url=$(printrepo $xoname)
 
         cmd="git remote add $xoname $url"
+
+        if [[ $noop_flag -eq 1 ]]; then
+            echo $cmd
+        else
+            $cmd
+        fi
+    fi
+fi
+
+if [[ $split_umbrella_remote_flag -eq 1 ]]; then
+    if [[ -n "$xoname" ]]; then
+        branch=$(git branch --show-current)
+        cmd="git subtree split --rejoin --prefix=$xoname $xoname ${branch}"
 
         if [[ $noop_flag -eq 1 ]]; then
             echo $cmd
