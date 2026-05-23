@@ -291,7 +291,7 @@ fi
 if [[ $pull_umbrella_remote_flag -eq 1 ]]; then
     if [[ -n "$xoname" ]]; then
         branch=$(git branch --show-current)
-        cmd="git subtree pull --prefix=$xoname $xoname ${branch}"
+        cmd="git subtree pull --rejoin --prefix=$xoname $xoname ${branch}"
 
         if [[ $noop_flag -eq 1 ]]; then
             echo $cmd
@@ -304,7 +304,7 @@ fi
 if [[ $push_umbrella_remote_flag -eq 1 ]]; then
     if [[ -n "$xoname" ]]; then
         branch=$(git branch --show-current)
-        cmd="git subtree push --prefix=$xoname $xoname ${branch}"
+        cmd="git subtree push --rejoin --prefix=$xoname $xoname ${branch}"
 
         if [[ $noop_flag -eq 1 ]]; then
             echo $cmd
