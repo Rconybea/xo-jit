@@ -1,9 +1,9 @@
 xo-cmake
+xo-subsys
 xo-indentlog
 xo-alloc
 xo-object
 xo-refcnt
-xo-subsys
 xo-testutil
 xo-randomgen
 xo-ordinaltree
