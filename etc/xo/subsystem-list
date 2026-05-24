@@ -5,6 +5,7 @@ xo-randomgen
 xo-flatstring
 xo-reflectutil
 xo-arena
+xo-facet
 xo-alloc
 xo-object
 xo-refcnt
