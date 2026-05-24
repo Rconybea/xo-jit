@@ -3,13 +3,14 @@ xo-subsys
 xo-indentlog
 xo-randomgen
 xo-flatstring
+xo-reflectutil
+xo-arena
 xo-alloc
 xo-object
 xo-refcnt
 xo-testutil
 xo-ordinaltree
 xo-pyutil
-xo-reflectutil
 xo-reflect
 xo-pyreflect
 xo-ratio
