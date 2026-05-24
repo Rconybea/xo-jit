@@ -7,6 +7,7 @@ xo-reflectutil
 xo-arena
 xo-facet
 xo-testutil
+xo-alloc2
 xo-alloc
 xo-object
 xo-refcnt
