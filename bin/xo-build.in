@@ -218,6 +218,9 @@ printrepo() {
         xo-subsys)
             echo "${XO_REPO_STEM}/subsys.git"
             ;;
+        xo-randomgen)
+            echo "${XO_REPO_STEM}/randomgen.git"
+            ;;
         xo-reflect)
             echo "${XO_REPO_STEM}/reflect.git"
             ;;
