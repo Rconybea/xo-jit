@@ -1,12 +1,12 @@
 xo-cmake
 xo-subsys
 xo-indentlog
+xo-randomgen
 xo-flatstring
 xo-alloc
 xo-object
 xo-refcnt
 xo-testutil
-xo-randomgen
 xo-ordinaltree
 xo-pyutil
 xo-reflectutil
