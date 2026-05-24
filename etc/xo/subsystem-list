@@ -6,10 +6,10 @@ xo-flatstring
 xo-reflectutil
 xo-arena
 xo-facet
+xo-testutil
 xo-alloc
 xo-object
 xo-refcnt
-xo-testutil
 xo-ordinaltree
 xo-pyutil
 xo-reflect
