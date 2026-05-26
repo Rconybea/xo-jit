@@ -329,7 +329,7 @@ if [[ $clone_flag -eq 1 ]]; then
     if [[ -n "$xoname" ]]; then
         url=$(printrepo $xoname)
 
-        cmd="git clone $url"
+        cmd="git clone $url $xoname"
 
         if [[ $noop_flag -eq 1 ]]; then
             echo $cmd
