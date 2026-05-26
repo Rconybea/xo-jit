@@ -6,6 +6,7 @@ xo-flatstring
 xo-reflectutil
 xo-arena
 xo-facet
+xo-printable2
 xo-testutil
 xo-alloc2
 xo-gc
