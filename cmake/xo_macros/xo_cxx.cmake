@@ -1855,7 +1855,7 @@ function(xo_add_genfacetimpl)
         # dependency (e.g. in a standalone nix build).
         #
         if(NOT TARGET share_${GF_FACET_PKG})
-            message(FATAL_ERROR "xo_add_genfacetimpl: share_${GF_FACET_PKG} not available; skipping ${GF_TARGET}")
+            message(STATUS "xo_add_genfacetimpl: share_${GF_FACET_PKG} not available; skipping ${GF_TARGET}")
             return()
         endif()
         get_target_property(_facet_dir share_${GF_FACET_PKG} path)
