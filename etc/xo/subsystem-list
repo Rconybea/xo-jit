@@ -8,6 +8,7 @@ xo-arena
 xo-facet
 xo-testutil
 xo-alloc2
+xo-gc
 xo-alloc
 xo-object
 xo-refcnt
