@@ -15,6 +15,7 @@ xo-stringtable2
 xo-object2
 xo-gc
 xo-type
+xo-allocutil
 xo-alloc
 xo-object
 xo-ordinaltree
