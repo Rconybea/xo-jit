@@ -52,3 +52,8 @@ xo-process
 xo-pyprocess
 xo-kalmanfilter
 xo-pykalmanfilter
+xo-imgui
+xo-interpreter
+xo-interpreter2
+xo-reader2
+xo-symboltable
