@@ -19,6 +19,7 @@ xo-gc
 xo-type
 xo-procedure2
 xo-numeric
+xo-tokenizer2
 xo-allocutil
 xo-alloc
 xo-object
