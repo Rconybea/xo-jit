@@ -18,6 +18,7 @@ xo-object2
 xo-gc
 xo-type
 xo-procedure2
+xo-numeric
 xo-allocutil
 xo-alloc
 xo-object
