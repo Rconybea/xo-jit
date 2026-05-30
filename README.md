@@ -1,1 +1,1 @@
-# xo-numierc
+# xo-numeric
