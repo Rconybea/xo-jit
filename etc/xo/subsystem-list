@@ -10,7 +10,9 @@ xo-printable2
 xo-testutil
 xo-alloc2
 xo-refcnt
+xo-pyutil
 xo-reflect
+xo-pyreflect
 xo-stringtable2
 xo-object2
 xo-gc
@@ -20,8 +22,6 @@ xo-allocutil
 xo-alloc
 xo-object
 xo-ordinaltree
-xo-pyutil
-xo-pyreflect
 xo-ratio
 xo-unit
 xo-pyunit
