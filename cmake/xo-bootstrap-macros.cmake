@@ -19,7 +19,13 @@ endif()
 
 message(STATUS "XO_CMAKE_CONFIG_EXECUTABLE=${XO_CMAKE_CONFIG_EXECUTABLE}")
 
-if (NOT XO_SUBMODULE_BUILD)
+if (XO_SUBMODULE_BUILD)
+    if (("${CMAKE_MODULE_PATH}" STREQUAL "") OR ("${CMAKE_MODULE_PATH}" STREQUAL prefix))
+        # local version of xo-cmake macros
+        set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/xo-cmake/cmake")
+        message(STATUS "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
+    endif()
+else()
     if (("${CMAKE_MODULE_PATH}" STREQUAL "") OR ("${CMAKE_MODULE_PATH}" STREQUAL prefix))
         # default to typical install location for xo-project-macros
         execute_process(COMMAND ${XO_CMAKE_CONFIG_EXECUTABLE} --cmake-module-path OUTPUT_VARIABLE CMAKE_MODULE_PATH)
