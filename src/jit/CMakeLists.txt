@@ -43,7 +43,8 @@ execute_process(
 
 message(STATUS "LLVM_LIBS=[${LLVM_LIBS}]")
 
-target_include_directories(${SELF_LIB} PUBLIC ${LLVM_INCLUDE_DIRS})
+# SYSTEM: suppress warnings from LLVM headers (e.g. gcc14 false positive in SmallDenseMap)
+target_include_directories(${SELF_LIB} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_compile_definitions(${SELF_LIB} PUBLIC ${LLVM_DEFINITIONS_LIST})
 target_link_directories(${SELF_LIB} PUBLIC ${LLVM_LIBRARY_DIR})
 target_link_libraries(${SELF_LIB} PUBLIC ${LLVM_LIBS})
