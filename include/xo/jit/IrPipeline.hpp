@@ -10,7 +10,9 @@
 
 /* stuff from kaleidoscope.cpp */
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+# pragma GCC diagnostic ignored "-Wunused-parameter"
+# pragma GCC diagnostic ignored "-Wcpp"
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 # include "llvm/ADT/APFloat.h"
 # include "llvm/ADT/STLExtras.h"
 # include "llvm/IR/BasicBlock.h"
@@ -29,10 +31,7 @@
 # include "llvm/Target/TargetMachine.h"
 # include "llvm/Transforms/InstCombine/InstCombine.h"
 # include "llvm/Transforms/Scalar.h"
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 # include "llvm/Transforms/Scalar/GVN.h"
-# pragma GCC diagnostic pop
 # include "llvm/Transforms/Utils/Mem2Reg.h"
 # include "llvm/Transforms/Scalar/Reassociate.h"
 # include "llvm/Transforms/Scalar/SimplifyCFG.h"
