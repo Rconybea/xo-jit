@@ -195,7 +195,7 @@ namespace xo {
 
                     bool ok = array_->push_back(p_psm->expr_alloc(), lit);
 
-                    assert(ok);
+                    if (!ok) assert(false);
                 }
 
                 // start syntax to receive next literal

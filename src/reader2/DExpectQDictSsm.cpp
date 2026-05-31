@@ -243,7 +243,7 @@ namespace xo {
 
                 this->key_ = nullptr;
 
-                assert(ok);
+                if (!ok) assert(false);
 
                 return;
             }

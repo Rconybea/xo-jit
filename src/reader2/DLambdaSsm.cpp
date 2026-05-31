@@ -311,7 +311,7 @@ namespace xo {
                                                    param_var.data()->name(),
                                                    param_var.data()->typeref());
 
-                    assert(b.is_local());
+                    if (!b.is_local()) assert(false);
 
                     this->local_symtab_ = symtab;
                 }
