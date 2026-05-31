@@ -55,7 +55,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-gcobject-vsmapplyframe
     FACET_PKG xo_alloc2
-#    REPR VsmApplyFrame
     INPUT idl/IGCObject_DVsmApplyFrame.json5
 )
 
@@ -63,7 +62,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-printable-vsmapplyframe
     FACET_PKG xo_printable2
-#    REPR VsmApplyFrame
     INPUT idl/IPrintable_DVsmApplyFrame.json5
 )
 
@@ -73,7 +71,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-gcobject-vsmevalargsframe
     FACET_PKG xo_alloc2
-#    REPR VsmEvalArgsFrame
     INPUT idl/IGCObject_DVsmEvalArgsFrame.json5
 )
 
@@ -81,7 +78,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-printable-vsmevalargsframe
     FACET_PKG xo_printable2
-#    REPR DVsmEvalArgsFrame
     INPUT idl/IPrintable_DVsmEvalArgsFrame.json5
 )
 
@@ -91,7 +87,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-gcobject-vsmapplyclosureframe
     FACET_PKG xo_alloc2
-#    REPR VsmApplyClosureFrame
     INPUT idl/IGCObject_DVsmApplyClosureFrame.json5
 )
 
@@ -99,7 +94,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-printable-vsmapplyclosureframe
     FACET_PKG xo_printable2
-#    REPR DVsmApplyClosureFrame
     INPUT idl/IPrintable_DVsmApplyClosureFrame.json5
 )
 
@@ -109,7 +103,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-gcobject-vsmifelsecontframe
     FACET_PKG xo_alloc2
-#    REPR VsmIfElseContFrame
     INPUT idl/IGCObject_DVsmIfElseContFrame.json5
 )
 
@@ -117,7 +110,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-printable-vsmifelsecontframe
     FACET_PKG xo_printable2
-#    REPR VsmIfElseContFrame
     INPUT idl/IPrintable_DVsmIfElseContFrame.json5
 )
 
@@ -127,7 +119,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-gcobject-vsmseqcontframe
     FACET_PKG xo_alloc2
-#    REPR VsmSeqContFrame
     INPUT idl/IGCObject_DVsmSeqContFrame.json5
 )
 
@@ -135,7 +126,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-printable-vsmseqcontframe
     FACET_PKG xo_printable2
-#    REPR DVsmSeqContFrame
     INPUT idl/IPrintable_DVsmSeqContFrame.json5
 )
 
@@ -154,7 +144,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-gcobject-closure
     FACET_PKG xo_alloc2
-#    REPR Closure
     INPUT idl/IGCObject_DClosure.json5
 )
 
@@ -162,7 +151,6 @@ xo_add_genfacetimpl(
 xo_add_genfacetimpl(
     TARGET xo-interpreter2-facetimpl-printable-closure
     FACET_PKG xo_printable2
-#    REPR Closure
     INPUT idl/IPrintable_DClosure.json5
 )
 
